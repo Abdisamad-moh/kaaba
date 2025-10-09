@@ -1,0 +1,54 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}
+Contact us
+{% endblock %}
+
+{% block body %}
+
+	<div class="container-fluid" data-controller="employer">
+
+		<div class="container">
+
+			<div class="row">
+				<div class="col-12"></div>
+				<div class="col-md-6"></div>
+				<div class="col-md-6">
+					<div class="form-group"></div>
+				</div>
+			</div>
+
+
+		</div>
+		
+		<div
+
+			class="datatables">
+			<!-- start File export -->
+			<div class="card">
+				<div class="card-body">
+				<div class="row">
+						<div class="col-12  text-center">
+							<h5>Contact Form</h5>
+							{% if form_message == 'success' %}
+							<div class="alert alert-success" role="alert">Thank you for connecting with us</div>
+							{% elseif form_message == null %}
+
+							{% else %}
+							<div class="alert alert-danger" role="alert"> {{ form_message == 'error' ? 'Sorry, Something went wrong. Please try again' : form_message }}</div>
+							{% endif %}
+						</div>
+						<div class="col-12">
+							{% include 'home/contact_form.html.twig' with { form: form, site_key: site_key } %}
+							{# <div data-controller="contact-form" data-contact-form-url-value="{{ path('app_contact_form') }}" data-contact-form-key-value="{{ site_key }}">
+								<div class="alert_message"></div>
+								<div class="form_container"></div>
+							</div> #}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- end File export -->
+	</div>
+</div>{% endblock %}

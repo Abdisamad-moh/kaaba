@@ -1,0 +1,909 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Reports!
+{% endblock %}
+{# {% block stylesheets %}
+	<style>
+
+		.left-menus hr {
+			margin: 0 !important;
+		}
+	</style>
+{% endblock %} #}
+{% block body %}
+	<div class="main-content">
+		<div class="page-content">
+			<section class="bg-homelogin" id="home">
+				<div class="container-fluid">
+					<div class="row align-items-center">
+						<div class="col-lg-12">
+							<div class="mb-2 pb-1 me-lg-6 text-center">
+								<h1 class="display-5 fw-semibold mb-3 mt-3 fs-22">Reports and Activities
+								</h1>
+								<p class="lead text-muted mb-0 pc-da">You can use this platform to interact with employers</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="section">
+				<div class="container-fluid">
+					<div class="row">
+						<div class="col-lg-3">
+							<div
+								class="section-title   d-lg-block ui-elements-bar card notification-wrapper dropdown-scroll insidese left-menu">
+								{# <div class="p-4 border-bottom">
+																																									<h5 class="mb-0 text-purple">Settings</h5>
+																																								</div> #}
+								<div class="process-menu nav flex-column nav-pills  dropdown-scroll" class="" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+									<a class=" active text-dark notification-item d-block mt-3 " id="v-pills-home-tab" data-bs-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">
+										<div class="  d-flex align-items-center rounded-3">
+											<div class="boxlogoiconj">
+												<img class="img-fluid" src="assets/images/se1.png" alt=""></div>
+											<div class="flex-grow-1 ms-3">
+												<h6 class="fs-15  sufont">Applied Jobs</h6>
+												{# <p class="texthead mt-1">Contact Information & Password</p> #}
+											</div>
+										</div>
+									</a>
+
+									<hr>
+
+									<a class=" text-dark notification-item d-block" id="v-pills-profile-tab" data-bs-toggle="pill" href="#v-pills-profile" role="tab" aria-controls="v-pills-profile" aria-selected="false" tabindex="-1">
+										<div class="  d-flex align-items-center rounded-3">
+											<div class="boxlogoiconj">
+												<img class="img-fluid" src="assets/images/jo-1.png" alt=""></div>
+											<div class="flex-grow-1 ms-3">
+												<h6 class="fs-15  sufont">Saved Jobs</h6>
+												{# <p class="texthead mt-1">Subcription plan & billing details</p> #}
+											</div>
+										</div>
+									</a>
+									<hr>
+									<a class=" text-dark notification-item d-block" id="v-billdownloads-tab" data-bs-toggle="pill" href="#downloads-tab" role="tab" aria-controls="v-pills-profile" aria-selected="false" tabindex="-1">
+										<div class="  d-flex align-items-center rounded-3">
+											<div class="boxlogoiconj">
+												<img class="img-fluid" src="assets/images/jo-1.png" alt=""></div>
+											<div class="flex-grow-1 ms-3">
+												<h6 class="fs-15  sufont">Shortlisted</h6>
+												{# <p class="texthead mt-1">Purchased items to download</p> #}
+											</div>
+										</div>
+									</a>
+									<hr>
+									<a class=" text-dark notification-item d-block" id="v-billinterviews-tab" data-bs-toggle="pill" href="#interviews-tab" role="tab" aria-controls="v-pills-profile" aria-selected="false" tabindex="-1">
+										<div class="  d-flex align-items-center rounded-3">
+											<div class="boxlogoiconj">
+												<img class="img-fluid" src="assets/images/jo-1.png" alt=""></div>
+											<div class="flex-grow-1 ms-3">
+												<h6 class="fs-15  sufont">Scheduled Interviews</h6>
+												{# <p class="texthead mt-1">Purchased items to download</p> #}
+											</div>
+										</div>
+									</a>
+									<hr>
+									<a class=" text-dark notification-item d-block" id="v-billjobOffersTab" data-bs-toggle="pill" href="#jobOffersTab" role="tab" aria-controls="v-pills-profile" aria-selected="false" tabindex="-1">
+										<div class="  d-flex align-items-center rounded-3">
+											<div class="boxlogoiconj">
+												<img class="img-fluid" src="assets/images/jo-1.png" alt=""></div>
+											<div class="flex-grow-1 ms-3">
+												<h6 class="fs-15  sufont">Job Offers</h6>
+												{# <p class="texthead mt-1">Purchased items to download</p> #}
+											</div>
+										</div>
+									</a>
+									<hr>
+
+									<a class=" text-dark notification-item d-block" id="v-billrejected-tab" data-bs-toggle="pill" href="#rejected-tab" role="tab" aria-controls="v-pills-profile" aria-selected="false" tabindex="-1">
+										<div class="  d-flex align-items-center rounded-3">
+											<div class="boxlogoiconj">
+												<img class="img-fluid" src="assets/images/jo-1.png" alt=""></div>
+											<div class="flex-grow-1 ms-3">
+												<h6 class="fs-15  sufont">Rejected Applications</h6>
+												{# <p class="texthead mt-1">Purchased items to download</p> #}
+											</div>
+										</div>
+									</a>
+									<hr>
+									<a class=" text-dark notification-item d-block" id="v-billinternaljobs-tab" data-bs-toggle="pill" href="#internaljobs-tab" role="tab" aria-controls="v-pills-profile" aria-selected="false" tabindex="-1">
+										<div class="  d-flex align-items-center rounded-3">
+											<div class="boxlogoiconj">
+												<img class="img-fluid" src="assets/images/jo-1.png" alt=""></div>
+											<div class="flex-grow-1 ms-3">
+												<h6 class="fs-15  sufont">Internal/Private Jobs</h6>
+												{# <p class="texthead mt-1">Purchased items to download</p> #}
+											</div>
+										</div>
+									</a>
+									<hr>
+
+									<a class=" text-dark notification-item d-block" id="v-billviewed-tab" data-bs-toggle="pill" href="#viewed-tab" role="tab" aria-controls="v-pills-profile" aria-selected="false" tabindex="-1">
+										<div class="  d-flex align-items-center rounded-3">
+											<div class="boxlogoiconj">
+												<img class="img-fluid" src="assets/images/jo-1.png" alt=""></div>
+											<div class="flex-grow-1 ms-3">
+												<h6 class="fs-15  sufont">Profile Viewed</h6>
+												{# <p class="texthead mt-1">Purchased items to download</p> #}
+											</div>
+										</div>
+									</a>
+								</div>
+							</div>
+						</div>
+						<!--end col-->
+
+						<div class="col-lg-9">
+							<div class="d-lg-block ui-elements-bar card">
+								<div class="tab-content" id="v-pills-tabContent">
+									<div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
+										<div class="p-4 border-bottom">
+											<h5 class="mb-0 text-purple">Applied Jobs</h5>
+										</div>
+										<div class="row">
+											<div class="col-12">
+												<div class="ss">
+													<div class="ss-body  p-4">
+														<div class="d-flex justify-content-between align-items-center gap-6 mb-9">
+
+															<a class="fs-6 text-muted" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Filter list">
+																<i class="ti ti-filter"></i>
+															</a>
+														</div>
+														<div class="table-responsive border rounded  mb-8">
+															{% set now = "now"|date("Y-m-d H:i:s") %}
+															{# Get the current datetime #}
+															<table class="table align-middle text-nowrap mb-0">
+																<thead>
+																	<tr>
+																		<th scope="col">Job Title</th>
+																		<th scope="col">Posted By</th>
+																		<th>Applied At</th>
+																		<th scope="col">Closing Date</th>
+																		<th scope="col">Action</th>
+																	</tr>
+																</thead>
+																<tbody>
+																	{# {% for application in app.user.jobApplications|filter(application => application.job.applicationClosingDate > now) %} #}
+																	{% if app.user.jobApplications %}
+
+																		{% for application in app.user.jobApplications %}
+																			<tr>
+																				{# <td>{{ application.job.title ?? '' }}</td> #}
+																				<td>{{ application.job.title ?? '' }}</td>
+																				<td>
+																					<a class="text-primary" href="{{ path('app_home_single_company', {detail: application.job.employer.id}) }}">{{ application.job.employer.name }}</a>
+																				</td>
+																				<td>{{ application.createdAt|date('Y-m-d') }}</td>
+																				<td>{{ application.job ? application.job.applicationClosingDate|date('Y-m-d') : "" }}</td>
+																				<td>
+																					{% if application.job %}
+																						<a href="{{ path('job_seeker_job_details', {'slug': application.job.title|slugify, 'uuid': application.job.uuid }) }}" class="btn btn-info">View</a>
+																					{% endif %}
+																				</td>
+																			</tr>
+																		{% endfor %}
+																	{% endif %}
+
+																	{% if app.user.jobApplications|length < 1 %}
+																		<tr>
+																			<td colspan="4" class="fw-bold text-center">No date</td>
+																		</tr>
+																	{% endif %}
+																</tbody>
+															</table>
+														</div>
+
+													</div>
+												</div>
+											</div>
+										</div>
+
+
+									</div>
+									<div class="tab-pane fade" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+										<div class="p-4 border-bottom">
+											<h5 class="mb-0 text-purple">Saved Jobs</h5>
+										</div>
+										<div class="row">
+											<div class="col-12">
+												<div class="ss">
+													<div class="ss-body  p-4">
+														<div class="d-flex justify-content-between align-items-center gap-6 mb-9">
+
+															<a class="fs-6 text-muted" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Filter list">
+																<i class="ti ti-filter"></i>
+															</a>
+														</div>
+														<div class="table-responsive border rounded  mb-8">
+															{% set now = "now"|date("Y-m-d H:i:s") %}
+															{# Get the current datetime #}
+															<table class="table align-middle text-nowrap mb-0">
+																<thead>
+																	<tr>
+																		<th scope="col">Job Title</th>
+																		<th scope="col">Posted By</th>
+																		<th scope="col">Closing Date</th>
+																		<th scope="col">Action</th>
+																	</tr>
+																</thead>
+																<tbody>
+																	{% for saved_job in app.user.jobSeekerSavedJobs %}
+																		{# {% for saved_job in app.user.jobSeekerSavedJobs|filter(savedJob => savedJob.job.applicationClosingDate > now) %} #}
+																		<tr>
+																			<td>{{ saved_job.job.title ?? '' }}</td>
+																			<td>
+																				<a class="text-primary" href="{{ path('app_home_single_company', {detail: saved_job.job.employer.id}) }}">{{ saved_job.job.employer.name }}</a>
+																			</td>
+																			<td>{{ saved_job.job.applicationClosingDate|date('Y-m-d') }}</td>
+																			<td>
+																				<a href="{{ path('job_seeker_job_details', {'slug': saved_job.job.title|slugify, 'uuid': saved_job.job.uuid }) }}" class="btn btn-info">View</a>
+																			</td>
+																		</tr>
+																	{% endfor %}
+																	{# {% if app.user.jobSeekerSavedJobs|filter(savedJob => savedJob.job.applicationClosingDate > now)|length < 1 %} #}
+																	{% if app.user.jobSeekerSavedJobs|length < 1 %}
+																		<tr>
+																			<td colspan="4" class="fw-bold text-center">No date</td>
+																		</tr>
+																	{% endif %}
+																</tbody>
+															</table>
+														</div>
+
+													</div>
+												</div>
+											</div>
+										</div>
+
+
+										<!-- ----------------------------- -->
+
+										<!-- ----------------------------- -->
+									</div>
+									<div class="tab-pane fade" id="v-pills-jobs" role="tabpanel" aria-labelledby="v-pills-jobs-tab">
+										<div class="p-4 border-bottom">
+											<h5 class="mb-0 text-purple">Job Settings</h5>
+										</div>
+										<div class="p-4 border-bottom row">
+											<div class="col-lg-10">
+												<div class="flex-grow-1">
+													<h6 class="fs-15  sufont">Daily job feed email</h6>
+													<p class="texthead mt-1">Get emails about new jobs based on your preferences, profile and activity on Indeed</p>
+												</div>
+											</div>
+											<div class="col-lg-2">
+												<div class="flex-grow-1 text-md-end">
+													<label class="switch">
+														<input type="checkbox" checked>
+														<span class="sliders round"></span>
+													</label>
+												</div>
+											</div>
+										</div>
+										<div class="p-4 border-bottom row">
+											<div class="col-lg-10">
+												<div class="flex-grow-1">
+													<h6 class="fs-15  sufont">Company email alerts</h6>
+													<p class="texthead mt-1">Get company updates, reviews and new job postings when they become available</p>
+												</div>
+											</div>
+											<div class="col-lg-2">
+												<div class="flex-grow-1 text-md-end">
+													<label class="switch">
+														<input type="checkbox" checked>
+														<span class="sliders round"></span>
+													</label>
+												</div>
+											</div>
+										</div>
+										<div class="p-4 border-bottom row">
+											<div class="col-lg-10">
+												<div class="flex-grow-1">
+													<h6 class="fs-15  sufont">Resume visibility</h6>
+													<p class="texthead mt-1">Control the visibility of your resume to potential employers and recruiters</p>
+												</div>
+											</div>
+											<div class="col-lg-2">
+												<div class="flex-grow-1 text-md-end">
+													<label class="switch">
+														<input type="checkbox" checked>
+														<span class="sliders round"></span>
+													</label>
+												</div>
+											</div>
+										</div>
+										<div class="p-4 border-bottom row">
+											<div class="col-lg-10">
+												<div class="flex-grow-1">
+													<h6 class="fs-15  sufont">Recommended Jobs</h6>
+													<p class="texthead mt-1">Targeted job recommendations based on your CV and activity</p>
+												</div>
+											</div>
+											<div class="col-lg-2">
+												<div class="flex-grow-1 text-md-end">
+													<label class="switch">
+														<input type="checkbox" checked>
+														<span class="sliders round"></span>
+													</label>
+												</div>
+											</div>
+										</div>
+										<div class="p-4 border-bottom row">
+											<div class="col-lg-10">
+												<div class="flex-grow-1">
+													<h6 class="fs-15  sufont">Profile Public</h6>
+													<p class="texthead mt-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+													</p>
+												</div>
+											</div>
+											<div class="col-lg-2">
+												<div class="flex-grow-1 text-md-end">
+													<label class="switch">
+														<input type="checkbox" checked>
+														<span class="sliders round"></span>
+													</label>
+												</div>
+											</div>
+										</div>
+
+										<!-- ----------------------------- -->
+
+										<!-- ----------------------------- -->
+									</div>
+									<div class="tab-pane fade" id="downloads-tab" role="tabpanel" aria-labelledby="v-billdownloads-tab">
+										<div class="p-4 border-bottom">
+											<h5 class="mb-0 text-purple">Shortlisted Jobs</h5>
+										</div>
+										<div class="row">
+											<div class="col-12">
+												<div class="ss">
+													<div class="ss-body  p-4">
+														<div class="d-flex justify-content-between align-items-center gap-6 mb-9">
+
+															<a class="fs-6 text-muted" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Filter list">
+																<i class="ti ti-filter"></i>
+															</a>
+														</div>
+														<div class="table-responsive border rounded  mb-8">
+															{% set now = "now"|date("Y-m-d H:i:s") %}
+															{# Get the current datetime #}
+															<table class="table align-middle text-nowrap mb-0">
+																<thead>
+																	<tr>
+																		<th scope="col">Job Title</th>
+																		<th scope="col">Posted By</th>
+																		<th scope="col">Closing Date</th>
+																		<th scope="col">Action</th>
+																	</tr>
+																</thead>
+																<tbody>
+																	{% for saved_job in app.user.jobApplications|filter(application =>  application.status == 'shortlisted') %}
+																		<tr>
+																			<td>{{ saved_job.job.title ?? '' }}</td>
+																			<td>
+																				<a class="text-primary" href="{{ path('app_home_single_company', {detail: saved_job.job.employer.id}) }}">{{ saved_job.job.employer.name }}</a>
+																			</td>
+																			<td>{{ saved_job.job ? saved_job.job.applicationClosingDate|date('Y-m-d') : "" }}</td>
+																			<td>
+																				{% if saved_job.job %}
+																					<a href="{{ path('job_seeker_job_details', {'slug': saved_job.job.title|slugify, 'uuid': saved_job.job.uuid}) }}" class="btn btn-info">View</a>
+																				{% endif %}
+																			</td>
+																		</tr>
+																	{% endfor %}
+																	{% if app.user.jobApplications|filter(application =>  application.status == 'shortlisted')|length < 1 %}
+																		<tr>
+																			<td colspan="4" class="fw-bold text-center">No date</td>
+																		</tr>
+																	{% endif %}
+																</tbody>
+															</table>
+														</div>
+
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="tab-pane fade" id="interviews-tab" role="tabpanel" aria-labelledby="v-billinterviews-tab">
+										<div class="p-4 border-bottom">
+											<h5 class="mb-0 text-purple">Scheduled Interviews</h5>
+										</div>
+										<div class="row">
+											<div class="col-12">
+												<div class="ss">
+													<div class="ss-body  p-4">
+														<div class="d-flex justify-content-between align-items-center gap-6 mb-9">
+
+															<a class="fs-6 text-muted" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Filter list">
+																<i class="ti ti-filter"></i>
+															</a>
+														</div>
+														<div class="table-responsive border rounded  mb-8">
+															{% set now = "now"|date("Y-m-d H:i:s") %}
+															{# Get the current datetime #}
+															<table class="table align-middle text-nowrap mb-0">
+																<thead>
+																	<tr>
+																		<th scope="col">Job Title</th>
+																		<th scope="col">Posted By</th>
+																		<th scope="col">Interview Date</th>
+																		<th scope="col">Interview at [location/link]</th>
+																		<th scope="col">Note</th>
+																		<th scope="col">Action</th>
+																	</tr>
+																</thead>
+																<tbody>
+																																	{% for interview in app.user.jobApplicationInterviews|filter(interview => interview.application.job.applicationClosingDate > now) %}
+																																		<tr>
+																																			<td>{{ interview.application.job.title ?? '' }}</td>
+																																			<td>
+																																				<a class="text-primary" href="{{ path('app_home_single_company', {detail: interview.application.job.employer.id}) }}">{{ interview.application.job.employer.name }}</a>
+																																			</td>
+																																			<td>{{ interview.date|date('Y-m-d h:i A') }}</td>
+																																			<td>
+																																				{% if interview.type == "virtual" %}
+																																					{% set url  = interview.meetinglink %}
+																																					{% if url starts with 'http' %}
+																																						<a href="{{url}}" class="btn btn-warning">
+																																							<i class="ti ti-video fs-6"></i>
+																																							Link
+																																						</a>
+																																					{% else %}
+																																						<a href="https://{{ url }}" target="_blank" class="btn btn-warning">
+																																							<i class="ti ti-video fs-6"></i>
+																																							Link
+																																						</a>
+																																					{% endif %}
+																																					{% else %}
+																																					{{interview.location ?? ""}}, {{interview.city.name ?? ""}}, {{interview.country.name ?? ""}}
+																																				{% endif %}
+																																			</td>
+																																			<td>
+																																				{{ interview.notes }}
+																																			</td>
+																																			<td>
+																																				<a href="{{ path('job_seeker_job_details', {'slug': interview.application.job.title|slugify, 'uuid': interview.application.job.uuid}) }}" class="btn btn-info">View Job</a>
+																																			</td>
+																																		</tr>
+																																	{% endfor %}
+																																	{% if app.user.jobApplicationInterviews|filter(interview => interview.application.job.applicationClosingDate > now)|length < 1 %}
+																																		<tr>
+																																			<td colspan="4" class="fw-bold text-center">No date</td>
+																																		</tr>
+																																	{% endif %}
+																
+																																</tbody> 
+															</table>
+														</div>
+
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="tab-pane fade" id="jobOffersTab" role="tabpanel" aria-labelledby="v-billjobOffersTab">
+										<div class="p-4 border-bottom">
+											<h5 class="mb-0 text-purple">Job Offers</h5>
+										</div>
+										<div class="row">
+											<div class="col-12">
+												<div class="ss">
+													<div class="ss-body  p-4">
+														<div class="d-flex justify-content-between align-items-center gap-6 mb-9">
+
+															<a class="fs-6 text-muted" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Filter list">
+																<i class="ti ti-filter"></i>
+															</a>
+														</div>
+														<div class="table-responsive border rounded  mb-8">
+															{% set now = "now"|date("Y-m-d H:i:s") %}
+															{# Get the current datetime #}
+															<table class="table align-middle text-nowrap mb-0">
+																<thead>
+																	<tr>
+																		<th scope="col">Job Title</th>
+																		<th scope="col">Posted By</th>
+																		<th scope="col">Starting Date</th>
+																		<th scope="col">Salary</th>
+																		<th scope="col">Offer Letter</th>
+																		<th scope="col">Action</th>
+																	</tr>
+																</thead>
+																<tbody>
+																	{% for interview in app.user.jobOfferings|filter(interview => interview.application.job.applicationClosingDate > now) %}
+																		<tr>
+																			<td>{{ interview.application.job.title ?? '' }}</td>
+																			<td>
+																				<a class="text-primary" href="{{ path('app_home_single_company', {detail: interview.employer.id}) }}">{{ interview.employer.name }}</a>
+																			</td>
+																			<td>{{ interview.joiningdate|date('m-d-Y') }}</td>
+																			<td>{{ interview.salary }}</td>
+																			<td>
+
+																				{% if interview.offerLetter %}
+																					<a class="btn btn-primary" href="{{ asset("uploads" ~ '/' ~ interview.offerLetter) }}" target="_blank">Download Offer Letter</a>
+																				{% else %}
+																					<p>No offer letter uploaded.</p>
+																				{% endif %}
+																			</td>
+																			<td>
+																				<a href="{{ path('job_seeker_job_details', {'slug': interview.application.job.title|slugify, 'uuid': interview.application.job.uuid}) }}" class="btn btn-info">View Job</a>
+																			</td>
+																		</tr>
+																	{% endfor %}
+																	{% if app.user.jobOfferings|filter(interview => interview.application.job.applicationClosingDate > now)|length < 1 %}
+																		<tr>
+																			<td colspan="4" class="fw-bold text-center">No date</td>
+																		</tr>
+																	{% endif %}
+
+																</tbody>
+															</table>
+														</div>
+
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="tab-pane fade" id="rejected-tab" role="tabpanel" aria-labelledby="v-billrejected-tab">
+										<div class="p-4 border-bottom">
+											<h5 class="mb-0 text-purple">Rejected Applications</h5>
+										</div>
+										<div class="row">
+											<div class="col-12">
+												<div class="ss">
+													<div class="ss-body  p-4">
+														<div class="d-flex justify-content-between align-items-center gap-6 mb-9">
+
+															<a class="fs-6 text-muted" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Filter list">
+																<i class="ti ti-filter"></i>
+															</a>
+														</div>
+														<div class="table-responsive border rounded  mb-8">
+															{% set now = "now"|date("Y-m-d H:i:s") %}
+															{# Get the current datetime #}
+															<table class="table align-middle text-nowrap mb-0">
+																<thead>
+																	<tr>
+																		<th scope="col">Job Title</th>
+																		<th scope="col">Posted By</th>
+																		<th scope="col">Closing Date</th>
+																		<th scope="col">Note</th>
+																		<th scope="col">Action</th>
+																	</tr>
+																</thead>
+																<tbody>
+																	{% for saved_job in app.user.jobApplications|filter(application =>  application.status == 'rejected') %}
+																		<tr>
+																			<td>{{ saved_job.job.title ?? '' }}</td>
+																			<td>
+																				<a class="text-primary" href="{{ path('app_home_single_company', {detail: saved_job.job.employer.id}) }}">{{ saved_job.job.employer.name }}</a>
+																			</td>
+																			<td>{{ saved_job.job ? saved_job.job.applicationClosingDate|date('Y-m-d') : "" }}</td>
+																			<td>{{ saved_job.rejectionnote ?? '' }}</td>
+																			<td>
+																				{% if saved_job.job %}
+
+																					<a href="{{ path('job_seeker_job_details', {'slug': saved_job.job.title|slugify, 'uuid': saved_job.job.uuid}) }}" class="btn btn-info">View</a>
+																				{% endif %}
+																			</td>
+																		</tr>
+
+																	{% endfor %}
+																	{% if app.user.jobApplications|filter(application =>  application.status == 'rejected')|length < 1 %}
+																		<tr>
+																			<td colspan="4" class="fw-bold text-center">No date</td>
+																		</tr>
+																	{% endif %}
+																</tbody>
+															</table>
+														</div>
+
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									{# Internal Jobs Tab START #}
+									<div class="tab-pane fade" id="internaljobs-tab" role="tabpanel" aria-labelledby="v-billinternaljobs-tab">
+										<div class="p-4 border-bottom">
+											<h5 class="mb-0 text-purple">Internal/Private Jobs</h5>
+										</div>
+										<div class="row">
+											<div class="col-12">
+												<div class="ss">
+													<div class="ss-body  p-4">
+														<div class="d-flex justify-content-between align-items-center gap-6 mb-9">
+
+															<a class="fs-6 text-muted" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Filter list">
+																<i class="ti ti-filter"></i>
+															</a>
+														</div>
+														<div class="table-responsive border rounded  mb-8">
+															{% set now = "now"|date("Y-m-d H:i:s") %}
+															{# Get the current datetime #}
+															<table class="table align-middle text-nowrap mb-0">
+																<thead>
+																	<tr>
+																		<th scope="col">Job Title</th>
+																		<th scope="col">Posted By</th>
+																		<th scope="col">Closing Date</th>
+																		<th scope="col">Action</th>
+																	</tr>
+																</thead>
+																<tbody>
+																	{% if privateJobs is not empty %}
+    {% for job in privateJobs %}
+        <tr>
+            <td>{{ job.title }}</td>
+            <td>
+                <a class="text-primary" href="{{ path('app_home_single_company', { detail: job.employer.id }) }}">
+                    {{ job.employer.name }}
+                </a>
+            </td>
+            <td>{{ job.applicationClosingDate|date('Y-m-d') }}</td>
+            <td>
+                <a href="{{ path('job_seeker_job_details', { slug: job.title|slugify, uuid: job.uuid }) }}" class="btn btn-info">
+                    View
+                </a>
+            </td>
+        </tr>
+    {% endfor %}
+{% else %}
+    <tr>
+        <td colspan="5" class="fw-bold text-center">No private/internal jobs available</td>
+    </tr>
+{% endif %}
+
+																</tbody>
+															</table>
+														</div>
+
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									{# Internal Jobs Tab END #}
+
+									<div class="tab-pane fade" id="viewed-tab" role="tabpanel" aria-labelledby="v-billviewed-tab">
+										<div class="p-4 border-bottom">
+											<h5 class="mb-0 text-purple">Profile Viewed</h5>
+										</div>
+										<div class="row">
+											<div class="col-12">
+												<div class="ss">
+													<div class="ss-body  p-4">
+														<div class="d-flex justify-content-between align-items-center gap-6 mb-9">
+
+															<a class="fs-6 text-muted" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Filter list">
+																<i class="ti ti-filter"></i>
+															</a>
+														</div>
+														<div class="table-responsive border rounded  mb-8">
+															{% set now = "now"|date("Y-m-d H:i:s") %}
+															{# Get the current datetime #}
+															<table class="table align-middle text-nowrap mb-0">
+																<thead>
+																	<tr>
+																		<th scope="col">Employer</th>
+																		<th scope="col">Last Viewed</th>
+																		<th scope="col">View Count</th>
+																		{# <th scope="col">Action</th> #}
+																	</tr>
+																</thead>
+																<tbody>
+																	{% for employer in employers %}
+																		<tr>
+																			<td>
+																				<a class="text-primary" href="{{ path('app_home_single_company', {detail: employer.employerId}) }}">{{ employer.employerName }}</a>
+																			</td>
+																			<td>{{ employer.lastViewedAt|date('Y-m-d h:i A') }}</td>
+																			<td>{{ employer.viewCount }}</td>
+																		</tr>
+																	{% endfor %}
+																	{% if app.user.metierProfileViews|length < 1 %}
+																		<tr>
+																			<td colspan="4" class="fw-bold text-center">No date</td>
+																		</tr>
+																	{% endif %}
+
+																</tbody>
+															</table>
+														</div>
+
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!--end row-->
+				</div>
+				<!--end container-->
+			</section>
+			<section class="ftimg"></section>
+			<section class="bg-footer">
+				<div class="container">
+					<div class="row">
+						<div class="col-lg-4">
+							<div class="footer-item mt-4 mt-lg-0 me-lg-5">
+								<img class="img-fluid teimg" src="assets/images/logo_foot.png" alt="">
+								<p class="text-grey mt-3">Connect with us on</p>
+								<ul class="footer-social-menu list-inline mb-0">
+									<li class="list-inline-item">
+										<a href="#">
+											<i class="fa fa-facebook" aria-hidden="true"></i>
+										</a>
+									</li>
+									<li class="list-inline-item">
+										<a href="#">
+											<i class="fa fa-youtube-play" aria-hidden="true"></i>
+										</a>
+									</li>
+									<li class="list-inline-item">
+										<a href="#">
+											<i class="fa fa-twitter" aria-hidden="true"></i>
+										</a>
+									</li>
+									<li class="list-inline-item">
+										<a href="#">
+											<i class="fa fa-instagram" aria-hidden="true"></i>
+										</a>
+									</li>
+									<li class="list-inline-item">
+										<a href="#">
+											<i class="fa fa-linkedin" aria-hidden="true"></i>
+										</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<!--end col-->
+						<div class="col-lg-3 col-6">
+							<div class="footer-item mt-4 mt-lg-0">
+								<ul class="list-unstyled footer-list mb-0">
+									<li>
+										<a href="#">
+											<i class="mdi mdi-chevron-right"></i>
+											About Us</a>
+									</li>
+									<li>
+										<a href="#">
+											<i class="mdi mdi-chevron-right"></i>
+											Products</a>
+									</li>
+									<li>
+										<a href="#">
+											<i class="mdi mdi-chevron-right"></i>
+											Services</a>
+									</li>
+									<li>
+										<a href="#">
+											<i class="mdi mdi-chevron-right"></i>Contact us</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<!--end col-->
+						<div class="col-lg-3 col-6">
+							<div class="footer-item mt-4 mt-lg-0">
+								<ul class="list-unstyled footer-list mb-0">
+									<li>
+										<a href="#">
+											<i class="mdi mdi-chevron-right"></i>
+											Browse Job</a>
+									</li>
+									<li>
+										<a href="#">
+											<i class="mdi mdi-chevron-right"></i>
+											Resume templates</a>
+									</li>
+									<li>
+										<a href="#">
+											<i class="mdi mdi-chevron-right"></i>
+											Companies</a>
+									</li>
+									<li>
+										<a href="#">
+											<i class="mdi mdi-chevron-right"></i>
+											FAQ’s
+										</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<!--end col-->
+
+						<!--end col-->
+						<div class="col-lg-2 col-6">
+							<div class="footer-item mt-4 mt-lg-0">
+								<ul class="list-unstyled footer-list mb-0">
+									<li>
+										<a href="#">
+											<i class="mdi mdi-chevron-right"></i>
+											Testimonials</a>
+									</li>
+									<li>
+										<a href="#">
+											<i class="mdi mdi-chevron-right"></i>
+											Blogs</a>
+									</li>
+									<li>
+										<a href="#">
+											<i class="mdi mdi-chevron-right"></i>
+											Q&A</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<!--end col-->
+					</div>
+					<div class="mt-3">
+						<hr/>
+					</div>
+					<div class="row">
+						<div class="col-lg-4 col-12 text-grey text-center text-md-start">
+							<p>2023 Metier Quest. All Rights Reserved.</p>
+						</div>
+						<div class="col-lg-8  col-12">
+							<ul class="list-inline mb-0 text-grey text-md-end  text-center">
+								<li class="list-inline-item text-grey">
+									<p class="fs-13 mb-0">
+										<a href="#">Terms & Conditions</a>
+										|
+										<a href="#">
+											Privacy
+										</a>
+										|
+										<a href="#">Cookie Settings</a>
+									</p>
+								</li>
+							</ul>
+							<button onclick="topFunction()" id="back-to-top" style="display: block;">
+								<i class="mdi mdi-arrow-up"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<div id="settingsModal" class="modal fade" tabindex="-1" aria-labelledby="settingsModalLabel" style="display: none;" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content">
+						<div class="modal-header text-black">
+							<h5 class="modal-title mt-0" id="settingsModalLabel">Personal Informations</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+
+
+					</div>
+					<!-- /.modal-content -->
+				</div>
+				<!-- /.modal-dialog -->
+			</div>
+
+			<div id="profileModal" class="modal fade" tabindex="-1" aria-labelledby="profileModalLabel" style="display: none;" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content">
+						<div class="modal-header text-black">
+							<h5 class="modal-title mt-0" id="profileModalLabel">Update Profile Image</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+
+
+					</div>
+					<!-- /.modal-content -->
+				</div>
+				<!-- /.modal-dialog -->
+			</div>
+		</div>
+	{% endblock %}

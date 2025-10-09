@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+	Messages Center
+{% endblock %}
+{% block body %}
+	<style>
+		.min-height-200 {
+			min-height: 200px;
+		}
+	</style>
+
+	<div class="page-content">
+		<section class="bg-homelogin" id="home">
+			<div class="container">
+				<div class="row align-items-center">
+					<div class="col-lg-12">
+						<div class="mb-2 pb-1 me-lg-6 text-center">
+							<h1 class="display-5 fw-semibold mb-3 mt-3 fs-22">Messages
+							</h1>
+							<p class="lead text-muted mb-0 pc-da">You can use this platform to interact with employers</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		{{ component('Chat', { view: 'job_seeker' }) }}
+	</div>
+{% endblock %}

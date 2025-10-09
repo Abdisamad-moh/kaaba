@@ -1,0 +1,238 @@
+{
+    "app": {
+        "path": "\/assets\/app-8b67b518a21777cdd9194a493b84784f.js",
+        "type": "js"
+    },
+    "\/assets\/bootstrap.js": {
+        "path": "\/assets\/bootstrap-c423b8bbc1f9cae218c105ca8ca9f767.js",
+        "type": "js"
+    },
+    "\/assets\/@symfony\/stimulus-bundle\/controllers.js": {
+        "path": "\/assets\/@symfony\/stimulus-bundle\/controllers-916470ac07b8f9363247fb0e27420761.js",
+        "type": "js"
+    },
+    "\/assets\/@symfony\/ux-autocomplete\/controller.js": {
+        "path": "\/assets\/@symfony\/ux-autocomplete\/controller-dd1b31bd819824edecb124585c6bdb56.js",
+        "type": "js"
+    },
+    "\/assets\/@symfony\/ux-chartjs\/controller.js": {
+        "path": "\/assets\/@symfony\/ux-chartjs\/controller-ca19c6fa17c0c7a61a47fa5cd49a8137.js",
+        "type": "js"
+    },
+    "\/assets\/@symfony\/ux-live-component\/live_controller.js": {
+        "path": "\/assets\/@symfony\/ux-live-component\/live_controller-b4fdb1f53d5a5f813f85327cceb706b8.js",
+        "type": "js"
+    },
+    "\/assets\/@symfony\/ux-live-component\/live.min.css": {
+        "path": "\/assets\/@symfony\/ux-live-component\/live.min-5108f988fb2a3dbb292d6feebc9db7e8.css",
+        "type": "css"
+    },
+    "\/assets\/controllers\/employer_controller.js": {
+        "path": "\/assets\/controllers\/employer_controller-8d822172fb6fc82662b8b91129148979.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/jobseeker-education-controller.js": {
+        "path": "\/assets\/controllers\/jobseeker-education-controller-994dda21167bcde304de963aa123298c.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/test_controller.js": {
+        "path": "\/assets\/controllers\/test_controller-a2bf4261509e4d4cf7ef40a9551a0b34.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/sync-select-controller.js": {
+        "path": "\/assets\/controllers\/sync-select-controller-275ebd02ee9507a247ee9b507fc42bb8.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/career-autocomplete-controller.js": {
+        "path": "\/assets\/controllers\/career-autocomplete-controller-348fe96f22bbf753847be557f2484771.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/recommended-candidates-controller.js": {
+        "path": "\/assets\/controllers\/recommended-candidates-controller-edeba4be4746cdc59ded2c5bd0730728.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/sync-location-controller.js": {
+        "path": "\/assets\/controllers\/sync-location-controller-93403fc5dfd95128452e25f3aae1f377.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/autocomplete_controller.js": {
+        "path": "\/assets\/controllers\/autocomplete_controller-304e2d2076aaea9c18f5e42a33f6cc64.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/copy-clipboard-controller.js": {
+        "path": "\/assets\/controllers\/copy-clipboard-controller-43d7efa6e1fbc72dd85a467851b27009.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/apps_controller.js": {
+        "path": "\/assets\/controllers\/apps_controller-1c1375e6fbbdb0ef6496cb2b755ed377.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/tender-course-controller.js": {
+        "path": "\/assets\/controllers\/tender-course-controller-5a747a8e8f6312a6ae6e13ac96f2dfca.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/job-application-controller.js": {
+        "path": "\/assets\/controllers\/job-application-controller-8fbed9bef0cab4cdcc403b8d9ef1f4ce.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/interview-result-controller.js": {
+        "path": "\/assets\/controllers\/interview-result-controller-217bb00b8d9ac2740e2bf3f9ad3a6ba1.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/accordion_controller.js": {
+        "path": "\/assets\/controllers\/accordion_controller-9d3ff223f3f35ab7d1f7e476161f2a5d.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/contact-form-controller.js": {
+        "path": "\/assets\/controllers\/contact-form-controller-2582490376d3893271b0f65f63a8cce1.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/home-controller.js": {
+        "path": "\/assets\/controllers\/home-controller-a5e8835804c5c1a95fb33138d657fdb8.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/t_controller.js": {
+        "path": "\/assets\/controllers\/t_controller-e6f728e3fb62313000a77b13a02f2378.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/jobs-controller.js": {
+        "path": "\/assets\/controllers\/jobs-controller-9eabef9b5d7ec97aab47afc1469fd65e.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/jobseeker-jobs_controller.js": {
+        "path": "\/assets\/controllers\/jobseeker-jobs_controller-0d923b5efd3d13d5ab9554b58d1b8e48.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/packages-controller.js": {
+        "path": "\/assets\/controllers\/packages-controller-39bb114a6f65d7435df198f66850aaa6.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/jobseeker-settings-controller.js": {
+        "path": "\/assets\/controllers\/jobseeker-settings-controller-b83a0f4c13883179229a95a8e15e620d.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/jobseeker-work-controller.js": {
+        "path": "\/assets\/controllers\/jobseeker-work-controller-5687e5853e3b2fc76ae33523f96792c1.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/admin_controller.js": {
+        "path": "\/assets\/controllers\/admin_controller-9ab30ea36001d01c2c33b457a8baaee0.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/job-details-controller.js": {
+        "path": "\/assets\/controllers\/job-details-controller-b078790fdfc005ab8a61bd1430e5461c.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/jobseeker-profile_controller.js": {
+        "path": "\/assets\/controllers\/jobseeker-profile_controller-a161992e1e6a72120c17c2dc3cd3cade.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/zaad_controller.js": {
+        "path": "\/assets\/controllers\/zaad_controller-6123798a8e7c8b4f42e349af358f6653.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/alert_controller.js": {
+        "path": "\/assets\/controllers\/alert_controller-988b1190e92ca3ca58a5c7e16ea1ad71.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/toggle-profile-controller.js": {
+        "path": "\/assets\/controllers\/toggle-profile-controller-8c177c9e56dc1001ecd334651ba5eca0.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/bootstrap-modal-controller.js": {
+        "path": "\/assets\/controllers\/bootstrap-modal-controller-28939c41a643ced21d120400ed70ec5c.js",
+        "type": "js"
+    },
+    "\/assets\/styles\/app.css": {
+        "path": "\/assets\/styles\/app-3338b99f7844a1f643f8e374136f910f.css",
+        "type": "css"
+    },
+    "@hotwired\/stimulus": {
+        "path": "\/assets\/vendor\/@hotwired\/stimulus\/stimulus.index-b5b1d00e42695b8959b4a1e94e3bc92a.js",
+        "type": "js"
+    },
+    "@symfony\/stimulus-bundle": {
+        "path": "\/assets\/@symfony\/stimulus-bundle\/loader-870999a02e9fc147c034d522826ea70d.js",
+        "type": "js"
+    },
+    "@hotwired\/turbo": {
+        "path": "\/assets\/vendor\/@hotwired\/turbo\/turbo.index-810f44ef1a202a441e4866b7a4c72d11.js",
+        "type": "js"
+    },
+    "@symfony\/ux-live-component": {
+        "path": "\/assets\/@symfony\/ux-live-component\/live_controller-b4fdb1f53d5a5f813f85327cceb706b8.js",
+        "type": "js"
+    },
+    "bootstrap": {
+        "path": "\/assets\/vendor\/bootstrap\/bootstrap.index-c0423c99f6075e6b1cef7579b5c00d32.js",
+        "type": "js"
+    },
+    "@popperjs\/core": {
+        "path": "\/assets\/vendor\/@popperjs\/core\/core.index-ceb5b6c0f9e1d3f6c78ef733facfdcda.js",
+        "type": "js"
+    },
+    "bootstrap\/dist\/css\/bootstrap.min.css": {
+        "path": "\/assets\/vendor\/bootstrap\/dist\/css\/bootstrap.min-1712f0378f8675ca7cd423d6262fcccf.css",
+        "type": "css"
+    },
+    "tom-select": {
+        "path": "\/assets\/vendor\/tom-select\/tom-select.index-c0036889cf3e94dade1e56c11996b014.js",
+        "type": "js"
+    },
+    "tom-select\/dist\/css\/tom-select.default.css": {
+        "path": "\/assets\/vendor\/tom-select\/dist\/css\/tom-select.default-92c31c033a23be0cfebdda3d089d8b11.css",
+        "type": "css"
+    },
+    "tom-select\/dist\/css\/tom-select.bootstrap5.css": {
+        "path": "\/assets\/vendor\/tom-select\/dist\/css\/tom-select.bootstrap5-d1198a1334645c68df961af727e3c4fe.css",
+        "type": "css"
+    },
+    "typeahead.js": {
+        "path": "\/assets\/vendor\/typeahead.js\/typeahead.js.index-509c0af104071392e047d409770df2db.js",
+        "type": "js"
+    },
+    "jquery": {
+        "path": "\/assets\/vendor\/jquery\/jquery.index-fb3b33d7311be80ac8aa5c367205beba.js",
+        "type": "js"
+    },
+    "intl-tel-input": {
+        "path": "\/assets\/vendor\/intl-tel-input\/intl-tel-input.index-6c0f8fdd045089fdd56c15299244e87e.js",
+        "type": "js"
+    },
+    "intl-tel-input\/build\/css\/intlTelInput.min.css": {
+        "path": "\/assets\/vendor\/intl-tel-input\/build\/css\/intlTelInput.min-09a51356880d2d81c580b0d80d3db6ea.css",
+        "type": "css"
+    },
+    "axios": {
+        "path": "\/assets\/vendor\/axios\/axios.index-071085c4f373867f8d8c20839085a979.js",
+        "type": "js"
+    },
+    "chart.js": {
+        "path": "\/assets\/vendor\/chart.js\/chart.js.index-5ef6f3c0a946679607ea18943aa445ea.js",
+        "type": "js"
+    },
+    "react": {
+        "path": "\/assets\/vendor\/react\/react.index-e2206d3df16079590292e0aec1fbc706.js",
+        "type": "js"
+    },
+    "react-dom": {
+        "path": "\/assets\/vendor\/react-dom\/react-dom.index-f8650b34f936ce4cb85c1ee6e4a199d8.js",
+        "type": "js"
+    },
+    "scheduler": {
+        "path": "\/assets\/vendor\/scheduler\/scheduler.index-72fd8a5b66f28a0fdfb2b6b39a27d028.js",
+        "type": "js"
+    },
+    "choices.js": {
+        "path": "\/assets\/vendor\/choices.js\/choices.js.index-62913290244e568e582344053c80f054.js",
+        "type": "js"
+    },
+    "ckeditor": {
+        "path": "\/assets\/vendor\/ckeditor\/ckeditor.index-204fb479c46fcc123feb3414a09b594b.js",
+        "type": "js"
+    },
+    "ckeditor5-build-classic": {
+        "path": "\/assets\/vendor\/ckeditor5-build-classic\/ckeditor5-build-classic.index-73a732f94d4d669243e671449e6f48ad.js",
+        "type": "js"
+    }
+}

@@ -1,0 +1,331 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+	Apply Tender
+{% endblock %}
+{% block body %}
+	<style>
+		.min-height-200 {
+			min-height: 200px;
+		}
+	</style>
+	<div class="min-height-200">
+		<section class="bg-home8" id="home">
+			<div class="container">
+				<nav class="d-inline-block" aria-label="breadcrumb ">
+					<ol class="breadcrumb justify-content-center fs-12">
+						<li class="">
+							<a href="{{ path('app_home') }}">Search Tenders&nbsp; /</a>
+						</li>
+						<li class="pl-1">
+							<a href="#">
+								{{ tender.title }}&nbsp;
+							</a>
+						</li>
+						<li class=" active" aria-current="page">
+							/&nbsp;&nbsp;{{ tender.title }},
+							{{ tender.employer.name|capitalizeWords }}
+						</li>
+					</ol>
+				</nav>
+				<div class="candidate-list-box card mt-4 col-lg-12">
+					<div class="card-body p-4">
+						<div
+							class="row align-items-center">
+							<!--end col-->
+
+							<div class="row text-lg-start">
+								<div class="col-lg-6">
+									<div class="  me-lg-12 text-dark">
+										<div class="ps-3 pt-2">
+											<h6 class="fs-20">
+												{{ tender.employer.name|capitalizeWords }}</h6>
+											<h6>{{ tender.title }}</h6>
+											<ul class="list-inline d-flex ">
+												<li class="list-inline-item ">
+													<p class="text-muted mb-0 ">
+														<span class="text-muted fw-medium">
+															<i class="fa fa-map-marker" aria-hidden="true"></i>
+															&nbsp;
+															{{ tender.city.name ?? '' }},
+															{{ tender.city.country }}</span>
+													</p>
+												</li>
+												{# <li>
+																																																													|</li>
+																																																												<li class="list-inline-item pl-1">
+																																																													<p class="text-muted mb-0">
+																																																														<span class="text-muted fw-medium">
+																																																															<i class="fa fa-briefcase" aria-hidden="true"></i>
+																																																															&nbsp;
+																																																															{{ job.numberPosition }}
+																																																															roles available</span>
+																																																													</p>
+																																																												</li> #}
+												<li>
+													|</li>
+												<li class="list-inline-item pl-1"></li>
+											</ul>
+										</div>
+									</div>
+									<div class="btn-group">
+										<a target="__blank" href="https://www.facebook.com/sharer/sharer.php?u={{ absolute_url(app.request.pathinfo) }}" class="btn btn-primary">
+											<i class="fa fa-facebook-f"></i>
+											Share on Facebook
+										</a>
+										<a target="__blank" href="https://twitter.com/intent/tweet?url={{ absolute_url(app.request.pathinfo) }}&text={{ job.title ?? '' }}" class="btn btn-info">
+											<i class="fa fa-twitter"></i>
+											Tweet
+										</a>
+										<a data-action="click->job-details#copyUrl" href="#" class="btn btn-success">
+											<i class="fa fa-copy"></i>
+											Copy
+										</a>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div
+										class="modal-footer">
+										{# <div class="sh mt-2 text-center ms-2">
+																																																			<a href="#">
+																																																				<i class="fa fa-share" aria-hidden="true"></i>
+																																																				&nbsp; Share Job &nbsp;
+																																																			</a>
+																																																		</div> #}
+										{% if tender_application %}
+											<div class="sh mt-2 text-center ms-2">
+												<a
+													href="#" class="text-success fw-bold">
+													{# <i class="fa fa-share" aria-hidden="true"></i> #}
+													&nbsp; You applied for this Tender  &nbsp;
+												</a>
+											</div>
+										{% else %}
+											{# {% if job.externalLink == null %} #}
+											{# <div class="top-login-line mt-2 text-center ms-2 ">
+												<a href="{{ path('job_seeker_apply_tender', {'tender': tender.id }) }}">&nbsp; Apply Tender &nbsp;
+												</a>
+											</div> #}
+											{# {% endif %} #}
+
+											{# <div class="top-login-line mt-2 text-center ms-2 ">
+																																																								<form action="{{ path('job_seeker_save_tender', {'tender': tender.id}) }}" method="post">
+																																																									<button class="btn {{ tender.id in saved_jobs ? 'btn-light' : 'btn-outline-primary' }} fw-bold" {% if tender.id in saved_jobs %} data-bs-toggle="tooltip" data-bs-placement="top" title="Un-mark this job" {% else %} data-bs-toggle="tooltip" data-bs-placement="top" title="Save this job" {% endif %} {{ (app.user == null) ? 'disabled' : '' }} style="font-family: 'Inter', sans-serif; border: none; background: none;">
+																																																										<i class="fa {{ tender.id in saved_jobs ? 'fa-bookmark text-success' : 'fa-bookmark-o' }} fw-bold" aria-hidden="true">
+																																																											<span class="job-cont">
+																																																												{{ tender.id in saved_jobs ? 'Saved ' : 'Save For Later' }}</span>
+																																																										</i>
+																																																									</button>
+																																																								</form>
+																																																							</div> #}
+										{% endif %}
+									</div>
+									<div class="modal-footer">
+										<ul class="list-inline d-flex  mb-3 mt-3">
+
+											<li class="px-1">
+												<p class="text-muted mb-0 ">
+													<span class="text-muted fw-medium">
+														Expires in<strong>
+															{{ tender.expiresAt }}</strong>
+													</span>
+												</p>
+											</li>
+											<li>
+												|</li>
+											<li class=" pl-1">
+												<p class="text-muted mb-0">
+													<span class="text-muted fw-medium">
+														<i>Posted
+															{{ tender.postedAt }}</i>
+													</span>
+												</p>
+											</li>
+											{% if tender_application %}
+												<li class=" pl-1">
+													<p class="text-muted mb-0">
+														<span class="text-muted fw-medium">
+															<i>Applied
+																{{ tender_application.createdAt|diffForHumans }}</i>
+														</span>
+													</p>
+												</li>
+											{% endif %}
+										</ul>
+									</div>
+								</div>
+							</div>
+
+							<!--end col-->
+
+						</div>
+						<!--end row-->
+
+					</div>
+				</div>
+			</div>
+		</section>
+		<section class="section-re-de ">
+			<div class="container">
+				<div class="mb-5">
+					<p>
+						<span class="fw-bold">Tender Title:
+						</span>
+						{{ tender.title ?? '' }}
+					</p>
+					<p>
+						<span class="fw-bold">Company Name:
+						</span>
+						{{ tender.companyName }}
+					</p>
+					<p>
+						<span class="fw-bold">Tender Duration:
+						</span>
+						{{ tender.duration }}
+					</p>
+					{% if tender.attachment %}
+						<p>
+							<span class="fw-bold">Attachment</span>
+							<a class="btn btn-primary btn-lg" href="{{ asset('uploads/' ~ tender.attachment) }}" target="_blank">Preview</a>
+						</p>
+					{% endif %}
+					<p>
+						<span class="fw-bold">Funded By:
+						</span>
+						{{ tender.fundedBy }}
+					</p>
+					<p>
+						<span class="fw-bold">Tender Value:
+						</span>
+						{{ tender.value }}
+					</p>
+					<p>
+						<span class="fw-bold">Contact Name:
+						</span>
+						{{ tender.contactName }}
+					</p>
+					<p>
+						<span class="fw-bold">Contact Email:
+						</span>
+						{{ tender.contactEmail }}
+					</p>
+					<p>
+						<span class="fw-bold">Contact Phone:
+						</span>
+						{{ tender.contactPhone }}
+					</p>
+					
+					<p>
+						<span class="fw-bold">Project Location:
+						</span>
+						{{ tender.projectLocation}}
+					</p>
+					<p>
+						<span class="fw-bold">Location:
+						</span>
+						{{ tender.locationString|join(', ')}}
+					</p>
+					<p>
+						<span class="fw-bold">Skill and Experience Requirements:
+						</span>
+						{{ tender.skillAndExperience|nl2br}}
+					</p>
+
+				</div>
+				<div class="description mb-5 mt-2">
+					<h5>Scope</h5>
+					<div class="">
+						{{ tender.description|nl2br }}
+					</div>
+					
+				</div>
+				<p class="pb-3">
+						{% set url  = tender.externalLink %}
+						
+						<span class="fw-bold">Link To Apply:
+						</span>
+						{% if url is not empty %}
+							{% if url starts with 'http' %}
+								<a href="{{ url }}" target="_blank">{{ url }}</a>
+							{% else %}
+								<a  class="btn btn-primary btn-lg" href="http://{{ url }}" target="_blank">Click Here To Apply</a>
+							{% endif %}
+							
+						{% else %}
+							<span>No URL provided.</span>
+						{% endif %}
+						{# <a target="_blank"  href="{{ course.externalLink }}">{{ course.externalLink }}</a> #}
+					</p>
+				{% if tender_application == null %}
+				{% if form.vars.errors|length > 0 %}
+					<div class="alert alert-danger">
+						{{ form_errors(form) }}
+					</div>
+				{% endif %}
+					<div class="card">
+						<div class="card-header">
+							<h5>Tender Application</h5>
+						</div>
+						<div class="card-body" id="tender-application-card">
+							{{ form_start(form) }}
+							<div class="row">
+								<div class="col-md-6">
+									<div class="form-group mt-2">
+										<label class="form-label">Company/Applicant Name <span class="text-danger">*</span></label>
+										{{ form_widget(form.companyName) }}
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group mt-2">
+										<label class="form-label">Contact Email <span class="text-danger">*</span></label>
+										{{ form_widget(form.companyEmail) }}
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group mt-2">
+										<label class="form-label">Contact Phone <span class="text-danger">*</span></label>
+										{{ form_widget(form.companyPhone) }}
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="form-group mt-2">
+										<label class="form-label">Country <span class="text-danger">*</span></label>
+										{{ form_widget(form.country) }}
+									</div>
+								</div>
+								<div class="col-md-12">
+									<div class="form-group mt-2">
+										<label class="form-label">Attach File</label>
+									{{ form_widget(form.attachment) }}
+									</div>
+								</div>
+								<div class="col-md-12">
+									<div class="form-group mt-2">
+										<label class="form-label">Description <span class="text-danger">*</span></label>
+										{{ form_widget(form.description) }}
+										{{ form_errors(form.description) }}
+									</div>
+								</div>
+								<div class="col-md-12">
+									<div class="form-group mt-2">
+										<button class="btn btn-primary" onclick="return confirm('Are you sure you want to apply for this tender?');">Submit Application</button>
+									</div>
+								</div>
+							</div>
+							{{ form_end(form) }}
+						</div>
+					</div>
+
+				{% endif %}
+			</div>
+
+		</section>
+
+		<section style="min-height: 280px"></section>
+
+		<section class="ftimg text-center">
+			 
+		</section>
+		{% include 'home/_footer.html.twig' %}
+		
+	</div>
+{% endblock %}

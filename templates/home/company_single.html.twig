@@ -1,0 +1,213 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Company!
+{% endblock %}
+
+{% block body %}
+
+	<section class="bg-home3" id="home">
+		<div class="container">
+			<div class="row align-items-center">
+				<div class="col-lg-2">
+					<div
+						class="mt-3 mt-md-0">{# <img class="img-fluid home-imgco" src="assets/images/co1.png" alt=""> #}
+					</div>
+				</div>
+				<div class="col-lg-8">
+					<div class="mb-2 pb-3 me-lg-6 text-center"></div>
+
+				</div>
+				<div class="col-lg-2">
+					<div
+						class="mt-3 mt-md-0">{# <img class="img-fluid home-imgco" src="assets/images/co2.png" alt=""> #}
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<div
+		class="container-fluid">
+
+		<!-- ------------start------------ -->
+
+
+		<section class="section-re-de top-up">
+			<div class="container">
+				<div class="col-xl-12 col-md-12">
+					<div
+						class="card mini-stat m-b-30">
+
+						<!-- ---------------------------- -->
+
+						<div class=" p-3 d-flex align-items-center rounded-3 row">
+							<div class="col-lg-1">
+								<div class="">
+									<a href="#"><img class="img-fluid rounded-3 " src="{{ path('profile_image', {'filename': detail.logo }) }}" alt=""></a>
+								</div>
+							</div>
+							<div class="col-lg-8 pa-les-img">
+								<div class="flex-grow-1 ms-3 mt-3">
+									<h6 class="fs-19 mt-0 sufont">{{ detail.employer.name }}</h6>
+									{# <p class="text-dark fs-16 fw-bold">1.4K Jobs actively hiring</p>
+																		<p class="textgro fs-16">
+																			<i class="fa fa-users isty" aria-hidden="true"></i>
+																			50+ people hired</p> #}
+								</div>
+							</div>
+							<div class="col-lg-3"><!-- <button class="btn btn-primary" type="button" id="dropdownMenuprimary" data-bs-toggle="dropdown" aria-expanded="false"> Edit Company details </button> -->
+								{# <button type="button" class=" btn btn-outline-primary waves-effect waves-light" data-toggle="modal" data-target=".cobs-example-modal-lg">Edit Company Details</button> #}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<div class="row">
+			<div class="col-xl-12">
+				<div class="card m-b-30">
+					<div class="card-body">
+						<div class="container">
+							<div class="row">
+								<div class="col-md-12">
+									<nav class="ma_top">
+										<div class="nav nav-tabs nav-fill" id="nav-tab" role="tablist">
+											<a class="nav-item nav-link active text-dark" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">About us</a>
+											<a class="nav-item nav-link text-dark" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Jobs</a>
+										</div>
+									</nav>
+									<div class="tab-content" id="nav-tabContent">
+										<div
+											class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+											<!-- ------------------------------------- -->
+											<div class="container ma_top">
+												<div class="row">
+													<div
+														class="col-lg-8 pt-4">
+														{# <span class="primary-link"> #}
+														<h3 class="title mb-2">About
+															<span class="text-primary fw-bold">
+																Us
+															</span>
+														</h3>
+														{# </span> #}
+														<p>{{ detail.description|nl2br }}</p>
+													</div>
+													<!--end col-->
+
+													{# <div class="col-lg-4">
+																											<img class="img-fluid text-center ms-2" src="assets/images/img_man.png" alt="">
+																										</div> #}
+												</div>
+												<div class="row align-items-center my-3">
+													<div class="col-lg-8">
+														<div class="card card-pad">
+															<div class="row">
+																<div class="col-lg-4">
+																	<h6 class="fs-15 mt-0 sufont">Founded</h6>
+																	<p class=" fs-13">{{ detail.companystablishmentdate|date('Y') }}</p>
+																</div>
+																<div class="col-lg-4">
+																	<h6 class="fs-15 mt-0 sufont">Headquarters</h6>
+																	<p class=" fs-13">
+																		{% if detail.country %}
+																			{{detail.country.name}}
+																		{% endif %}
+																		{% if detail.city %}
+																			,{{detail.city.name}}
+																		{% endif %}
+																	</p>
+																</div>
+																<div class="col-lg-4">
+																	<h6 class="fs-15 mt-0 sufont">Company Size</h6>
+																	<p class=" fs-13">{{ detail.numberofemployees}}
+																		people</p>
+																</div>
+															</div>
+															<div class="row mt-2">
+																<div class="col-lg-4">
+																	<h6 class="fs-15 mt-0 sufont">Website</h6>
+																	<p class=" fs-13">{{ detail.website }}</p>
+																</div>
+																<div class="col-lg-4">
+																	<h6 class="fs-15 mt-0 sufont">Industry</h6>
+																	<p class=" fs-13">{{ detail.industry.name ?? ''}}</p>
+																</div>
+																{# <div class="col-lg-4">
+																																	<h6 class="fs-15 mt-0 sufont">Type</h6>
+																																	<p class=" fs-13">Private</p>
+																																</div> #}
+															</div>
+														</div>
+													</div>
+													<div class="col-lg-4">
+														<div class="card card-pad">
+															<h6 class="fs-15 mt-0 sufont mt-3 mb-3">Follow Us</h6>
+															<ul class="social-menu list-inline mb-4 mt-4">
+																<li class="list-inline-item">
+																	<a href="{{ detail.socialFacebook}}">
+																		<i class="fa fa-facebook" aria-hidden="true"></i>
+																	</a>
+																</li>
+																<li class="list-inline-item">
+																	<a href="{{ detail.socialTwitter }}">
+																		<i class="fa fa-twitter" aria-hidden="true"></i>
+																	</a>
+																</li>
+
+																<li class="list-inline-item">
+																	<a href="{{ detail.sociallinkedin }}">
+																		<i class="fa fa-linkedin" aria-hidden="true"></i>
+																	</a>
+																</li>
+															</ul>
+														</div>
+													</div>
+												</div>
+											</div>
+
+											<!-- ------------------------------------- -->
+										</div>
+										<div
+											class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+											<!-- ------------------------------------- -->
+											<div class="container">
+												<div class="row ma_top">
+													<div class="col-lg-12">
+														<span class="primary-link mt-4 mb-4">
+															<h4 class="title m-3">
+																<span class="text-primary fw-bold">
+																	Jobs List
+																</span>
+															</h4>
+														</span>
+														<div class="row">
+															{% include 'home/job-cards.html.twig' with {jobs: jobs, saved_jobs: []} %}
+														</div>
+													</div>
+													<!--end col-->
+
+												</div>
+											</div>
+
+											<!-- ------------------------------------- -->
+										</div>
+
+									</div>
+
+									<!--SECTION eND-->
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- ------------end------------ -->
+
+	</div>
+	 
+
+	{% include 'home/_footer.html.twig' %}
+{% endblock %}

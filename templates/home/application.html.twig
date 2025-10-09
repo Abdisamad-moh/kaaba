@@ -1,0 +1,1864 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>
+			{% block title %}Rajo Kaaba Project
+			{% endblock %}
+		</title>
+		<meta name="robots" content="index, follow">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<link rel="icon" href="{{ asset('assets/images/logo.png') }}"> {% block stylesheets %}{% endblock %}
+
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link
+		rel="preconnect" href="https://fonts.googleapis.com">
+
+		<!-- CSS Links -->
+		<link href="{{ asset('assets/css/vendors.min.css') }}" rel="stylesheet" type="text/css"/>
+		<link href="{{ asset('assets/css/icon.min.css') }}" rel="stylesheet" type="text/css"/>
+
+		<link href="{{ asset('assets/css/style.css') }}" rel="stylesheet" type="text/css"/>
+
+		<link href="{{ asset('assets/css/responsive.css') }}" rel="stylesheet" type="text/css"/>
+
+
+		<style>
+			.file-drop-area {
+				transition: all 0.3s ease;
+				cursor: pointer;
+				min-height: 120px;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				border: 2px dashed #dee2e6;
+			}
+
+			.file-drop-area:hover {
+				background-color: #f8f9fa !important;
+				border-color: #1b5e20 !important;
+			}
+
+			.bg-light-green {
+				background-color: #e8f5e8 !important;
+			}
+
+			.file-item {
+				font-size: 17px;
+				background-color: #386026;
+				border-radius: 4px;
+				margin-bottom: 5px;
+				padding: 8px 12px;
+				border: 1px solid #dee2e6;
+				color: #fff;
+			}
+
+			.file-name {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+				font-size: 16px;
+			}
+
+			.file-drop-area.dragover {
+				background-color: #e8f5e8 !important;
+				border: 2px dashed #1b5e20 !important;
+			}
+
+			.file-drop-area {
+				text-align: center;
+				align-items: center;
+			}
+
+			.file-remove {
+				color: #ff0019;
+				cursor: pointer;
+				margin-left: 8px;
+				font-size: 35px;
+			}
+
+			.file-remove:hover {
+				color: #831b1b;
+
+			}
+
+			/* inner dot when checked */
+			.form-check-input[type="radio"]:checked::before {
+				content: "";
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				width: 0.5em;
+				height: 0.5em;
+				background-color: #1b5e20; /* your theme green */
+				border-radius: 50%;
+				transform: translate(-50%, -50%);
+			}
+
+			/* Validation Styles */
+			.is-invalid {
+				border-color: #dc3545 !important;
+			}
+
+			.invalid-feedback {
+				display: block;
+				width: 100%;
+				margin-top: 0.25rem;
+				font-size: 0.875em;
+				color: #dc3545;
+			}
+
+			.validation-alert {
+				border-radius: 4px;
+				animation: fadeIn 0.3s ease-in;
+			}
+
+			@keyframes fadeIn {
+				from {
+					opacity: 0;
+				}
+				to {
+					opacity: 1;
+				}
+			}
+
+			/* Make required field labels more obvious */
+			.form-label.fw-600.text-dark-gray:after {
+				content: " *";
+				color: #dc3545;
+			}
+
+			.hidden-file-input {
+				display: none;
+			}
+
+
+			/* File Validation Styles */
+			.file-area-error {
+				border: 2px dashed #dc3545 !important;
+				background-color: #f8d7da !important;
+			}
+
+			.file-area-valid {
+				border: 2px dashed #198754 !important;
+				background-color: #d1e7dd !important;
+			}
+
+			.file-error-message {
+				font-size: 12px;
+				font-weight: 500;
+			}
+
+			.file-success-message {
+				font-size: 12px;
+				font-weight: 500;
+				color: #198754;
+			}
+
+			/* Enhanced file item styles for validation states */
+			.file-drop-area.file-area-error:hover {
+				background-color: #f8d7da !important;
+				border-color: #dc3545 !important;
+			}
+
+			.file-drop-area.file-area-valid:hover {
+				background-color: #d1e7dd !important;
+				border-color: #198754 !important;
+			}
+
+			/* Pulse animation for error areas */
+			@keyframes pulseError {
+				0% {
+					border-color: #dc3545;
+				}
+				50% {
+					border-color: #ff6b6b;
+				}
+				100% {
+					border-color: #dc3545;
+				}
+			}
+
+			.file-area-error {
+				animation: pulseError 2s ease-in-out;
+			}
+
+
+			.bg-theme {
+				background: #222222 !important;
+			}
+			.page-layout {
+				margin-top: 100px !important;
+			}
+
+			.btn.btn-dark-gray:hover,
+			.btn.btn-dark-gray:active {
+				background: #121212 !important;
+				color: #ffffff;
+			}
+
+
+			/* Disabled button styles */
+			.btn-disabled {
+				background-color: #6c757d !important;
+				border-color: #6c757d !important;
+				color: #fff !important;
+				cursor: not-allowed !important;
+				opacity: 0.65 !important;
+			}
+
+			.btn-disabled:hover {
+				background-color: #6c757d !important;
+				border-color: #6c757d !important;
+				color: #fff !important;
+			}
+
+
+
+/* Disabled tab styles */
+.disabled-tab {
+    pointer-events: none !important;
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+    color: #6c757d !important;
+}
+
+.nav-link.disabled-tab:hover {
+    background-color: transparent !important;
+    border-color: #dee2e6 !important;
+}
+
+/* Tooltip for disabled tab */
+.disabled-tab[title] {
+    position: relative;
+}
+
+.disabled-tab[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 1000;
+}
+		</style>
+	</head>
+
+	<body data-mobile-nav-style="full-screen-menu" data-mobile-nav-bg-color="">
+		<!-- start header -->
+		<!-- start header -->
+			<header>
+			<!-- start navigation -->
+				<nav class="navbar navbar-expand-lg header-transparent bg-theme header-reverse" data-header-hover="light"> <div class="container-fluid">
+					<div class="col-auto col-lg-2 me-lg-0 me-auto">
+						<a class="navbar-brand" href="#">
+							<img src="{{ asset('assets/images/hero-logo.png') }} " data-at2x="{{ asset('assets/images/hero-logo.png') }}" alt="" class="default-logo">
+							<img src="{{ asset('assets/images/hero-logo.png') }}" data-at2x="{{ asset('assets/images/hero-logo.png') }}" alt="" class="alt-logo">
+							<img src="{{ asset('assets/images/hero-logo.png') }}" data-at2x="{{ asset('assets/images/hero-logo.png') }}" alt="" class="mobile-logo">
+						</a>
+					</div>
+					<div class="col-auto menu-order position-static ms-auto">
+						<button class="navbar-toggler float-start" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+							<span class="navbar-toggler-line"></span>
+							<span class="navbar-toggler-line"></span>
+							<span class="navbar-toggler-line"></span>
+							<span class="navbar-toggler-line"></span>
+						</button>
+						<div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+    <a href="{% if lang == 'so' %}{{ path('app_home', {'_locale': 'so'}) }}{% else %}{{ path('app_home', {'_locale': 'en'}) }}{% endif %}" class="btn btn-extra-large btn-rounded with-rounded btn-gray d-table d-lg-inline-block lg-mb-15px">
+        <span class="bg-dark text-white">
+            <i class="fa-solid fa-arrow-left"></i>
+        </span>
+        {{ trans.trans('back_to_home') }}
+    </a>
+</div>
+					</div>
+				</div>
+			</nav>
+			<!-- end navigation -->
+		</header>
+		<!-- end header -->
+		<!-- end header -->
+
+		<!-- start banner -->
+			<section class="position-relative">
+    <div class="container">
+        <!-- Language Switcher -->
+        <div class="row mb-3">
+            <div class="col-12 text-end">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-sm btn-outline-dark-gray language-btn {% if app.session.get('app_language', 'en') == 'en' %}active{% endif %}" data-lang="en">English</button>
+                    <button type="button" class="btn btn-sm btn-outline-dark-gray language-btn {% if app.session.get('app_language', 'en') == 'so' %}active{% endif %}" data-lang="so">Somali</button>
+                </div>
+            </div>
+        </div>
+
+<!-- Header row -->
+<div class="row">
+    <div class="col-12">
+        <h6 class="fw-700 text-white text-uppercase mb-0 py-3 px-4" style="background-color:#1b5e20; font-size:14px;">
+            {{ 'application_form'|trans }} -
+            {% if lang == 'so' %}
+                {{ scholarship.sotitle ?? scholarship.title }}
+            {% else %}
+                {{ scholarship.title }}
+            {% endif %}
+        </h6>
+    </div>
+</div>
+
+<!-- Scholarship Info -->
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="alert alert-info">
+            <h6 class="fw-600 mb-2">{{ 'scholarship_information'|trans }}</h6>
+            <p class="mb-1">
+                <strong>{{ 'description'|trans }}:</strong>
+                {% if lang == 'so' %}
+                    {{ scholarship.socontent ?? scholarship.content }}
+                {% else %}
+                    {{ scholarship.content }}
+                {% endif %}
+            </p>
+            <p class="mb-0">
+                <strong>{{ 'closing_date'|trans }}:</strong>
+                {{ scholarship.closingDate|date('F d, Y') }}
+            </p>
+        </div>
+    </div>
+</div>
+       <!-- Tab Navigation -->
+<div class="row mt-4">
+    <div class="col tab-style-06">
+        <ul class="nav nav-tabs alt-font justify-content-center border-0 text-center text-uppercase alt-font fw-500 mb-5">
+            <li class="nav-item bg-white border-color-extra-medium-gray">
+                <a class="nav-link active fw-500" data-bs-toggle="tab" href="#step1">{{ 'personal_information'|trans }}</a>
+                <span class="tab-bg-active bg-dark-gray"></span>
+            </li>
+          <li class="nav-item bg-white border-color-extra-medium-gray">
+    <a class="nav-link fw-500 disabled-tab" id="step2-tab" data-bs-toggle="tab" href="#step2" 
+       title="Complete Step 1 first" style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
+        {{ 'supporting_documents'|trans }}
+    </a>
+    <span class="tab-bg-active bg-dark-gray"></span>
+</li>
+        </ul>
+
+                <div class="tab-content">
+                    <!-- Step 1: Personal Information -->
+                    <div class="tab-pane fade in active show" id="step1">
+                        {{ form_start(form, {'attr': {'class': 'contact-form-style-03', 'id': 'register_form', 'enctype': 'multipart/form-data'}}) }}
+                        <div class="row justify-content-center">
+                            <div class="col-lg-10">
+  <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3" style="background-color:#1b5e20; font-size:14px;">
+                                            {{ 'personal_information'|trans }}
+                                        </h6>
+                                <div class="row g-4">
+                                    <!-- Full Name -->
+
+                                    <div class="col-md-6">
+                                        {{ form_label(form.full_name, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                                        {{ form_widget(form.full_name, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
+                                        {{ form_errors(form.full_name) }}
+                                    </div>
+
+                                    <!-- Gender -->
+                                    <div class="col-md-6">
+                                        {{ form_label(form.gender, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                                        {{ form_widget(form.gender, {'attr': {'class': 'form-select border border-dark rounded-0'}}) }}
+                                        {{ form_errors(form.gender) }}
+                                    </div>
+
+                                    <!-- Phone -->
+                                    <div class="col-md-6">
+                                        {{ form_label(form.phone, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                                        {{ form_widget(form.phone, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
+                                        {{ form_errors(form.phone) }}
+                                    </div>
+
+                                    <!-- Email -->
+                                    <div class="col-md-6">
+                                        {{ form_label(form.email, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                                        {{ form_widget(form.email, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
+                                        {{ form_errors(form.email) }}
+                                    </div>
+
+                                    <!-- Nationality -->
+                                    <div class="col-md-6">
+                                        {{ form_label(form.nationality, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                                        {{ form_widget(form.nationality, {'attr': {'class': 'form-select border border-dark rounded-0'}}) }}
+                                        {{ form_errors(form.nationality) }}
+                                    </div>
+
+                                    <!-- Date of Birth -->
+                                    <div class="col-md-6">
+                                        {{ form_label(form.date_of_birth, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                                        {{ form_widget(form.date_of_birth, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
+                                        {{ form_errors(form.date_of_birth) }}
+                                    </div>
+
+                                    <!-- Region -->
+                                    <div class="col-md-6">
+                                        {{ form_label(form.region, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                                        {{ form_widget(form.region, {'attr': {'class': 'form-select border border-dark rounded-0', 'id': 'region-select', 'onchange': 'loadDistricts(this.value)'}}) }}
+                                        {{ form_errors(form.region) }}
+                                    </div>
+
+                                    <!-- District (Dynamic) -->
+                                    <div class="col-md-6">
+                                        {{ form_label(form.district, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                                        {{ form_widget(form.district, {'attr': {'class': 'form-select border border-dark rounded-0', 'id': 'district-select'}}) }}
+                                        {{ form_errors(form.district) }}
+                                    </div>
+
+                                    <!-- Town -->
+                                    <div class="col-md-6">
+                                        {{ form_label(form.town, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                                        {{ form_widget(form.town, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
+                                        {{ form_errors(form.town) }}
+                                    </div>
+
+                                    <!-- Village -->
+                                    <div class="col-md-6">
+                                        {{ form_label(form.village, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                                        {{ form_widget(form.village, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
+                                        {{ form_errors(form.village) }}
+                                    </div>
+                                </div>
+
+     
+
+                                <!-- Disability Disclosure Section -->
+                                <div class="row justify-content-center mt-4">
+                                    <div class="col-12">
+                                        <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3" style="background-color:#1b5e20; font-size:14px;">
+                                            {{ 'disability_disclosure'|trans }}
+                                        </h6>
+
+                                        <div class="mt-3" style="font-size:14px;">
+                                            {{ form_label(form.disability, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                                            {{ form_widget(form.disability, {'attr': {'class': 'form-select border border-dark rounded-0', 'onchange': 'toggleDisabilityExplanation(this)'}}) }}
+                                            {{ form_errors(form.disability) }}
+                                        </div>
+                                        <!-- Disability Explanation (Conditional) -->
+                                        <div id="disabilityExplanation" style="display: none;">
+                                            <div class="mb-3">
+                                                {{ form_label(form.disability_explanation, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                                                {{ form_widget(form.disability_explanation, {'attr': {'class': 'form-control border border-dark rounded-0', 'rows': 3}}) }}
+                                                {{ form_errors(form.disability_explanation) }}
+                                            </div>
+                                        </div>
+
+                                        <!-- Personal Identification Verification -->
+                                        <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3 mt-4" style="background-color:#1b5e20; font-size:14px;">
+                                            {{ 'personal_identification'|trans }}
+                                        </h6>
+
+                                        <div class="mt-3">
+                                            <div class="mb-3">
+                                                {{ form_label(form.identity_type, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                                                {{ form_widget(form.identity_type, {'attr': {'class': 'form-select border border-dark rounded-0'}}) }}
+                                                {{ form_errors(form.identity_type) }}
+                                            </div>
+
+                                            <div class="mb-3">
+                                                <label class="form-label fw-600 text-dark-gray">{{ 'identity_attachment'|trans }}</label>
+                                                <div class="file-drop-area border border-dark rounded-0 p-3 text-center bg-light" id="identityArea" data-field-name="identity_attachment">
+                                                    {{ form_widget(form.identity_attachment, {'attr': {'class': 'hidden-file-input file-input', 'data-area': 'identityArea'}}) }}
+                                                    <button type="button" class="btn btn-sm btn-dark-gray mb-2" onclick="document.getElementById('{{ form.identity_attachment.vars.id }}').click()">{{ 'add_files'|trans }}</button>
+                                                    <div class="text-muted" style="font-size:13px;">{{ 'drag_files_here'|trans }}</div>
+                                                    <div class="file-list mt-2" id="identityList"></div>
+                                                </div>
+                                                {{ form_errors(form.identity_attachment) }}
+                                            </div>
+                                        </div>
+                                            {% if type != 'l' %}
+                                        <!-- Enrollment School Selection -->
+                                        <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3 mt-4" style="background-color:#1b5e20; font-size:14px;">
+                                            {{ 'enrollment_school'|trans }}
+                                        </h6>
+
+                                        <div class="mt-3">
+                                            {{ form_label(form.institute, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                                            {{ form_widget(form.institute, {'attr': {'class': 'form-select border border-dark rounded-0'}}) }}
+                                            {{ form_errors(form.institute) }}
+                                        </div>
+{% endif %}
+                                            {% if type != 'l' %}
+
+                                        <!-- Enrollment Course Selection -->
+                                        <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3 mt-4" style="background-color:#1b5e20; font-size:14px;">
+                                            {{ 'enrollment_course'|trans }}
+                                        </h6>
+
+                                        <div class="mt-3">
+                                            {{ form_label(form.course, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                                            {{ form_widget(form.course, {'attr': {'class': 'form-select border border-dark rounded-0'}}) }}
+                                            {{ form_errors(form.course) }}
+                                        </div>
+{% endif %}
+
+
+ {% if type != 'h' and type != 't' %}
+<!-- NEW FIELDS: Literacy and Numeracy Section -->
+<div class="row justify-content-center mt-4">
+    <div class="col-12">
+        <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3" style="background-color:#1b5e20; font-size:14px;">
+            {{ 'literacy_numeracy_section'|trans }}
+        </h6>
+
+        <div class="mt-3">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    {{ form_label(form.literacy_level, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                    {{ form_widget(form.literacy_level, {'attr': {'class': 'form-select border border-dark rounded-0'}}) }}
+                    {{ form_errors(form.literacy_level) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_label(form.numeracy_level, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                    {{ form_widget(form.numeracy_level, {'attr': {'class': 'form-select border border-dark rounded-0'}}) }}
+                    {{ form_errors(form.numeracy_level) }}
+                </div>
+                <div class="col-12">
+                    {{ form_label(form.literacy_numeracy_qualification, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                    {{ form_widget(form.literacy_numeracy_qualification, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
+                    {{ form_errors(form.literacy_numeracy_qualification) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if type != 'h' and type != 't' %}
+<!-- NEW SECTION: Education Background -->
+<div class="row justify-content-center mt-4">
+    <div class="col-12">
+        <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3" style="background-color:#1b5e20; font-size:14px;">
+            {{ 'Educational Background'|trans }}
+        </h6>
+
+        <div class="mt-3">
+            <div class="row g-3">
+                <div class="col-12">
+                    {{ form_label(form.recent_education, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                    {{ form_widget(form.recent_education, {'attr': {'class': 'form-control border border-dark rounded-0', 'rows': 3}}) }}
+                    {{ form_errors(form.recent_education) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+
+<!-- Secondary School Education Section -->
+{% if type != 'l' %}
+<div class="row justify-content-center mt-4">
+    <div class="col-12">
+        <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3" style="background-color:#1b5e20; font-size:14px;">
+            {{ 'secondary_school_education'|trans }}
+        </h6>
+
+        <div class="mt-3">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    {{ form_label(form.secondary_region, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                    {{ form_widget(form.secondary_region, {'attr': {'class': 'form-select border border-dark rounded-0'}}) }}
+                    {{ form_errors(form.secondary_region) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_label(form.secondary_school, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                    {{ form_widget(form.secondary_school, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
+                    {{ form_errors(form.secondary_school) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_label(form.secondary_graduation_year, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                    {{ form_widget(form.secondary_graduation_year, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
+                    {{ form_errors(form.secondary_graduation_year) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_label(form.secondary_grade, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                    {{ form_widget(form.secondary_grade, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
+                    {{ form_errors(form.secondary_grade) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+<!-- Higher Education Qualification Section -->
+{% if type != 'l' %}
+<div class="row justify-content-center mt-4">
+    <div class="col-12">
+        <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3" style="background-color:#1b5e20; font-size:14px;">
+            {{ 'higher_education'|trans }}
+        </h6>
+
+        <div class="mt-3">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    {{ form_label(form.highest_qualification, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                    {{ form_widget(form.highest_qualification, {'attr': {'class': 'form-select border border-dark rounded-0'}}) }}
+                    {{ form_errors(form.highest_qualification) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_label(form.highest_qualification_detail, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                    {{ form_widget(form.highest_qualification_detail, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
+                    {{ form_errors(form.highest_qualification_detail) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+                                      <!-- Last Education Training Institution Section -->
+{% if type != 'l' %}
+<div class="row justify-content-center mt-4">
+    <div class="col-12">
+        <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3" style="background-color:#1b5e20; font-size:14px;">
+            {{ 'last_education'|trans }}
+        </h6>
+
+        <div class="mt-3">
+            <div class="border rounded-2 p-3 bg-light">
+                <div class="row g-4">
+                    <!-- Institution/Plan Name -->
+                    <div class="col-md-6">
+                        {{ form_label(form.institution_name, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                        {{ form_widget(form.institution_name, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
+                        {{ form_errors(form.institution_name) }}
+                    </div>
+
+                    <!-- Location -->
+                    <div class="col-md-6">
+                        {{ form_label(form.location, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                        {{ form_widget(form.location, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
+                        {{ form_errors(form.location) }}
+                    </div>
+
+                    <!-- Start Year -->
+                    <div class="col-md-6">
+                        {{ form_label(form.start_year, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                        {{ form_widget(form.start_year, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
+                        {{ form_errors(form.start_year) }}
+                    </div>
+
+                    <!-- End Year -->
+                    <div class="col-md-6">
+                        {{ form_label(form.end_year, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                        {{ form_widget(form.end_year, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
+                        {{ form_errors(form.end_year) }}
+                    </div>
+
+                    <!-- Qualification -->
+                    <div class="col-md-6">
+                        {{ form_label(form.qualification, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                        {{ form_widget(form.qualification, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
+                        {{ form_errors(form.qualification) }}
+                    </div>
+
+                    <!-- Minimum Grade/GPA -->
+                    <div class="col-md-6">
+                        {{ form_label(form.minimum_grade, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                        {{ form_widget(form.minimum_grade, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
+                        {{ form_errors(form.minimum_grade) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+
+                                        <div class="col-12 text-end mt-4">
+                                            <button type="button" class="btn btn-dark-gray btn-round-edge px-5" onclick="switchTab('step2')" id="nextStepButton">{{ 'next_step'|trans }}</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Step 1 -->
+
+                    <!-- Step 2: Supporting Documents -->
+                    <div class="tab-pane fade in" id="step2">
+                        <div class="row justify-content-center">
+                            <div class="col-lg-10">
+                                <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3" style="background-color:#1b5e20; font-size:14px;">
+                                    {{ 'supporting_documents'|trans }}
+                                </h6>
+
+                                <div class="mt-3" style="font-size:14px;">
+                                    <!-- Certificates Attachment -->
+                                    <div class="mb-4">
+                                        <label class="form-label fw-600 text-dark-gray">{{ 'certificates_attachment'|trans }}</label>
+                                        <div class="file-drop-area border border-dark rounded-0 p-4 text-center bg-light" id="certificatesArea" data-field-name="certificate_attachment">
+                                            {{ form_widget(form.certificate_attachment, {'attr': {'class': 'hidden-file-input file-input', 'data-area': 'certificatesArea'}}) }}
+                                            <button type="button" class="btn btn-sm btn-dark-gray mb-2" onclick="document.getElementById('{{ form.certificate_attachment.vars.id }}').click()">{{ 'add_files'|trans }}</button>
+                                            <div class="text-muted" style="font-size:13px;">{{ 'drag_files_here'|trans }}</div>
+                                            <div class="file-list mt-2" id="certificatesList"></div>
+                                        </div>
+                                        {{ form_errors(form.certificate_attachment) }}
+                                    </div>
+
+                                    <!-- Willingness Declaration Attachment -->
+                                    <div class="mb-4">
+                                        <label class="form-label fw-600 text-dark-gray">{{ 'willingness_declaration'|trans }}</label>
+                                        <div class="file-drop-area border border-dark rounded-0 p-4 text-center bg-light" id="willingnessArea" data-field-name="willingness_declaration_attachment">
+                                            {{ form_widget(form.willingness_declaration_attachment, {'attr': {'class': 'hidden-file-input file-input', 'data-area': 'willingnessArea'}}) }}
+                                            <button type="button" class="btn btn-sm btn-dark-gray mb-2" onclick="document.getElementById('{{ form.willingness_declaration_attachment.vars.id }}').click()">{{ 'add_files'|trans }}</button>
+                                            <div class="text-muted" style="font-size:13px;">{{ 'drag_files_here'|trans }}</div>
+                                            <div class="file-list mt-2" id="willingnessList"></div>
+                                        </div>
+                                        {{ form_errors(form.willingness_declaration_attachment) }}
+                                    </div>
+
+                                    <!-- Needs Statement Attachment -->
+                                    <div class="mb-4">
+                                        <label class="form-label fw-600 text-dark-gray">{{ 'needs_statement'|trans }}</label>
+                                        <div class="file-drop-area border border-dark rounded-0 p-4 text-center bg-light" id="needsArea" data-field-name="needs_statement_attachment">
+                                            {{ form_widget(form.needs_statement_attachment, {'attr': {'class': 'hidden-file-input file-input', 'data-area': 'needsArea'}}) }}
+                                            <button type="button" class="btn btn-sm btn-dark-gray mb-2" onclick="document.getElementById('{{ form.needs_statement_attachment.vars.id }}').click()">{{ 'add_files'|trans }}</button>
+                                            <div class="text-muted" style="font-size:13px;">{{ 'drag_files_here'|trans }}</div>
+                                            <div class="file-list mt-2" id="needsList"></div>
+                                        </div>
+                                        {{ form_errors(form.needs_statement_attachment) }}
+                                    </div>
+
+                                    <!-- Other Documents Attachment -->
+                                    <div class="mb-4">
+                                        <label class="form-label fw-600 text-dark-gray">{{ 'other_documents'|trans }}</label>
+                                        <div class="file-drop-area border border-dark rounded-0 p-4 text-center bg-light" id="otherArea" data-field-name="other_documents_attachment">
+                                            {{ form_widget(form.other_documents_attachment, {'attr': {'class': 'hidden-file-input file-input', 'data-area': 'otherArea'}}) }}
+                                            <button type="button" class="btn btn-sm btn-dark-gray mb-2" onclick="document.getElementById('{{ form.other_documents_attachment.vars.id }}').click()">{{ 'add_files'|trans }}</button>
+                                            <div class="text-muted" style="font-size:13px;">{{ 'drag_files_here'|trans }}</div>
+                                            <div class="file-list mt-2" id="otherList"></div>
+                                        </div>
+                                        {{ form_errors(form.other_documents_attachment) }}
+                                    </div>
+
+                                    <!-- Action Buttons -->
+                                    <div class="d-flex justify-content-between mt-4">
+                                        <button type="button" class="btn btn-outline-dark-gray btn-round-edge px-4" onclick="switchTab('step1')">{{ 'previous'|trans }}</button>
+                                        <div>
+<button type="button" onclick="submitApplication()" class="btn btn-outline-dark-gray btn-round-edge px-5" id="submitBtn">{{ 'submit_application'|trans }}</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- End Step 2 -->
+                </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<!-- start footer -->
+{% include 'home/_footer.html.twig' %}
+<!-- end footer -->
+
+	 <script>
+	// File upload functionality
+	document.addEventListener('DOMContentLoaded', function() {
+	    // Initialize all file drop areas
+	    const fileDropAreas = document.querySelectorAll('.file-drop-area');
+	    
+	    fileDropAreas.forEach(area => {
+	        const fileInput = area.querySelector('.file-input');
+	        const fileList = area.querySelector('.file-list');
+	        
+	        // Click to open file dialog
+	        area.addEventListener('click', function(e) {
+	            if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'SPAN') {
+	                fileInput.click();
+	            }
+	        });
+	        
+	        // Handle file selection
+	        fileInput.addEventListener('change', function(e) {
+	            handleFiles(this.files, fileList, fileInput);
+	        });
+	        
+	        // Drag and drop functionality
+	        area.addEventListener('dragover', function(e) {
+	            e.preventDefault();
+	            area.classList.add('dragover');
+	        });
+	        
+	        area.addEventListener('dragleave', function(e) {
+	            e.preventDefault();
+	            area.classList.remove('dragover');
+	        });
+	        
+	        area.addEventListener('drop', function(e) {
+	            e.preventDefault();
+	            area.classList.remove('dragover');
+	            handleFiles(e.dataTransfer.files, fileList, fileInput);
+	        });
+	    });
+	});
+	
+	function handleFiles(files, fileList, fileInput) {
+	    for (let i = 0; i < files.length; i++) {
+	        const file = files[i];
+	        addFileToList(file, fileList, fileInput);
+	    }
+	}
+	
+	function addFileToList(file, fileList, fileInput) {
+	    const fileItem = document.createElement('div');
+	    fileItem.className = 'file-item d-flex justify-content-between align-items-center';
+	    fileItem.innerHTML = `
+	        <span class="file-name">${file.name}</span>
+	        <span class="file-remove" onclick="removeFile(this)">×</span>
+	    `;
+	    fileList.appendChild(fileItem);
+	    
+	    // Store file data (you might want to handle this differently for actual upload)
+	    if (!fileInput.dataset.files) {
+	        fileInput.dataset.files = JSON.stringify([]);
+	    }
+	    const currentFiles = JSON.parse(fileInput.dataset.files);
+	    currentFiles.push(file.name);
+	    fileInput.dataset.files = JSON.stringify(currentFiles);
+	}
+	
+	function removeFile(element) {
+	    const fileItem = element.parentElement;
+	    const fileList = fileItem.parentElement;
+	    const fileInput = fileList.parentElement.querySelector('.file-input');
+	    
+	    // Remove from stored files
+	    const fileName = fileItem.querySelector('.file-name').textContent;
+	    let currentFiles = JSON.parse(fileInput.dataset.files || '[]');
+	    currentFiles = currentFiles.filter(name => name !== fileName);
+	    fileInput.dataset.files = JSON.stringify(currentFiles);
+	    
+	    fileItem.remove();
+	}
+	
+	// Enhanced file validation functions
+	function validateFileAttachments() {
+	    const fileFields = [
+	        'identity_attachment',
+	        'certificate_attachment', 
+	        'willingness_declaration_attachment',
+	        'needs_statement_attachment',
+	        'other_documents_attachment'
+	    ];
+	    
+	    let hasAtLeastOneFile = false;
+	    const emptyFileAreas = [];
+	    
+	    fileFields.forEach(fieldName => {
+	        const fileInput = document.querySelector(`[name="kaaba_application_form[${fieldName}]"]`);
+	        const fileArea = document.querySelector(`[data-field-name="${fieldName}"]`);
+	        
+	        if (fileInput && fileArea) {
+	            const fileList = fileArea.querySelector('.file-list');
+	            const hasFiles = fileList && fileList.children.length > 0;
+	            
+	            if (hasFiles) {
+	                hasAtLeastOneFile = true;
+	                // Remove error styling if files are present
+	                fileArea.classList.remove('file-area-error');
+	                const existingError = fileArea.querySelector('.file-error-message');
+	                if (existingError) {
+	                    existingError.remove();
+	                }
+	            } else {
+	                emptyFileAreas.push(fileArea);
+	            }
+	        }
+	    });
+	    
+	    // If no files found, show errors on all file areas
+	    if (!hasAtLeastOneFile && emptyFileAreas.length > 0) {
+	        emptyFileAreas.forEach(area => {
+	            area.classList.add('file-area-error');
+	            
+	            // Add error message if not already present
+	            if (!area.querySelector('.file-error-message')) {
+	                const errorDiv = document.createElement('div');
+	                errorDiv.className = 'file-error-message text-danger mt-2';
+	                errorDiv.innerHTML = '<i class="fa fa-exclamation-circle me-1"></i>At least one document is required';
+	                area.appendChild(errorDiv);
+	            }
+	        });
+	        
+	        return false;
+	    }
+	    
+	    return true;
+	}
+	// Function to update file area validation state
+	function updateFileAreaValidation(fileArea) {
+	    const fileList = fileArea.querySelector('.file-list');
+	    const hasFiles = fileList && fileList.children.length > 0;
+	    
+	    if (hasFiles) {
+	        fileArea.classList.remove('file-area-error');
+	        fileArea.classList.add('file-area-valid');
+	        
+	        const existingError = fileArea.querySelector('.file-error-message');
+	        if (existingError) {
+	            existingError.remove();
+	        }
+	    } else {
+	        fileArea.classList.remove('file-area-valid');
+	    }
+	}
+	
+	// Enhanced file handling functions
+	function handleFiles(files, fileList, fileInput) {
+	    for (let i = 0; i < files.length; i++) {
+	        const file = files[i];
+	        addFileToList(file, fileList, fileInput);
+	    }
+	    
+	    // Update validation state
+	    const fileArea = fileList.closest('.file-drop-area');
+	    updateFileAreaValidation(fileArea);
+	}
+	
+	function addFileToList(file, fileList, fileInput) {
+	    const fileItem = document.createElement('div');
+	    fileItem.className = 'file-item d-flex justify-content-between align-items-center';
+	    fileItem.innerHTML = `
+	        <span class="file-name">${file.name}</span>
+	        <span class="file-remove" onclick="removeFile(this)">×</span>
+	    `;
+	    fileList.appendChild(fileItem);
+	    
+	    // Update validation state
+	    const fileArea = fileList.closest('.file-drop-area');
+	    updateFileAreaValidation(fileArea);
+	}
+	
+	function removeFile(element) {
+	    const fileItem = element.parentElement;
+	    const fileList = fileItem.parentElement;
+	    const fileArea = fileList.closest('.file-drop-area');
+	    
+	    fileItem.remove();
+	    
+	    // Update validation state
+	    updateFileAreaValidation(fileArea);
+	}
+// Update the switchTab function to handle programmatic tab switching
+function switchTab(tabName) {
+    if (tabName === 'step2') {
+        // Validate Step 1 before proceeding - use the feedback version for user feedback
+        if (!validateStep1WithFeedback()) {
+            return false;
+        }
+    }
+    
+    const tab = new bootstrap.Tab(document.querySelector(`a[href="#${tabName}"]`));
+    tab.show();
+
+    // If switching to step 2, validate files to show current state
+    if (tabName === 'step2') {
+        setTimeout(() => {
+            validateFileAttachments();
+        }, 100);
+    }
+}
+	
+// Enhanced validation function for Step 1
+function validateStep1() {
+    let isValid = true;
+
+    // Clear previous error messages and styling
+    clearValidationErrors();
+
+    // Validate Full Name
+    const fullName = document.getElementById('{{ form.full_name.vars.id }}');
+    if (!fullName.value.trim()) {
+        isValid = false;
+    }
+    
+    // Validate Gender
+    const gender = document.getElementById('{{ form.gender.vars.id }}');
+    if (!gender.value) {
+        isValid = false;
+    }
+    
+    // Validate Phone
+    const phone = document.getElementById('{{ form.phone.vars.id }}');
+    if (!phone.value.trim()) {
+        isValid = false;
+    }
+    
+    // Validate Nationality
+    const nationality = document.getElementById('{{ form.nationality.vars.id }}');
+    if (!nationality.value) {
+        isValid = false;
+    }
+    
+    // Validate Date of Birth
+    const dateOfBirth = document.getElementById('{{ form.date_of_birth.vars.id }}');
+    if (!dateOfBirth.value) {
+        isValid = false;
+    }
+    
+    // Validate Region
+    const region = document.getElementById('{{ form.region.vars.id }}');
+    if (!region.value) {
+        isValid = false;
+    }
+    
+    // Validate Town
+    const town = document.getElementById('{{ form.town.vars.id }}');
+    if (!town.value.trim()) {
+        isValid = false;
+    }
+    
+    // Validate Disability
+    const disability = document.getElementById('{{ form.disability.vars.id }}');
+    if (!disability.value) {
+        isValid = false;
+    }
+
+    // Validate Disability Explanation (if disability is "Yes")
+    const disabilityExplanation = document.getElementById('{{ form.disability_explanation.vars.id }}');
+    if (disability.value === 'Yes' && !disabilityExplanation.value.trim()) {
+        // Make sure the explanation field is visible
+        const explanationDiv = document.getElementById('disabilityExplanation');
+        explanationDiv.style.display = 'block';
+        isValid = false;
+    }
+    
+ 
+    // Only validate secondary region if it exists (scholarship type is not 'l')
+    const secondaryRegion = document.getElementById('secondary_region');
+    if (secondaryRegion && !secondaryRegion.value) {
+        isValid = false;
+    }
+
+    // Validate Identity Attachment (at least one file)
+    const identityAttachment = document.querySelector('[data-field-name="identity_attachment"]');
+    const identityFileList = identityAttachment ? identityAttachment.querySelector('.file-list') : null;
+    const hasIdentityFiles = identityFileList && identityFileList.children.length > 0;
+    
+    if (!hasIdentityFiles) {
+        isValid = false;
+    }
+    
+    // Update Next Step button state
+    updateNextStepButton(isValid);
+    // Update tab accessibility
+    updateTabAccessibility(isValid);
+
+    
+    return isValid;
+}
+
+// Function to validate and show errors only when user tries to proceed
+function validateStep1WithFeedback() {
+    let isValid = true;
+
+    // Clear previous error messages and styling
+    clearValidationErrors();
+
+    // Validate Full Name
+    const fullName = document.getElementById('{{ form.full_name.vars.id }}');
+    if (!fullName.value.trim()) {
+        showValidationError(fullName, 'Please enter your full name');
+        isValid = false;
+    }
+    
+    // Validate Gender
+    const gender = document.getElementById('{{ form.gender.vars.id }}');
+    if (!gender.value) {
+        showValidationError(gender, 'Please select your gender');
+        isValid = false;
+    }
+    
+    // Validate Phone
+    const phone = document.getElementById('{{ form.phone.vars.id }}');
+    if (!phone.value.trim()) {
+        showValidationError(phone, 'Please enter your phone number');
+        isValid = false;
+    }
+    
+    // Validate Nationality
+    const nationality = document.getElementById('{{ form.nationality.vars.id }}');
+    if (!nationality.value) {
+        showValidationError(nationality, 'Please select your nationality');
+        isValid = false;
+    }
+    
+    // Validate Date of Birth
+    const dateOfBirth = document.getElementById('{{ form.date_of_birth.vars.id }}');
+    if (!dateOfBirth.value) {
+        showValidationError(dateOfBirth, 'Please enter your date of birth');
+        isValid = false;
+    }
+    
+    // Validate Region
+    const region = document.getElementById('{{ form.region.vars.id }}');
+    if (!region.value) {
+        showValidationError(region, 'Please select your region');
+        isValid = false;
+    }
+    
+    // Validate Town
+    const town = document.getElementById('{{ form.town.vars.id }}');
+    if (!town.value.trim()) {
+        showValidationError(town, 'Please enter your town');
+        isValid = false;
+    }
+    
+    // Validate Disability
+    const disability = document.getElementById('{{ form.disability.vars.id }}');
+    if (!disability.value) {
+        showValidationError(disability, 'Please select an option for disability information');
+        isValid = false;
+    }
+
+    // Validate Disability Explanation (if disability is "Yes")
+    const disabilityExplanation = document.getElementById('{{ form.disability_explanation.vars.id }}');
+    if (disability.value === 'Yes' && !disabilityExplanation.value.trim()) {
+        // Make sure the explanation field is visible
+        const explanationDiv = document.getElementById('disabilityExplanation');
+        explanationDiv.style.display = 'block';
+        showValidationError(disabilityExplanation, 'Please provide an explanation for your disability');
+        isValid = false;
+    }
+    
+  
+    // Only validate secondary region if it exists (scholarship type is not 'l')
+    const secondaryRegion = document.getElementById('secondary_region');
+    if (secondaryRegion && !secondaryRegion.value) {
+        showValidationError(secondaryRegion, 'Please select your secondary school region');
+        isValid = false;
+    }
+
+    // Validate Identity Attachment (at least one file)
+    const identityAttachment = document.querySelector('[data-field-name="identity_attachment"]');
+    const identityFileList = identityAttachment ? identityAttachment.querySelector('.file-list') : null;
+    const hasIdentityFiles = identityFileList && identityFileList.children.length > 0;
+    
+    if (!hasIdentityFiles) {
+        // Show error on identity attachment area
+        identityAttachment.classList.add('file-area-error');
+        if (!identityAttachment.querySelector('.file-error-message')) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'file-error-message text-danger mt-2';
+            errorDiv.innerHTML = '<i class="fa fa-exclamation-circle me-1"></i>Identity attachment is required';
+            identityAttachment.appendChild(errorDiv);
+        }
+        isValid = false;
+    } else {
+        // Remove error if files are present
+        identityAttachment.classList.remove('file-area-error');
+        const existingError = identityAttachment.querySelector('.file-error-message');
+        if (existingError) {
+            existingError.remove();
+        }
+    }
+
+    // If validation fails, scroll to first error and show alert
+    if (!isValid) {
+        const firstError = document.querySelector('.is-invalid, .file-area-error');
+        if (firstError) {
+            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        showAlertMessage('Please complete all required fields and upload identity attachment before proceeding.', 'danger');
+    }
+    
+    return isValid;
+}
+
+
+
+// Enhanced real-time validation for fields
+function setupRealTimeValidation() {
+    const requiredFields = [
+        '{{ form.full_name.vars.id }}',
+        '{{ form.phone.vars.id }}',
+        '{{ form.town.vars.id }}',
+        '{{ form.gender.vars.id }}',
+        '{{ form.nationality.vars.id }}',
+        '{{ form.date_of_birth.vars.id }}',
+        '{{ form.region.vars.id }}',
+        '{{ form.disability.vars.id }}',
+    ];
+    
+    // Add secondary_region only if it exists
+    const secondaryRegionField = document.getElementById('secondary_region');
+    if (secondaryRegionField) {
+        requiredFields.push('secondary_region');
+    }
+    
+    requiredFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            field.addEventListener('blur', function() {
+                validateStep1(); // Silent validation - just update button state
+            });
+            
+            field.addEventListener('change', function() {
+                validateStep1(); // Silent validation - just update button state
+            });
+            
+            field.addEventListener('input', function() {
+                validateStep1(); // Silent validation - just update button state
+            });
+        }
+    });
+
+
+    // Also validate when files are added/removed
+    const fileAreas = document.querySelectorAll('.file-drop-area');
+    fileAreas.forEach(area => {
+        const fileList = area.querySelector('.file-list');
+        if (fileList) {
+            // Use MutationObserver to detect file list changes
+            const observer = new MutationObserver(function() {
+                validateStep1(); // Silent validation - just update button state
+            });
+            
+            observer.observe(fileList, {
+                childList: true,
+                subtree: true
+            });
+        }
+    });
+}
+	// Function to update Next Step button state
+	function updateNextStepButton(isValid) {
+	    const nextStepButton = document.querySelector('button[onclick="switchTab(\'step2\')"]');
+	    if (nextStepButton) {
+	        if (isValid) {
+	            nextStepButton.disabled = false;
+	            nextStepButton.classList.remove('btn-disabled');
+	            nextStepButton.classList.add('btn-dark-gray');
+	        } else {
+	            nextStepButton.disabled = true;
+	            nextStepButton.classList.add('btn-disabled');
+	            nextStepButton.classList.remove('btn-dark-gray');
+	        }
+	    }
+	}
+	
+	
+	// Function to validate and show errors only when user tries to proceed
+	function validateStep1WithFeedback() {
+	    let isValid = true;
+	
+	    // Clear previous error messages and styling
+	    clearValidationErrors();
+	
+	    // Validate Full Name
+	    const fullName = document.getElementById('{{ form.full_name.vars.id }}');
+	    if (!fullName.value.trim()) {
+	        showValidationError(fullName, 'Please enter your full name');
+	        isValid = false;
+	    }
+	    
+	    // Validate Gender
+	    const gender = document.getElementById('{{ form.gender.vars.id }}');
+	    if (!gender.value) {
+	        showValidationError(gender, 'Please select your gender');
+	        isValid = false;
+	    }
+	    
+	    // Validate Phone
+	    const phone = document.getElementById('{{ form.phone.vars.id }}');
+	    if (!phone.value.trim()) {
+	        showValidationError(phone, 'Please enter your phone number');
+	        isValid = false;
+	    }
+	    
+	    // Validate Nationality
+	    const nationality = document.getElementById('{{ form.nationality.vars.id }}');
+	    if (!nationality.value) {
+	        showValidationError(nationality, 'Please select your nationality');
+	        isValid = false;
+	    }
+	    
+	    // Validate Date of Birth
+	    const dateOfBirth = document.getElementById('{{ form.date_of_birth.vars.id }}');
+	    if (!dateOfBirth.value) {
+	        showValidationError(dateOfBirth, 'Please enter your date of birth');
+	        isValid = false;
+	    }
+	    
+	    // Validate Region
+	    const region = document.getElementById('{{ form.region.vars.id }}');
+	    if (!region.value) {
+	        showValidationError(region, 'Please select your region');
+	        isValid = false;
+	    }
+	    
+	    // Validate Town
+	    const town = document.getElementById('{{ form.town.vars.id }}');
+	    if (!town.value.trim()) {
+	        showValidationError(town, 'Please enter your town');
+	        isValid = false;
+	    }
+	    
+	    // Validate Disability
+	    const disability = document.getElementById('{{ form.disability.vars.id }}');
+	    if (!disability.value) {
+	        showValidationError(disability, 'Please select an option for disability information');
+	        isValid = false;
+	    }
+	
+	    // Validate Disability Explanation (if disability is "Yes")
+	    const disabilityExplanation = document.getElementById('{{ form.disability_explanation.vars.id }}');
+	    if (disability.value === 'Yes' && !disabilityExplanation.value.trim()) {
+	        // Make sure the explanation field is visible
+	        const explanationDiv = document.getElementById('disabilityExplanation');
+	        explanationDiv.style.display = 'block';
+	        showValidationError(disabilityExplanation, 'Please provide an explanation for your disability');
+	        isValid = false;
+	    }
+	    
+	  
+	    
+	    // Validate Secondary Region
+	
+	
+	    // Validate Identity Attachment (at least one file)
+	    const identityAttachment = document.querySelector('[data-field-name="identity_attachment"]');
+	    const identityFileList = identityAttachment ? identityAttachment.querySelector('.file-list') : null;
+	    const hasIdentityFiles = identityFileList && identityFileList.children.length > 0;
+	    
+	    if (!hasIdentityFiles) {
+	        // Show error on identity attachment area
+	        identityAttachment.classList.add('file-area-error');
+	        if (!identityAttachment.querySelector('.file-error-message')) {
+	            const errorDiv = document.createElement('div');
+	            errorDiv.className = 'file-error-message text-danger mt-2';
+	            errorDiv.innerHTML = '<i class="fa fa-exclamation-circle me-1"></i>Identity attachment is required';
+	            identityAttachment.appendChild(errorDiv);
+	        }
+	        isValid = false;
+	    } else {
+	        // Remove error if files are present
+	        identityAttachment.classList.remove('file-area-error');
+	        const existingError = identityAttachment.querySelector('.file-error-message');
+	        if (existingError) {
+	            existingError.remove();
+	        }
+	    }
+	
+	    // If validation fails, scroll to first error and show alert
+	    if (!isValid) {
+	        const firstError = document.querySelector('.is-invalid, .file-area-error');
+	        if (firstError) {
+	            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+	        }
+	        
+	        showAlertMessage('Please complete all required fields and upload identity attachment before proceeding.', 'danger');
+	    }
+	    
+	    return isValid;
+	}
+	
+	// Enhanced real-time validation for fields
+function setupRealTimeValidation() {
+    const requiredFields = [
+        '{{ form.full_name.vars.id }}',
+        '{{ form.phone.vars.id }}',
+        '{{ form.town.vars.id }}',
+        '{{ form.gender.vars.id }}',
+        '{{ form.nationality.vars.id }}',
+        '{{ form.date_of_birth.vars.id }}',
+        '{{ form.region.vars.id }}',
+        '{{ form.disability.vars.id }}',
+    ];
+    
+    // Add secondary_region only if type is not 'l'
+    {% if type != 'l' %}
+    requiredFields.push('{{ form.secondary_region.vars.id }}');
+    {% endif %}
+    
+    requiredFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            field.addEventListener('blur', function() {
+                validateStep1(); // Silent validation - just update button state
+            });
+            
+            field.addEventListener('change', function() {
+                validateStep1(); // Silent validation - just update button state
+            });
+            
+            field.addEventListener('input', function() {
+                validateStep1(); // Silent validation - just update button state
+            });
+        }
+    });
+
+	
+	    // Also validate when files are added/removed
+    const fileAreas = document.querySelectorAll('.file-drop-area');
+    fileAreas.forEach(area => {
+        const fileList = area.querySelector('.file-list');
+        if (fileList) {
+            // Use MutationObserver to detect file list changes
+            const observer = new MutationObserver(function() {
+                validateStep1(); // Silent validation - just update button state
+            });
+            
+            observer.observe(fileList, {
+                childList: true,
+                subtree: true
+            });
+        }
+    });
+	}
+	
+	// Enhanced tab switching function with validation
+function switchTab(tabName) {
+    if (tabName === 'step2') {
+        // Validate Step 1 before proceeding - use the feedback version for user feedback
+        if (!validateStep1WithFeedback()) {
+            return false;
+        }
+    }
+    
+    const tab = new bootstrap.Tab(document.querySelector(`a[href="#${tabName}"]`));
+    tab.show();
+
+    // If switching to step 2, validate files to show current state
+    if (tabName === 'step2') {
+        setTimeout(() => {
+            validateFileAttachments();
+        }, 100);
+    }
+}
+	// Function to show validation error
+	function showValidationError(field, message) {
+	    // Add Bootstrap invalid class
+	    field.classList.add('is-invalid');
+	    
+	    // Create or update error message
+	    let errorElement = field.parentNode.querySelector('.invalid-feedback');
+	    if (!errorElement) {
+	        errorElement = document.createElement('div');
+	        errorElement.className = 'invalid-feedback';
+	        field.parentNode.appendChild(errorElement);
+	    }
+	    errorElement.textContent = message;
+	    
+	    // Add red border styling
+	    field.style.borderColor = '#dc3545';
+	}
+	
+	// Function to clear validation errors
+	function clearValidationErrors() {
+	    // Remove invalid classes and error messages
+	    const invalidFields = document.querySelectorAll('.is-invalid');
+	    invalidFields.forEach(field => {
+	        field.classList.remove('is-invalid');
+	        field.style.borderColor = '';
+	        
+	        const errorElement = field.parentNode.querySelector('.invalid-feedback');
+	        if (errorElement) {
+	            errorElement.remove();
+	        }
+	    });
+	    
+	    // Remove alert messages
+	    const alert = document.querySelector('.validation-alert');
+	    if (alert) {
+	        alert.remove();
+	    }
+	}
+	
+	// Function to show alert message
+	function showAlertMessage(message, type = 'danger') {
+	    // Remove existing alert
+	    const existingAlert = document.querySelector('.validation-alert');
+	    if (existingAlert) {
+	        existingAlert.remove();
+	    }
+	    
+	    // Create alert
+	    const alertDiv = document.createElement('div');
+	    alertDiv.className = `alert alert-${type} validation-alert mt-3`;
+	    alertDiv.innerHTML = `
+	        <div class="d-flex align-items-center">
+	            <i class="fa fa-exclamation-circle me-2"></i>
+	            <span>${message}</span>
+	        </div>
+	    `;
+	    
+	    // Insert after the tab navigation
+	    const tabContent = document.querySelector('.tab-content');
+	    if (tabContent) {
+	        tabContent.parentNode.insertBefore(alertDiv, tabContent);
+	    }
+	}
+	
+	// Function to toggle disability explanation field
+	function toggleDisabilityExplanation(selectElement) {
+	    const explanationDiv = document.getElementById('disabilityExplanation');
+	    const explanationField = document.getElementById('{{ form.disability_explanation.vars.id }}');
+	    
+	    if (selectElement.value === 'Yes') {
+	        explanationDiv.style.display = 'block';
+	        explanationField.setAttribute('required', 'required');
+	        // Remove any inline display:none style
+	        explanationField.style.display = 'block';
+	    } else {
+	        explanationDiv.style.display = 'none';
+	        explanationField.removeAttribute('required');
+	        explanationField.value = '';
+	    }
+	}
+function loadDistricts(regionId) {
+    console.log('loadDistricts called with regionId:', regionId);
+    
+    // Get the district select element using the correct Symfony-generated ID
+    const districtSelect = document.getElementById('{{ form.district.vars.id }}');
+    
+    if (!districtSelect) {
+        console.error('District select element not found');
+        return;
+    }
+
+    if (!regionId || regionId === '') {
+        districtSelect.innerHTML = '<option value="">Select District</option>';
+        districtSelect.disabled = true;
+        return;
+    }
+
+    // Show loading state
+    districtSelect.innerHTML = '<option value="">Loading districts...</option>';
+    districtSelect.disabled = true;
+
+    // Construct the URL properly - use the current path and add query parameters
+    const currentPath = window.location.pathname;
+    const apiUrl = `${currentPath}?action=get_districts&region_id=${regionId}`;
+    
+    console.log('Making request to:', apiUrl);
+
+    fetch(apiUrl, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(districts => {
+        console.log('Received districts:', districts);
+        
+        districtSelect.innerHTML = '<option value="">Select District</option>';
+        districtSelect.disabled = false;
+        
+        if (districts && districts.length > 0) {
+            districts.forEach(district => {
+                const option = document.createElement('option');
+                option.value = district.id;
+                option.textContent = district.name;
+                districtSelect.appendChild(option);
+            });
+            console.log(`Loaded ${districts.length} districts`);
+        } else {
+            console.log('No districts found for this region');
+            districtSelect.innerHTML = '<option value="">No districts available</option>';
+        }
+    })
+    .catch(error => {
+        console.error('Error loading districts:', error);
+        districtSelect.innerHTML = '<option value="">Error loading districts</option>';
+        districtSelect.disabled = false;
+    });
+}	
+	// Enhanced real-time validation for fields
+	function setupRealTimeValidation() {
+	    const requiredFields = [
+	        '{{ form.full_name.vars.id }}',
+	        '{{ form.phone.vars.id }}',
+	        '{{ form.town.vars.id }}',
+	        '{{ form.gender.vars.id }}',
+	        '{{ form.nationality.vars.id }}',
+	        '{{ form.date_of_birth.vars.id }}',
+	        '{{ form.region.vars.id }}',
+	        '{{ form.disability.vars.id }}',
+	    ];
+	    
+	    requiredFields.forEach(fieldId => {
+	        const field = document.getElementById(fieldId);
+	        if (field) {
+	            field.addEventListener('blur', function() {
+	                validateStep1(); // Silent validation - just update button state
+	            });
+	            
+	            field.addEventListener('change', function() {
+	                validateStep1(); // Silent validation - just update button state
+	            });
+	            
+	            field.addEventListener('input', function() {
+	                validateStep1(); // Silent validation - just update button state
+	            });
+	        }
+	    });
+	
+	    // Also validate when files are added/removed
+	    const fileAreas = document.querySelectorAll('.file-drop-area');
+	    fileAreas.forEach(area => {
+	        const fileList = area.querySelector('.file-list');
+	        if (fileList) {
+	            // Use MutationObserver to detect file list changes
+	            const observer = new MutationObserver(function() {
+	                validateStep1(); // Silent validation - just update button state
+	            });
+	            
+	            observer.observe(fileList, {
+	                childList: true,
+	                subtree: true
+	            });
+	        }
+	    });
+	}
+	// Enhanced form submission validation
+function validateFormSubmission() {
+    // First validate step 1
+    if (!validateStep1WithFeedback()) {
+        switchTab('step1');
+        showAlertMessage('Please complete all required fields before submitting your application.', 'danger');
+        return false;
+    }
+    
+    // Then validate file attachments
+    if (!validateFileAttachments()) {
+        switchTab('step2');
+        showAlertMessage('Please upload at least one supporting document before submitting your application.', 'danger');
+        
+        // Scroll to first file area with error
+        const firstErrorArea = document.querySelector('.file-area-error');
+        if (firstErrorArea) {
+            firstErrorArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        return false;
+    }
+    
+    return true;
+}
+
+	// Function to update tab accessibility
+function updateTabAccessibility(isValid) {
+    const step2Tab = document.getElementById('step2-tab');
+    const step2TabLink = step2Tab.querySelector('a');
+    
+    if (isValid) {
+        // Enable the tab
+        step2TabLink.classList.remove('disabled-tab');
+        step2TabLink.style.pointerEvents = 'auto';
+        step2TabLink.style.opacity = '1';
+        step2TabLink.style.cursor = 'pointer';
+        step2TabLink.removeAttribute('tabindex');
+    } else {
+        // Disable the tab
+        step2TabLink.classList.add('disabled-tab');
+        step2TabLink.style.pointerEvents = 'none';
+        step2TabLink.style.opacity = '0.6';
+        step2TabLink.style.cursor = 'not-allowed';
+        step2TabLink.setAttribute('tabindex', '-1');
+    }
+}
+
+// Function to prevent tab switching via click
+function setupTabProtection() {
+    const step2Tab = document.getElementById('step2-tab');
+    const step2TabLink = step2Tab.querySelector('a');
+    
+    step2TabLink.addEventListener('click', function(e) {
+        if (this.classList.contains('disabled-tab')) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Show validation message
+            showAlertMessage('Please complete all required fields in Step 1 before accessing Supporting Documents.', 'warning');
+            
+            // Scroll to first error if any
+            const firstError = document.querySelector('.is-invalid, .file-area-error');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            return false;
+        }
+    });
+}
+	
+	
+	
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Clear any existing validation messages on page load
+    clearValidationErrors();
+    
+    // Get the region select element using the correct Symfony-generated ID
+    const regionSelect = document.getElementById('{{ form.region.vars.id }}');
+    
+    if (!regionSelect) {
+        return;
+    }
+    
+    // Get the district select element
+    const districtSelect = document.getElementById('{{ form.district.vars.id }}');
+    
+    // If a region is already selected, load its districts
+    if (regionSelect && regionSelect.value) {
+        loadDistricts(regionSelect.value);
+    } else {
+        console.log('No region pre-selected');
+        // Disable district select initially
+        if (districtSelect) {
+            districtSelect.innerHTML = '<option value="">Select region first</option>';
+            districtSelect.disabled = true;
+        }
+    }
+    
+    // Add event listener for region changes
+    regionSelect.addEventListener('change', function() {
+        loadDistricts(this.value);
+    });
+    
+    // Setup real-time validation
+    setupRealTimeValidation();
+    
+    // Setup tab protection
+    setupTabProtection();
+
+    // Run initial validation to set button state (silent - no messages)
+    validateStep1();
+
+    // Initialize file area validation state
+    const fileAreas = document.querySelectorAll('.file-drop-area');
+    fileAreas.forEach(area => {
+        updateFileAreaValidation(area);
+    });
+
+    // Initialize disability explanation toggle
+    const disabilitySelect = document.getElementById('{{ form.disability.vars.id }}');
+    if (disabilitySelect) {
+        // Set initial state
+        toggleDisabilityExplanation(disabilitySelect);
+        
+        // Add event listener for changes
+        disabilitySelect.addEventListener('change', function() {
+            toggleDisabilityExplanation(this);
+            validateStep1(); // Silent validation - just update button state
+        });
+    }
+});
+
+	</script>
+
+
+		 <script src="{{ asset('assets/js/jquery.js') }}"></script>
+		 <script src="{{ asset('assets/js/vendors.min.js') }}"></script>
+		 <script src="{{ asset('assets/js/main.js') }}"></script>
+		 <script>
+		
+	function submitApplication() {
+    var form = document.getElementById('register_form');
+    
+    // Run our custom validation first
+    if (!validateFormSubmission()) {
+        return false;
+    }
+    
+    // If validation passes, submit the form only once
+    if (form.reportValidity()) {
+        // Disable the submit button to prevent double submission
+        const submitBtn = document.getElementById('submitBtn');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = 'Submitting...';
+        }
+        
+        // Submit the form
+        form.submit();
+    }
+}
+				</script>
+
+		 {# <script src="https://www.google.com/recaptcha/api.js" async defer></script> #}
+
+         <script>
+// Language switching functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const languageButtons = document.querySelectorAll('.language-btn');
+    
+    languageButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const lang = this.getAttribute('data-lang');
+            
+            fetch(`/change-language/${lang}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update active button
+                    languageButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Reload the page to apply translations
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error changing language:', error);
+            });
+        });
+    });
+});
+
+// Existing functions for your form
+function toggleDisabilityExplanation(select) {
+    const explanationDiv = document.getElementById('disabilityExplanation');
+    if (select.value === 'Yes') {
+        explanationDiv.style.display = 'block';
+    } else {
+        explanationDiv.style.display = 'none';
+    }
+}
+
+function switchTab(tabName) {
+    const tab = new bootstrap.Tab(document.querySelector(`[href="#${tabName}"]`));
+    tab.show();
+}
+
+function validateFormSubmission() {
+    // Your existing validation logic
+    document.getElementById('register_form').submit();
+}
+</script>
+	</body>
+</html>

@@ -1,0 +1,74 @@
+<div {{ attributes }}>
+	{{ form_start(form) }}
+	<div class="row">
+		<div class="col-12">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">{{ form_label(form.title, 'Title') }}</label>
+				{{ form_widget(form.title, {'attr': {'class': 'form-control'}}) }}
+				{{ form_errors(form.title) }}
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-12">
+			<table class="table table-borderless form-no-mb">
+				<thead>
+					<tr>
+						<td>Title</td>
+						<td>Description</td>
+						<td>Right</td>
+						<td>Action</td>
+					</tr>
+				</thead>
+				<tbody>
+					{% for key, itemForm in form.employerJobQuestionAnswers %}
+						<tr>
+							<td>
+								{{ form_row(itemForm.title, {
+                                label: false,
+                                row_attr: {class: 'mb-1'},
+                                attr: {
+                                    placeholder: 'Title',
+                                 class: 'form-control',
+                                }
+                            }) }}
+							</td>
+							<td>
+								{{ form_row(itemForm.description, {
+                                label: false,
+                                row_attr: {class: 'mb-1'},
+                                attr: {
+                                    placeholder: 'description',
+                              class: 'form-control',
+                                }
+                            }) }}
+							</td>
+							<td>
+								{{ form_row(itemForm.is_right, {
+                                label: false,
+                                row_attr: {class: 'mb-1'},
+                                attr: {
+                                    placeholder: 'Correct',
+                                 class: 'form-control qty',
+                                }
+                            }) }}
+							</td>
+						
+							<td>
+								{{ form_row(itemForm.vars.button_delete, { label: 'X', attr: { class: 'btn btn-outline-danger'} }) }}
+							</td>
+
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+	{{ form_widget(form.employerJobQuestionAnswers.vars.button_add, { label: '+ Add Answer', attr: { class: 'btn btn-outline-primary' } }) }}
+
+	<div class="col-12">
+		<button type="submit" class="btn btn-primary">Submit</button>
+	</div>
+	{{ form_end(form) }}
+</div>

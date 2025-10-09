@@ -1,0 +1,54 @@
+<div {{ attributes }}>
+    <div class="filter-search-form mt-3 mt-md-0">
+        <i class="fa fa-comment-o" aria-hidden="true"></i>
+        <input type="text" data-model="query"
+            data-live-debounce="300ms" placeholder="Results update as you type..." class="form-control comformin">
+    </div>
+
+        {% if page > 1 %}
+            {# 🦊 #}
+            {# Adding a fake "previous page" div is enough to trick the system #}
+            {# It must have the same ID than the original page #}
+            <div class="Packages_grid" id="page--{{ page - 1 }}" data-live-ignore="true"></div>
+        {% endif %}
+
+    <div class="row Packages_grid"  id="page--{{ page}}" data-live-ignore="true">
+        {% for item in this.packages %}
+            <div class="col-lg-3 mb-4">
+                <div class="card blog-grid-box p-2">
+                    <img class="img-fluid" src="{{ path('profile_serve_employer_image', {'filename': item.thumbnail, 'type': 'product'}) }}" alt="">
+                    <div class="card-body">
+                        <h6 class="fs-17">{{ item.name }}</h6>
+                        <div class="product-info">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h5 class="m-0">Type: <b>DOCX</b></h5>
+                                </div>
+                                <div class="col-auto">
+                                    <div class="product-price-tag">${{ item.cost }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-center">
+                        <a href="{{ path('app_jobseeker_purchase_checkout', {'package': item.id}) }}" class="btn btn-primary btn-hover">Buy Now</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if this.hasMore %}
+        <div class="text-center mt-4">
+            <button 
+                data-action="live#action" data-live-action-param="more"
+                class="btn btn-primary">
+                Load More
+            </button>
+        </div>
+    {% else %}
+        <div class="text-center mt-4">
+            <span class="text-muted">No more results</span>
+        </div>
+    {% endif %}
+</div>

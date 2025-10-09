@@ -1,0 +1,168 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Blogs!
+{% endblock %}
+
+{% block body %}
+	<section class="bg-home4" id="home">
+		<div class="container">
+			<div class="row align-items-center">
+				<div class="col-lg-12">
+					<div class=" pb-2 me-lg-6 text-center mt-4">
+						<h1 class="display-5 fw-semibold mb-3 mt-3 fs-22">Blogs
+						</h1>
+						<p class="lead text-muted mb-0 pc-da">
+							Welcome
+							<br>
+							If you're finding value in our content, don't miss out on the latest industry insights. Keep connected and explore our articles to stay ahead in the job market. Dive into our resources for a wealth of knowledge that can propel your career forward.
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<section class="section-re">
+		<div class="container">
+			{# {% for key, blog in blogs %}
+				{% if key == 0 %}
+
+					<div
+						class="row justify-content-center">
+
+
+						<div class="mb-3">
+							<img class="img-fluid rounded-3" src="assets/images/im14.jpg" alt="">
+
+						</div>
+						<div class="mt-4">
+							<h5 class="pb-2">{{blog.title}}</h5>
+							{% set description = blog.description|striptags %}
+							<p class="text-muted fs-14 fw-medium">{{ description|slice(0, 300) ~ '...' }}</p>
+							<p class="text-muted fs-14 fw-medium">
+
+
+								{% if controller_name and controller_name == "MetierEmController" %}
+									<a href="{{ path("app_home_read_em_post", {"blog": blog.id}) }}">
+										Read post &nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+									</a>
+								{% else %}
+									<a href="{{ path("app_home_read-post", {"blog": blog.id}) }}">
+										Read post &nbsp;<i class="fa fa-external-link-square" aria-hidden="true"></i>
+									</a>
+								{% endif %}
+							</p>
+						</div>
+					{% endif %}
+
+				{% endfor %}
+
+
+			</div>
+			<hr> #}
+		</div>
+	</section>
+	<section class="section mt-2">
+		<div class="container">
+			<div class="row text-lg-start">
+				<div class="col-lg-12">
+					<h3 class="title mb-4">Discover the<span class="text-primary fw-bold">
+							latest blogs</span>
+					</h3>
+					<ul class="faq-menu nav nav-fill nav-pills text-lg-start borac" id="pills-tab" role="tablist">
+						<li class="nav-item me-lg-5" role="presentation">
+							<button class="nav-link text-le active" id="general-tab" data-bs-toggle="pill" data-bs-target="#all" type="button" role="tab" aria-controls="all" aria-selected="true">All</button>
+						</li>
+						{# <li class="nav-item me-lg-5" role="presentation">
+																														                  <button class="nav-link text-le" id="buying-tab" data-bs-toggle="pill" data-bs-target="#interviews"
+																														                    type="button" role="tab" aria-controls="interviews" aria-selected="false"
+																														                    tabindex="-1">Interviews</button>
+																														                </li>
+																														                <li class="nav-item me-lg-5" role="presentation">
+																														                  <button class="nav-link text-le" id="payment-tab" data-bs-toggle="pill" data-bs-target="#trending"
+																														                    type="button" role="tab" aria-controls="trending" aria-selected="false" tabindex="-1">Trending
+																														                    Skills</button>
+																														                </li>
+																														                <li class="nav-item me-lg-5" role="presentation">
+																														                  <button class="nav-link text-le" id="support-tab" data-bs-toggle="pill" data-bs-target="#technology"
+																														                    type="button" role="tab" aria-controls="technology" aria-selected="false"
+																														                    tabindex="-1">Technology</button>
+																														                </li> #}
+					</ul>
+				</div>
+				<!--end col-->
+			</div>
+			<!--end row-->
+			<div class="row align-items-center mt-5">
+				<div class="col-lg-12">
+					<div class="tab-content" id="pills-tabContent">
+						<div class="tab-pane fade show active" id="all" role="tabpanel" aria-labelledby="all">
+							<div class="row">
+								<div class="blog-post">
+									<div class="row">
+										{% for key, blog in blogs %}
+											{% set description = blog.description|striptags %}
+											<div class="col-lg-4 mb-4">
+												<div class="card blog-grid-box p-2">
+													<img src="{{ asset('uploads/blogs/' ~ blog.image) }}" width="300px" alt="modernize-img" class="iconn img-fluid mb-n4">
+													<div class="card-body">
+														<ul class="list-inline d-flex justify-content-between mb-3">
+															<li
+																class="list-inline-item">{# <p class="text-muted mb-0">
+																																																																				<a href="blog-author.html" class="text-muted fw-medium">{{ blog.category.name }}</a>
+																																																																				- {{ blog.date|date('F j, Y')}}</p> #}
+															</li>
+														</ul>
+
+														{% if controller_name and controller_name == "MetierEmController" %}
+															<a href="{{ path("app_home_read_em_post", {"blog": blog.id}) }}" class="primary-link">
+																<h6 class="fs-17">{{blog.title}}</h6>
+															</a>
+														{% else %}
+															<a href="{{ path("app_home_read-post", {"blog": blog.id}) }}" class="primary-link">
+																<h6 class="fs-17">{{blog.title}}</h6>
+															</a>
+														{% endif %}
+														<p class="text-muted">{{ description|slice(0, 150) ~ '...' }}</p>
+														<div>
+															{% if controller_name and controller_name == "MetierEmController" %}
+																<a href="{{ path("app_home_read_em_post", {"blog": blog.id}) }}" class="form-text text-primary">Read post
+																	<i class="fa fa-external-link-square" aria-hidden="true"></i>
+																</a>
+															{% else %}
+																<a href="{{ path("app_home_read-post", {"blog": blog.id}) }}" class="form-text text-primary">Read post
+																	<i class="fa fa-external-link-square" aria-hidden="true"></i>
+																</a>
+															{% endif %}
+
+														</div>
+													</div>
+												</div>
+											</div>
+										{% endfor %}
+									</div>
+								</div>
+								<div
+									class="text-center mt-3">{# <button type="button" class="btn btn-outline-primary">Load More Blogs</button> #}
+								</div>
+							</div>
+							<!--end row-->
+						</div>
+
+
+					</div>
+				</div>
+				<!--end col-->
+
+			</div>
+			<!--end row-->
+		</div>
+		<!--end container-->
+	</section>
+
+	<!--starrt-->
+
+	<!-- company-LISTEnd -->
+
+
+	{% include 'home/_footer.html.twig' %}
+{% endblock %}

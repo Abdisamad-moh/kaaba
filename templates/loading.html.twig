@@ -1,0 +1,16 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Candidates
+{% endblock %}
+
+{% block body %}
+	<div class="container-fluid" data-controller="employer">
+		<div id="loading-overlay">
+			<div class="d-flex justify-content-center align-items-center vh-100">
+				<div class="spinner-border" role="status">
+					<span class="visually-hidden">Loading...</span>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

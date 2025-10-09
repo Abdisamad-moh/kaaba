@@ -1,0 +1,48 @@
+<li class="list-inline-item dropdown me-4">
+	<a href="#" class="header-item noti-icon position-relative" id="notification" data-bs-toggle="dropdown" aria-expanded="false">
+		<i class="mdi mdi-bell fs-18"></i>
+		<div class="count position-absolute">{{ unreadNotificationCount }}</div>
+	</a>
+	<div class="dropdown-menu dropdown-menu-sm dropdown-menu-end p-0" aria-labelledby="notification">
+		<div class="notification-header border-bottom ">
+			{# <a href="#" class="header-item noti-icon position-relative" id="notification" data-bs-toggle="dropdown" aria-expanded="false">
+				<span class="fw-bold">Notification &nbsp;</span>
+				<div class="count position-absolute">{{ unreadNotificationCount }}</div>
+			</a> #}
+			<div class="alert bg-secondary-subtle text-secondary sufontlogin" role="alert">
+				<div class="row">
+					<div class="col-lg-6 sufontlogin">
+						<p class="text-muted fw-bold fs-16">Notifications</p>
+                        {# <div class="count position-absolute">{{ unreadNotificationCount }}</div> #}
+					</div>
+					<div class="col-lg-6 text-md-end sufontlogin">
+						<p class="texthead text-muted fw-medium fs-16">
+							<a href="{{ path('app_notifications_list')}}">
+								<u>View &amp; All</u>
+								<i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+							</a>
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="notification-wrapper dropdown-scroll">
+			{% for notification in topUnreadNotifications %}
+				<a href="{{ notification.action }}" class="text-dark notification-item d-block {{ notification.isRead ? '' : 'active' }}">
+					<div class="d-flex align-items-center">
+						<div
+							class="flex-shrink-0 me-3 top-bu">{# <img src="{{ notification.imageUrl }}" class="img-fluid boxlogoicon avatar-xs" alt="user-pic"> #}
+						</div>
+						<div class="flex-grow-1">
+							<h6 class="mt-0 mb-1 fs-14">{{ notification.content }}</h6>
+							{# <p class="mb-0 fs-12 text-mutedlogin">{{ notification.content }}</p> #}
+						</div>
+						<div
+							class="flex-shrink-0 text-md-end">{# <p class="texthead text-md-end">{{ notification.timeAgo }}</p> #}
+						</div>
+					</div>
+				</a>
+			{% endfor %}
+		</div>
+	</div>
+</li>

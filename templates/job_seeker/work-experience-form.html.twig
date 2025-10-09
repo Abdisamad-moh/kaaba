@@ -1,0 +1,204 @@
+{{ form_start(form, {'action': path('job_seeker_experience_form', {'experience': experience.id })}) }}
+{# Display all error messages at the top of the form #}
+<div data-controller="sync-location career-autocomplete"
+		data-sync-location-cities-url-value="{{ path('app_fetch_cities') }}" 
+		data-sync-location-states-url-value="{{ path('app_fetch_states') }}" 
+		data-career-autocomplete-career-url-value="{{ path('fetch_job_title') }}"
+	>
+	<div class="form-errors">
+		{% for fieldName, fieldErrors in errors %}
+			{% for error in fieldErrors %}
+				<p class="alert alert-danger fw-bold">
+					{{ fieldName|capitalize }}:
+					{{ error }}
+				</p>
+			{% endfor %}
+		{% endfor %}
+	</div>
+	<div class="row">
+		<div class="col-lg-12">
+			<label class="form-label">Is this your current employment?
+				<span class="text-danger">*</span>
+			</label>
+		</div>
+		<div class="col-lg-12">
+			{{ form_widget(form.current, {
+        }) }}
+		</div>
+	</div>
+	<!-- ---------------------------------- -->
+
+	<!-- ---------------------------------- -->
+	<hr>
+	<div class="row">
+		<div class="col-lg-12">
+			<label class="form-label">Company/Organization Name
+				<span class="text-danger">*</span>
+			</label>
+			{{ form_widget(form.companyName) }}
+		</div>
+	</div>
+	<!-- ---------------------------------- -->
+
+	<!-- ---------------------------------- -->
+	<hr>
+	<div class="row">
+		<div class="col-lg-12">
+			<label class="form-label">Position Name
+				<span class="text-danger">*</span>
+			</label>
+			<span class="d-block label_note">Example:  Type Human Resources Manager, Web Developer Cashier, Driver, Housemaid</span>
+			{{ form_widget(form.positionName) }}
+		</div>
+	</div>
+	<!-- ---------------------------------- -->
+
+	<!-- ---------------------------------- -->
+	<hr>
+	<div class="row mt-4">
+		<div class="col-lg-12 ">
+			<label class="form-label">Employment type
+				<span class="text-danger">*</span>
+			</label>
+		</div>
+		<div class="col-lg-12">
+			{{ form_widget(form.jobType) }}
+		</div>
+	</div>
+	<!-- ---------------------------------- -->
+
+	<!-- ---------------------------------- -->
+	<hr>
+	<div class="row">
+		<div class="col-lg-12">
+			<label class="form-label">Start Date
+				<span class="text-danger">*</span>
+			</label>
+			{{ form_widget(form.joinedDate) }}
+		</div>
+	</div>
+	<hr>
+
+	<div class="row finish_date">
+		<div class="col-lg-12">
+			<label class="form-label">End Date
+			</label>
+			{{ form_widget(form.finishDate) }}
+		</div>
+	</div>
+	<hr>
+	{# <h5>Location</h5> #}
+	<div class="row my-3">
+		<div class="col-lg-6">
+			<label class="form-label">Country
+				<span class="text-danger">*</span>
+			</label>
+			<div class="input-div">
+				{{ form_widget(form.country) }}
+			</div>
+		</div>
+		<div class="col-lg-6">
+			<label class="form-label">City
+				<span class="text-danger">*</span>
+			</label>
+			<div class="input-div">
+				{{ form_widget(form.city) }}
+			</div>
+		</div>
+		
+	</div>
+	{# <hr> #}
+	<div class="row my-3">
+		<div class="col-lg-6">
+			<label class="form-label">State/Region
+			</label>
+			{{ form_widget(form.state) }}
+		</div>
+		<div class="col-lg-6">
+			<label class="form-label">Zip/Postal Code</label>
+			{{ form_widget(form.zipCode) }}
+		</div>
+	</div>
+	<hr>
+	<div class="row">
+		<div class="col-lg-12">
+			<label class="form-label">Number of years of experience<span class="text-danger">*</span>
+			</label>
+		</div>
+		<div class="col-lg-6">
+			<div class="input-div">
+				{{ form_widget(form.experienceYears) }}
+			</div>
+		</div>
+		<div class="col-lg-6">
+			<div class="input-div">
+				{{ form_widget(form.experienceMonths) }}
+			</div>
+		</div>
+	</div>
+	<!-- ---------------------------------- -->
+
+	<!-- ---------------------------------- -->
+	<hr>
+	
+
+	
+	
+	<div class="row">
+		<div class="col-lg-3">
+			<label class="form-label">Currency
+				{# <span class="text-danger">*</span> #}
+			</label>
+			<span class="d-block label_note">
+				Choose currency
+			</span>
+			{{ form_widget(form.currency) }}
+		</div>
+		<div class="col-lg-9">
+			<label class="form-label">Salary
+				<span class="text-danger">*</span>
+			</label>
+			<span class="d-block label_note">
+				Enter your current salary or the last salary you received from this employer
+			</span>
+			{{ form_widget(form.salary) }}
+		</div>
+	</div>
+	<hr>
+	{# <div class="row">
+		<div class="col-lg-12">
+			<label class="form-label">Salary
+				<span class="text-danger">*</span>
+			</label>
+			<span class="d-block label_note">
+				Enter your current salary or the last salary you received from this employer
+			</span>
+			{{ form_widget(form.salary) }}
+		</div>
+	</div>
+	<hr> #}
+	<div class="row">
+		<div class="col-lg-12">
+			<label class="form-label">Duties
+				<span class="text-danger">*</span>
+			</label>
+			<span class="d-block label_note">
+				Enter the duties you performed in this role.
+			</span>
+			{{ form_widget(form.duties) }}
+		</div>
+	</div>
+	</hr>
+	<div class="row notice_period">
+		<div class="col-lg-12">
+			<label class="form-label">Notice period
+			</label>
+			{{ form_widget(form.noticePeriod) }}
+		</div>
+	</div>
+	<div class="modal-footer mt-3">
+		<a href="#" class="btn btn-outline-primary" style="border-radius: 50px;" data-bs-dismiss="modal">Cancel</a>
+		<button type="submit" class="btn btn-primary waves-effect waves-light">Save</button>
+	</div>
+</div>
+{{ form_end(form) }}

@@ -1,0 +1,410 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+	Tender Details
+{% endblock %}
+{% block ogs %}
+	<meta property="og:title" content="{{ tender.title }}" />
+    <meta property="og:description" content="{{ tender.description }}" />
+    <meta property="og:image" content="{{ absolute_url(asset('assets/images/metier-log-1.png')) }}" />
+    <meta property="og:url" content="{{ url('job_seeker_tender_details', {slug: tender.title|slugify, uuid: tender.uuid }) }}" />
+{% endblock %}
+{% block body %}
+	<style>
+		.min-height-200 {
+			min-height: 200px;
+		}
+	</style>
+	<div class="min-height-200" data-controller="job-details">
+		<section class="bg-home8" id="home">
+			<div class="container">
+				<nav class="d-inline-block" aria-label="breadcrumb ">
+					<ol class="breadcrumb justify-content-center fs-12">
+						<li class="">
+							<a href="{{ path('app_home') }}">Search Tenders&nbsp; /</a>
+						</li>
+						<li class="pl-1">
+							<a href="#">
+								{{ tender.title }}&nbsp;
+							</a>
+						</li>
+						<li class=" active" aria-current="page">
+							/&nbsp;&nbsp;{{ tender.title }},
+							{{ tender.employer.name|capitalizeWords }}
+						</li>
+					</ol>
+				</nav>
+				<div class="candidate-list-box card mt-4 col-lg-12">
+					<div class="card-body p-4">
+						<div
+							class="row align-items-center">
+							<!--end col-->
+
+							<div class="row text-lg-start">
+								<div class="col-lg-6">
+									<div class="  me-lg-12 text-dark">
+										<div class="ps-3 pt-2">
+											<h6 class="fs-20">
+												{{ tender.employer.name|capitalizeWords }}</h6>
+											<h6>{{ tender.title }}</h6>
+											<ul class="list-inline d-flex ">
+												<li class="list-inline-item ">
+													<p class="text-muted mb-0 ">
+														<span class="text-muted fw-medium">
+															<i class="fa fa-map-marker" aria-hidden="true"></i>
+															&nbsp;
+															{{ tender.city.name ?? '' }},
+															{{ tender.country.name ?? '' }}</span>
+													</p>
+												</li>
+												{# <li>
+																																																	|</li>
+																																																<li class="list-inline-item pl-1">
+																																																	<p class="text-muted mb-0">
+																																																		<span class="text-muted fw-medium">
+																																																			<i class="fa fa-briefcase" aria-hidden="true"></i>
+																																																			&nbsp;
+																																																			{{ job.numberPosition }}
+																																																			roles available</span>
+																																																	</p>
+																																																</li> #}
+												<li>
+													|</li>
+												<li class="list-inline-item pl-1"></li>
+											</ul>
+										</div>
+									</div>
+									<div class="btn-group">
+										<a target="__blank" href="https://www.facebook.com/sharer/sharer.php?u={{ url('job_seeker_tender_details', {slug: tender.title|slugify, uuid: tender.uuid }) }}" style="background-color: #1877F2 !important;color: white !important;" class="btn">
+											<i class="fa fa-facebook-f"></i>
+											Share on Facebook
+										</a>
+										<a target="__blank" href="https://twitter.com/intent/tweet?url={{ url('job_seeker_tender_details', {slug: tender.title|slugify, uuid: tender.uuid }) }}&text={{ tender.title ?? '' }}" class="btn btn-dark">
+											<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="30" height="20"><path  d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z" fill="white"/></svg>
+
+										</a>
+										<a data-action="click->job-details#copyUrl" href="#" class="btn btn-success">
+											<i class="fa fa-copy"></i>
+											Copy
+										</a>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div
+										class="modal-footer">
+										{# <div class="sh mt-2 text-center ms-2">
+																																									<a href="#">
+																																										<i class="fa fa-share" aria-hidden="true"></i>
+																																										&nbsp; Share Job &nbsp;
+																																									</a>
+																																								</div> #}
+										{% if tender_application %}
+											<div class="sh mt-2 text-center ms-2">
+												<a
+													href="{{ path('job_seeker_apply_tender', {slug: tender.title|slugify, uuid: tender.uuid }) }}">
+													{# <i class="fa fa-share" aria-hidden="true"></i> #}
+													&nbsp; You applied for this Tender  &nbsp;
+												</a>
+											</div>
+										{% else %}
+											{% if tender.externalLink == null %}
+												
+											{# {% if job.externalLink == null %} #}
+											<div class="top-login-line mt-2 text-center ms-2 ">
+												<a href="{{ path('job_seeker_apply_tender', {'slug': tender.title|slugify, 'uuid': tender.uuid }) }}#tender-application-card">&nbsp; Apply Tender &nbsp;
+												</a>
+											</div>
+											{# {% endif %} #}
+											{% endif %}
+
+										{% endif %}
+									</div>
+									<div class="modal-footer">
+										<ul class="list-inline d-flex  mb-3 mt-3">
+
+											<li class="px-1">
+												<p class="text-muted mb-0 ">
+													<span class="text-muted fw-medium">
+														Expires in<strong>
+															{{ tender.expiresAt }}</strong>
+													</span>
+												</p>
+											</li>
+											<li>
+												|</li>
+											<li class=" pl-1">
+												<p class="text-muted mb-0">
+													<span class="text-muted fw-medium">
+														<i>Posted
+															{{ tender.postedAt }}</i>
+													</span>
+												</p>
+											</li>
+											{% if tender_application %}
+												<li class=" pl-1">
+													<p class="text-muted mb-0">
+														<span class="text-muted fw-medium">
+															<i>Applied
+																{{ tender_application.createdAt|diffForHumans }}</i>
+														</span>
+													</p>
+												</li>
+											{% endif %}
+										</ul>
+									</div>
+								</div>
+							</div>
+
+							<!--end col-->
+
+						</div>
+						<!--end row-->
+
+					</div>
+				</div>
+			</div>
+		</section>
+		<section class="section-re-de ">
+			<div class="container">
+				<div class="mb-5">
+					<p>
+						<span class="fw-bold">Tender Title:
+						</span>
+						{{ tender.title ?? '' }}
+					</p>
+					<p>
+						<span class="fw-bold">Company Name:
+						</span>
+						{{ tender.companyName }}
+					</p>
+					<p>
+						<span class="fw-bold">Tender Duration:
+						</span>
+						{{ tender.duration }}
+					</p>
+					{% if tender.attachment %}
+						<p>
+							<span class="fw-bold">Attachment</span>
+							<a class="btn btn-primary btn-lg" href="{{ asset('uploads/' ~ tender.attachment) }}" target="_blank">Preview</a>
+						</p>
+					{% endif %}
+					<p>
+						<span class="fw-bold">Funded By:
+						</span>
+						{{ tender.fundedBy }}
+					</p>
+					<p>
+						<span class="fw-bold">Tender Value:
+						</span>
+						{{ tender.value }}
+					</p>
+					<p>
+						<span class="fw-bold">Contact Name:
+						</span>
+						{{ tender.contactName }}
+					</p>
+					<p>
+						<span class="fw-bold">Contact Email:
+						</span>
+						{{ tender.contactEmail }}
+					</p>
+					<p>
+						<span class="fw-bold">Contact Phone:
+						</span>
+						{{ tender.contactPhone }}
+					</p>
+					
+					<p>
+						<span class="fw-bold">Project Location:
+						</span>
+						{{ tender.projectLocation}}
+					</p>
+					<p>
+						<span class="fw-bold">Location:
+						</span>
+						{{ tender.locationString|join(', ')}}
+					</p>
+					<p>
+						<span class="fw-bold">Skill and Experience Requirements:
+						</span>
+						{{ tender.skillAndExperience|nl2br}}
+					</p>
+
+				</div>
+				<div class="description mb-5 mt-2">
+					<h5>Scope</h5>
+					<div class="">
+						{{ tender.description|nl2br }}
+					</div>
+					
+				</div>
+				<p class="pb-3">
+					{% set url  = tender.externalLink %}
+					
+					<span class="fw-bold">Link To Apply:
+					</span>
+					{% if url is not empty %}
+						{% if url starts with 'http' %}
+							<a href="{{ url }}" target="_blank">{{ url }}</a>
+						{% else %}
+							<a  class="btn btn-primary btn-lg" href="http://{{ url }}" target="_blank">Click Here To Apply</a>
+						{% endif %}
+						
+					{% else %}
+						<p>No URL provided.</p>
+					{% endif %}
+					{# <a target="_blank"  href="{{ course.externalLink }}">{{ course.externalLink }}</a> #}
+				</p>
+			</div>
+
+		</section>
+
+		<section class="ftimg text-center">
+			 
+		</section>
+		<section class="bg-footer">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-4">
+						<div class="footer-item mt-4 mt-lg-0 me-lg-5">
+							<img class="img-fluid teimg" src="assets/images/logo_foot.png" alt="">
+							<p class="text-grey mt-3">Connect with us on</p>
+							<ul class="footer-social-menu list-inline mb-0">
+								<li class="list-inline-item">
+									<a href="#">
+										<i class="fa fa-facebook" aria-hidden="true"></i>
+									</a>
+								</li>
+								<li class="list-inline-item">
+									<a href="#">
+										<i class="fa fa-youtube-play" aria-hidden="true"></i>
+									</a>
+								</li>
+								<li class="list-inline-item">
+									<a href="#">
+										<i class="fa fa-twitter" aria-hidden="true"></i>
+									</a>
+								</li>
+								<li class="list-inline-item">
+									<a href="#">
+										<i class="fa fa-instagram" aria-hidden="true"></i>
+									</a>
+								</li>
+								<li class="list-inline-item">
+									<a href="#">
+										<i class="fa fa-linkedin" aria-hidden="true"></i>
+									</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<!--end col-->
+					<div class="col-lg-3 col-6">
+						<div class="footer-item mt-4 mt-lg-0">
+							<ul class="list-unstyled footer-list mb-0">
+								<li>
+									<a href="#">
+										<i class="mdi mdi-chevron-right"></i>
+										About Us</a>
+								</li>
+								<li>
+									<a href="#">
+										<i class="mdi mdi-chevron-right"></i>
+										Products</a>
+								</li>
+								<li>
+									<a href="#">
+										<i class="mdi mdi-chevron-right"></i>
+										Services</a>
+								</li>
+								<li>
+									<a href="#">
+										<i class="mdi mdi-chevron-right"></i>Contact us</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<!--end col-->
+					<div class="col-lg-3 col-6">
+						<div class="footer-item mt-4 mt-lg-0">
+							<ul class="list-unstyled footer-list mb-0">
+								<li>
+									<a href="#">
+										<i class="mdi mdi-chevron-right"></i>
+										Browse Job</a>
+								</li>
+								<li>
+									<a href="#">
+										<i class="mdi mdi-chevron-right"></i>
+										Resume templates</a>
+								</li>
+								<li>
+									<a href="#">
+										<i class="mdi mdi-chevron-right"></i>
+										Companies</a>
+								</li>
+								<li>
+									<a href="#">
+										<i class="mdi mdi-chevron-right"></i>
+										FAQ’s
+									</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<!--end col-->
+
+					<!--end col-->
+					<div class="col-lg-2 col-6">
+						<div class="footer-item mt-4 mt-lg-0">
+							<ul class="list-unstyled footer-list mb-0">
+								<li>
+									<a href="#">
+										<i class="mdi mdi-chevron-right"></i>
+										Testimonials</a>
+								</li>
+								<li>
+									<a href="#">
+										<i class="mdi mdi-chevron-right"></i>
+										Blogs</a>
+								</li>
+								<li>
+									<a href="#">
+										<i class="mdi mdi-chevron-right"></i>
+										Q&A</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<!--end col-->
+				</div>
+				<div class="mt-3">
+					<hr/>
+				</div>
+				<div class="row">
+					<div class="col-lg-4 col-12 text-grey text-center text-md-start">
+						<p>2023 Metier Quest. All Rights Reserved.</p>
+					</div>
+					<div class="col-lg-8  col-12">
+						<ul class="list-inline mb-0 text-grey text-md-end  text-center">
+							<li class="list-inline-item text-grey">
+								<p class="fs-13 mb-0">
+									<a href="#">Terms & Conditions</a>
+									|
+									<a href="#">
+										Privacy
+									</a>
+									|
+									<a href="#">Cookie Settings</a>
+								</p>
+							</li>
+						</ul>
+						<button onclick="topFunction()" id="back-to-top" style="display: block;">
+							<i class="mdi mdi-arrow-up"></i>
+						</button>
+					</div>
+				</div>
+			</div>
+		</section>
+		{{ include('components/live-toast.html.twig') }}
+	</div>
+{% endblock %}

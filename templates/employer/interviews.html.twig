@@ -1,0 +1,174 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Candidates{% endblock %}
+
+{% block body %}
+    <div class="">
+        <div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+            <div class="card-body px-4 py-3">
+                <div class="row align-items-center">
+                    <div class="col-9">
+                        <h4 class="fw-semibold mb-8">
+                            <i class="ti ti-users fs-8"></i>
+                            Interviews
+                        </h4>
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item">
+                                    <a class="text-muted text-decoration-none" href="#">Interviews</a>
+                                </li>
+                                <li class="breadcrumb-item" aria-current="page">Interviews List</li>
+                            </ol>
+                        </nav>
+                    </div>
+                    <div class="col-3">
+                        <div class="text-center">
+                            <img src="{{ asset('assets/images/inter-veiw.png') }}" alt="modernize-img" class="iconn img-fluid mb-n4">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Form -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="get" action="{{ path('app_employer_interviews') }}">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="job" class="form-label">Job</label>
+                            <select name="job" id="job" class="form-select">
+                                <option value="">All Jobs</option>
+                                {% for job in jobs %}
+                                    <option value="{{ job.id }}" {{ job.id == app.request.query.get('job') ? 'selected' : '' }}>
+                                        {{ job.title }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="from_date" class="form-label">From Date</label>
+                            <input type="date" name="from_date" id="from_date" class="form-control" value="{{ app.request.query.get('from_date') }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="to_date" class="form-label">To Date</label>
+                            <input type="date" name="to_date" id="to_date" class="form-control" value="{{ app.request.query.get('to_date') }}">
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12 text-end">
+                            <button type="submit" class="btn btn-primary">Search</button>
+                            <a href="{{ path('app_employer_interviews') }}" class="btn btn-secondary">Reset</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Rest of the content -->
+        <div class="container">
+            <div class="row">
+                <div class="col-12"></div>
+                <div class="col-md-6"></div>
+                <div class="col-md-6">
+                    <div class="form-group"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="datatables">
+            <div class="card">
+                <div class="card-body">
+                    <ul class="mb-4 nav nav-pills user-profile-tab" id="pills-tab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link position-relative rounded-0 active d-flex align-items-center justify-content-center bg-transparent fs-3 py-3" id="pills-account-tab" data-bs-toggle="pill" data-bs-target="#pills-account" type="button" role="tab" aria-controls="pills-account" aria-selected="true">
+                                <span class="d-none d-md-block">Scheduled Interviews</span>
+                            </button>
+                        </li>
+                    </ul>
+                    <div class="table-responsive">
+                        <table id="accounts" class="table w-100 table-striped table-bordered display text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th>Applicant Name</th>
+                                    <th>Interview Job Title</th>
+                                    <th>Candidate Type</th>
+                                    <th>Experience</th>
+                                    <th>Interview Type</th>
+                                    <th>Round</th>
+                                    <th>Time</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody data-controller="employer">
+                                {% for item in interviews %}
+                                    <tr>
+                                        <td>{{ item.applicant.name }}</td>
+                                        <td>{{ item.application.job.title ?? "" }}</td>
+                                        <td>
+                                            {% if item.application.type == "self" %}
+                                                Applied Candidate
+                                            {% else %}
+                                                Searched From Database
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {{item.applicant.jobseekerresume.experience > -1 ? item.applicant.jobseekerresume.experience|numberToString : ""}}
+                                        </td>
+                                        <td>{{ item.type|capitalize }}</td>
+                                        <td>{{ item.rounds }}</td>
+                                        <td>
+                                            <button type="button" class="justify-content-center w-100 btn mb-1 btn-rounded bg-primary-subtle text-primary d-flex align-items-center">
+                                                <i class="ti ti-clock-hour-4 fs-4 me-2"></i>
+                                                {{ item.createdAt|date('d F Y, H:i:s') }}
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+                                                <div class="btn-group me-2 mb-2" role="group" aria-label="First group">
+                                                    {% if item.type == "virtual" %}
+                                                        {% set url = item.meetinglink %}
+                                                        {% if url starts with 'http' %}
+                                                            <a href="{{ url }}" class="btn btn-warning">
+                                                                <i class="ti ti-video fs-6"></i>
+                                                                Link
+                                                            </a>
+                                                        {% else %}
+                                                            <a href="https://{{ url }}" target="_blank" class="btn btn-warning">
+                                                                <i class="ti ti-video fs-6"></i>
+                                                                Link
+                                                            </a>
+                                                        {% endif %}
+                                                    {% endif %}
+                                                    <a href="{{ path('app_employer_edit_interview', {'interview': item.id}) }}" class="btn primary_one">
+                                                        <i class="ti ti-edit fs-6"></i>
+                                                        Edit
+                                                    </a>
+                                                    {% if item.application.status == "interview scheduled" or item.application.status == "rejected" %}
+                                                        <a data-type="interview result" href="#" data-status="interview scheduled" data-can="{{ item.application.id }}" data-action="click->employer#scheduleInterview" class="btn primary_two">
+                                                            <i class="ti ti-check fs-4"></i>
+                                                            Result/Schedule
+                                                        </a>
+                                                    {% elseif item.application.status == "selected" or item.application.status == "sent offer" or item.application.status != "rejected" %}
+                                                        <a data-bs-dismiss="modal" data-type="send offer" href="#" data-status="send offer" data-can="{{ item.application.id }}" data-action="click->employer#scheduleInterview" class="btn primary_two">
+                                                            <i class="ti ti-calendar fs-4"></i>
+                                                            Send Offer/ Hire
+                                                        </a>
+                                                        <a data-type="rejected" href="#" data-status="rejected" data-can="{{ item.application.id }}" data-action="click->employer#shortlistCandidate" class="btn primary_three">
+                                                            Reject
+                                                        </a>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

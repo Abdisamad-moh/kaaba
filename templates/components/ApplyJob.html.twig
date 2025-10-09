@@ -1,0 +1,243 @@
+<div {{attributes}} data-controller="job-details" data-job-details-title-value="{{ this.job.title ?? '' }}" data-job-details-jobid-value="{{ this.job.id }}">
+	<div class="candidate-list-box card mt-4 col-lg-12">
+		<div class="card-body p-4">
+			<div
+				class="row align-items-center">
+				<!--end col-->
+
+				<div class="row text-lg-start">
+					<div class="col-lg-6">
+						<div class="  me-lg-12 text-dark">
+							<div class="ps-3 pt-2">
+								<h6 class="fs-20">{{ this.job.title }},
+									{{ this.job.employer.name }}</h6>
+								<ul class="list-inline d-flex ">
+									<input type="hidden" data-model="job_id" value="{{ this.job.id }}"/>
+									<li class="list-inline-item ">
+										<p class="text-muted mb-0 ">
+											<span class="text-muted fw-medium">
+												<i class="fa fa-map-marker" aria-hidden="true"></i>
+												&nbsp;
+												{{ this.job.formattedLocation }}</span>
+										</p>
+									</li>
+									<li>
+										|</li>
+									<li class="list-inline-item pl-1">
+										<p class="text-muted mb-0">
+											<span class="text-muted fw-medium">
+												<i class="fa fa-briefcase" aria-hidden="true"></i>
+												&nbsp;
+												{% if job.numberPosition == 0 %}
+
+																{% elseif job.numberPosition  == 1 %}
+																	Role Available
+																{% elseif job.numberPosition > 1 %}
+																	Roles Available
+															{% endif %}
+															</span>
+										</p>
+									</li>
+									<li>
+										|</li>
+									<li class="list-inline-item pl-1">
+										<p
+											class="text-muted mb-0">{# <span class="text-muted fw-medium">
+																																																																																																																																																													<i class="fa fa-users" aria-hidden="true"></i>
+																																																																																																																																																													&nbsp; {855} Applicants</span> #}
+										</p>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="modal-footer">
+							<div class="sh mt-2 text-center ms-2">
+								<a href="#" data-action="click->job-details#copyUrl">
+									<i class="fa fa-share" aria-hidden="true"></i>
+									&nbsp; Share Job  &nbsp;
+								</a>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<ul class="list-inline d-flex  mb-3 mt-3">
+								<li class="list-inline-item ">
+									<p class="text-muted mb-0 ">
+										<span class="text-muted fw-medium">
+											&nbsp; Expires in<b>
+												{{ this.job.expiresAt }}</b>
+										</span>
+									</p>
+								</li>
+								<li>
+									|</li>
+								<li class="list-inline-item pl-1">
+									<p class="text-muted mb-0">
+										<span class="text-muted fw-medium">
+											<i>Posted
+												{{ this.job.postedAt }}</i>
+										</span>
+									</p>
+								</li>
+								{% if this.job_application %}
+									<li class="list-inline-item pl-1">
+										<p class="text-muted mb-0">
+											<span class="text-muted fw-medium">
+												<i>Applied
+													{{ this.job_application.createdAt|diffForHumans }}</i>
+											</span>
+										</p>
+									</li>
+								{% endif %}
+							</ul>
+						</div>
+					</div>
+				</div>
+				<!--end col-->
+			</div>
+			<!--end row-->
+		</div>
+	</div>
+
+
+	<div class="card mt-2">
+		<div class="card-header text-bg-primary">
+			<h5 class="mb-0 text-white">Job Application</h5>
+		</div>
+		<div class="form-body">
+			<div class="card-body">
+				<h5 class="card-title mb-0 d-none">Resume Info</h5>
+			</div>
+			<hr class="m-0"/>
+			<div class="card-body">
+				{% if this.job_application %}
+					<div class="alert alert-info text-dark" role="alert">
+						You Applied for this job
+						<p>
+							{# <a class="text-dark" href="{{ asset('uploads/'~ this.job_application.cv) }}" target="_blank">
+								<strong class="fw-bold">Preview Resume</strong>
+							</a> #}
+						</p>
+					</div>
+				{% else %}
+					{% if this.profile_cv %}
+						{% if this.resume_file %}
+							<h5 class="ps-3">Click ‘Apply Job’ if you want to apply for this position using this resume.</h5>
+							<a class="btn btn-lg btn-light" target="_blank" href="{{ asset('uploads/'~ this.resumeFile)}}">Preview your resume</a>
+						{% endif %}
+						<div class="form-check">
+							<div class="form-check d-none">
+								<input disabled class="form-check-input" type="checkbox" data-model="cv_option" id="profile_cv">
+								<label class="form-check-label" for="profile_cv">
+									Use Profile Resume: Uncheck here and upload your CV if you prefer not to use the resume from your profile. Otherwise, you can skip this step.
+								</label>
+							</div>
+						</div>
+					{% endif %}
+					<div class="col">
+						{% if this.job.requireCoverLetter %}
+							<p class="ps-3 {{ this.job.requireCoverLetter ? 'text-success' : ''}}"> {{ this.job.requireCoverLetter ? 'You Need to Provide a Cover Letter to Apply for this Job' : 'Cover Letter is Optional' }} Upload cover letter</p>
+							<div class="custom-uploader ms-3 mt-3">
+								<div class="mb-4">
+									<label class="form-label" for="inputGroupFile01">
+										Upload Cover Letter</label>
+									<input name="cover_letter_file" type="file" class="form-control" id="cover_letter_file">
+									<p class="fw-bold text-green" data-loading>Uploading Document ...</p>
+									<p class="mt-3" data-loading="hide">Supported Formats: pdf, upto 2 MB</p>
+									{% if this.fileError %}
+										<div class="text-danger p-2" data-loading="hide">{{ this.fileError }}</div>
+									{% endif %}
+								</div>
+							</div>
+						{% endif %}
+					</div>
+
+				{% endif %}
+			</div>
+
+			<hr class="m-0"/>
+			{% if this.job.employerJobQuestions|length > 0 %}
+				<div class="card-body">
+					<h5 class="card-title mb-0">Questions</h5>
+				</div>
+				<hr class="m-0"/>
+				<div class="card-body p-4">
+					<div class="row justify-content-center">
+						<form data-job-application-target="form" action="{{ path('apply_job_save_answers', {job: this.job.id}) }}" method="POST">
+							<div class="col-lg-12 mb-7">
+								{% if this.job.employerJobQuestions|length > 0 %}
+									<p class="text-primary fw-bold">Please be aware that it is mandatory to answer the questions provided by the employer in this job post. If you skip this step, you will not be considered for shortlisting.</p>
+								{% endif %}
+								{# {{ dump(this.job.employerJobQuestions[0].employerJobQuestionAnswers[0]) }} #}
+								<ul>
+									{% for question in this.job.employerJobQuestions %}
+										<li class="pb-2">
+											<h5 class="fw-buld">{{ question.title }}</h5>
+											{% for answer in question.employerJobQuestionAnswers %}
+												<div class="form-check ms-2">
+													<input {% if answer.id in (answers ?? []) %} disabled checked {% endif %} value="{{ answer.id }}" class="form-check-input" type="radio" name="{{question.id}}" id="flexRadioDefault1{{answer.id}}">
+													<label class="form-check-label" for="flexRadioDefault1{{answer.id}}">
+														{{ answer.title }}
+													</label>
+												</div>
+											{% endfor %}
+										</li>
+									{% endfor %}
+
+								</ul>
+
+							</div>
+							{# <button>Submit</button> #}
+						</form>
+					</div>
+				</div>
+			{% endif %}
+			{% if this.job_application == false %}
+				<div class="card-body">
+					<div class="top-login-line">
+						<button href="" data-loading="addAttribute(disabled)" class="btn btn-lg fw-bold btn-primary" data-action="live#action:prevent" data-live-action-param="files|apply">&nbsp; Apply Job&nbsp;</a>
+					</div>
+				</div>
+			{% endif %}
+
+			{% if job_report %}
+				<div class="card-body">
+					<div class="alert alert-info">
+						<h6>You reported this job</h6>
+						<p>{{ job_report.description|nl2br }}</p>
+					</div>
+				</div>
+			{% else %}
+				<div class="card-body text-start py-4">
+					<div class="card-title">
+
+						<div class="alert alert-warning text-center text-black">
+							<p>
+								Métier Quest never charges for job searches or applying for jobs. We also do not guarantee employment or interviews in return for payment. Be wary of scammers asking you for money for jobs or interviews. Report such offers to us at suspicionjob@metier-quest.com
+								<br>If you think this job violates our guidelines, please report it by clicking here<br>
+								<button class="btn btn-sm btn-primary" data-action="click->job-application#showReportForm">Report job</button>
+							</p>
+						</div>
+
+					</div>
+				</div>
+				<div class="card-body d-none" data-job-application-target="reportDiv">
+					<form method="POST" action="{{ path('report_job', { job: this.job.id }) }}">
+						<label for="description">Report Description</label>
+						<textarea class="form-control" name="description" id="description" rows="4"></textarea>
+						<button class="btn btn-primary my-2">Submit Report</button>
+					</form>
+				</div>
+			{% endif %}
+		</div>
+		{# <div class="row p-4 text-center" data-controller="jobs" data-job-details-jobid-value="{{ job.id }}" data-job-details-url-value="{{ path('app_home_jobs') }}">
+			<h3 class="title mb-90 mt-90">Similar <span class="text-primary fw-bold">
+					Jobs</span>
+			</h3>
+			<div class="col-12 p-3" data-job-details-target="jobs">
+				
+			</div>
+		</div> #}
+	</div>
+</div></div>

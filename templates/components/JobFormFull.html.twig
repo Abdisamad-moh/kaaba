@@ -1,0 +1,402 @@
+<div {{ attributes.add(stimulus_controller('employer')) }}>
+	<div class="card">
+		<div class="card-body wizard-content">
+			<h4 class="card-title mb-0">Create a new job</h4>
+			<h6 class="card-subtitle mb-3"></h6>
+			{# {{ form_start(form, {'attr': {'class': 'validation-wizard  wizard-circle mt-5 needs-validation'}}) }} #}
+			{{ form_start(form) }}
+			<ul class="error-list">
+				{% if form.vars.errors|length > 0 %}
+					<div class="alert alert-danger">
+						<ul>
+							{% for error in form.vars.errors %}
+								<li>{{ error.message }}</li>
+							{% endfor %}
+						</ul>
+					</div>
+				{% endif %}
+			</ul>
+			<!-- Step 1 -->
+			<h6>Basic Details</h6>
+			<section>
+				{# 
+																																         <h5 class="fs-4 fw-semibold mb-4">Account Details</h5>
+																																         #}
+				<div class="row">
+					<div class="col-lg-6">
+						<div class="mb-4">
+							<label for="exampleInputtext3" class="form-label">Job Title</label>
+							<span class="text-danger">*</span>
+							<span class="d-block" style="font-style: italic">
+								<span class="d-block mb-1" style="">Type or select options from the drop-down box.</span>
+								( example: Human Resources Manager, Monitoring and Evaluation Officer, etc)
+							</span>
+							{{ form_widget(form.jobtitle) }}
+							<div class="invalid-feedback">
+								Please provide a valid city.
+							</div>
+						</div>
+						<div>
+							<label class="form-label">Job Types</label>
+							<span class="text-danger">*</span>
+							<div class="input-group">
+								{{ form_widget(form.job_types) }}
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="mb-4">
+							<label class="form-label">Job Category</label>
+							<span class="text-danger">*</span>
+							<div class="input-group">
+								{{ form_widget(form.job_category) }}
+							</div>
+						</div>
+						<div class="mb-4">
+							<label class="form-label">Industry</label>
+							<span class="text-danger">*</span>
+							<div class="input-group">
+								{{ form_widget(form.industry) }}
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="mb-4">
+							<label class="form-label">Number of positions</label>
+							<span class="text-danger">*</span>
+							<div class="input-group">
+								{{ form_widget(form.number_position) }}
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="mb-4">
+							<label class="form-label">Experience Level</label>
+							<span class="text-danger">*</span>
+							<div class="input-group">
+								{{ form_widget(form.experience) }}
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4">
+						<div class="mb-4">
+							<label class="form-label">Work Shift</label>
+							<span class="text-danger">*</span>
+							<div class="input-group">
+								{{ form_widget(form.shift, {'attr': {'required': true}}) }}
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4">
+						<div class="mb-4">
+							<label class="form-label">Work Type</label>
+							<span class="text-danger">*</span>
+							<div class="input-group">
+								{{ form_widget(form.work_type) }}
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4">
+						<div class="mb-4">
+							<label class="form-label">Working Hours</label>
+							<span class="text-danger">*</span>
+							<div class="input-group">
+								{{ form_widget(form.hours, {'attr': {'required': true}}) }}
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-12">
+						<div class="form-group mb-4">
+							<label class="form-label">Job Description</label>
+							<span class="text-danger">*</span>
+							<span class="d-block text-primary pb-1" style="font-style: italic">
+								Please copy and paste the job description you want to post below.
+							</span>
+							{{ form_widget(form.job_description, {'attr': {'rows': 10}}) }}
+							{# <small id="textHelp" class="form-text text-muted">Job Description</small> #}
+						</div>
+					</div>
+				</div>
+			</section>
+			<!-- Step 2 -->
+			<h6>Salary & Location Details</h6>
+			<section>
+				<h5 class="fs-4 fw-semibold mb-4">Salary Details</h5>
+				<div class="row">
+					<div class="col-lg-4">
+						<div class="mb-4">
+							<label for="exampleInputtext3" class="form-label">Minimum Pay</label>
+							{{ form_widget(form.minimum_pay) }}
+						</div>
+					</div>
+					<div class="col-lg-4">
+						<div class="mb-4">
+							<label class="form-label">Maxmimum Pay</label>
+							<div class="input-group">
+								{{ form_widget(form.maximum_pay) }}
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4">
+						<div class="mb-4">
+							<label class="form-label">Currency</label>
+							<span class="text-danger">*</span>
+							<div class="input-group">
+								{{ form_widget(form.currency) }}
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="mb-4">
+							<label class="form-label">Salary Frequency</label>
+							<div class="input-group">
+								{{ form_widget(form.mentioned_amount_by) }}
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="mb-4">
+							<label class="form-label">Display Salary</label>
+							{{ form_widget(form.show_salary) }}
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="mb-4">
+							<label class="form-label">Commission</label>
+							{{ form_widget(form.has_commission) }}
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="mb-4">
+							<label class="form-label">Benefits</label>
+							<span class="text-danger">*</span>
+							<div class="input-group">
+								{{ form_widget(form.benefits) }}
+							</div>
+						</div>
+					</div>
+				</div>
+				<h5 class="fs-4 fw-semibold mb-4">Job Location Details</h5>
+				<div class="row">
+					<div class="col-lg-6">
+						<div class="mb-4">
+							<label class="form-label">Address</label>
+							<div class="input-group">
+								{{ form_widget(form.location) }}
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="mb-4">
+							<label class="form-label">City</label>
+							<span class="text-danger">*</span>
+							<div class="input-groupa">
+								{{ form_widget(form.city) }}
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4">
+						<div class="mb-4">
+							<label class="form-label">State/Region</label>
+							<div class="input-group">
+								{{ form_widget(form.states) }}
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4">
+						<div class="mb-4">
+							<label for="exampleInputtext3" class="form-label">Country</label>
+							<span class="text-danger">*</span>
+							{{ form_widget(form.country) }}
+						</div>
+					</div>
+					<div class="col-lg-4 mb-4">
+						<label class="form-label">Zip Code</label>
+						<div class="input-group">
+							{{ form_widget(form.zipe_code) }}
+						</div>
+					</div>
+				</div>
+			</section>
+			<!-- Step 3 -->
+			<h6>Skills & Education</h6>
+			<section>
+				<h5 class="fs-4 fw-semibold mb-2">Skill Details</h5>
+				<span class="d-block text-primary" style="font-style: italic">
+					Type or select multiple options from the drop-down box.
+				</span>
+				<div class="row">
+					<div class="col-lg-6">
+						<div class="mb-4">
+							<label for="exampleInputtext3" class="form-label">Required Skills</label>
+							<span class="text-danger">*</span>
+							{{ form_widget(form.required_skill) }}
+						</div>
+					</div>
+					<div class="col-lg-6">
+					<span class="d-block text-primary" style="font-style: italic">
+					Type or select multiple options from the drop-down box.
+				</span>
+						<div class="mb-4">
+							<label class="form-label">Preferred Skills</label>
+							<span class="text-danger">*</span>
+
+							
+							<div class="input-group">
+								{{ form_widget(form.preferred_skill) }}
+							</div>
+						</div>
+					</div>
+				</div>
+				<h5 class="fs-4 fw-semibold mb-4">Education Details</h5>
+				<div class="row">
+					<div class="col-lg-4">
+						<div class="mb-4">
+							<label for="exampleInputtext3" class="form-label">Degree Required</label>
+							<span class="text-danger">*</span>
+							{{ form_widget(form.education_required) }}
+						</div>
+					</div>
+					<div class="col-lg-4">
+						<div class="mb-4">
+							<label class="form-label">Certification Required</label>
+							<span class="text-danger">*</span>
+							<div class="input-group">
+								{{ form_widget(form.certification_required) }}
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-4">
+						<div class="mb-4">
+							<label class="form-label">Certifications</label>
+							<div class="input-group">
+								{{ form_widget(form.certifications) }}
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-12">
+						<div class="mb-4">
+							<label class="form-label">Other Requirements</label>
+							<span class="text-danger">*</span>
+							<div class="input-group">
+								{{ form_widget(form.other_requirements, {'attr': {'rows': 5}}) }}
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<!-- Step 4 -->
+			<h6>Preview</h6>
+			<section>
+				<h5 class="fs-4 fw-semibold mb-4">Posting Details & Quesitions</h5>
+				<div class="row">
+					<div class="col-lg-6">
+						<div class="mb-4">
+							<label for="exampleInputtext3" class="form-label">Locals/Citizens Only</label>
+							{{ form_widget(form.locals_only) }}
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="mb-4">
+							<label class="form-label">Immediate Hiring</label>
+							<div class="input-group">
+								{{ form_widget(form.immediate_hiring) }}
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="mb-4">
+							<label for="exampleInputtext3" class="form-label">External Link (Copy/Paste external link for job application)</label>
+							{{ form_widget(form.external_link) }}
+						</div>
+					</div>
+					<div class="col-lg-6">
+						<div class="mb-4">
+							<label class="form-label">Application closing date</label>
+							<span class="text-danger">*</span>
+							<div class="input-group">
+								{{ form_widget(form.application_closing_date) }}
+							</div>
+						</div>
+					</div>
+					<div class="col-12">
+						<h5 class="fs-4 fw-semibold ">Questionnaire</h5>
+						<p class="mute mb-4">To help us find the best applicants for the role, please answer the following questions, or create your own Be brief and clear. We will not reveal the answers to the candidates, but use them to compare their responses to evaluate the best candidates</p>
+					</div>
+					<div class="col-lg-6">
+						<div>
+							<table class="table table-borderless form-no-mb">
+								<thead>
+									<tr>
+										<th>Title</th>
+										<th>Action</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for key, itemForm in form.employerJobQuestions %}
+										<tr>
+											<td>
+												{{ form_row(itemForm.title, {
+                              label: false,
+                              row_attr: { class: 'mb-1' },
+                              attr: {
+                              placeholder: 'Title',
+                              class: 'form-control',
+                              }
+                              }) }}
+											</td>
+											<td>
+												{{ form_row(itemForm.vars.button_delete, { label: 'X', attr: { class: 'btn btn-outline-danger' } }) }}
+											</td>
+										</tr>
+										<tr>
+											<td colspan="2">
+												<div class="d-flex flex-wrap justify-content-between">
+													<table class="table table-sm table-borderless form-no-mb nested-answers">
+														<tbody>
+															{% for key, subItemForm in itemForm.employerJobQuestionAnswers %}
+																<tr>
+																	<td>
+																		{{ form_row(subItemForm.title, {
+                                             label: false,
+                                             row_attr: { class: 'mb-1' },
+                                             attr: {
+                                             placeholder: 'Title',
+                                             class: 'form-control',
+                                             }
+                                             }) }}
+																	</td>
+																	<td>
+																		{{ form_row(subItemForm.is_right, {
+                                             label: false,
+                                             row_attr: { class: 'mb-1' },
+                                             attr: {
+                                             placeholder: 'is right answer',
+                                             class: 'form-control',
+                                             }
+                                             }) }}
+																	</td>
+																	<td>
+																		{{ form_row(subItemForm.vars.button_delete, { label: 'X', attr: { class: 'btn btn-outline-danger' } }) }}
+																	</td>
+																</tr>
+															{% endfor %}
+														</tbody>
+													</table>
+													{{ form_widget(itemForm.employerJobQuestionAnswers.vars.button_add, { label: '+ Add Answer', attr: { class: 'btn btn-outline-primary btn-sm mt-2' } }) }}
+												</div>
+											</td>
+										</tr>
+									{% endfor %}
+								</tbody>
+							</table>
+							{{ form_widget(form.employerJobQuestions.vars.button_add, { label: '+ Add Question', attr: { class: 'btn btn-outline-primary mt-3' } }) }}
+						</div>
+					</div>
+				</div>
+				<button type="submit" class="btn btn-primary mt-8 mb-8">Submit</button>
+			</section>
+			{{ form_end(form) }}
+		</div>
+	</div>
+</div>

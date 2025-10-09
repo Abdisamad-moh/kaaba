@@ -1,0 +1,229 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Scholarship Applications Dashboard{% endblock %}
+
+{% block body %}
+<!-- Counter Carousel -->
+<!-- Statistics Cards with Tabler Icons -->
+<div class="row">
+    <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 mb-4">
+        <div class="card border-0 zoom-in bg-primary-subtle shadow-none h-100">
+            <div class="card-body">
+                <div class="text-center">
+                    <i class="ti ti-users fs-1 text-primary mb-3"></i>
+                    <p class="fw-semibold fs-3 text-primary mb-1">Total Applications</p>
+                    <h5 class="fw-semibold text-primary mb-0">{{ totalApplications }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 mb-4">
+        <div class="card border-0 zoom-in bg-warning-subtle shadow-none h-100">
+            <div class="card-body">
+                <div class="text-center">
+                    <i class="ti ti-clock fs-1 text-warning mb-3"></i>
+                    <p class="fw-semibold fs-3 text-warning mb-1">Pending Review</p>
+                    <h5 class="fw-semibold text-warning mb-0">{{ pendingApplications }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 mb-4">
+        <div class="card border-0 zoom-in bg-success-subtle shadow-none h-100">
+            <div class="card-body">
+                <div class="text-center">
+                    <i class="ti ti-circle-check fs-1 text-success mb-3"></i>
+                    <p class="fw-semibold fs-3 text-success mb-1">Approved</p>
+                    <h5 class="fw-semibold text-success mb-0">{{ approvedApplications }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 mb-4">
+        <div class="card border-0 zoom-in bg-danger-subtle shadow-none h-100">
+            <div class="card-body">
+                <div class="text-center">
+                    <i class="ti ti-circle-x fs-1 text-danger mb-3"></i>
+                    <p class="fw-semibold fs-3 text-danger mb-1">Rejected</p>
+                    <h5 class="fw-semibold text-danger mb-0">{{ rejectedApplications }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 mb-4">
+        <div class="card border-0 zoom-in bg-info-subtle shadow-none h-100">
+            <div class="card-body">
+                <div class="text-center">
+                    <i class="ti ti-star fs-1 text-info mb-3"></i>
+                    <p class="fw-semibold fs-3 text-info mb-1">Shortlisted</p>
+                    <h5 class="fw-semibold text-info mb-0">{{ shortlistedApplications }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 mb-4">
+        <div class="card border-0 zoom-in bg-secondary-subtle shadow-none h-100">
+            <div class="card-body">
+                <div class="text-center">
+                    <i class="ti ti-calendar fs-1 text-secondary mb-3"></i>
+                    <p class="fw-semibold fs-3 text-secondary mb-1">Last Year</p>
+                    <h5 class="fw-semibold text-secondary mb-0">{{ lastYearApplications }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row 1 -->
+<div class="row">
+    <div class="col-lg-6 d-flex align-items-stretch">
+        <div class="card w-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="card-title fw-semibold mb-0">Applications by Region</h5>
+                    <a href="{{ path('app_admin_kaaba_applications') }}" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="chart-container" style="height: 300px;">
+                    {{ render_chart(regionChart) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6 d-flex align-items-stretch">
+        <div class="card w-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="card-title fw-semibold mb-0">Applications by Gender</h5>
+                    <a href="{{ path('app_admin_kaaba_applications') }}" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="chart-container" style="height: 300px;">
+                    {{ render_chart(genderChart) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row 2 -->
+<div class="row">
+    <div class="col-lg-6 d-flex align-items-stretch">
+        <div class="card w-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="card-title fw-semibold mb-0">Applications by Institute</h5>
+                    <a href="{{ path('app_admin_kaaba_applications') }}" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="chart-container" style="height: 300px;">
+                    {{ render_chart(instituteChart) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6 d-flex align-items-stretch">
+        <div class="card w-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="card-title fw-semibold mb-0">Monthly Applications Trend</h5>
+                    <a href="{{ path('app_admin_kaaba_applications') }}" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="chart-container" style="height: 300px;">
+                    {{ render_chart(monthlyChart) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row 3 -->
+<div class="row">
+    <div class="col-lg-8 d-flex align-items-stretch">
+        <div class="card w-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="card-title fw-semibold mb-0">Applications by Scholarship</h5>
+                    <a href="{{ path('app_admin_kaaba_applications') }}" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="chart-container" style="height: 300px;">
+                    {{ render_chart(scholarshipChart) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4 d-flex align-items-stretch">
+        <div class="card w-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="card-title fw-semibold mb-0">Recent Applications</h5>
+                    <a href="{{ path('app_admin_kaaba_applications') }}" class="btn btn-sm btn-primary">View All</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table align-middle text-nowrap mb-0">
+                        <thead>
+                            <tr class="text-muted fw-semibold">
+                                <th scope="col" class="ps-0">Applicant</th>
+                                <th scope="col">Scholarship</th>
+                                <th scope="col">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody class="border-top">
+                            {% for application in recentApplications %}
+                                <tr>
+                                    <td class="ps-0">
+                                        <div class="d-flex align-items-center">
+                                            <div>
+                                                <h6 class="fw-semibold mb-1">{{ application.fullname }}</h6>
+                                                <p class="fs-2 mb-0 text-muted">
+                                                    {{ application.region.name }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <p class="mb-0 fs-3">
+                                            {{ application.scholarship.title|length > 20 ? application.scholarship.title|slice(0, 20) ~ '...' : application.scholarship.title }}
+                                        </p>
+                                    </td>
+                                    <td>
+                                        <span class="badge fw-semibold py-1 w-85 
+                                            {% if application.status.name == 'Approved' %}bg-success-subtle text-success
+                                            {% elseif application.status.name == 'Rejected' %}bg-danger-subtle text-danger
+                                            {% elseif application.status.name == 'Pending' %}bg-warning-subtle text-warning
+                                            {% elseif application.status.name == 'Shortlisted' %}bg-info-subtle text-info
+                                            {% else %}bg-secondary-subtle text-secondary{% endif %}">
+                                            {{ application.status.name ?? 'Pending' }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center py-3">
+                                        <p class="text-muted mb-0">No recent applications</p>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.chart-container {
+    position: relative;
+    width: 100%;
+}
+.owl-carousel .item {
+    padding: 0 5px;
+}
+</style>
+{% endblock %}

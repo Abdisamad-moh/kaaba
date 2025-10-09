@@ -1,0 +1,174 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Internal Job Approval
+{% endblock %}
+
+{% block body %}
+	<!-- Page Header -->
+	<div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+		<div class="card-body px-4 py-3">
+			<div class="row align-items-center">
+				<div class="col-9">
+					<h4 class="fw-semibold mb-8">Internal Staff (Individual)</h4>
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item">
+								<a class="text-muted text-decoration-none" href="#">Employer</a>
+							</li>
+							<li class="breadcrumb-item" aria-current="page">internal staff</li>
+						</ol>
+					</nav>
+				</div>
+				<div class="col-3">
+					<a href="{{ path('app_internal_staff_bulk') }}" class="btn btn-primary float-end">
+						Add Staff in Bulk
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Form for Creating/Editing -->
+	<div class="card">
+		<div class="card-header text-bg-primary">
+			<h5 class="mb-0 text-white">Add New Staff</h5>
+		</div>
+		<div class="form-horizontal">
+			<div class="form-body">
+				<hr class="m-0">
+				<div class="card-body">
+					{{ form_start(form) }}
+					<div
+						class="row">
+						<!-- Jobseeker Field -->
+						<div class="col-md-6 mb-3">
+							<div class="form-group row">
+								<label class="form-label text-end col-md-3 mt-2">Email</label>
+								<div class="col-md-9">
+									{{ form_widget(form.email, { 'attr': { 'class': 'form-control' } }) }}
+									{{ form_errors(form.email) }}
+								</div>
+							</div>
+						</div>
+
+						<!-- Description Field -->
+						<div class="col-md-6 mb-3">
+							<div class="form-group row">
+								<label class="form-label text-end col-md-3 mt-2">Description</label>
+								<div class="col-md-9">
+									{{ form_widget(form.description, { 'attr': { 'class': 'form-control' } }) }}
+									{{ form_errors(form.description) }}
+								</div>
+							</div>
+						</div>
+
+					</div>
+
+					<hr class="m-0">
+					<div class="form-actions border-top">
+						<div class="card-body">
+							<div class="row">
+								<div class="col-md-6">
+									<div class="row">
+										<div class="col-md-offset-3 col-md-9">
+											<button type="submit" class="btn btn-primary">
+												<i class="ti ti-edit fs-5"></i>
+												{{ editId ? 'Save Changes' : 'Create Approver' }}
+											</button>
+											<a href="{{ path('app_internal_staff') }}" class="btn bg-danger-subtle text-danger ms-6">
+												Cancel
+											</a>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6"></div>
+							</div>
+						</div>
+					</div>
+					{{ form_end(form) }}
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+
+	<!-- Table of Existing Approvers -->
+	<div class="card mt-4">
+		<div class="card-body">
+			<h5 class="card-title">Existing Staff</h5>
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>email</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for staff in staffs %}
+						<tr>
+							<td>{{ staff.jobseeker.name }}</td>
+							<td>{{ staff.jobseeker.email }}</td>
+
+
+							<td>
+								{# <a href="{{ path('app_procurement_operation_approvers', { edit: approver.id }) }}" class="btn btn-sm btn-warning">Edit</a> #}
+								<a href="{{ path('app_internal_staff', { delete: staff.id }) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this staff?')">Delete</a>
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+
+	{% set page = 'internal stuff' %}
+		{% set filteredAds = ads|filter(ad => ad.pages|filter(p => p.name == page)|length > 0)|shuffle %}
+
+		{% if filteredAds %}
+			<div class="col-lg-8">
+				<div class="card"></div>
+
+				<div class="card">
+					<div class="card-body">
+						<h4 class="card-title mb-3">Companies Ads</h4>
+
+						<div id="carouselExampleIndicators" class="carousel slide carousel-dark" data-bs-ride="carousel">
+							<ol class="carousel-indicators">
+								{% for ad in filteredAds %}
+									<li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{{ loop.index0 }}" class="{% if loop.first %}active{% endif %}"></li>
+								{% endfor %}
+							</ol>
+
+							<div class="carousel-inner">
+								{% for ad in filteredAds %}
+									{% set url = ad.link %}
+									<div class="carousel-item {% if loop.first %}active{% endif %}">
+										{% if url starts with 'http' %}
+											<a href="{{ url }}">
+												<img src="{{ path('profile_image', {'filename': ad.image }) }}" class="d-block w-100" alt="Ad image {{ loop.index }}"/>
+											</a>
+										{% else %}
+											<a href="http://{{ url }}">
+												<img src="{{ path('profile_image', {'filename': ad.image }) }}" class="d-block w-100" alt="Ad image {{ loop.index }}"/>
+											</a>
+										{% endif %}
+									</div>
+								{% endfor %}
+							</div>
+
+							<a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-bs-slide="prev">
+								<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+								<span class="visually-hidden">Previous</span>
+							</a>
+							<a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-bs-slide="next">
+								<span class="carousel-control-next-icon" aria-hidden="true"></span>
+								<span class="visually-hidden">Next</span>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		{% endif %}
+{% endblock %}

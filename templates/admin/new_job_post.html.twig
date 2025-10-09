@@ -1,0 +1,327 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Post Job!
+{% endblock %}
+
+{% block body %}
+
+	<div class="container-fluid">
+
+
+		<div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+			<div class="card-body px-4 py-3">
+				<div class="row align-items-center">
+					<div class="col-9">
+						<h4 class="fw-semibold mb-8">Job Posting</h4>
+						<nav aria-label="breadcrumb">
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item">
+									<a class="text-muted text-decoration-none" href="#">Home</a>
+								</li>
+								<li class="breadcrumb-item" aria-current="page">""</li>
+							</ol>
+						</nav>
+					</div>
+					<div class="col-3">
+						<div class="text-center mb-n5">
+							<img src="{{ asset('assets/images/job.png') }}" alt="modernize-img" class="iconn img-fluid mb-n4">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="containerss">
+
+			<div class="row">
+				<div class="col-12"></div>
+				<div class="col-md-6"></div>
+				<div class="col-md-6">
+					<div class="form-group"></div>
+				</div>
+			</div>
+
+
+		</div>
+		<div class="cardsss">
+			<div class="card" data-controller="employer sync-select sync-location" 
+				data-sync-location-cities-url-value="{{ path('app_fetch_cities') }}" 
+				data-sync-location-states-url-value="{{ path('app_fetch_states') }}" 
+				data-sync-select-preferred-skills-value="{{ preferred_skills|json_encode }}" 
+				data-sync-select-career-skills-value="{{ career_skills|json_encode }}" 
+				data-sync-select-required-skills-value="{{ required_skills|json_encode }}" 
+				data-sync-select-career-url-value="{{ path('app_fetch_careers') }}" 
+				data-sync-select-skill-url-value="{{ path('app_fetch_skills') }}"
+			>
+				<div class="card-body wizard-content">
+					<h4 class="card-title mb-0">Create a new job</h4>
+					<h6 class="card-subtitle mb-3"></h6>
+					{{ form_start(form, {'attr': {'class': 'validation-wizard  wizard-circle mt-5 needs-validation'}}) }}
+					{# {{ form_start(form) }} #}
+					<ul class="error-list">
+						{% if form.vars.errors|length > 0 %}
+							<div class="alert alert-danger">
+								<ul>
+									{% for error in form.vars.errors %}
+										<li>{{ error.message }}</li>
+									{% endfor %}
+								</ul>
+							</div>
+						{% endif %}
+					</ul>
+					<!-- Step 1 -->
+					<h6>Basic Details</h6>
+					<section>
+						<div class="row d-flex align-items-end">
+							<div
+						class="col-lg-12">
+						{# Check if the 'employer' field exists before rendering #}
+						{% if form.employer is defined %}
+							<div class="mb-4">
+								<label class="form-label">Employer</label>
+								<span class="text-danger">*</span>
+								{{ form_widget(form.employer) }}
+								<div class="invalid-feedback">
+								Please provide a valid employer.
+							</div>
+							</div>
+						{% endif %}
+
+					</div>
+							<div class="col-lg-6 mb-3">
+								<label for="exampleInputtext3" class="form-label">Job Title</label>
+								<span class="text-danger">*</span>
+								<span class="d-block text-primary" style="font-style: italic;">
+									Select or type:  example: Human Resources Manager, Cashier, etc
+								</span>
+								{{ form_widget(form.title) }}
+								<div class="invalid-feedback">
+									Please provide a valid city.
+								</div>
+							</div>
+							<div class="col-lg-6 mb-3">
+								<label class="form-label">Job Category</label>
+								<span class="text-danger">*</span>
+								<span class="d-block text-primary" style="font-style: italic ">
+									Please select a category from the drop-down box
+								</span>
+								{{ form_widget(form.job_category) }}
+								<div class="invalid-feedback">
+									Please provide a valid city.
+								</div>
+							</div>
+							<div class="col-lg-6 mb-3">
+								<label class="form-label">Job Types</label>
+								<span class="text-danger">*</span>
+								{{ form_widget(form.job_types) }}
+							</div>
+							<div class="col-lg-6">
+								<div class="mb-3">
+									<label class="form-label">Industry</label>
+									<span class="text-danger">*</span>
+									<span class="d-block text-primary" style="font-style: italic;">
+									Please select the job industry from the drop-down box
+								</span>
+									<div class="input-group">
+										{{ form_widget(form.industry, {'attr': {'required': true}}) }}
+									</div>
+								</div>
+							</div>
+							<div class="col-lg-6 mb-3">
+								<label class="form-label">Number of positions</label>
+								<span class="text-danger">*</span>
+								{{ form_widget(form.number_position, {'attr': {'type': "number"}}) }}
+							</div>
+							<div class="col-lg-6 mb-3">
+								<label class="form-label">Experience Level</label>
+								<span class="text-danger">*</span>
+								{{ form_widget(form.experience) }}
+							</div>
+							<div class="col-lg-4 mb-3">
+								<label class="form-label">Work Shift</label>
+								<span class="text-danger">*</span>
+								{{ form_widget(form.shift, {'attr': {'required': true}}) }}
+							</div>
+							<div class="col-lg-4 mb-3">
+								<label class="form-label">Work Type</label>
+								<span class="text-danger">*</span>
+								{{ form_widget(form.work_type) }}
+							</div>
+							<div class="col-lg-4 mb-3">
+								<label class="form-label">Working Hours</label>
+								<span class="text-danger">*</span>
+								{{ form_widget(form.hours, {'attr': {'required': true}}) }}
+							</div>
+							<div class="col-lg-12 mb-3 mt-1">
+								<label class="form-label">Job Description</label>
+								<span class="text-danger">*</span>
+								<span class="d-block text-primary pb-1" style="font-style: italic;">
+									Copy and paste the job description of this role.
+								</span>
+								{{ form_widget(form.job_description, {'attr': {'rows': 10}}) }}
+								{# <small id="textHelp" class="form-text text-muted">Job Description</small> #}
+							</div>
+						</div>
+					</section>
+					<!-- Step 2 -->
+					<h6>Salary & Location Details</h6>
+					<section>
+						<h5 class="fs-4 fw-semibold mb-4">Salary Details</h5>
+						<div class="row d-flex align-items-end">
+							<div class="col-lg-4 mb-3">
+								<label for="exampleInputtext3" class="form-label">Minimum Pay</label>
+								{{ form_widget(form.minimum_pay) }}
+							</div>
+							<div class="col-lg-4 mb-3">
+								<label class="form-label">Maxmimum Pay</label>
+								{{ form_widget(form.maximum_pay) }}
+							</div>
+							<div class="col-lg-4 mb-3">
+								<label class="form-label">Currency</label>
+								{# <span class="text-danger">*</span> #}
+								{{ form_widget(form.currency) }}
+							</div>
+							<div class="col-lg-6 mb-3">
+								<label class="form-label">Salary Frequency</label>
+								{{ form_widget(form.mentioned_amount_by) }}
+							</div>
+							<div class="col-lg-6 mb-3">
+								<label class="form-label">Display Salary</label>
+								{{ form_widget(form.show_salary) }}
+							</div>
+							<div class="col-lg-6 mb-3">
+								<label class="form-label">Commission</label>
+								<span class="text-danger">*</span>
+								{{ form_widget(form.has_commission) }}
+							</div>
+							<div class="col-lg-6 mb-3">
+								<label class="form-label">Benefits</label>
+								<span class="text-danger">*</span>
+								{{ form_widget(form.benefits) }}
+							</div>
+							<div class="col-lg-6 mb-3">
+								<label class="form-label">Cover Letter</label>
+								<span class="text-danger">*</span>
+								{{ form_widget(form.requireCoverLetter) }}
+							</div>
+						</div>
+						<h5 class="fs-4 fw-semibold mb-4">Job Location Details</h5>
+						<div class="row d-flex align-items-end">
+							<div class="col-lg-6 mb-3">
+								<label class="form-label">Address</label>
+								{{ form_widget(form.location) }}
+							</div>
+							<div class="col-lg-4 mb-3">
+								<label for="exampleInputtext3" class="form-label">Country</label>
+								<span class="text-danger">*</span>
+								{{ form_widget(form.country) }}
+							</div>
+							<div class="col-lg-4 mb-3">
+								<label class="form-label">City</label>
+									<span class="text-danger">*</span>
+									{{ form_widget(form.city) }}
+								
+							</div>
+							<div class="col-lg-4 mb-3">
+								<label class="form-label">State/Region</label>
+								{{ form_widget(form.states) }}
+							</div>
+							
+							
+							<div class="col-lg-4 mb-3">
+								<label class="form-label">Zip/Postal Code</label>
+								<div class="input-group">
+									{{ form_widget(form.zipe_code) }}
+								</div>
+							</div>
+							<div class="col-lg-12 mb-10 mt-10 h-100-t" style="padding: 6rem;">
+								<div class="input-group">
+								
+								</div>
+							</div>
+							
+						</div>
+					</section>
+					<!-- Step 3 -->
+					<h6>Skills & Education</h6>
+					<section>
+						<h5 class="fs-4 fw-semibold mb-2">Skill Details</h5>
+						<span class="d-block text-primary" style="font-style: italic;">
+							Type or select multiple options from the drop-down box.
+						</span>
+						<div class="row d-flex align-items-end">
+							<div class="col-lg-6 mb-3">
+								<label for="exampleInputtext3" class="form-label">Required Skills</label>
+								<span class="text-danger">*</span>
+								{{ form_widget(form.required_skill) }}
+							</div>
+							<div class="col-lg-6 mb-3">
+								<label class="form-label">Preferred Skills</label>
+								<span class="text-danger">*</span>
+								{{ form_widget(form.preferred_skill) }}
+							</div>
+							
+						</div>
+						<h5 class="fs-4 fw-semibold mb-4">Education Details</h5>
+						<div class="row d-flex align-items-end">
+							<div class="col-lg-4">
+								<label for="exampleInputtext3" class="form-label">Degree Required</label>
+								<span class="text-danger">*</span>
+								{{ form_widget(form.education_required) }}
+							</div>
+							<div class="col-lg-12 mb-3">
+								<label class="form-label">Education Titles</label>
+								<span class="text-danger">*</span>
+								{{ form_widget(form.education_titles) }}
+							</div>
+							<div class="col-lg-4">
+								<label class="form-label">Certification Required</label>
+								<span class="text-danger">*</span>
+								{{ form_widget(form.certification_required) }}
+							</div>
+							<div class="col-lg-4">
+								<label class="form-label">Certifications</label>
+								{{ form_widget(form.certifications) }}
+							</div>
+							<div class="col-lg-12">
+								<label class="form-label">Other Requirements</label>
+								<span class="text-danger">*</span>
+								{{ form_widget(form.other_requirements, {'attr': {'rows': 5}}) }}
+							</div>
+						</div>
+					</section>
+					<!-- Step 4 -->
+					<h6>Preview</h6>
+					<section>
+						<h5 class="fs-4 fw-semibold mb-4">Posting Details & Quesitions</h5>
+						<div class="row d-flex align-items-end">
+							<div class="col-lg-6 mb-3">
+								<label for="exampleInputtext3" class="form-label">Locals/Citizens Only</label>
+								{{ form_widget(form.locals_only) }}
+							</div>
+							<div class="col-lg-6 mb-3">
+								<label class="form-label">Immediate Hiring</label>
+								<span class="d-block text-primary" style="font-style: italic;">
+									Specify if the job is for immediate hiring. If not, select NO.
+								</span>
+								{{ form_widget(form.immediate_hiring) }}
+							</div>
+							<div class="col-lg-6 mb-3">
+								{# <label for="exampleInputtext3" class="form-label">External Link (Copy/Paste external link for job application)</label> #}
+								<label for="exampleInputtext3" class="form-label">How can candidates apply?</label>
+								<span class="d-block mb-1 text-primary" style="">Provide the job link or your email address if you prefer direct applications. Otherwise, leave blank.</span>
+								{{ form_widget(form.external_link) }}
+							</div>
+							<div class="col-lg-6 mb-3">
+								<label class="form-label">Application closing date</label>
+								<span class="text-danger">*</span>
+								{{ form_widget(form.application_closing_date) }}
+							</div>
+						</div>
+						<button type="submit" class="btn btn-primary mt-8 mb-8">Submit</button>
+					</section>
+					{{ form_end(form) }}
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

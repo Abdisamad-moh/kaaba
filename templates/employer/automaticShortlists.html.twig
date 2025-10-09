@@ -1,0 +1,167 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Automatic Shortlisting
+{% endblock %}
+
+{% block body %}
+</div>
+	<div class="" data-controller="employer">
+
+
+		<div class="row">
+			<div class="col-12">
+				<div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+					<div class="card-body px-4 py-3">
+						<div class="row align-items-center">
+							<div class="col-9">
+								<h4 class="fw-semibold mb-8">
+									<i class="ti ti-users fs-8 "></i>
+									Automatic Shortlisting</h4>
+								<nav aria-label="breadcrumb">
+									<ol class="breadcrumb">
+										<li class="breadcrumb-item">
+											<a class="text-muted text-decoration-none" href="#">Candidates</a>
+										</li>
+										<li class="breadcrumb-item" aria-current="page">Candidates List</li>
+									</ol>
+								</nav>
+							</div>
+							<div class="col-3">
+								<div class="text-center">
+									<img src="{{ asset('assets/images/candidate.png') }}" alt="modernize-img" class="iconn img-fluid mb-n4">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-12">
+
+
+				<div class="row">
+				{{ form_start(form) }}
+				<div class="row">
+					<div class="col-md-4">
+						<label for="score">Min Relevance Score</label>
+						{{ form_widget(form.score) }}
+					</div>
+					<div class="col-md-5">
+						<label for="score">Job</label>
+						{{ form_widget(form.jobs) }}
+					</div>
+					<div class="col-3 d-flex align-items-end">
+						{{ form_row(form.submit) }}
+					</div>
+				</div>
+				{{ form_end(form) }}
+
+
+			</div>
+		</div>
+		</div>
+		<div
+			class="datatables">
+			<!-- start File export -->
+			<div class="card">
+				<div class="card-body">
+					<ul class="nav nav-pills user-profile-tab" id="pills-tab" role="tablist"></ul>
+					<div class="table-responsive">
+						<table id="accounts" class="table table-striped table-bordered w-100 text-nowrap display">
+							<thead>
+								<tr>
+									<th>Applicant Name</th>
+									<th>Job ID - Title</th>
+									<th>Application Date</th>
+									<th>Experience</th>
+									<th>Education</th>
+									<th>Relevance Score</th>
+									<th>Cover Letter</th>
+									<th>Status</th>
+									<th>Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for item in shortlist %}
+									{% set jobApplication = item.application %}
+									{% set matchScore = item.score %}
+									<tr>
+										<td>{{ jobApplication.jobSeeker.name ?? 'N/A' }}</td>
+										<td>JOB-{{ jobApplication.job.id ?? 'N/A' }}
+											-
+											{{ jobApplication.job.title ?? 'N/A' }}</td>
+										<td>{{ jobApplication.createdat|date('d-m-Y') }}</td>
+										<td>{{ jobApplication.jobSeeker.jobSeekerResume.experience|numberToString }}</td>
+										<td>{{ jobApplication.jobSeeker.jobSeekerResume.education|educationNumberToString }}</td>
+										<td>{{ matchScore }}</td>
+										<td>
+											{% if jobApplication.coverLetter %}
+												<a class="btn btn-primary btn-sm" target="_blank" href="{{ asset('uploads/' ~ jobApplication.coverLetter) }}">
+													<i class="ti ti-file text-white"></i>
+													Preview
+												</a>
+											{% endif %}
+										</td>
+										<td>{{ jobApplication.status|capitalize }}</td>
+										<td>
+	<div class="btn-toolbar" role="toolbar">
+		<div class="btn-group mb-2 me-2" role="group">
+			<a data-type="resume" data-can="{{ jobApplication.jobseeker.id }}" data-action="click->employer#scheduleInterview" href="#" class="btn primary_one text-white btn-sm">
+				<i class="ti ti-user-circle"></i>
+				View Profile
+			</a>
+
+			{% if jobApplication.status == 'applied' %}
+				<a data-type="schedule interview" data-status="shortlisted" data-can="{{ jobApplication.id }}" data-action="click->employer#scheduleInterview" href="#" class="btn primary_two text-white btn-sm">
+					<i class="ti ti-edit"></i>
+					Schedule Interview
+				</a>
+			{% elseif jobApplication.status in ['interview scheduled', 'selected', 'sent offer'] %}
+				<a data-type="interview result" data-status="interview scheduled" data-can="{{ jobApplication.id }}" data-action="click->employer#scheduleInterview" href="#" class="btn primary_two text-white btn-sm">
+					<i class="ti ti-calendar"></i>
+					Result/Schedule
+				</a>
+			{% endif %}
+
+			{% if jobApplication.status != 'rejected' %}
+				<a data-type="rejected" data-status="rejected" data-can="{{ jobApplication.id }}" data-action="click->employer#shortlistCandidate" href="#" class="btn primary_three text-white btn-sm">
+					Reject
+				</a>
+				<a data-type="message" data-status="message" data-can="{{ jobApplication.jobseeker.id }}" data-action="click->employer#shortlistCandidate" href="#" class="btn primary_four text-white btn-sm">
+					<i class="ti ti-message"></i>
+					Message
+				</a>
+			{% endif %}
+		</div>
+
+		<div class="btn-group">
+			<button type="button" class="btn btn-outline-danger btn-sm">Actions</button>
+			<button type="button" class="btn btn-outline-danger dropdown-toggle dropdown-toggle-split btn-sm" data-bs-toggle="dropdown" aria-expanded="false">
+				<span class="visually-hidden">Toggle Dropdown</span>
+			</button>
+			<ul class="dropdown-menu">
+				<li>
+					<a class="dropdown-item" href="{{ path('app_employer_delete_a_shortlist', {shortlist: item.id}) }}">
+						Delete
+					</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+</td>
+
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+
+					</div>
+
+				</div>
+			</div>
+		</div>
+		<!-- end File export -->
+	</div>
+</div>{% endblock %}

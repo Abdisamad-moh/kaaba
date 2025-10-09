@@ -1,0 +1,13 @@
+	<div class="col-lg-12 mt-5">
+		<div class="card mt-4" id="images">
+			<div class="p-4 border-bottom">
+				<h6 class="mb-2 "><label class="form-label">Question:</label> <span style="#51006a !important" class="fs-15"><strong>{{ question.q | replace({'Question:': ''}) }}</strong></span></h6>
+				<p><label class="form-label">Answer:</label>{{ question.a | replace({'Answer:': ''}) }}</p>
+				{% if question.r %}
+				
+				<p><label class="form-label">Rationale:</label><span class="fst-italic">{{question.r}}</span> </p>
+				{% endif %}
+			</div>
+			
+		</div>
+	</div>

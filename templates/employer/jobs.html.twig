@@ -1,0 +1,270 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Jobs
+{% endblock %}
+
+{% block body %}
+	<style>
+
+		.primary_one {
+			background-color: #350D3C !important;
+		}
+
+		.primary_two {
+			background-color: #6e3278 !important;
+		}
+
+		.primary_three {
+			background-color: #95599e !important;
+		}
+		.primary_four {
+			background-color: #917994 !important;
+		}
+	</style>
+	<div class="">
+
+
+		<div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+			<div class="card-body px-4 py-3">
+				<div class="row align-items-center">
+					<div class="col-9">
+						<h4 class="fw-semibold mb-8">
+							<i class="ti ti-briefcase fs-8 "></i>
+							Jobs</h4>
+						<nav aria-label="breadcrumb">
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item">
+									<a class="text-muted text-decoration-none" href="#">Jobs</a>
+								</li>
+								<li class="breadcrumb-item" aria-current="page">Jobs List</li>
+							</ol>
+						</nav>
+					</div>
+					<div class="col-3">
+						<div class="text-center">
+							<img src="{{ asset('assets/images/job.png') }}" alt="modernize-img" class="iconn img-fluid mb-n4">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="container">
+
+			<div class="row">
+				<div class="col-12"></div>
+				<div class="col-md-6"></div>
+				<div class="col-md-6">
+					<div class="form-group"></div>
+				</div>
+			</div>
+
+
+		</div>
+		<div
+			class="datatables">
+			<!-- start File export -->
+			<div class="card">
+				<div class="card-body">
+					<div class="action-btn layout-top-spacing mb-7 d-flex align-items-center justify-content-between flex-wrap gap-6">
+						<ul class="nav nav-pills user-profile-tab" id="pills-tab" role="tablist">
+							<li class="nav-item" role="presentation">
+								<a href="{{ path("app_employer_jobs") }}" class="nav-link position-relative rounded-0 {{type ? " " : " active" }} d-flex align-items-center justify-content-center bg-transparent fs-3 py-3" aria-selected="true">
+									<i class="ti ti-user-circle me-2 fs-6"></i>
+									<span class="d-none d-md-block">All Jobs</span>
+								</a>
+							</li>
+							<li class="nav-item" role="presentation">
+								<a href="{{ path("app_employer_jobs",{'type': 'posted'}) }}" class="nav-link position-relative rounded-0 {{type == " posted" ? " active" : " " }} d-flex align-items-center justify-content-center bg-transparent fs-3 py-3" aria-selected="false">
+									<i class="ti ti-bell me-2 fs-6"></i>
+									<span class="d-none d-md-block">Open Jobs</span>
+								</a>
+							</li>
+							<li class="nav-item" role="presentation">
+								<a href="{{ path("app_employer_jobs",{'type': 'paused'}) }}" class="nav-link position-relative rounded-0 {{type == " paused" ? " active" : " " }} d-flex align-items-center justify-content-center bg-transparent fs-3 py-3" aria-selected="false">
+									<i class="ti ti-article me-2 fs-6"></i>
+									<span class="d-none d-md-block">Paused Jobs</span>
+								</a>
+							</li>
+							<li class="nav-item" role="presentation">
+								<a href="{{ path("app_employer_jobs",{'type': 'closed'}) }}" class="nav-link position-relative rounded-0 {{type == " closed" ? " active" : " " }} d-flex align-items-center justify-content-center bg-transparent fs-3 py-3" aria-selected="false">
+									<i class="ti ti-lock me-2 fs-6"></i>
+									<span class="d-none d-md-block">Closed Jobs</span>
+								</a>
+							</li>
+							<li class="nav-item" role="presentation">
+								<a href="{{ path("app_employer_jobs",{'type': 'draft'}) }}" class="nav-link position-relative rounded-0 {{type == " draft" ? " active" : " " }} d-flex align-items-center justify-content-center bg-transparent fs-3 py-3" aria-selected="false">
+									<i class="ti ti-lock me-2 fs-6"></i>
+									<span class="d-none d-md-block">Drafted Jobs</span>
+								</a>
+							</li>
+						</ul>
+						<a href="{{ path("app_employer_post_job") }}" class="btn rounded-pill waves-effect waves-light btn-primary">
+							Post a job
+						</a>
+					</div>
+
+					<div class="table-responsive" style="min-height: 400px">
+						<table id="file_export" class="table w-100 table-striped table-bordered display text-nowrap">
+							<thead>
+								<tr>
+									<th>Job ID</th>
+									<th>Job Title</th>
+									<th>Experience</th>
+									<th>Salary Range</th>
+									<th>Application Received</th>
+									<th>Job Status</th>
+									<th>is Private</th>
+									<th>Posted On - Closed On</th>
+									<th>Location</th>
+									<th>Actions</th>
+								</tr>
+							</thead>
+							<tbody data-controller="copy-clipboard">
+								{% for job in jobs %}
+									<tr>
+										<td>{{ job.id }}</td>
+										<td>{{ job.title }}</td>
+										<td>{{ job.experience|numberToString }}</td>
+										<td>{{ job.currency.symbol ?? '' }}
+											{{ job.minimumpay }}-{{ job.maximumpay }}</td>
+										<td>{{ job.jobApplications|length }}</td>
+										<td>
+											{% set status_class = {
+    'draft': 'btn-warning',
+    'posted': 'btn-success',
+    'paused': 'btn-danger',
+    'closed': 'btn-danger'
+  }[job.status] ?? 'btn-secondary' %}
+
+											<button type="button" class="btn rounded-pill btn-block waves-effect waves-light {{ status_class }}">
+												{{ job.isrepost ? 'Repost' : job.status | capitalize }}
+											</button>
+										</td>
+										<td>{{ job.isPrivate ? 'Yes' : 'No' }}</td>
+
+										<td>{{ job.createdat|date("d-m-Y") }}
+											-
+											{{ job.applicationclosingdate|date("d-m-Y") }}</td>
+										<td>{{ job.city.name ?? "" }}</td>
+										<td>
+											<div class="btn-toolbar" role="toolbar">
+												<div class="btn-group me-2 mb-2">
+													{% if job.status in ['paused', 'closed', 'draft'] %}
+														<a href="{{ path('app_employer_job_change_status', {'job': job.id, 'encodedStatus': 'posted' | encodeStatus, 're': 'repost'}) }}" class="btn primary_one text-white">
+															<i class="ti ti-check fs-4"></i>
+															Repost
+														</a>
+													{% endif %}
+													{% if job.status == "posted" %}
+														<a href="{{ path('app_employer_job_change_status', {'job': job.id, 'encodedStatus': 'paused' | encodeStatus}) }}" class="btn primary_one text-white">
+															<i class="ti ti-printer fs-4"></i>
+															Pause
+														</a>
+														<a href="{{ path('app_employer_job_change_status', {'job': job.id, 'encodedStatus': 'closed' | encodeStatus}) }}" class="btn primary_two text-white">
+															<i class="ti ti-trash fs-4"></i>
+															Close
+														</a>
+													{% endif %}
+													<a href="{{ path('app_employer_post_job', {'job': job.id}) }}" class="btn primary_three text-white">
+														<i class="ti ti-edit fs-4"></i>
+														Edit
+													</a>
+													<a href="{{ path('app_employer_job_change_status', {'job': job.id, 'encodedStatus': 'deleted' | encodeStatus}) }}" class="btn primary_four text-white">
+														<i class="ti ti-trash fs-4"></i>
+														Delete
+													</a>
+
+													<button class="btn btn-info dropdown-toggle" type="button" data-bs-toggle="dropdown">
+														Share
+													</button>
+													<ul class="dropdown-menu">
+														<li>
+															<a target="__blank" href="https://twitter.com/intent/tweet?url={{ url('job_seeker_job_details', {slug: job.title|slugify, uuid: job.uuid }) }}&text={{ job.title ?? '' }}" class="dropdown-item btn bg-dark">
+																<svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 512 512" width="30" height="20"><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z" fill="white"/></svg>
+															</a>
+														</li>
+														<li>
+															<a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{ url('job_seeker_job_details', {slug: job.title|slugify, uuid: job.uuid }) }}" class="dropdown-item btn" style="background-color: #1877F2 !important;color: white !important;">
+																<i class="fa fa-facebook-f"></i>
+																Facebook
+															</a>
+														</li>
+														<li>
+															<a data-action="click->copy-clipboard#copyUrl" data-copy-clipboard-url-param="{{ url('job_seeker_job_details', {slug: job.title|slugify, uuid: job.uuid }) }}" href="#" class="dropdown-item btn btn-success">
+																<i class="fa fa-copy"></i>
+																Copy
+															</a>
+														</li>
+													</ul>
+												</div>
+											</div>
+										</td>
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+
+				</div>
+			</div>
+		</div>
+		<!-- end File export -->
+	</div>
+	<div class="row">
+		<div class="col-lg-2"></div>
+
+		{% set page = 'Employer Jobs Page' %}
+		{% set filteredAds = ads|filter(ad => ad.pages|filter(p => p.name == page)|length > 0)|shuffle %}
+
+		{% if filteredAds %}
+			<div class="col-lg-8">
+				<div class="card"></div>
+
+				<div class="card">
+					<div class="card-body">
+						<h4 class="card-title mb-3">Companies Ads</h4>
+
+						<div id="carouselExampleIndicators" class="carousel slide carousel-dark" data-bs-ride="carousel">
+							<ol class="carousel-indicators">
+								{% for ad in filteredAds %}
+									<li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{{ loop.index0 }}" class="{% if loop.first %}active{% endif %}"></li>
+								{% endfor %}
+							</ol>
+
+							<div class="carousel-inner">
+								{% for ad in filteredAds %}
+									{% set url = ad.link %}
+									<div class="carousel-item {% if loop.first %}active{% endif %}">
+										{% if url starts with 'http' %}
+											<a href="{{ url }}">
+												<img src="{{ path('profile_image', {'filename': ad.image }) }}" class="d-block w-100" alt="Ad image {{ loop.index }}"/>
+											</a>
+										{% else %}
+											<a href="http://{{ url }}">
+												<img src="{{ path('profile_image', {'filename': ad.image }) }}" class="d-block w-100" alt="Ad image {{ loop.index }}"/>
+											</a>
+										{% endif %}
+									</div>
+								{% endfor %}
+							</div>
+
+							<a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-bs-slide="prev">
+								<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+								<span class="visually-hidden">Previous</span>
+							</a>
+							<a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-bs-slide="next">
+								<span class="carousel-control-next-icon" aria-hidden="true"></span>
+								<span class="visually-hidden">Next</span>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		{% endif %}
+
+		<div class="col-lg-2"></div>
+
+	</div>
+
+	{{ include('components/live-toast.html.twig') }}
+</div>{% endblock %}

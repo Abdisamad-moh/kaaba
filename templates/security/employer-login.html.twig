@@ -1,0 +1,119 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Login!
+{% endblock %}
+
+{% block body %}
+
+	<div class="main-content bg-login">
+		<div class="page-content">
+			<section class="section-login ">
+				<div class="container">
+					<div class="row justify-content-center">
+						<div class="col-xl-7 col-lg-6">
+							<div class="card auth-box">
+								<div class="row g-0">
+									<div class="col-lg-12">
+										<div class="section-title mt-4 mt-lg-0 p-5 ">
+											<h3 class="title text-center">Find the Right Talent & Grow Your Business</h3>
+											<p class="text-muted text-center">Sign In to connect with top talent and manage your hiring process seamlessly 
+											</p>
+											{# <p class="text-muted text-center">Sign Up to access the most advanced job search engine in Africa
+											</p> #}
+											<div class="text-center">
+												<div class="boxlogoicon text-center">
+													<a href="#"><img src="assets/images/featured-job/go.png" alt="" class="img-fluid rounded-3 text-center"></a>
+												</div>
+												&nbsp;
+												<div class="boxlogoicon">
+													<a href="#"><img src="assets/images/featured-job/fs.png" alt="" class="img-fluid rounded-3"></a>
+												</div>
+												&nbsp;
+												<div class="boxlogoicon">
+													<a href="#"><img src="assets/images/featured-job/in.png" alt="" class="img-fluid rounded-3"></a>
+												</div>
+											</div>
+											<div class="container">
+												<div class="row mt-2 mb-2">
+													<div class="col-lg-5 border01 mt-4"></div>
+													<div class="col-lg-2">
+														<h3 class="title  text-center log_co">
+															<span class="text-primary fs-15 fw-bold">
+																OR</span>
+														</h3>
+													</div>
+													<div class="col-lg-5 border01 mt-4"></div>
+												</div>
+											</div>
+
+											<form method="post"  onsubmit="" class="contact-form mt-3" name="myForm" id="myForm">
+												
+												{# <span id="error-msg"></span> #}
+
+												{# {% if error %}
+													<div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+												{% endif %} #}
+												<div class="row">
+													{% if error %}
+														<div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+													{% endif %}
+													{% if app.user %}
+														<div class="col-lg-12">
+															<div class="mb-3 fw-bold">
+																You are logged in as
+																{{ app.user.userIdentifier }},
+																<a class="text-primary" href="{{ path('app_logout') }}">Logout</a>
+															</div>
+														</div>
+
+													{% endif %}
+													<div class="col-lg-12">
+														<div class="mb-3">
+															<label for="nameInput" class="form-label fs-13">Email ID / User Name</label>
+															<input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
+														</div>
+													</div>
+													<!--end col-->
+
+													<div class="col-md-12">
+														<label for="passwordInput" class="form-label fs-13">Password</label>
+												<input type="password" name="password" id="inputPassword" class="form-control" autocomplete="current-password" required>
+
+														<p class="text-end mt-2">
+															<a class="text-blue" href="#">Forgot password?</a>
+														</p>
+													</div>
+													<!--end col-->
+													<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+												</div>
+												<!--end row-->
+												<div class="checkbox mb-3">
+													<label>
+														<input type="checkbox" name="_remember_me">
+														Remember me
+													</label>
+												</div>
+												<div class="text-center mt-3">
+													<button type="submit" id="submit" name="submit" class="btn btn-primary lo_pa">
+														Log In</button>
+												</div>
+											</form>
+
+
+											<p class="mt-3 text-center">Don’t have an account ? &nbsp;<a href="{{ path('app_jobseeker_register') }}" class="fw-medium text-decoration-underline text-purple">Register
+												</a>
+											</p>
+										</div>
+									</div>
+								</div>
+								<!--end row-->
+							</div>
+							<!--end auth-box-->
+						</div>
+					</div>
+				</div>
+			</section>
+
+		</div>
+	</div>
+{% endblock %}

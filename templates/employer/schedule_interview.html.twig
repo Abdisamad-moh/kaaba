@@ -1,0 +1,184 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Candidates
+{% endblock %}
+
+{% block body %}
+	<div class="container-fluid" data-controller="employer">
+
+		<div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+			<div class="card-body px-4 py-3">
+				<div class="row align-items-center">
+					<div class="col-9">
+						<h4 class="fw-semibold mb-8">
+							<i class="ti ti-users fs-8 "></i>
+							Candidates</h4>
+						<nav aria-label="breadcrumb">
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item">
+									<a class="text-muted text-decoration-none" href="#">Candidates</a>
+								</li>
+								<li class="breadcrumb-item" aria-current="page">Candidates List</li>
+							</ol>
+						</nav>
+					</div>
+					<div class="col-3">
+						<div class="text-center mb-n5">
+							<img src="{{ asset('assets/de/images/breadcrumb/ChatBc.png') }}" alt="modernize-img" class="img-fluid mb-n4">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="container">
+
+			<div class="row">
+				<div class="col-12"></div>
+				<div class="col-md-6"></div>
+				<div class="col-md-6">
+					<div class="form-group"></div>
+				</div>
+			</div>
+			<div class="row">
+						<div class="col-12">
+							<div class="card">
+								<div class="card-body wizard-content">
+									<h4 class="card-title mb-0">Custom Design Example</h4>
+									<h6 class="card-subtitle mb-3"></h6>
+									<form
+										action="#" class="tab-wizard wizard-circle">
+										<!-- Step 1 -->
+										<h6>Personal Info</h6>
+										<section>
+											<div class="row">
+												<div class="col-md-6">
+													<div class="mb-3">
+														<label class="form-label" for="firstName1">First Name :</label>
+														<input type="text" class="form-control" id="firstName1"/>
+													</div>
+												</div>
+												<div class="col-md-6">
+													<div class="mb-3">
+														<label class="form-label" for="lastName1">Last Name :</label>
+														<input type="text" class="form-control" id="lastName1"/>
+													</div>
+												</div>
+											</div>
+										</section>
+										<!-- Step 2 -->
+										<h6>Job Status</h6>
+										<section>
+											<div class="row">
+												<div class="col-md-6">
+													<div class="mb-3">
+														<label class="form-label" for="jobTitle1">Job Title :</label>
+														<input type="text" class="form-control" id="jobTitle1"/>
+													</div>
+												</div>
+											</div>
+										</section>
+										<!-- Step 3 -->
+									</form>
+								</div>
+							</div>
+						</div>
+
+					</div>
+
+
+		</div>
+
+		{{ form_start(form, {action: path('app_employer_schedule_interview', {'candidate': candidate.id})}) }}
+		<div class="row">
+			<div class="col-12">
+				<div class="card">
+					<div class="card-body wizard-content">
+						<h4 class="card-title mb-0">Custom Design Example</h4>
+						<h6 class="card-subtitle mb-3"></h6>
+						<form
+							action="#" class="tab-wizard wizard-circle">
+							<!-- Step 1 -->
+							<h6>Personal Info</h6>
+							<section>
+								<div class="row">
+									<div class="col-md-6">
+										<div class="mb-3">
+											<label class="form-label" for="firstName1">First Name :</label>
+											<input type="text" class="form-control" id="firstName1"/>
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div class="mb-3">
+											<label class="form-label" for="lastName1">Last Name :</label>
+											<input type="text" class="form-control" id="lastName1"/>
+										</div>
+									</div>
+								</div>
+							</section>
+							<!-- Step 2 -->
+							<h6>Job Status</h6>
+							<section>
+								<div class="row">
+									<div class="col-md-6">
+										<div class="mb-3">
+											<label class="form-label" for="jobTitle1">Job Title :</label>
+											<input type="text" class="form-control" id="jobTitle1"/>
+										</div>
+									</div>
+								</div>
+							</section>
+							<!-- Step 3 -->
+						</form>
+					</div>
+				</div>
+			</div>
+			<div class="col-12">
+				<div class="{{msg.class}}" role="alert">
+					{{msg.msg}}
+				</div>
+			</div>
+			<div class="col-12"></div>
+			<div class="col-4">
+				<div class="mb-3">
+					<label for="formGroupExampleInput" class="form-label">Candidate</label>
+					<div class="d-flex align-items-center">
+						<div class="position-relative">
+							<img src="{{ asset("assets/de/images/profile/user-1.jpg") }}" alt="user1" width="54" height="54" class="rounded-circle">
+							<span class="position-absolute bottom-0 end-0 p-1 badge rounded-pill bg-success">
+								<span class="visually-hidden">New alerts</span>
+							</span>
+						</div>
+						<div class="ms-3">
+							<h4 class="fw-semibold mb-2">{{candidate.jobseeker.name}}</h4>
+							<p class="mb-0 fs-2">Designer</p>
+						</div>
+					</div>
+					<h4></h4>
+				</div>
+			</div>
+			<div class="col-4">
+				<div class="mb-3">
+					<label for="formGroupExampleInput" class="form-label">Job</label>
+					<h4>{{candidate.job ?  candidate.job.title :  ""}}</h4>
+				</div>
+			</div>
+			<div class="col-4">
+				<div class="mb-3">
+					<label for="formGroupExampleInput" class="form-label">Current Status</label>
+					<h4>{{candidate.status}}</h4>
+				</div>
+			</div>
+
+			<div class="col-12">
+				<div class="mb-3">
+					<label for="formGroupExampleInput" class="form-label">{{ form_label(form.notes, 'Notes') }}</label>
+					{{ form_widget(form.notes, {'attr': {'class': 'form-control', 'placeholder': 'Note'}}) }}
+					{{ form_errors(form.notes) }}
+				</div>
+			</div>
+		</div>
+
+		<button type="submit" class="btn btn-primary">Submit</button>
+		{{ form_end(form) }}
+	</div>
+</div>{% endblock %}

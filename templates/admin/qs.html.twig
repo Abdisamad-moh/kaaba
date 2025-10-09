@@ -1,0 +1,101 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Interview Questions & Answers
+{% endblock %}
+
+{% block body %}
+	<div class="row">
+		<div class="col-xl-12">
+			<div class="">
+				<div class="">
+<div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+			<div class="card-body px-4 py-3">
+				<div class="row align-items-center">
+					<div class="col-9">
+						<h4 class="fw-semibold mb-8">
+							<i class="ti ti-users fs-8 "></i>
+							Interview Questions & Answers</h4>
+						<nav aria-label="breadcrumb">
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item">
+									<a class="text-muted text-decoration-none" href="#">Interview Questions & Answers</a>
+								</li>
+								
+							</ol>
+						</nav>
+					</div>
+					<div class="col-3">
+						<div class="text-center">
+							<a href="{{ path("app_admin_add_qa") }}" class=" btn btn-danger waves-effect waves-light waves-effect mb-2" >Create a new interview question</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="container">
+
+			<div class="row">
+				<div class="col-12"></div>
+				<div class="col-md-6"></div>
+				<div class="col-md-6">
+					<div class="form-group"></div>
+				</div>
+			</div>
+
+
+		</div>
+
+					
+
+					<div class="container">
+						<div class="row ma_top-inner">
+							<div class="table-responsive">
+								<table id="file_export" class="table w-100 table-striped table-bordered display text-nowrap">
+									<thead>
+										<tr style="font-size: 15px;">
+											<th>ID</th>
+											<th>Job Title</th>
+											<th>Question</th>
+											<th>Answer</th>
+											<th>Rationale</th>
+											<th>Actions</th>
+										</tr>
+									</thead>
+									<tbody>
+										{% for item in blogs %}
+
+
+											<tr>
+												<th scope="row">{{item.id}}</th>
+												<td>{{item.jobtype.name}}</td>
+												<td>{{item.q}}</td>
+												<td>{{item.a}}</td>
+												<td>{{item.r}}</td>
+												<td>
+													<a class="text-red " href="{{ path("app_admin_edit_qa",{'q': item.id}) }}">
+														<i class="fa fa-edit alert alert-primary"></i>
+													</a>
+													<a class="text-red m-1" href="{{ path("app_admin_delete_qa",{'q': item.id}) }}">
+														<i class="fa fa-trash alert alert-danger"></i>
+													</a>
+												</td>
+
+
+											</tr>
+										{% endfor %}
+
+
+									</tbody>
+								</table>
+							</div>
+							<div class="navigation">
+			{% do blogs.setPageRange(2) %}
+			{{ knp_pagination_render(blogs,'pagination.html.twig') }}
+		</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>{% endblock %}

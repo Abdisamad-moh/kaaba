@@ -1,0 +1,123 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tenders List!
+{% endblock %}
+{% block stylesheets %}
+	<style>
+		.no-border {
+			border: none !important; /* Removes the border */
+			outline: none !important; /* Removes the focus outline */
+		}
+		.no-border:focus {
+			box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Bootstrap-like focus shadow */
+		}
+		.logo-size {
+			width: 58px;
+			height: 58px;
+		}
+	</style>
+{% endblock %}
+{% block body %}
+	<div data-controller="tender-course" data-tender-course-url-value="{{ path('app_home_tenders') }}" data-tender-course-cities-url-value="{{ path('app_fetch_cities') }}">
+		<section class="bg-home2" id="home">
+			<div class="container">
+				<div class="row align-items-center">
+					<div class="col-lg-12 mt-5 ">
+						<form>
+							<div class="registration-form">
+								<div class="row g-0">
+									<div class="col-md-3">
+										<div class="filter-search-form filter-border mt-3 mt-md-0">
+											<i class="fa fa-briefcase icopa ps-2" aria-hidden="true"></i>
+											<input type="search" value="" data-tender-course-target="title" name="tender" id="tender-title" class="form-control filter-input-box" placeholder="Search Tender Title">
+										</div>
+									</div>
+									<!--end col-->
+									<div class="col-md-3 bg-white d-flex align-items-center">
+										<div class="filter-border w-100 d-flex justify-content-center align-items-center">
+											<i class="fa fa-globe icopa ps-2" aria-hidden="true"></i>
+											<select data-tender-course-target="country" class="form-select no-border" data-trigger name="country" id="" aria-label="Default select example" style="color: #999b9d !important;">
+												<option value="">Country</option>
+												{% for country in countries %}
+													<option value="{{ country.id }}">{{ country.name }}</option>
+												{% endfor %}
+											</select>
+										</div>
+									</div>
+									<div class="col-md-3 bg-white d-flex align-items-center">
+										<div class="filter-border d-flex align-items-center justify-content-center w-100">
+											<i class="fa fa-map-marker icopa ps-2" aria-hidden="true"></i>
+											<select data-tender-course-target="city" class="form-select no-border" data-trigger name="city" id="" aria-label="Default select example" style="color: #999b9d !important;">
+												<option value="">City</option>
+											</select>
+										</div>
+									</div>
+
+									<!--end col-->
+									<div class="col-md-1 ">
+										<div class="mt-2 mt-md-0 h-100">
+											<button class="btn btn-primary submit-btn w-100 h-100" type="button" data-action="click->tender-course#applyFilter">
+												<i class="fa fa-search" aria-hidden="true"></i>
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</section>
+		<section class="section-re">
+			<div class="container">
+				<div class="row justify-content-center">
+					<div class="col-lg-12">
+						<div class="section-title text-center">
+							<div class="section-title text-center">
+								<h3 class="title mb-2">Discover the<span class="text-primary fw-bold">
+										latest tenders</span>
+								</h3>
+							</div>
+						</div>
+					</div>
+
+
+					<!--end-->
+				</div>
+				<!--end container-->
+			</div>
+		</section>
+		<section class="pa-les">
+			<div
+				class="container">
+				{# <div class="row"> #}
+				<div class="row" data-tender-course-target="list">
+					{# {% if tenders|length < 1 %}
+						<p class="text-center">No tenders found</p>
+					{% endif %} #}
+					{# {% include 'home/tender-cards.html.twig' with {tenders: tenders} %} #}
+
+				</div>
+				{# {{ component('all-tenders', {loading: 'defer', 'loading-template': 'components/jobs-loading.html.twig', job_category_id: job_category_id, tender_title: job_title, country_id: country_id} ) }} #}
+			</div>
+
+			<div class="col-lg-12">
+				<div class="section-title text-center">
+					<p class="text-muted mb-5 mt-5 fs-14">Did not find what you’re looking for? &nbsp;
+						<a data-loading="hide" href="" data-action="click->tender-course#loadMore" data-tender-course-target="loadMore">
+							<span>View More
+								</span>
+							<span>
+								<i class="fa fa-arrow-right" aria-hidden="true"></i>
+							</a>
+						</p>
+					</p>
+				</div>
+			</div>
+
+		</section>
+	</div>
+	 
+	{% include 'home/_footer.html.twig' %}
+
+{% endblock %}

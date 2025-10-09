@@ -1,0 +1,8 @@
+# See https://github.com/excelwebzone/EWZRecaptchaBundle for full configuration
+ewz_recaptcha:
+    public_key:  '%env(RECAPTCHA3_KEY)%'
+    private_key: '%env(RECAPTCHA3_SECRET)%'
+    locale_key: '%kernel.default_locale%'
+    enabled: true
+    verify_host: true
+    version: 2    # Specify the version explicitly if needed

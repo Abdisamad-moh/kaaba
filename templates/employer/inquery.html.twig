@@ -1,0 +1,139 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}
+	Inquery us
+{% endblock %}
+
+{% block body %}
+
+	<div class="container-fluid" data-controller="employer">
+
+		<div class="container">
+
+			<div class="row">
+				<div class="col-12"></div>
+				<div class="col-md-6"></div>
+				<div class="col-md-6">
+					<div class="form-group"></div>
+				</div>
+			</div>
+
+
+		</div>
+
+		<div
+
+			class="datatables">
+			<!-- start File export -->
+			<div class="card">
+				<div class="card-body">
+					{{ form_start(form) }}
+					<div class="row">
+						<div class="col-4">
+							{{ form_row(form.company_name) }}
+						</div>
+						<div class="col-4">
+							{{ form_row(form.contact_person) }}
+						</div>
+						<div class="col-4">
+							{{ form_row(form.email) }}
+						</div>
+						<div class="col-4">
+							{{ form_row(form.phone) }}
+						</div>
+						<div class="col-4">
+							{{ form_row(form.country) }}
+						</div>
+						<div class="col-4">
+							{{ form_row(form.address) }}
+						</div>
+						<div class="col-4">
+							{{ form_row(form.job_title) }}
+						</div>
+						<div class="col-4">
+							{{ form_row(form.department) }}
+						</div>
+						<div class="col-4">
+							{{ form_row(form.purpose_of_evaluation) }}
+						</div>
+						<div class="col-4">
+							{{ form_row(form.estimated_budget) }}
+						</div>
+						<div class="col-4">
+							{{ form_row(form.payment_method) }}
+						</div>
+						<div class="col-12">
+							{{ form_row(form.description) }}
+						</div>
+						<div class="col-12  text-center">
+							<h5>Inquiry Form</h5>
+							{% if form_message == 'success' %}
+								<div class="alert alert-success" role="alert">Thank you for connecting with us</div>inquery
+							{% elseif form_message == null %}
+
+							{% else %}
+								<div class="alert alert-danger" role="alert">
+									{{ form_message == 'error' ? 'Sorry, Something went wrong. Please try again' : form_message }}</div>
+							{% endif %}
+						</div>
+						<div class="col-12">
+							<button class="btn btn-primary">Submit</button>
+						</div>
+					</div>
+					{{ form_end(form) }}
+				</div>
+			</div>
+		</div>
+		<!-- end File export -->
+
+		{% set page = 'PS enquiry' %}
+		{% set filteredAds = ads|filter(ad => ad.pages|filter(p => p.name == page)|length > 0)|shuffle %}
+
+		{% if filteredAds %}
+			<div class="col-lg-12">
+				<div class="card"></div>
+
+				<div class="card">
+					<div class="card-body">
+						<h4 class="card-title mb-3">Companies Ads</h4>
+
+						<div id="carouselExampleIndicators" class="carousel slide carousel-dark" data-bs-ride="carousel">
+							<ol class="carousel-indicators">
+								{% for ad in filteredAds %}
+									<li data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{{ loop.index0 }}" class="{% if loop.first %}active{% endif %}"></li>
+								{% endfor %}
+							</ol>
+
+							<div class="carousel-inner">
+								{% for ad in filteredAds %}
+									{% set url = ad.link %}
+									<div class="carousel-item {% if loop.first %}active{% endif %}">
+										{% if url starts with 'http' %}
+											<a href="{{ url }}">
+												<img src="{{ path('profile_image', {'filename': ad.image }) }}" class="d-block w-100" alt="Ad image {{ loop.index }}"/>
+											</a>
+										{% else %}
+											<a href="http://{{ url }}">
+												<img src="{{ path('profile_image', {'filename': ad.image }) }}" class="d-block w-100" alt="Ad image {{ loop.index }}"/>
+											</a>
+										{% endif %}
+									</div>
+								{% endfor %}
+							</div>
+
+							<a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-bs-slide="prev">
+								<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+								<span class="visually-hidden">Previous</span>
+							</a>
+							<a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-bs-slide="next">
+								<span class="carousel-control-next-icon" aria-hidden="true"></span>
+								<span class="visually-hidden">Next</span>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		{% endif %}
+		<!-- end With indicators -->
+	</div>
+</div></div>{% endblock %}

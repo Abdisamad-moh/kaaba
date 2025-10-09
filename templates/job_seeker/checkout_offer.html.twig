@@ -1,0 +1,177 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	Checkout & Payment
+{% endblock %}
+{% block body %}
+	<style>
+		.min-height-200 {
+			min-height: 200px;
+		}
+		.sss {
+			height: 79vh;
+		}
+
+
+		.product_image {
+			width: 100%;
+			height: 100%;
+			object-fit: fill;
+		}
+
+		.text-muted {
+			font-size: 10px;
+		}
+
+		.textmuted {
+			color: #6c757d;
+			font-size: 13px;
+		}
+
+		.fs-14 {
+			font-size: 14px;
+		}
+
+		.btn.btn-primary {
+			width: 100%;
+			height: 55px;
+			border-radius: 0;
+			padding: 13px 0;
+			background-color: black;
+			border: none;
+			font-weight: 600;
+		}
+
+		.btn.btn-primary:hover .fas {
+			transform: translateX(10px);
+			transition: transform 0.5s ease
+		}
+
+
+		.fw-900 {
+			font-weight: 900;
+		}
+
+		::placeholder {
+			font-size: 12px;
+		}
+
+		.ps-30 {
+			padding-left: 30px;
+		}
+
+		.h4 {
+			font-family: 'Work Sans', sans-serif !important;
+			font-weight: 800 !important;
+		}
+
+		.textmuted,
+		h5,
+		.text-muted {
+			font-family: 'Poppins', sans-serif;
+		}
+		.btn-outline-primary:hover {
+			background-color: #edebff !important;
+		}
+		.btn-outline-primary .open > .dropdown-toggle.btn-primary,
+		.btn-outline-primary.active,
+		.btn-outline-primary.focus,
+		.btn-outline-primary:active,
+		.btn-outline-primary:focus,
+		.btn-outline-primary:hover,
+		.btn-outline-primary:not(:disabled):not(.disabled):active,
+		.btn-outline-primary:not(:disabled):not(.disabled):active:focus {
+			color: #fff !important;
+			background: #edebff !important;
+			-webkit-box-shadow: 0 0 0 0.15rem rgb(var(--bs-primary-rgb), 50%);
+			box-shadow: 0 0 0 0.15rem rgb(var(--bs-primary-rgb), 50%);
+		}
+	</style>
+
+	<div class="page-content">
+		<section class="bg-homelogin" id="home">
+			<div class="container">
+				<div class="row align-items-center">
+					<div class="col-lg-12">
+						<div class="mb-2 pb-1 me-lg-6 text-center">
+							<h1 class="display-5 fw-semibold mb-3 mt-3 fs-22">Checkout
+							</h1>
+							{# <p class="lead text-muted mb-0 pc-da">You can use this platform to interact with employers</p> #}
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		{% set tax = (package.cost * 5) / 100 %}
+		{% set final  = package.cost + tax %}
+
+		<div class="container">
+			<div class="row m-0">
+				<div class="col-lg-12 p-0 ps-lg-4">
+					<div class="">
+						<div class="card">
+							<div class="card-header"></div>
+							<div class="card-body">
+								<div class="row nav-tabs" role="tablist">
+
+
+									<div class="tab-content " data-controller="zaad">
+									{{ form_start(form) }}
+										<div class="tab-pane active" id="home2" role="tabpanel">
+											<tr>
+												<td class="mt-4" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding-top: 10px;">
+													<p class="mt-4" style="font-size: 16px; font-weight: 400; line-height: 24px; color: #777777;">
+													{% if type == "d" %}
+													This item is part of your subscription plan. Please click <strong>'Get Now'</strong> if you are sure you want to proceed with the download.
+														{% else %}
+														By clicking <strong>'Start Now'</strong>, you will begin your free subscription, granting you full access for one month. Your subscription will automatically end on {{ formattedDate|date('Y-m-d') }}. No payment is required to start this subscription. Please review the details carefully before proceeding to enjoy the offer and make the most of your subscription period.
+													{% endif %}
+														
+													</p>
+												</td>
+											</tr>
+
+											<div class="mb-4 m-3">
+												<label class="form-label" for="example-email"></label>
+											</div>
+											<div class="mb-3">
+												<div class="form-check">
+													<label for="termsInput" class="form-label  fs-13">Agree Terms</label>
+													{{ form_widget(form.agreeTerms) }}
+												</div>
+
+												<label class="ms-2 fs-15" for="SMS">By clicking Agree terms, you agree to the
+													<a target="__blank" class="text-primary text-decoration-underline" href="{{ path("app_home_terms") }}">Terms and Conditions</a>
+													,
+													<a target="__blank" class="text-primary text-decoration-underline" href="{{ path("app_home_privacy") }}">Privacy Policy</a>
+													&amp;
+													<a target="__blank" class="text-primary text-decoration-underline" href="{{ path("app_home_refundPolicy") }}">Refund Policy</a>
+													of Métier  metier-quest.com
+												</label>
+
+											</div>
+											<div class="row mt-3">
+												<div class="col-12 d-flex justify-content-center">
+													<button data-type="jobseeker" data-status="zaadPayment" data-can="6" data-action="click->zaad#checkout" class="btn btn-primary mt-2">
+														{{type == "f" ? "Start Now" : "Get Now"}}<span class="fas fa-dollar-sign px-1"></span>
+													</button>
+												</div>
+											</div>
+
+
+										</div>
+										{{ form_end(form) }}
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+	</div>
+	<div class="my-5"></div>
+	{% include 'home/_footer.html.twig' %}
+{% endblock %}

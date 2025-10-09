@@ -1,0 +1,494 @@
+{% extends 'admin_base2.html.twig' %}
+
+{# {% block title %}Hello EmployerController!{% endblock %} #}
+
+{% block body %}
+	<div class="container-fluid">
+		<div
+			class="row">
+			{# <div class="col-lg-12 ">
+																			<div class="card w-100 bg-primary-subtle overflow-hidden shadow-none">
+																				<div class="card-body position-relative">
+																					<div class="row">
+																						<div class="col-lg-12">
+																							<div class="d-flex align-items-center mb-7">
+																								<h5 class="fw-semibold mb-0 fs-5">Glance of this month</h5>
+																							</div>
+																							<div class="d-flex justify-content-between align-items-center">
+																								<div class="border-end pe-4 border-muted border-opacity-10">
+																									<h3 class="mb-1 fw-semibold fs-8 d-flex align-content-center">{{posted}}
+																									</h3>
+																									<p class="mb-0 text-dark">Total Job Posted</p>
+																								</div>
+																								<div class="ps-4 border-end pe-4 border-muted border-opacity-10">
+																									<h3 class="mb-1 fw-semibold fs-8 d-flex align-content-center">{{applicants}}
+																									</h3>
+																									<p class="mb-0 text-dark">Total Applicants</p>
+																								</div>
+																								<div class="ps-4"></div>
+																								<div class="border-end pe-4 border-muted border-opacity-10">
+																									<h3 class="mb-1 fw-semibold fs-8 d-flex align-content-center">{{shortlisted}}
+																									</h3>
+																									<p class="mb-0 text-dark">Shortlisted Candidates</p>
+																								</div>
+																								<div class="ps-4 border-end pe-4 border-muted border-opacity-10">
+																									<h3 class="mb-1 fw-semibold fs-8 d-flex align-content-center">{{interviews}}
+																									</h3>
+																									<p class="mb-0 text-dark">Interview Schedules</p>
+																								</div>
+																								<div class="ps-4 border-end pe-4 border-muted border-opacity-10">
+																									<h3 class="mb-1 fw-semibold fs-8 d-flex align-content-center">{{offers}}
+																									</h3>
+																									<p class="mb-0 text-dark">Total Offer Made</p>
+																								</div>
+																								<div class="ps-4 border-end pe-4 border-muted border-opacity-10">
+																									<h3 class="mb-1 fw-semibold fs-8 d-flex align-content-center">{{hired}}
+																									</h3>
+																									<p class="mb-0 text-dark">Total Hired Candidates</p>
+																								</div>
+																							</div>
+																						</div>
+																					</div>
+																				</div>
+																			</div>
+																		</div> #}
+			<div class="col-lg-4 col-md-6">
+				<div class="card">
+					<div class="text-bg-brand p-4 rounded-3 rounded-bottom-0">
+						<div class="text-center text-white display-6">
+							<i class="ti ti-tie"></i>
+						</div>
+					</div>
+					<div class="card-body">
+						<div class="d-flex align-items-center">
+							<div>
+								<h4 class="fs-6">{{posted}}</h4>
+								<h5 class="fs-4 fw-medium text-info mb-0">Total Jobs Posted</h5>
+							</div>
+							<div class="ms-auto">
+								<h4 class="fs-6">{{applicants}}</h4>
+								<h5 class="fs-4 fw-medium text-info mb-0">Total Applicants</h5>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-4 col-md-6">
+				<div class="card">
+					<div class="text-bg-second-brand p-4 rounded-3 rounded-bottom-0">
+						<div class="text-center text-white display-6">
+							<i class="ti ti-user"></i>
+						</div>
+					</div>
+					<div class="card-body">
+						<div class="d-flex align-items-center">
+							<div>
+								<h4 class="fs-6">{{shortlisted}}</h4>
+								<h5 class="fs-4 fw-medium text-primary mb-0">Shortlisted Candidates</h5>
+							</div>
+							<div class="ms-auto">
+								<h4 class="fs-6">{{interviews}}</h4>
+								<h5 class="fs-4 fw-medium text-primary mb-0">Interview Schedules</h5>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-4 col-md-6">
+				<div class="card">
+					<div class="text-bg-third-brand p-4 rounded-3 rounded-bottom-0">
+						<div class="text-center text-white display-6">
+							<i class="ti ti-briefcase "></i>
+						</div>
+					</div>
+					<div class="card-body">
+						<div class="d-flex align-items-center">
+							<div>
+								<h4 class="fs-6">{{offers}}</h4>
+								<h5 class="fs-4 fw-medium text-danger mb-0">Total Offer Made</h5>
+							</div>
+							<div class="ms-auto">
+								<h4 class="fs-6">{{hired}}</h4>
+								<h5 class="fs-4 fw-medium text-danger mb-0">Total Hired Candidates</h5>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-md-6 col-lg-6 d-flex align-items-stretch">
+    <div class="card w-100">
+        <div class="card-body p-4">
+            <div class="d-flex flex-row mb-4">
+                <div class="round-40 rounded-circle text-white d-flex align-items-center justify-content-center text-bg-primary">
+                    <i class="ti ti-tie fs-6"></i>
+                </div>
+                <div class="ms-3 align-self-center">
+                    <h4 class="card-title fw-semibold mb-0">Posted Jobs</h4>
+                </div>
+            </div>
+            <div class="position-relative">
+                {% if jobs is empty %}
+                    <div class="d-flex flex-column align-items-center justify-content-center">
+                        <h5 class="card-title">No Jobs Available</h5>
+                    </div>
+                {% else %}
+                    {% for key, item in jobs %}
+                        {% if key < 4 %}
+                            <div class="d-flex align-items-center justify-content-between mb-3 job-item">
+                                <div class="job-details">
+                                    <h6 class="mb-1 fs-4 fw-semibold">{{ item.title }}</h6>
+                                    <p class="fs-3 mb-0">
+                                        <i class="ti ti-map-pin"></i>
+                                        {{ item.country.name }},
+                                        {{ item.city.name }}
+                                        <span class="ms-2">
+                                            <i class="ti ti-briefcase"></i>
+                                            {{ item.numberposition }}
+                                        </span>
+                                    </p>
+                                </div>
+                                <span class="mb-0 job-date">{{ item.postedAt }}</span>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Only show the button if there are more than 4 jobs -->
+        {% if jobs|length > 4 %}
+            <div class="card-footer p-0">
+                <a href="{{ path('app_employer_jobs') }}" class="btn btn-primary w-100 rounded-0">View 10 more posted Jobs</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+
+
+			<div class="col-md-6 col-lg-6 d-flex align-items-stretch">
+				<div class="card w-100">
+					<div class="card-body p-4">
+						<div class="d-flex flex-row mb-4">
+							<div class="round-40 rounded-circle text-white d-flex align-items-center justify-content-center text-bg-info">
+								<i class="ti ti-align-right fs-6"></i>
+							</div>
+							<div class="ms-3 align-self-center">
+								<h4 class="card-title fw-semibold mb-0">Shortlisted Candidates</h4>
+							</div>
+						</div>
+						<div class="position-relative">
+							{% if candidates %}
+								{% for item in candidates %}
+									{% if loop.index <= 4 %}
+										{% set jobApplication = item.jobApplication %}
+										<div class="d-flex align-items-center justify-content-between mb-3 candidate-item">
+											<div class="candidate-details">
+												<h6 class="mb-1 fs-4 fw-semibold">{{ jobApplication.jobseeker.name }}</h6>
+												<p class="fs-3 mb-0">{{ jobApplication.job.title }}</p>
+												<p class="fs-3 mb-0">
+													<i class="ti ti-map-pin"></i>
+													{{ jobApplication.job.country.name }},
+													{{ jobApplication.job.city.name }}
+												</p>
+											</div>
+											<h6 class="mb-0 fw-semibold candidate-status">{{ jobApplication.status|capitalizeWords }}</h6>
+										</div>
+									{% endif %}
+								{% endfor %}
+							{% else %}
+								<div class="d-flex flex-column align-items-center justify-content-center">
+									<h5 class="card-title">No Candidates Available</h5>
+								</div>
+							{% endif %}
+						</div>
+					</div>
+
+					<!-- Only show the button if there are more than 4 candidates -->
+					{% if candidates|length > 2 %}
+						<div class="card-footer p-0">
+							<a href="#" class="btn btn-primary w-100 rounded-0">See All Shortlisted Candidates →</a>
+						</div>
+					{% endif %}
+				</div>
+			</div>
+
+
+			<div class="col-md-6 col-lg-4 d-flex align-items-stretch">
+				<div class="card w-100">
+					<div class="card-body">
+						<div class="d-flex flex-row">
+							<div class="round-40 rounded-circle text-white d-flex align-items-center justify-content-center text-bg-success">
+								<i class="ti ti-briefcase fs-6"></i>
+							</div>
+							<div class="ms-3 align-self-center">
+								<h4 class="card-title fw-semibold">Candidates</h4>
+								<p class="card-subtitle mb-4">Per Month</p>
+							</div>
+						</div>
+
+						{{ render_chart(applicantchart) }}
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6 col-lg-4 d-flex align-items-stretch">
+				<div class="card w-100">
+					<div class="card-body">
+						<div>
+							<div class="d-flex flex-row">
+								<div class="round-40 rounded-circle text-white d-flex align-items-center justify-content-center text-bg-success">
+									<i class="ti ti-users fs-6"></i>
+								</div>
+								<div class="ms-3 align-self-center">
+									<h4 class="card-title fw-semibold">Interviews</h4>
+									<p class="card-subtitle mb-4">Rounds of interview and results</p>
+								</div>
+							</div>
+
+						</div>
+						<div>
+							{{ render_chart(interviewchart) }}
+						</div>
+
+					</div>
+				</div>
+			</div>
+
+
+			<div class="col-md-6 col-lg-4 d-flex align-items-stretch">
+				<div class="card w-100">
+					<div class="card-body p-4">
+						<div class="d-flex flex-row">
+							<div class="round-40 rounded-circle text-white d-flex align-items-center justify-content-center text-bg-success">
+								<i class="ti ti-credit-card fs-6"></i>
+							</div>
+							<div class="ms-3 align-self-center">
+								<h4 class="card-title fw-semibold">Plan & Subscription</h4>
+								<p class="card-subtitle mb-4">Your subscriptions</p>
+							</div>
+						</div>
+						{% if activeplan %}
+							<div class="position-relative">
+								<div class="d-flex align-items-center justify-content-between mb-4">
+									<div class="d-flex">
+
+										<div>
+											<h6 class="mb-1 fs-4 fw-semibold">Last Billing Date</h6>
+											<p class="fs-3 mb-0">{{activeplan.orderdate|date("F j, Y")}}</p>
+										</div>
+									</div>
+								</div>
+								<div class="d-flex align-items-center justify-content-between mb-4">
+									<div class="d-flex">
+
+										<div>
+											<h6 class="mb-1 fs-4 fw-semibold">Plan Name</h6>
+											<p class="fs-3 mb-0">{{activeplan.plan.name}}
+												Plan</p>
+										</div>
+									</div>
+								</div>
+								<div class="d-flex align-items-center justify-content-between mb-4">
+									<div class="d-flex">
+
+										<div>
+											<h6 class="mb-1 fs-4 fw-semibold">Subscription end Date</h6>
+											<p class="fs-3 mb-0">{{activeplan.validto|date("F j, Y")}}</p>
+										</div>
+									</div>
+								</div>
+							</div>
+							<button class="btn btn-primary w-100">Upgrade/Extend</button>
+						{% else %}
+							<div class="position-relative">
+								<div class="d-flex align-items-center justify-content-between mb-4">
+									<div class="d-flex">
+
+										<div>
+											<h6 class="mb-1 fs-4 fw-semibold">Last Billing Date</h6>
+											<p class="fs-3 mb-0">Not Subscribed</p>
+										</div>
+									</div>
+								</div>
+								<div class="d-flex align-items-center justify-content-between mb-4">
+									<div class="d-flex">
+
+										<div>
+											<h6 class="mb-1 fs-4 fw-semibold">Plan Name</h6>
+											<p class="fs-3 mb-0">Not Subscribed</p>
+										</div>
+									</div>
+								</div>
+								<div class="d-flex align-items-center justify-content-between mb-4">
+									<div class="d-flex">
+
+										<div>
+											<h6 class="mb-1 fs-4 fw-semibold">Subscription end Date</h6>
+											<p class="fs-3 mb-0">Not Subscribed</p>
+										</div>
+									</div>
+								</div>
+								<a href="/employer/settings" class="btn btn-primary w-100">Subscribe Now</a>
+
+							</div>
+						{% endif %}
+
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4 col-lg-4 d-flex align-items-stretch">
+				<div class="card w-100">
+					<div class="card-body  p-4">
+						<div class="d-flex flex-row">
+							<div class="round-40 rounded-circle text-white d-flex align-items-center justify-content-center text-bg-primary">
+								<i class="ti ti-certificate fs-6"></i>
+							</div>
+							<div class="ms-3 align-self-center">
+								<h4 class="card-title fw-semibold">Courses</h4>
+								<p class="card-subtitle mb-4">All courses</p>
+							</div>
+						</div>
+						<div class="position-relative">
+							{% if courses %}
+
+
+								{% for item in courses %}
+									<div class="d-flex align-items-center justify-content-between mb-4">
+										<div class="d-flex">
+											<div>
+												<h6 class="mb-1 fs-4 fw-semibold">{{item.title}}
+													-
+													{{item.subtitle ?? ""}}</h6>
+												<p class="fs-3 mb-0">
+													<i class="ti ti-map-pin"></i>
+													{{item.country.name ?? ""}},
+													{{item.city.name ?? ""}}
+													<span>
+														<i class="ti ti-briefcase"></i>
+														{{item.price ?? 0}}</span>
+												</p>
+											</div>
+										</div>
+										<h6 class="mb-0 fw-semibold">{{item.status|capitalizeWords}}</h6>
+									</div>
+								{% endfor %}
+								{% if courses|length > 5 %}
+
+									<button class="btn btn-outline-primary w-100">View all Courses</button>
+								{% endif %}
+							{% else %}
+								<div class="d-flex flex-column align-items-center justify-content-center">
+									<h5 class="card-title">No Courses Available</h5>
+								</div>
+							{% endif %}
+
+						</div>
+
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4 col-lg-4 d-flex align-items-stretch">
+				<div class="card w-100">
+					<div class="card-body  p-4">
+						<div class="d-flex flex-row">
+							<div class="round-40 rounded-circle text-white d-flex align-items-center justify-content-center text-bg-primary">
+								<i class="ti ti-zoom-scan fs-6"></i>
+							</div>
+							<div class="ms-3 align-self-center">
+								<h4 class="card-title fw-semibold">Tenders</h4>
+								<p class="card-subtitle mb-4">All Tenders</p>
+							</div>
+						</div>
+						<div class="position-relative">
+							{% if tenders %}
+
+
+								{% for item in tenders %}
+
+
+									<div class="d-flex align-items-center justify-content-between mb-4">
+										<div class="d-flex">
+											<div>
+												<h6 class="mb-1 fs-4 fw-semibold">{{item.title}}
+													-
+													{{item.subtitle}}</h6>
+												<p class="fs-3 mb-0">
+													<i class="ti ti-map-pin"></i>
+													{{item.country.name ?? ""}},
+													{{item.city.name ?? ""}}
+													<span>
+														<i class="ti ti-calendar"></i>
+														{{item.duration ?? 0}}</span>
+												</p>
+											</div>
+										</div>
+										<h6 class="mb-0 fw-semibold">{{item.status|capitalizeWords}}</h6>
+									</div>
+								{% endfor %}
+								{% if tenders|length > 5 %}
+
+									<button class="btn btn-outline-primary w-100">View all Tenders</button>
+								{% endif %}
+							{% else %}
+								<div class="d-flex flex-column align-items-center justify-content-center">
+									<h5 class="card-title">No Tenders Available</h5>
+								</div>
+							{% endif %}
+						</div>
+
+					</div>
+				</div>
+			</div>
+			<div class="col-md-4 col-lg-4 d-flex align-items-stretch">
+				<div class="card w-100">
+					<div class="card-body  p-4">
+						<div class="d-flex flex-row">
+							<div class="round-40 rounded-circle text-white d-flex align-items-center justify-content-center text-bg-primary">
+								<i class="ti ti-article-off fs-6"></i>
+							</div>
+							<div class="ms-3 align-self-center">
+								<h4 class="card-title fw-semibold">Rejected Candidates</h4>
+								<p class="card-subtitle mb-4">All rejected candidates</p>
+							</div>
+						</div>
+						<div class="position-relative">
+							{% if rejected %}
+
+
+								{% for item in rejected %}
+
+
+									<div class="d-flex align-items-center justify-content-between mb-4">
+										<div class="d-flex">
+											<div>
+												<h6 class="mb-1 fs-4 fw-semibold">{{item.jobseeker.name}}<br>
+													{{item.job.title ?? ""}}</h6>
+												<p class="fs-3 mb-0">
+													<i class="ti ti-map-pin"></i>
+													{{item.job.country.name ?? ""}},
+													{{item.job.city.name ?? ""}}
+													<span>
+														<i class="ti ti-briefcase"></i>
+														{{item.job.numberposition ?? ""}}</span>
+												</p>
+											</div>
+										</div>
+										<h6 class="mb-0 fw-semibold">{{item.status|capitalizeWords}}</h6>
+									</div>
+								{% endfor %}
+								<button class="btn btn-outline-primary w-100">View all Rejected Candidates</button>
+							{% else %}
+								<div class="d-flex flex-column align-items-center justify-content-center">
+									<h5 class="card-title">No Rejected Candidates Available</h5>
+								</div>
+							{% endif %}
+						</div>
+
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+{% endblock %}

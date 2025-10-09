@@ -1,0 +1,7 @@
+/**
+ * Bundled by jsDelivr using Rollup v2.79.1 and Terser v5.19.2.
+ * Original file: /npm/flasher@0.1.0/flasher.js
+ *
+ * Do NOT use SRI with dynamically generated files! More information: https://www.jsdelivr.com/using-sri-with-dynamic-files
+ */
+import s from"underscore";var e=s,a={namespace:"flashes",types:["error","info"]},n={init:function(s){if(s.types&&!e.isArray(s.types))throw Error("If specifying custom flash message types you must provide an Array.");if(s.namespace&&!e.isString(s.namespace))throw Error("If specifying a custom namespace to store your flash messages you must provide a string.");e.extend(a,s)},middleware:function(s,n,o){if(!s.session)throw Error("Sessions must be enabled to use Flasher");n.locals[a.namespace]={},s.flash={},n.flash={},s.session[a.namespace]=s.session[a.namespace]||[],e.each(a.types,(function(o){s.flash[o]=function(n){if(!e.isArray(n))n=[n];e.each(n,(function(e,n,i){s.session[a.namespace].push({type:o,text:e})}))},n.flash[o]=function(s){if(!e.isArray(s))s=[s];e.each(s,(function(s,e,i){n.locals[a.namespace][o]=n.locals[a.namespace][o]||[],n.locals[a.namespace][o].push(s)}))}})),s.session[a.namespace].length&&(e.each(s.session[a.namespace],(function(s,e,o){n.locals[a.namespace][s.type]=n.locals[a.namespace][s.type]||[],n.locals[a.namespace][s.type].push(s.text)})),s.session[a.namespace]=[]),o()}},o=n.init,i=n.middleware;export{n as default,o as init,i as middleware};

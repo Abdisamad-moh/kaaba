@@ -1,0 +1,16 @@
+{% macro render_search_form(form, button_label) %}
+    {{ form_start(form) }}
+        <div class="row">
+            {% for field in form %}
+                {% if field.vars.name != '_token' %}
+                    <div class="{{ field.vars.attr.col_class|default('col-12') }}">
+                        {{ form_label(field) }}
+                        {{ form_widget(field) }}
+                        {{ form_errors(field) }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <button type="submit" class="btn btn-primary mt-5 mb-5">{{ button_label }}</button>
+    {{ form_end(form) }}
+{% endmacro %}

@@ -1,0 +1,369 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Products & Services
+{% endblock %}
+
+{% block body %}
+	<div class="page-content">
+		<section class="bg-home4" id="home">
+			<div class="container">
+				<div class="row align-items-center">
+					<div class="col-lg-12">
+						<div class=" pb-2 me-lg-6 text-center mt-4">
+							<h1 class="display-5 fw-semibold mb-3 mt-3 fs-22">About Our
+								<span class="text-primary fw-bold">Services
+								</span>
+							</h1>
+							<p class="lead text-muted mb-0 pc-da">Explore our comprehensive range of assessment tests designed to meet your hiring and team-building needs. From personality and psychometric tests to interview preparation and team-building exercises, our platform offers tools to help you understand and maximize your team's potential. Discover how these assessments can enhance your recruitment process and improve team dynamics.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<section class="section-re">
+			<div class="container">
+				<div
+					class="row justify-content-center">
+
+					<!-- ------------------------------------- -->
+					<div class="row">
+						<div class="upload_box">
+							<img class="img-fluid" src="{{ asset("assets/images/upim.png") }}" alt="">
+							<h3 class="title mb-2">Candidate Screening
+							</h3>
+							<p>
+								Are you looking for the best candidates for your job openings? Take advantage of this tool now, where we will shortlist the most qualified applicants for you. Do not miss this opportunity to find your ideal employees. Start posting your jobs today and:</p>
+							<img class="img-fluid" src="{{ asset("assets/images/seline.png") }}" alt="">
+							<div class="row">
+								<div class="col-lg-4 text-md-start mt-4">
+									<ul>
+										<li class="mb-3 no-text mt-1 text-black">
+											<img class="img-fluid teimg" src="{{ asset("assets/images/ico.png") }}" alt="">
+											&nbsp; Save time and money by letting us screening candidates on our job board portal</li>
+									</ul>
+								</div>
+								<div class="col-lg-4 text-md-start mt-4">
+									<ul>
+										<li class="mb-3 no-text mt-1 text-black">
+											<img class="img-fluid teimg" src="{{ asset("assets/images/ico.png") }}" alt="">
+											&nbsp; Find the best talent for your vacancies with our smart matching algorithm</li>
+									</ul>
+								</div>
+								<div class="col-lg-4 text-md-start mt-4">
+									<ul>
+										<li class="mb-3 no-text mt-1 text-black">
+											<img class="img-fluid teimg" src="{{ asset("assets/images/ico.png") }}" alt="">
+											&nbsp; Reduce hiring risks and improve retention with our verified profiles and reviews</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- ------------------------------------- -->
+				</div>
+			</div>
+		</section>
+		<div class="container">
+			<div class="row justify-content-center">
+				<div class="row text-center">
+					<div class="mt-2 pt-0" style="margin-top: -20px !important;">
+						<a href="{{ path('app_metier_em_subscriptions')}}" class="btn btn-primary btn-hover">Learn More about out subscription packages</a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!--starrt-->
+
+		<section class="section-re mt-5">
+			<div class="container">
+				<div
+					class="row justify-content-center">
+
+					<!-- ------------------------------------- -->
+
+					<div class="row">
+						<div class="sm-bg-pr alert bg-success-subtle text-success">
+							<div class="section-title text-md-start">
+								<h3 class="mb-0 mt-2 text-md-start fs-20 ">
+									Interview scheduling</h3>
+								<p class="text-mutedse mb-4 fs-15 mt-2">
+									Our job board portal lets you schedule interviews with candidates you want to hire, saving you time and hassle. Log in to your account and access the dashboard to:</p>
+								<ul class="abd">
+									<li class="mb-3 no-text mt-1 text-black">
+										<img class="img-fluid teimg" src="{{ asset("assets/images/ico.png") }}" alt="">
+										&nbsp; Select the candidates you want to interview and click on the schedule button</li>
+									<li class="mb-3 no-text mt-1 text-black">
+										<img class="img-fluid teimg" src="{{ asset("assets/images/ico.png") }}" alt="">
+										&nbsp; Choose a date, time and mode of interview from the available options</li>
+									<li class="mb-3 no-text mt-1 text-black">
+										<img class="img-fluid teimg" src="{{ asset("assets/images/ico.png") }}" alt="">
+										&nbsp;Confirm the details and send invitations to the candidates</li>
+								</ul>
+								<div class="text-center">
+									<div class="text-center">
+										<a class="btn btn-primary" href="{{ path('app_metier_em_subscriptions') }}">&nbsp; Buy Now &nbsp;
+										</a>
+									</div>
+								</div>
+								<div class="mt-5">
+									<img class="img-fluid" src="{{ asset("assets/images/ca_2.png") }}" alt="">
+								</div>
+							</div>
+						</div>
+						<div class="sm-bg-pr alert  bg-warning-subtle text-warning">
+							<div class="section-title text-md-start">
+								<h3 class="mb-0 mt-2 text-md-start fs-20 ">
+									Resume Database</h3>
+								<p class="text-mutedse mb-4 fs-15 mt-2">
+									Accessing our resume database on our platform gives you the opportunity to find the best candidates for your business needs. You can also contact candidates directly through our messaging system. Don't miss this chance to:</p>
+								<ul class="abd">
+									<li class="mb-3 no-text mt-1 text-black">
+										<img class="img-fluid teimg" src="{{ asset("assets/images/ico.png") }}" alt="">
+										&nbsp; Find your ideal candidates for you job opening</li>
+									<li class="mb-3 no-text mt-1 text-black">
+										<img class="img-fluid teimg" src="{{ asset("assets/images/ico.png") }}" alt="">
+										&nbsp;Access our resume database and filter by skills, experience, and location</li>
+									<li class="mb-3 no-text mt-1 text-black">
+										<img class="img-fluid teimg" src="{{ asset("assets/images/ico.png") }}" alt="">
+										&nbsp;Save time and money by posting your vacancies on our platforms</li>
+								</ul>
+								<div class="text-center">
+									<div class="text-center">
+										<a class="btn btn-primary" href="{{ path('app_metier_em_subscriptions')}}">&nbsp; Buy Now &nbsp;
+										</a>
+									</div>
+								</div>
+								<div class="mt-5">
+									<img class="img-fluid" src="{{ asset("assets/images/ca_3.png") }}" alt="">
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- ------------------------------------- -->
+				</div>
+			</div>
+		</section>
+		{% set page = 'Product and Services' %}
+		{% if ads %}
+			<section class="section">
+				<div class="container">
+					<div class="row justify-content-center">
+						<div class="text-center">
+							<div class="section-title text-center mb-5 mt-4 pb-2">
+								<h3 class="title mb-2 mt-4">
+									Trusted
+									<span class="text-primary fw-bold">Companies Ads</span>
+								</h3>
+								<p class="text-muted mb-1 fs-14">
+									Explore advertisements from trusted companies across various industries and sectors.
+								</p>
+							</div>
+
+							<div class="carousel-container">
+								{% for item in ads|filter(ad => ad.pages|filter(p => p.name == page)|length > 0)|shuffle %}
+									{% set url = item.link %}
+									<div class="mySlides animate">
+										{% if url starts with 'http' %}
+											<a href="{{ url }}" class="btn btn-primary btn-hover">
+												<img src="{{ path('profile_image', {'filename': item.image}) }}" alt="slide">
+											</a>
+										{% else %}
+											<a href="http://{{ url }}" class="btn btn-primary btn-hover">
+												<img src="{{ path('profile_image', {'filename': item.image}) }}" alt="slide">
+											</a>
+										{% endif %}
+									</div>
+								{% endfor %}
+
+								<a class="prev" style="left:0%;" onclick="prevSlide()">&#10094;</a>
+								<a class="next" onclick="nextSlide()">&#10095;</a>
+
+								<div class="dots-container">
+									<span class="dots" onclick="currentSlide(1)"></span>
+									<span class="dots" onclick="currentSlide(2)"></span>
+									<span class="dots" onclick="currentSlide(3)"></span>
+									<span class="dots" onclick="currentSlide(4)"></span>
+									<span class="dots" onclick="currentSlide(5)"></span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+		{% endif %}
+
+		<!--starrt-->
+
+
+		<!--starrt-->
+
+
+		<section class="section-re">
+			<div class="container">
+				<div class="row">
+					<div class="upload_boxwhite">
+						<div class="section-title text-center">
+							<h3 class="title mb-2 mt-3">Our
+								<span class="text-primary fw-bold">Services</span>
+							</h3>
+						</div>
+						<p class="mb-4">Discover a range of tailored solutions designed to help employers</p>
+					</div>
+
+				</div>
+				<div class="row">
+					{% for item in packages %}
+
+						<div class="col-lg-4 col-xs-6  mb-4">
+							<div class="card blog-grid-box p-2">
+								<div class="card-header">
+									<a href="#" class="primary-link">
+										<h6 class="fs-17">{{item.name}}</h6>
+									</a>
+								</div>
+								<div class="card-body">
+									<p class="card-text">{{item.description}}</p>
+
+									<a href="#">
+										<img class="img-fluid" src="{{ path('profile_serve_only_image', {'filename': item.thumbnail }) }}" alt=""></a>
+									<div class="product-info mt-4">
+
+										<div class="row align-items-center">
+
+											<div class="col">
+												<div class="text-warning mb-2 font-13">
+													<i class="fa fa-star"></i>
+													<i class="fa fa-star"></i>
+													<i class="fa fa-star"></i>
+													<i class="fa fa-star"></i>
+													<i class="fa fa-star"></i>
+												</div>
+
+											</div>
+											<div class="col-auto">
+												<div class="product-price-tag">
+													${{item.cost}}
+												</div>
+											</div>
+										</div>
+
+										<!-- end row -->
+									</div>
+								</div>
+								<div class="card-footer">
+									<div class="text-center">
+										<a href="{{ path('app_employer_purchase_checkout', {'package': item.id}) }}" class="btn btn-primary btn-hover">Buy Now
+											<i class="fa fa-arrow-right" aria-hidden="true"></i>
+										</a>
+									</div>
+								</div>
+							</div>
+						</div>
+					{% endfor %}
+					<div class="col-lg-4 col-xs-6  mb-4">
+						<div class="card blog-grid-box p-2">
+							<div class="card-header">
+								<a href="#" class="primary-link">
+									<h6 class="fs-17">Advertisment</h6>
+								</a>
+							</div>
+							<div class="card">
+								<div class="card-body text-center">
+									<span class="fw-bolder text-uppercase fs-2 d-block mb-7"></span>
+									<div class="my-4">
+										<img src="{{ path('employer_serve_image', {'filename': 'ads.jpg' }) }}" alt="Service Image" class="img-fluid">
+									</div>
+									{# <h2 class="fw-bolder fs-7 mb-3">Ads</h2> #}
+									<p class=" mb-3">Request to advertise your products/services & business by clicking the request button</p>
+									{# <a href="{{ path('app_employer_request_ad_temp') }}" class="btn btn-primary fw-bolder py-6 w-100 text-capitalize">
+																																			Request Now</a> #}
+								</div>
+							</div>
+							<div class="card-footer">
+								<div class="text-center">
+									<a href="{{ path('app_employer_request_ad_temp') }}" class="btn btn-primary btn-hover">Request Now
+										<i class="fa fa-arrow-right" aria-hidden="true"></i>
+									</a>
+								</div>
+							</div>
+						</div>
+					</div>
+
+
+				</div>
+
+			</div>
+		</section>
+		<section class="section-re">
+			<div class="container">
+				<div
+					class="row justify-content-center">
+
+					<!-- ------------------------------------- -->
+					<div class="row">
+						<div class="upload_boxwhite">
+							<div class="section-title text-center">
+								<h3 class="title mb-2 mt-3">Cover
+									<span class="text-primary fw-bold">Personality/Psychometric assessment test on:</span>
+								</h3>
+							</div>
+							<p class="mb-4">Valuable insights into individual personalities, providing organizations with a deeper understanding of their workforce. These assessments can inform decisions about team composition, leadership development, and hiring strategies. By understanding the strengths, weaknesses, and behavioral tendencies of employees, organizations can create more cohesive teams, develop effective leaders, and recruit the right talent for specific roles.</p>
+						</div>
+						<div class="row">
+							<div class="sm-bg-pr alert bg-success-subtle text-success">
+								<div class="section-title text-md-start">
+									<img class="img-fluid" src="{{ asset("assets/images/01_1.png") }}" alt="">
+									<h3 class="mb-0 mt-3 text-md-start fs-20 ">
+										Recruitment/Interview Pro:</h3>
+									<p class="text-mutedse mb-4 fs-15 mt-2">
+										The Interview Pro Suite of personality reports is a tool that helps you recruit. Each report gives you insights into the candidate's personality and also provides you with specific interview questions to ask them.</p>
+								</div>
+							</div>
+							<div class="sm-bg-pr alert  bg-warning-subtle text-warning">
+								<div class="section-title text-md-start">
+									<img class="img-fluid" src="{{ asset("assets/images/01_2.png") }}" alt="">
+									<h3 class="mb-0 mt-3 text-md-start fs-20 ">Executive Suite - Teams</h3>
+									<p class="text-mutedse mb-4 fs-15 mt-2">
+										How to get the most from your teams by understanding how your personality affects how you work with others. Enhance collaboration and productivity by leveraging your unique strengths and improving communication.</p>
+								</div>
+							</div>
+							<div class="sm-bg-pr alert bg-primary-subtle text-primary">
+								<div class="section-title text-md-start">
+									<img class="img-fluid" src="{{ asset("assets/images/01_3.png") }}" alt="">
+									<h3 class="mb-0 mt-3 text-md-start fs-20 ">
+										Management</h3>
+									<p class="text-mutedse mb-4 fs-15 mt-2">
+										With this report, learn how to maximize your team’s potential by knowing how their personality type influences their work and management approach, and discover strategies to enhance team dynamics and performance.</p>
+								</div>
+							</div>
+							<div class="sm-bg-pr alert bg-danger-subtle text-danger">
+								<div class="section-title text-md-start">
+									<img class="img-fluid" src="{{ asset("assets/images/01_4.png") }}" alt="">
+									<h3 class="mb-0 mt-3 text-md-start fs-20 ">
+										Team Building/ Staff Development</h3>
+									<p class="text-mutedse mb-4 fs-15 mt-2">
+										Learn how to manage your team more effectively and achieve better outcomes quickly. Different people flourish in different work settings. Use these reports as tools to grow and understand your team members personalities.</p>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- ------------------------------------- -->
+				</div>
+			</div>
+			<div class="text-center mt-4 mb-5">
+				<a href="{{ path("app_employer_ps_inquiery") }}" class="btn btn-primary btn-hover">Click Here For More Details</a>
+			</div>
+		</section>
+
+		<!-- company-LISTEnd -->
+
+		<section class="ftimg">
+			<img class="img-fluid" src="{{ asset("assets/images/Vector6.png") }}" alt="">
+		</section>
+		{% include 'home/_footer.html.twig' %}
+	</div>
+{% endblock %}

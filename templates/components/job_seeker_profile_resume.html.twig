@@ -1,0 +1,72 @@
+{# <div {{ attributes }}>
+    {{ this.message }}
+    <button data-action="live#$render">{{ this.roundNumber }}</button>
+</div> #}
+<div {{ attributes }}>
+	<div class="col-lg-12 card mt-4" id="resume_title">
+		<div class="p-4">
+			<div class="d-flex justify-content-between align-items-center">
+				<h5 class="mb-0">Resume Headline  <i class="fa fa-star fs-10 text-primary" aria-hidden="true"></i>
+				</h5>
+				<button data-bs-toggle="modal" data-bs-target="#update-resume-title" type="button" class="btn btn-primary rounded-pill">
+					<i class="fa fa-plus" aria-hidden="true"></i>
+					Add
+				</button>
+			</div>
+			<p>"{{ this.resume_header ?? 'e.g. Strategic HR Professional Driving Talent Acquisition and Employee Development' }}"</p>
+
+			{# <div class="border-bottom">
+				<h5 class="mb-0">Resume Headline
+					<a href="#" class="prevent-link" data-bs-toggle="modal" data-bs-target="#update-resume-title">
+						<i class="fa fa-pencil fs-10 text-primary" aria-hidden="true"></i>
+					</a>
+				</h5>
+				<p class="lead text-muted mb-2 mt-3 pc-da">"{{ this.resumeHeader ?? 'e.g. Strategic HR Professional Driving Talent Acquisition and Employee Development' }}"</p>
+			</div>
+			<button type="button" class="btn btn-purple rounded-pill " data-bs-toggle="modal" data-bs-target="#myModal">
+				<i class="fa fa-plus" aria-hidden="true"></i>
+				Add
+			</button> #}
+		</div>
+		{{ component('ResumeTitle') }}
+
+		<div class="px-4">
+			<div class="alert bg-secondary-subtle text-secondary my-2" role="alert">
+				{% if this.resumeFile == null %}
+					<h5>Please upload your resume</h5>
+				{% else %}
+					<h6>
+						<img class="img-fluid" src="assets/images/pdf.png" alt="">
+						<i class="fa fa-file"></i>
+						<a class="text-dark" target="_blank" href="{{ asset('uploads/'~ this.resumeFile)}}">Preview Your Resume</a>
+					</h6>
+				{% endif %}
+			</div>
+			<div data-jobseeker-profile-target="message"></div>
+		</div>
+
+		<div class="card-body p-4">
+			<div class="row">
+				<div class="custom-uploader">
+					<div class="mb-4">
+						<label class="form-label" for="inputGroupFile01">{{ this.resumeFile ? 'Update' : 'Upload'}}
+							Upload Resume</label>
+						<input data-loading="hide" name="cv_file" type="file" class="form-control" id="cv_file">
+						<p class="fw-bold text-green" data-loading>Uploading Document ...</p>
+						<p class="mt-3" data-loading="hide">Supported Formats: pdf, upto 2 MB</p>
+						{% if this.fileError %}
+							<div class="text-danger p-2" data-loading="hide">{{ this.fileError }}</div>
+						{% endif %}
+						{% if this.cv_file != null %}
+							{# <button  class="btn btn-primary" data-action="live#action:prevent" data-live-action-param="save_upload" id="save_cv">Submit</button> #}
+						{% endif %}
+						<button class="btn btn-primary" id="save_cv" data-action="live#action:prevent" data-live-action-param="files|upload_cv">Submit</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	{# {{ component('ResumeTitle') }} #}
+</div>

@@ -1,0 +1,180 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}
+	Edit Interview
+{% endblock %}
+
+{% block body %}
+
+	<div class="container-fluid" data-controller="employer">
+
+
+		<div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+			<div class="card-body px-4 py-3">
+				<div class="row align-items-center">
+					<div class="col-9">
+						<h4 class="fw-semibold mb-8">
+							<i class="ti ti-user fs-8 "></i>
+							Edit Interview</h4>
+						<nav aria-label="breadcrumb">
+							<ol class="breadcrumb"></ol>
+						</nav>
+					</div>
+					<div class="col-3"></div>
+				</div>
+			</div>
+		</div>
+		<div class="container">
+
+			<div class="row">
+				<div class="col-12"></div>
+				<div class="col-md-6"></div>
+				<div class="col-md-6">
+					<div class="form-group"></div>
+				</div>
+			</div>
+
+
+		</div>
+
+		<div
+
+			class="datatables">
+			<!-- start File export -->
+			<div class="card">
+				<div class="card-body">
+
+					{{ form_start(form) }}
+					<div class="col-12">
+						<div class="card">
+							<div class="card-body">
+								<div class="row">
+									<div class="col-4">
+										<div class="mb-3">
+											<label for="formGroupExampleInput" class="form-label">Total Number of rounds in the process</label>
+											{{ form_widget(form.rounds, {'attr': {'class': 'form-control  form-control-lg', 'placeholder': 'Rounds'}}) }}
+											{{ form_errors(form.rounds) }}
+										</div>
+									</div>
+									<div class="col-4">
+										<div class="mb-3">
+											<label for="formGroupExampleInput" class="form-label">Choose Inteview Round</label>
+											{{ form_widget(form.which_round, {'attr': {'class': 'form-control  form-control-lg', 'placeholder': 'Which Round'}}) }}
+											{{ form_errors(form.which_round) }}
+										</div>
+									</div>
+									<div class="col-4">
+										<div class="mb-3">
+											<label for="formGroupExampleInput" class="form-label">Select Interview Date</label>
+											{{ form_widget(form.date, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'date'}}) }}
+											{{ form_errors(form.date) }}
+										</div>
+									</div>
+									<div class="col-12">
+										<div class="mb-3">
+											<label for="formGroupExampleInput" class="form-label">{{ form_label(form.notes, 'Notes') }}</label>
+											{{ form_widget(form.notes, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'Note'}}) }}
+											{{ form_errors(form.notes) }}
+										</div>
+									</div>
+
+
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 ">
+						<div class="card">
+							<div class="card-body">
+
+								<h4 class="card-title">Interview Type</h4>
+
+								<p
+									class="mb-3 card-subtitle">{# Use default tab with class #}
+								</p>
+								<div>
+									<!-- Nav tabs -->
+									<ul class="nav nav-tabs" role="tablist" data-controller="employer sync-select sync-location" data-sync-location-cities-url-value="{{ path('app_fetch_cities') }}" data-sync-location-states-url-value="{{ path('app_fetch_states') }}">
+										<li class="nav-item" role="presentation">
+											<a data-type="in person" data-action="click->employer#setType" class="nav-link d-flex justify-content align-items-center active btn btn-block btn-block btn-large" data-bs-toggle="tab" href="#home2" role="tab" aria-selected="true">
+												<span>
+													<i class="ti ti-home-2 fs-8"></i>
+												</span>
+												<span class="d-none d-md-block ms-2">In Person Interview</span>
+											</a>
+										</li>
+										<li class="nav-item" role="presentation">
+											<a data-type="virtual" data-action="click->employer#setType" class="nav-link d-flex justify-content align-items-center  btn-block" data-bs-toggle="tab" href="#profile2" role="tab" aria-selected="false" tabindex="-1">
+												<span>
+													<i class="ti ti-video fs-8"></i>
+												</span>
+												<span class="d-none d-md-block ms-2">Virtual Interview</span>
+											</a>
+										</li>
+									</ul>
+									<!-- Tab panes -->
+									<div class="tab-content">
+										<div class="tab-pane active" id="home2" role="tabpanel">
+											<div class="p-3">
+
+												<div class="row">
+													<div class="col-4">
+														<div class="mb-3">
+															<label for="formGroupExampleInput" class="form-label">Address</label>
+															{{ form_widget(form.location, {'attr': {'class': 'form-control'}}) }}
+															{{ form_errors(form.location) }}
+														</div>
+													</div>
+													<div class="col-4">
+														<div class="mb-3">
+															<label for="formGroupExampleInput" class="form-label">Country</label>
+															{{ form_widget(form.country) }}
+															{{ form_errors(form.country) }}
+														</div>
+													</div>
+													<div class="col-4">
+														<div class="mb-3">
+															<label for="formGroupExampleInput" class="form-label">City</label>
+															{{ form_widget(form.city) }}
+															{{ form_errors(form.city) }}
+														</div>
+													</div>
+
+												</div>
+											</div>
+										</div>
+										<div class="tab-pane p-3" id="profile2" role="tabpanel">
+											<h4>Virtual Meeting</h4>
+											<div class="row">
+												<div class="col-6">
+													<div class="mb-3">
+														<label for="formGroupExampleInput" class="form-label">Virtual Meeting Link</label>
+														{{ form_widget(form.meeting_link, {'attr': {'class': 'form-control  form-control-lg', 'placeholder': 'meeting_link'}}) }}
+														{{ form_errors(form.meeting_link) }}
+													</div>
+												</div>
+
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6">
+						<div class="mb-3">
+							<button type="submit" class="btn btn-primary  btn-large">Submit</button>
+						</div>
+					</div>
+
+				</div>
+
+
+				{{ form_end(form) }}
+			</div>
+		</div>
+	</div>
+	<!-- end File export -->
+</div></div>{% endblock %}

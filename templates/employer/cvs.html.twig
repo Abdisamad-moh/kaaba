@@ -1,0 +1,238 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}CV Center
+{% endblock %}
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .custom-profile-wrapper {
+	position: relative;
+}
+
+.premium-label {
+	top: -10px;
+	left: -10px;
+	font-size: 0.6rem;
+	padding: 0.2rem 0.4rem;
+	border-radius: 0.25rem;
+	z-index: 2;
+}
+</style>
+{% endblock %}
+{% block body %}
+</div>
+<div>
+	<div class="" data-controller="employer">
+		<div class="row">
+			<div class="col-12">
+
+
+				<div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+					<div class="card-body px-4 py-3">
+						<div class="row align-items-center">
+							<div class="col-9">
+								<h4 class="fw-semibold mb-8">
+									<i class="ti ti-users fs-8 "></i>
+									CV/RESUME CENTER</h4>
+								<nav aria-label="breadcrumb">
+									<ol class="breadcrumb">
+										<li class="breadcrumb-item" aria-current="page">To search the CV/Resume Database, complete as many filters as you like or select just one (e.g., job titles or country), then click "Submit" to get results.
+																																									You can experiment with different filter combinations to find the best candidates.
+										</li>
+									</ol>
+								</nav>
+							</div>
+							<div class="col-3">
+								<div class="text-center">
+									<img src="{{ asset('assets/images/resume.png') }}" alt="modernize-img" class="iconn img-fluid mb-n4">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="row"
+     data-controller="sync-location"
+     data-sync-location-cities-url-value="{{ path('app_fetch_cities') }}"
+     data-sync-location-states-url-value="{{ path('app_fetch_states') }}">
+    
+   {{ form_start(form, {'method': 'get'}) }}
+
+    <div class="col-12">
+        <div class="row">
+            <div class="col-md-4 col-lg-3">
+                <div class="mb-3">
+                    {{ form_row(form.jobtitle) }}
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <div class="mb-3">
+                    {{ form_row(form.experience) }}
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <div class="mb-3">
+                    {{ form_row(form.education) }}
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-3">
+                <div class="mb-3">
+                    {{ form_row(form.careerStatus) }}
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="mb-3">
+                    {{ form_row(form.city) }}
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="mb-3">
+                    {{ form_row(form.country) }}
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-4">
+                <div class="mb-3">
+                    {{ form_row(form.states) }}
+                </div>
+            </div>
+			<div class="col-md-2">
+    <div class="mb-3">
+        <label for="perPage" class="form-label">Results per page</label>
+       <select name="limit" id="perPage" class="form-select">
+    {% set selectedLimit = app.request.get('limit')|default(50) %}
+    {% for number in [10, 25, 50, 100, 200, 500] %}
+        <option value="{{ number }}" {{ selectedLimit == number ? "selected" : "" }}>
+            {{ number }}
+        </option>
+    {% endfor %}
+</select>
+    </div>
+</div>
+        </div>
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </div>
+
+    {{ form_end(form) }}
+</div>
+
+
+
+			{% if cvs %}
+
+				<div class="col-12">
+					<div
+						class="datatables">
+						<!-- start File export -->
+						<div class="card">
+							<div class="card-body">
+								<div class="table-responsive border rounded">
+									<table id="file_export" class="table w-100 table-striped table-bordered display text-nowrap" width="100%">
+										<thead>
+											<tr>
+												<th scope="col">Name</th>
+												<th scope="col">Location</th>
+												<th scope="col">Education</th>
+												<th scope="col">Experience</th>
+												<th scope="col">Status</th>
+												<th scope="col">Resume</th>
+												<th scope="col">Actions</th>
+											</tr>
+										</thead>
+										<tbody>
+											{% for item in cvs %}
+
+
+												<tr>
+													<td>
+	<div class="d-flex align-items-center position-relative custom-profile-wrapper">
+		{% if item.getActiveSubscription %}
+			<span class="premium-label badge bg-danger position-absolute">Premium</span>
+		{% endif %}
+		
+		<img src="{{ asset('uploads/profile/' ~ (item.profile ?? 'no-image.jpg')) }}" class="rounded-circle" alt="modernize-img" width="56" height="56">
+		<div class="ms-3">
+			<h6 class="mb-0 fs-6">{{ item.name }}</h6>
+			<p class="mb-0">
+				{{ item.jobSeekerResume.jobTitle.name }}
+			</p>
+		</div>
+	</div>
+</td>
+													<td>
+														{{item.jobseekerdetails.country.name ?? ""}},
+														{{item.jobseekerdetails.city.name ?? ""}}
+													</td>
+													<td>
+														<p class="mb-0">{{item.jobseekerresume.education|educationNumberToString}}</p>
+													</td>
+													<td>
+														<div class="d-flex align-items-center">
+															<span class="text-bg-success p-1 rounded-circle"></span>
+															<p class="mb-0 ms-2">{{item.jobseekerresume.experience|numberToString}}</p>
+														</div>
+													</td>
+													<td>
+														<h6 class="mb-0 fs-4" style="font-style: italic;">
+															{{ item.lastLogin ?   item.lastLogin  : 'Inactive' }}
+
+														</h6>
+													</td>
+													<td>
+														{% if item.jobseekerresume %}
+															<a data-type="resume" data-can="{{item.id}}" data-action="click->employer#scheduleInterview" href="#" class="btn primary_one">
+																<i class="ti ti-user-circle fs-4"></i>
+																View Profile
+															</a>
+														{% endif %}
+
+													</td>
+													<td>
+														{% if is_granted('ROLE_EMPLOYER') %}
+															<a href="#" data-type="manual" data-status="shortlisted" data-can="{{item.id}}" data-action="click->employer#shortlistCandidate" class="btn primary_two">
+																<i class="ti ti-user-check fs-4"></i>
+																Shortlist
+															</a>
+															<a href="#" data-type="message" data-status="message" data-can="{{item.id}}" data-action="click->employer#shortlistCandidate" class="btn primary_three">
+																<i class="ti ti-message fs-4"></i>
+																Message
+															</a>
+														{% endif %}
+													</td>
+												</tr>
+											{% endfor %}
+										</tbody>
+									</table>
+									<div class="d-flex align-items-center justify-content-end py-1">
+										<div class="navigation">
+											{% do cvs.setPageRange(2) %}
+											{{ knp_pagination_render(cvs,'pagination.html.twig') }}
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			{% else %}
+				<div class="col-lg-12 mt-5 mb-5">
+					<div class="card">
+						<div class="card-body">
+							<div class="text-center">
+
+								<h1 class="fw-semibold mb-7 fs-9">Opps!!!</h1>
+								<h4 class="fw-semibold mb-7">No Data Found</h4>
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+			{% endif %}
+			<!-- end File export -->
+		</div>
+	</div>
+</div>{% endblock %}

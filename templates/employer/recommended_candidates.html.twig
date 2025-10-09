@@ -1,0 +1,174 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}
+	Recommended Candidates
+
+{% endblock %}
+
+{% block body %}
+
+	<div class="container-fluid" data-controller="employer">
+
+
+		<div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+			<div class="card-body px-4 py-3">
+				<div class="row align-items-center">
+					<div class="col-9">
+						<h4 class="fw-semibold mb-8">
+							<i class="ti ti-users fs-8 "></i>
+							Recommended Candidates</h4>
+						<nav aria-label="breadcrumb">
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item" aria-current="page">"
+To search for recommended candidates, complete as many filters as you like or select just one (e.g., Job Title/ID), then click “Filter” to get results. You can experiment with different filter combinations to find the best candidates. Please note that the recommended candidates are based only on your previous job postings."
+								</li>
+							</ol>
+						</nav>
+					</div>
+					<div class="col-3">
+						<div class="text-center">
+							<img src="{{ asset('assets/images/candidate.png') }}" alt="modernize-img" class="iconn img-fluid mb-n4">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="container">
+			
+			<div class="row">
+				<div class="col-12"></div>
+				<div class="col-md-6"></div>
+				<div class="col-md-6">
+					<div class="form-group"></div>
+				</div>
+			</div>
+
+
+		</div>
+		{{ form_start(form) }}
+			<div class="row pb-2" data-controller="sync-location recommended-candidates" data-sync-location-cities-url-value="{{ path('app_fetch_cities') }}" data-sync-location-states-url-value="{{ path('app_fetch_states') }}">
+				<div class="col-4">
+					<label>Select Job</label>
+					{{ form_widget(form.jobs) }}
+				</div>
+				<div class="col-4">
+					<label>Choose Min Skill Requirement</label>
+					{{ form_widget(form.minSkill) }}
+				</div>
+				<div class="col-4">
+					<label>Choose candidates open to relocation</label>
+					{{ form_widget(form.relocate) }}
+				</div>
+				<div class="col-12 ">
+					<div class="row justify-content-center">
+						<div class="col-3">
+							<label>City</label>
+							{{ form_widget(form.city) }}
+						</div>
+						<div class="col-3">
+							<label>Country</label>
+							{{ form_widget(form.country) }}
+						</div>
+						<div class="col-3 mt-2 d-flex align-items-end">
+							<button class="btn btn-primary">Filter</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			{{ form_end(form) }}
+		<div
+
+			class="datatables">
+			<!-- start File export -->
+			<div class="card">
+				<div
+					class="card-body">
+					{# <div class="mb-2">
+																																																																												<h4 class="card-title mb-0">File export</h4>
+																																																																												<img src="data:image/png;base64,iVBORwkhzAAQAAAABJRU5ErkJggg==" alt="Placeholder Image">
+																																																																											</div> #}
+
+
+					<div class="table-responsive">
+						<table id="file_export" class="table w-100 table-striped table-bordered display text-nowrap" width="100%">
+							<thead>
+								<!-- start row -->
+								<tr>
+									<th>Job ID</th>
+									<th>Job</th>
+									<th>Candidate Name</th>
+									<th>Education Level</th>
+									<th>Experience</th>
+									<th>Location</th>
+									<th>Relocate</th>
+									<th>Last Active</th>
+									<th>Action</th>
+								</tr>
+								<!-- end row -->
+							</thead>
+							<tbody>
+								<!-- start row -->
+								{% for candidate in candidates %}
+{% set candidate  = candidate[0] %}
+									<tr>
+										<td>{{ job.id }}</td>
+										<td>{{ job.title }}</td>
+										<td>{{ candidate.jobSeeker.name }}</td>
+										<td>
+											{{ candidate.education|educationNumberToString }}
+										</td>
+										<td>
+											{{ candidate.experience|numberToString }}</td>
+										<td>
+											{{ candidate.jobSeeker.jobseekerDetails.city }}, {{ candidate.jobSeeker.jobseekerDetails.country }}
+										</td>
+										<td>
+											{{ candidate.willingToRelocate is null ? '' : (candidate.willingToRelocate ? 'Yes' : 'No') }}
+										</td>
+										<td>{{ candidate.jobSeeker.lastActive|diffForHumans }}</td>
+
+										<td>
+
+											<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+												<div class="btn-group me-2 mb-2" role="group" aria-label="First group">
+													<a data-type="resume" data-can="{{candidate.jobseeker.id}}" data-action="click->employer#scheduleInterview" href="#" class="btn btn-primary">
+														<i class="ti ti-user-circle fs-4"></i>
+														View Profile
+													</a>
+
+													{# <a href="#" data-type="manual" data-status="shortlisted" data-can="{{item.jobseeker.id}}" data-action="click->employer#shortlistCandidate" class="btn btn-primary">
+														<i class="ti ti-user-check fs-4"></i>
+														Shortlist
+													</a> #}
+													<a href="#" data-type="message" data-status="message" data-can="{{candidate.jobseeker.id}}" data-action="click->employer#shortlistCandidate" class="btn btn-success">
+														<i class="ti ti-message fs-4"></i>
+														Message
+													</a>
+
+												</div>
+												{# <button type="button" class="btn bg-secondary-subtle rounded-circle btn-lg round-48">
+																																																																									<i class="ti ti-check fs-4"></i>
+																																																																								</button>
+																																																																								<button type="button" class="btn bg-secondary-subtle rounded-circle btn-lg round-48">
+																																																																									<i class="ti ti-x fs-4"></i>
+																																																																								</button> #}
+
+											</div>
+											<div class="button-group"></div>
+										</td>
+									</tr>
+								{% endfor %}
+
+								<!-- end row -->
+							<!-- start row -->
+								<!-- end row -->
+							</tbody>
+						</tfoot>
+					</table>
+				</div>
+			</div>
+		</div>
+		<!-- end File export -->
+	</div>
+</div>{% endblock %}

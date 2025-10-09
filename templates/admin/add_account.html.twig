@@ -1,0 +1,38 @@
+{% extends 'admin_base2.html.twig' %}
+{% import 'macros/_form_macros.html.twig' as macros %}
+
+{% block title %}
+	Add {{type}}
+{% endblock %}
+
+{% block body %}
+</div>
+<div
+	class="container-fluid">
+	<!-- Modern Header with Button -->
+	<div class="card custom-header shadow-sm mb-4">
+    <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h4 class="fw-semibold mb-0 text-white">
+                    <i class="ti ti-mail fs-4 me-2"></i>
+                    Add {{type}}
+                </h4>
+                <p class="mb-0 text-white-50">Create accounts easily.</p>
+            </div>
+            <div class="d-flex gap-2">
+            </div>
+        </div>
+    </div>
+</div>
+
+	
+
+	<!-- Data Table Section -->
+	<div class="card custom-card shadow-sm">
+		<div class="card-body p-4">
+			{{ macros.render_search_form(form, 'Create ' ~ type) }}
+
+		</div>
+	</div>
+</div>{% endblock %}

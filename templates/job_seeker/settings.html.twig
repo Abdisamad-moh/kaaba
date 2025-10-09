@@ -1,0 +1,786 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Settings !
+{% endblock %}
+
+{% block body %}
+	<div class="main-content">
+		<div class="page-content">
+			<section class="bg-homelogin" id="home">
+				<div class="container">
+					<div class="row align-items-center">
+						<div class="col-lg-12">
+							<div class="mb-2 pb-1 me-lg-6 text-center">
+								<h1 class="display-5 fw-semibold mb-3 mt-3 fs-22">Settings
+								</h1>
+								<p class="lead text-muted mb-0 pc-da">You can use this platform to interact with employers</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="section">
+				<div class="container">
+					<div class="row">
+						<div class="col-lg-3">
+							<div class="section-title   d-lg-block ui-elements-bar card notification-wrapper dropdown-scroll insidese">
+								<div class="p-4 border-bottom">
+									<h5 class="mb-0 text-purple">Settings</h5>
+								</div>
+								<div class="process-menu nav flex-column nav-pills  dropdown-scroll" class="" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+									<a class=" active text-dark notification-item d-block mt-3 " id="v-pills-home-tab" data-bs-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">
+										<div class="  d-flex align-items-center rounded-3">
+											<div class="boxlogoiconj">
+												<img class="img-fluid" src="assets/images/se1.png" alt=""></div>
+											<div class="flex-grow-1 ms-3">
+												<h6 class="fs-15  sufont">Account Settings</h6>
+												<p class="texthead mt-1">Contact Information & Password</p>
+											</div>
+										</div>
+									</a>
+
+									<hr>
+
+									<a class=" text-dark notification-item d-block" id="v-pills-profile-tab" data-bs-toggle="pill" href="#v-pills-profile" role="tab" aria-controls="v-pills-profile" aria-selected="false" tabindex="-1">
+										<div class="  d-flex align-items-center rounded-3">
+											<div class="boxlogoiconj">
+												<img class="img-fluid" src="assets/images/jo-1.png" alt=""></div>
+											<div class="flex-grow-1 ms-3">
+												<h6 class="fs-15  sufont">Billing Details</h6>
+												<p class="texthead mt-1">Subcription plan & billing details</p>
+											</div>
+										</div>
+									</a>
+									<hr>
+									<a class=" text-dark notification-item d-block" id="v-billdownloads-tab" data-bs-toggle="pill" href="#downloads-tab" role="tab" aria-controls="v-pills-profile" aria-selected="false" tabindex="-1">
+										<div class="d-flex align-items-center rounded-3">
+											<div class="boxlogoiconj">
+												<img class="img-fluid" src="assets/images/jo-1.png" alt=""></div>
+											<div class="flex-grow-1 ms-3">
+												<h6 class="fs-15  sufont">Downloads</h6>
+												<p class="texthead mt-1">Purchased items to download</p>
+											</div>
+										</div>
+									</a>
+								</div>
+							</div>
+						</div>
+						<!--end col-->
+
+						<div class="col-lg-9">
+							<div class="d-lg-block ui-elements-bar card">
+								<div class="tab-content" id="v-pills-tabContent">
+									<div class="tab-pane fade show active" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
+										<div class="p-4 border-bottom d-flex justify-content-between">
+											<h5 class="mb-0 text-purple">Account Settings</h5>
+											<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#settingsModal" type="button">Edit</button>
+										</div>
+										<div class="p-4 border-bottom">
+											<div class="card-body p-4 pt-0">
+												<div class="row">
+													<div class="col-md-6 mt-4">
+														<div class="  d-flex align-items-center rounded-3">
+															<div class="boxlogoiconj">
+																<a href="#"><img class="img-fluid" src="{{ asset('assets/images/pr_1.png') }}" alt=""></a>
+															</div>
+															<div class="flex-grow-1 ms-3">
+																<p class="texthead mt-1">Name</p>
+																<h6 class="fs-15  sufont">{{ app.user.name ?? '-'}}</h6>
+															</div>
+														</div>
+													</div>
+													<div class="col-md-6 mt-4">
+														<div class="  d-flex align-items-center rounded-3">
+															<div class="boxlogoiconj">
+																<a href="#"><img class="img-fluid" src="{{ asset('assets/images/pr_2.png') }}" alt=""></a>
+															</div>
+															<div class="flex-grow-1 ms-3">
+																<p class="texthead mt-1">Email address</p>
+																<h6 class="fs-15  sufont">{{ app.user.email ?? '-'}}</h6>
+															</div>
+														</div>
+													</div>
+													<div class="col-md-6 mt-4">
+														<div class="  d-flex align-items-center rounded-3">
+															<div class="boxlogoiconj">
+																<a href="#"><img class="img-fluid" src="{{ asset('assets/images/pr_3.png') }}" alt=""></a>
+															</div>
+															<div class="flex-grow-1 ms-3">
+																<p class="texthead mt-1">Gender</p>
+																<h6 class="fs-15  sufont">{{ app.user.jobseekerDetails.gender.name ?? '-'}}</h6>
+															</div>
+														</div>
+													</div>
+													<div class="col-md-6 mt-4">
+														<div class="  d-flex align-items-center rounded-3">
+															<div class="boxlogoiconj">
+																<a href="#"><img class="img-fluid" src="{{ asset('assets/images/pr_4.png') }}" alt=""></a>
+															</div>
+															<div class="flex-grow-1 ms-3">
+																<p class="texthead mt-1">D.O.B</p>
+																<h6 class="fs-15  sufont">{{ app.user.jobseekerDetails.dob ? app.user.jobseekerDetails.dob|date('Y-m-d') : ''}}</h6>
+															</div>
+														</div>
+													</div>
+													<div class="col-md-6 mt-4">
+														<div class="  d-flex align-items-center rounded-3">
+															<div class="boxlogoiconj">
+																<a href="#"><img class="img-fluid" src="{{ asset('assets/images/pr_5.png') }}" alt=""></a>
+															</div>
+															<div class="flex-grow-1 ms-3">
+																<p class="texthead mt-1">Phone number</p>
+																<h6 class="fs-15  sufont">{{ app.user.jobseekerDetails.phone ?? '-' }}</h6>
+															</div>
+														</div>
+													</div>
+													<div class="col-md-6 mt-4">
+														<div class="  d-flex align-items-center rounded-3">
+															<div class="boxlogoiconj">
+																<a href="#"><img class="img-fluid" src="{{ asset('assets/images/pr_6.png') }}" alt=""></a>
+															</div>
+															<div class="flex-grow-1 ms-3">
+																<p class="texthead mt-1">Second Phone Line</p>
+																<h6 class="fs-15  sufont">{{ app.user.jobseekerDetails.whatsappPhone ?? '-' }}</h6>
+															</div>
+														</div>
+													</div>
+													<div class="col-md-6 mt-4">
+														<div class="  d-flex align-items-center rounded-3">
+															<div class="boxlogoiconj">
+																<a href="#"><img class="img-fluid" src="{{ asset('assets/images/pr_7.png') }}" alt=""></a>
+															</div>
+															<div class="flex-grow-1 ms-3">
+																<p class="texthead mt-1">Location</p>
+																<h6 class="fs-15  sufont">
+																	{{ app.user.jobseekerDetails.locationString }}
+																</h6>
+															</div>
+														</div>
+													</div>
+												</div>
+
+
+											</div>
+
+										</div>
+										<!-- Resume Visibility Toggle -->
+										<div class="p-4 border-bottom d-flex align-items-center justify-content-between">
+											<div>
+												<h4 class="fs-15 sufont">Resume Visibility</h4>
+												<p class="text-muted mt-3 texthead mt-1">Control the visibility of your resume to potential employers and recruiters</p>
+											</div>
+											<div class="form-check form-switch">
+												<input class="form-check-input" type="checkbox" id="flexSwitchCheckResumeVisibility" data-controller="toggle-profile" data-action="change->toggle-profile#toggle" data-toggle-field="resumeVisibility"  data-toggle-url="{{ path('profile_toggle') }}"  data-toggle-csrf="{{ csrf_token('profile_toggle') }}" {{ app.user.jobSeekerResume.resumeVisible ? 'checked' : '' }}>
+											</div>
+										</div>
+
+										<!-- Public Profile Toggle -->
+										<div class="p-4 border-bottom d-flex align-items-center justify-content-between">
+											<div>
+												<h4 class="fs-15 sufont">Public Profile</h4>
+												<p class="text-muted mt-3 texthead mt-1">Make your profile visible to potential employers and recruiters</p>
+											</div>
+											<div class="form-check form-switch">
+												<input class="form-check-input" type="checkbox" id="flexSwitchCheckPublicProfile" data-controller="toggle-profile" data-action="change->toggle-profile#toggle" data-toggle-field="publicProfile" data-toggle-url="{{ path('profile_toggle') }}"  data-toggle-csrf="{{ csrf_token('profile_toggle') }}" {{ app.user.jobSeekerResume.publicProfile ? 'checked' : '' }}>
+											</div>
+										</div>
+
+										<!-- Public Profile Toggle -->
+										<div class="p-4 border-bottom d-flex align-items-center justify-content-between">
+											<div>
+												<h4 class="fs-15 sufont">Two-step verification</h4>
+												<p class="text-muted mt-3 texthead mt-1">Enable or disable two-step verification on login</p>
+											</div>
+											<div class="form-check form-switch">
+												<input class="form-check-input" type="checkbox" id="flexSwitchCheckPublicProfile" data-controller="toggle-profile" data-action="change->toggle-profile#toggle" data-toggle-field="otpVerification" data-toggle-url="{{ path('profile_toggle') }}"  data-toggle-csrf="{{ csrf_token('profile_toggle') }}" {{ app.user.otpEnabled ? 'checked' : '' }}>
+											</div>
+										</div>
+										<!-- Public Profile Toggle -->
+										<div class="p-4 border-bottom d-flex align-items-center justify-content-between">
+											<div>
+												<h4 class="fs-15 sufont">Change Account Password</h4>
+												<p class="text-muted mt-3 texthead mt-1"><a href="{{ path('jobseeker_change_password')}}">Click Here to Update Your password</a></p>
+											</div>
+											<div class="form-check form-switch">
+												{# <input class="form-check-input" type="checkbox" id="flexSwitchCheckPublicProfile" data-controller="toggle-profile" data-action="change->toggle-profile#toggle" data-toggle-field="otpVerification" data-toggle-url="{{ path('profile_toggle') }}"  data-toggle-csrf="{{ csrf_token('profile_toggle') }}" {{ app.user.otpEnabled ? 'checked' : '' }}> #}
+											</div>
+										</div>
+
+										<div class="p-4 border-bottom row">
+											<div class="col-lg-8">
+												<div class="flex-grow-1">
+													<img src="{{ asset('uploads/profile/' ~ (app.user.profile ?? 'no-image.jpg')) }}" style="width: 80px; height: 80px;" class="rounded-circle img-thumbnail profile-img" id="profile-img" alt="">
+												</div>
+											</div>
+											<div class="col-lg-4 d-flex align-items-center">
+												<div class="flex-grow-1 text-md-end">
+													<button type="button" class="btn btn-outline-purple" data-bs-toggle="modal" data-bs-target="#profileModal">Update Profile Image</button>
+												</div>
+											</div>
+										</div>
+
+										<div class="p-4 border-bottom row alert bg-primary-subtle text-primary mt-3">
+											<div class="col-lg-8 ">
+												<div class="flex-grow-1">
+													<h6 class="fs-15  sufont">{{ app.user.name }}</h6>
+													<p class="texthead mt-1">{{ app.user.email }}</p>
+												</div>
+											</div>
+											<div class="col-lg-4">
+												<div class="flex-grow-1 text-md-end">
+													<a href="/logout" class="btn btn-purple rounded-pill">Sign Out</a>
+												</div>
+											</div>
+										</div>
+
+										<!-- ----------------------------- -->
+
+										<!-- ----------------------------- -->
+									</div>
+									<div class="tab-pane fade" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+										<div class="p-4 border-bottom">
+											<h5 class="mb-0 text-purple">Billings</h5>
+										</div>
+										<div class="row justify-content-center">
+											<div class="col-lg-12">
+												<div class="card border shadow-none">
+													<div class="card-body p-4">
+														{% if activePlan  %}
+															<h4 class="card-title">Current Plan :
+																<span class="text-success">{{activePlan.plan.name}}</span>
+															</h4>
+															<p class="card-subtitle">Thanks for being a subcriber and using our platform.</p>
+															<div class="d-flex align-items-center justify-content-between mt-7 mb-3">
+																<div class="d-flex align-items-center gap-3">
+																	<div class="text-bg-light rounded-1 p-6 d-flex align-items-center justify-content-center">
+																		<i class="ti ti-package text-dark d-block fs-7" width="22" height="22"></i>
+																	</div>
+																	<div>
+																		<p class="mb-0">Current Plan</p>
+																		<h5 class="fs-4 fw-semibold">{{activePlan.plan.name}}
+																			${{activePlan.plan.cost}}{{activePlan.plan.duration|packageType}}</h5>
+																	</div>
+																</div>
+
+															</div>
+															<div
+																class="d-flex align-items-center gap-3">{# <button class="btn btn-primary">Change Plan</button>
+																																																																																																																						<button class="btn bg-danger-subtle text-danger">Reset Plan</button> #}
+															</div>
+															{% else %}
+
+
+														{% endif %}
+
+													</div>
+												</div>
+											</div>
+											<div class="col-lg-12 mb-3 mt-3">
+												<div class="product-list">
+													<div class="card">
+														<h4 class="card-title mb-3">Billing/Orders History</h4>
+														<div class="card-body  p-4">
+															<div class="d-flex justify-content-between align-items-center gap-6 mb-9">
+
+																<a class="fs-6 text-muted" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Filter list">
+																	<i class="ti ti-filter"></i>
+																</a>
+															</div>
+															<div class="table-responsive border rounded  mb-8">
+																<table class="table align-middle text-nowrap mb-0">
+																	<thead>
+																		<tr>
+																			<th scope="col">Order ID</th>
+																			<th scope="col">Date</th>
+																			<th scope="col">Plan Price</th>
+																			<th scope="col">Tax</th>
+																			<th scope="col">Total Amount</th>
+																		</tr>
+																	</thead>
+																	<tbody>
+																		{% if app.user.orders is empty %}
+																			<tr>
+																				<td colspan="5" class="text-center">No data available</td>
+																			</tr>
+																		{% else %}
+																			{% for item in app.user.orders %}
+{% set tax = ((item.plan.cost * 5) / 100) | round(2) %}
+			{% set final = (item.plan.cost + tax) | round(2) %}
+																				<tr>
+																					<td>#{{item.id}}</td>
+																					<td>
+																						<p class="mb-0">{{item.validfrom|date("F j, Y")}}</p>
+																					</td>
+																					<td>
+																						<div class="d-flex align-items-center">
+																							<span class="text-bg-success p-1 rounded-circle"></span>
+																							<p class="mb-0 ms-2">{{item.plan.name}}</p>
+																						</div>
+																					</td>
+																					<td>
+																						<h6 class="mb-0 fs-4">${{tax}}</h6>
+																					</td>
+																					<td>
+																						<h6 class="mb-0 fs-4">${{final}}</h6>
+																					</td>
+
+																				</tr>
+																			{% endfor %}
+
+																		{% endif %}
+
+																	</tbody>
+																</table>
+															</div>
+
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+
+										<!-- ----------------------------- -->
+
+										<!-- ----------------------------- -->
+									</div>
+									<div class="tab-pane fade" id="v-pills-jobs" role="tabpanel" aria-labelledby="v-pills-jobs-tab">
+										<div class="p-4 border-bottom">
+											<h5 class="mb-0 text-purple">Job Settings</h5>
+										</div>
+										<div class="p-4 border-bottom row">
+											<div class="col-lg-10">
+												<div class="flex-grow-1">
+													<h6 class="fs-15  sufont">Daily job feed email</h6>
+													<p class="texthead mt-1">Get emails about new jobs based on your preferences, profile and activity on Indeed</p>
+												</div>
+											</div>
+											<div class="col-lg-2">
+												<div class="flex-grow-1 text-md-end">
+													<label class="switch">
+														<input type="checkbox" checked>
+														<span class="sliders round"></span>
+													</label>
+												</div>
+											</div>
+										</div>
+										<div class="p-4 border-bottom row">
+											<div class="col-lg-10">
+												<div class="flex-grow-1">
+													<h6 class="fs-15  sufont">Company email alerts</h6>
+													<p class="texthead mt-1">Get company updates, reviews and new job postings when they become available</p>
+												</div>
+											</div>
+											<div class="col-lg-2">
+												<div class="flex-grow-1 text-md-end">
+													<label class="switch">
+														<input type="checkbox" checked>
+														<span class="sliders round"></span>
+													</label>
+												</div>
+											</div>
+										</div>
+										<div class="p-4 border-bottom row">
+											<div class="col-lg-10">
+												<div class="flex-grow-1">
+													<h6 class="fs-15  sufont">Resume visibility</h6>
+													<p class="texthead mt-1">Control the visibility of your resume to potential employers and recruiters</p>
+												</div>
+											</div>
+											<div class="col-lg-2">
+												<div class="flex-grow-1 text-md-end">
+													<label class="switch">
+														<input type="checkbox" checked>
+														<span class="sliders round"></span>
+													</label>
+												</div>
+											</div>
+										</div>
+										<div class="p-4 border-bottom row">
+											<div class="col-lg-10">
+												<div class="flex-grow-1">
+													<h6 class="fs-15  sufont">Recommended Jobs</h6>
+													<p class="texthead mt-1">Targeted job recommendations based on your CV and activity</p>
+												</div>
+											</div>
+											<div class="col-lg-2">
+												<div class="flex-grow-1 text-md-end">
+													<label class="switch">
+														<input type="checkbox" checked>
+														<span class="sliders round"></span>
+													</label>
+												</div>
+											</div>
+										</div>
+										<div class="p-4 border-bottom row">
+											<div class="col-lg-10">
+												<div class="flex-grow-1">
+													<h6 class="fs-15  sufont">Profile Public</h6>
+													<p class="texthead mt-1">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+													</p>
+												</div>
+											</div>
+											<div class="col-lg-2">
+												<div class="flex-grow-1 text-md-end">
+													<label class="switch">
+														<input type="checkbox" checked>
+														<span class="sliders round"></span>
+													</label>
+												</div>
+											</div>
+										</div>
+
+										<!-- ----------------------------- -->
+
+										<!-- ----------------------------- -->
+									</div>
+									<div class="tab-pane fade" id="downloads-tab" role="tabpanel" aria-labelledby="v-billdownloads-tab">
+										<div class="p-4 border-bottom">
+											<h5 class="mb-0 text-purple">Item Downloads</h5>
+										</div>
+										<div class="row">
+											<div class="col-12">
+												<div class="ss">
+													<div class="ss-body  p-4">
+														<div class="d-flex justify-content-between align-items-center gap-6 mb-9">
+
+															<a class="fs-6 text-muted" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Filter list">
+																<i class="ti ti-filter"></i>
+															</a>
+														</div>
+														<div class="table-responsive border rounded  mb-8">
+															<table class="table align-middle text-nowrap mb-0">
+																<thead>
+																	<tr>
+																		<th scope="col">Item ID</th>
+																		<th scope="col">Description</th>
+																		<th scope="col">Date</th>
+																		<th scope="col">Action</th>
+																	</tr>
+																</thead>
+																<tbody>
+																	{% for item in downloads %}
+
+																		<tr>
+																			<td>#{{item.id}}</td>
+
+																			<td>
+																				<div class="d-flex align-items-center">
+																					<span class="text-bg-success p-1 rounded-circle"></span>
+																					<p class="mb-0 ms-2">{{item.description}}</p>
+																				</div>
+																			</td>
+																			<td>
+																				<p class="mb-0">{{item.date|date("d-m-Y H:s")}}</p>
+																			</td>
+																				{% set download = false %}
+																				<h6 class="mb-0 fs-4">
+																					{% if item.purchase.plan.category == "product" %}
+																						{% set download = true %}
+																						{# <span class="mb-1 badge rounded-pill text-bg-success">Yes</span> #}
+																					{% else %}
+																						{# <span class="mb-1 badge rounded-pill text-bg-danger">No</span> #}
+																					{% endif %}
+																				</h6>
+																			<td>
+																				{% if download %}
+																					<a class="btn btn-primary" href="{{ path('jobseeker_download_file', {'filename': item.purchase.plan.file,'type': "product" }) }}">Download</a>
+																				{% endif %}
+																			</td>
+
+																		</tr>
+																	{% endfor %}
+
+
+																</tbody>
+															</table>
+														</div>
+
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!--end row-->
+				</div>
+				<!--end container-->
+			</section>
+			<section class="ftimg">
+				 
+			</section>
+			<section class="bg-footer">
+				<div class="container">
+					<div class="row">
+						<div class="col-lg-4">
+							<div class="footer-item mt-4 mt-lg-0 me-lg-5">
+								<img class="img-fluid teimg" src="assets/images/logo_foot.png" alt="">
+								<p class="text-grey mt-3">Connect with us on</p>
+								<ul class="footer-social-menu list-inline mb-0">
+									<li class="list-inline-item">
+										<a href="#">
+											<i class="fa fa-facebook" aria-hidden="true"></i>
+										</a>
+									</li>
+									<li class="list-inline-item">
+										<a href="#">
+											<i class="fa fa-youtube-play" aria-hidden="true"></i>
+										</a>
+									</li>
+									<li class="list-inline-item">
+										<a href="#">
+											<i class="fa fa-twitter" aria-hidden="true"></i>
+										</a>
+									</li>
+									<li class="list-inline-item">
+										<a href="#">
+											<i class="fa fa-instagram" aria-hidden="true"></i>
+										</a>
+									</li>
+									<li class="list-inline-item">
+										<a href="#">
+											<i class="fa fa-linkedin" aria-hidden="true"></i>
+										</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<!--end col-->
+						<div class="col-lg-3 col-6">
+							<div class="footer-item mt-4 mt-lg-0">
+								<ul class="list-unstyled footer-list mb-0">
+									<li>
+										<a href="#">
+											<i class="mdi mdi-chevron-right"></i>
+											About Us</a>
+									</li>
+									<li>
+										<a href="#">
+											<i class="mdi mdi-chevron-right"></i>
+											Products</a>
+									</li>
+									<li>
+										<a href="#">
+											<i class="mdi mdi-chevron-right"></i>
+											Services</a>
+									</li>
+									<li>
+										<a href="#">
+											<i class="mdi mdi-chevron-right"></i>Contact us</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<!--end col-->
+						<div class="col-lg-3 col-6">
+							<div class="footer-item mt-4 mt-lg-0">
+								<ul class="list-unstyled footer-list mb-0">
+									<li>
+										<a href="#">
+											<i class="mdi mdi-chevron-right"></i>
+											Browse Job</a>
+									</li>
+									<li>
+										<a href="#">
+											<i class="mdi mdi-chevron-right"></i>
+											Resume templates</a>
+									</li>
+									<li>
+										<a href="#">
+											<i class="mdi mdi-chevron-right"></i>
+											Companies</a>
+									</li>
+									<li>
+										<a href="#">
+											<i class="mdi mdi-chevron-right"></i>
+											FAQ’s
+										</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<!--end col-->
+
+						<!--end col-->
+						<div class="col-lg-2 col-6">
+							<div class="footer-item mt-4 mt-lg-0">
+								<ul class="list-unstyled footer-list mb-0">
+									<li>
+										<a href="#">
+											<i class="mdi mdi-chevron-right"></i>
+											Testimonials</a>
+									</li>
+									<li>
+										<a href="#">
+											<i class="mdi mdi-chevron-right"></i>
+											Blogs</a>
+									</li>
+									<li>
+										<a href="#">
+											<i class="mdi mdi-chevron-right"></i>
+											Q&A</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<!--end col-->
+					</div>
+					<div class="mt-3">
+						<hr/>
+					</div>
+					<div class="row">
+						<div class="col-lg-4 col-12 text-grey text-center text-md-start">
+							<p>2023 Metier Quest. All Rights Reserved.</p>
+						</div>
+						<div class="col-lg-8  col-12">
+							<ul class="list-inline mb-0 text-grey text-md-end  text-center">
+								<li class="list-inline-item text-grey">
+									<p class="fs-13 mb-0">
+										<a href="#">Terms & Conditions</a>
+										|
+										<a href="#">
+											Privacy
+										</a>
+										|
+										<a href="#">Cookie Settings</a>
+									</p>
+								</li>
+							</ul>
+							<button onclick="topFunction()" id="back-to-top" style="display: block;">
+								<i class="mdi mdi-arrow-up"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<div id="settingsModal" class="modal fade" tabindex="-1" aria-labelledby="settingsModalLabel" style="display: none;" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content">
+						<div class="modal-header text-black">
+							<h5 class="modal-title mt-0" id="settingsModalLabel">Personal Informations</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						{{ form_start(infoForm, {attr: {'data-jobseeker-profile-target' : 'infoForm'}}) }}
+						<div class="modal-body" data-controller="sync-location" data-sync-location-cities-url-value="{{ path('app_fetch_cities') }}" data-sync-location-states-url-value="{{ path('app_fetch_states') }}">
+							<div class="row pb-3">
+								<div class="col-lg-12">
+									<label class="form-label">Full Name
+										<span class="text-danger">*</span>
+									</label>
+									{{ form_widget(infoForm.name, {attr: {'class': 'form-control', 'placeholder': 'Type Your Full Name'}}) }}
+									{# <input name="name" id="name" type="text" class="form-control" placeholder="Type your Name" required> #}
+								</div>
+							</div>
+
+							<div class="row pb-3">
+								<div class="col-lg-6">
+									<label for="form-label">Gender
+										<span class="text-danger">*</span>
+									</label>
+									{{ form_widget(infoForm.gender, {attr: {'class': 'form-select'}}) }}
+								</div>
+								<div class="col-lg-6">
+									<label for="form-label">DOB
+										<span class="text-danger">*</span>
+									</label>
+									{{ form_widget(infoForm.dob, {attr: {'class': 'form-control'}}) }}
+								</div>
+							</div>
+							<div class="row pb-3">
+								<div class="col-lg-6">
+									<label for="form-label">Phone Number</label>
+									{{ form_widget(infoForm.phone, {attr: {'class': 'form-control', 'placeholder': 'e.g. +971 50 7742222'}}) }}
+								</div>
+								<div class="col-lg-6">
+									<label for="form-label">Whatsapp Number</label>
+									{{ form_widget(infoForm.whatsappPhone, {attr: {'class': 'form-control', 'data-jobseeker-profile-target': 'phones', 'placeholder': 'e.g. +971 50 7742222'}}) }}
+								</div>
+							</div>
+							<div class="row pb-3">
+								<div class="col-lg-6">
+									<label class="form-label">Country
+										<span class="text-danger">*</span>
+									</label>
+									{{ form_widget(infoForm.country) }}
+								</div>
+								<div class="col-lg-6">
+									<label class="form-label">City
+										<span class="text-danger">*</span>
+									</label>
+									{{ form_widget(infoForm.city) }}
+									
+								</div>
+							</div>
+							<div class="row pb-3">
+								<div class="col-lg-12">
+									<label class="form-label">State/Region
+									</label>
+									{{ form_widget(infoForm.state) }}
+								</div>
+							</div>
+							<div class="row pb-3">
+								<div class="col-lg-6">
+									<label class="form-label">Zip/Postal Code
+									</label>
+									{{ form_widget(infoForm.zipCode) }}
+								</div>
+								<div class="col-lg-6">
+									<label for="" class="form-label">Address</label>
+									{{ form_widget(infoForm.location, {attr: {'class': 'form-control', 'placeholder':'Type Your Location'}}) }}
+								</div>
+							</div>
+						</div>
+						<div class="modal-footer">
+							<a href="#" class="btn btn-outline-primary" style="border-radius: 50px;" data-bs-dismiss="modal">Cancel</a>
+							<button type="submit" class="btn btn-primary waves-effect waves-light">Save</button>
+						</div>
+						{{ form_end(infoForm) }}
+
+					</div>
+					<!-- /.modal-content -->
+				</div>
+				<!-- /.modal-dialog -->
+			</div>
+
+			<div id="profileModal" class="modal fade" tabindex="-1" aria-labelledby="profileModalLabel" style="display: none;" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered">
+					<div class="modal-content">
+						<div class="modal-header text-black">
+							<h5 class="modal-title mt-0" id="profileModalLabel">Update Profile Image</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						{{ form_start(profileForm, {attr: {'data-jobseeker-profile-target' : 'infoForm'}}) }}
+						<div class="modal-body">
+							<div class="card-body p-4">
+								<div class="row">
+									<div class="custom-uploader">
+										<div class="mb-4">
+											<label class="form-label" for="inputGroupFile01">
+												Upload Profile</label>
+											{{ form_widget(profileForm.image) }}
+											<p class="fw-bold text-green" data-loading>Uploading Document ...</p>
+											<p class="mt-3" data-loading="hide">Supported Formats: pdf, upto 2 MB</p>
+											{# <button class="btn btn-primary" id="save_cv" data-action="live#action:prevent" data-live-action-param="files|upload_cv">Submit</button> #}
+										</div>
+									</div>
+								</div>
+							</div>
+
+						</div>
+						<div class="modal-footer">
+							<a href="#" class="btn btn-outline-primary" style="border-radius: 50px;" data-bs-dismiss="modal">Cancel</a>
+							<button type="submit" class="btn btn-primary waves-effect waves-light">Save</button>
+						</div>
+						{{ form_end(profileForm) }}
+
+					</div>
+					<!-- /.modal-content -->
+				</div>
+				<!-- /.modal-dialog -->
+			</div>
+		</div>
+	{% endblock %}

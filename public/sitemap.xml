@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+  <url>
+    <loc>https://metier-quest.com</loc>
+    <lastmod>2025-03-11T13:52:57+00:00</lastmod>
+    <priority>1.00</priority>
+  </url>
+
+  <url>
+    <loc>https://metier-quest.com/jobs</loc>
+    <lastmod>2025-03-11T13:52:57+00:00</lastmod>
+    <priority>0.80</priority>
+  </url>
+
+  <url>
+    <loc>https://metier-quest.com/resumes</loc>
+    <lastmod>2025-03-11T13:52:57+00:00</lastmod>
+    <priority>0.80</priority>
+  </url>
+
+  <url>
+    <loc>https://metier-quest.com/login?type=employer</loc>
+    <lastmod>2025-03-11T13:52:57+00:00</lastmod>
+    <priority>0.80</priority>
+  </url>
+
+  <url>
+    <loc>https://metier-quest.com/login</loc>
+    <lastmod>2025-03-11T13:52:57+00:00</lastmod>
+    <priority>0.80</priority>
+  </url>
+
+  <url>
+    <loc>https://metier-quest.com/signup/jobseeker</loc>
+    <lastmod>2025-03-11T13:52:57+00:00</lastmod>
+    <priority>0.80</priority>
+  </url>
+
+  <url>
+    <loc>https://metier-quest.com/signup/employer</loc>
+    <lastmod>2025-03-11T13:52:57+00:00</lastmod>
+    <priority>0.80</priority>
+  </url>
+
+  <url>
+    <loc>https://metier-quest.com/metier/em/</loc>
+    <lastmod>2025-03-11T13:52:57+00:00</lastmod>
+    <priority>0.80</priority>
+  </url>
+
+  <url>
+    <loc>https://metier-quest.com/tenders</loc>
+    <lastmod>2025-03-11T13:52:57+00:00</lastmod>
+    <priority>0.80</priority>
+  </url>
+
+  <url>
+    <loc>https://metier-quest.com/courses</loc>
+    <lastmod>2025-03-11T13:52:57+00:00</lastmod>
+    <priority>0.80</priority>
+  </url>
+
+  <url>
+    <loc>https://metier-quest.com/contacts</loc>
+    <lastmod>2025-03-11T13:52:57+00:00</lastmod>
+    <priority>0.80</priority>
+  </url>
+
+  <url>
+    <loc>https://metier-quest.com/blogs</loc>
+    <lastmod>2025-03-11T13:52:57+00:00</lastmod>
+    <priority>0.80</priority>
+  </url>
+
+  <url>
+    <loc>https://metier-quest.com/services</loc>
+    <lastmod>2025-03-11T13:52:57+00:00</lastmod>
+    <priority>0.80</priority>
+  </url>
+
+  <url>
+    <loc>https://metier-quest.com/about-us</loc>
+    <lastmod>2025-03-11T13:52:57+00:00</lastmod>
+    <priority>0.80</priority>
+  </url>
+
+</urlset>

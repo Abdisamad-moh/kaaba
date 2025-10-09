@@ -1,0 +1,86 @@
+<div {{ attributes.defaults(stimulus_controller('jobs')) }}>
+	<div class="row">
+		{% for tender in this.tenders %}
+			<div class="col-lg-4 col-md-6 mt-4">
+				<div class="card job-grid-box">
+					<div class="card-body p-4">
+						<div>
+							<div class="favorite-icon d-flex flex-column align-items-end">
+								{# <a href="#" {% if app.user %} data-action="live#action:prevent" data-live-action-param="saveJob" data-live-id-param="{{ job.id }}" {% endif %} style="font-family: 'Inter', sans-serif;">
+									<i id="save{{job.id}}" class="fa {{ job.id in this.saved_jobs ? 'fa-bookmark text-success' : 'fa-bookmark-o' }}" aria-hidden="true">
+									</i>
+									<span class="job-cont">
+											{{ job.id in this.saved_jobs ? 'Save' : 'Save' }}</span>
+								</a>
+								{% if job.isImmediateHiring %}
+									<span class="badge rounded-pill bg-warning text-dark">Immediate Hiring</span>
+								{% endif %} #}
+							</div>
+							<div class="boxlogoicon">
+								<a href="#"><img class="logo-size" src="{{ asset('uploads/profile/no-image.jpg') }}" alt="" class="img-fluid rounded-3"></a>
+							</div>
+						</div>
+						<div class="mt-4">
+							<a href="{{ path('job_seeker_tender_details', {'slug': tender.title|slugify, 'uuid': tender.uuid}) }}" class="primary-link">
+								<h5>{{ tender.employer.name}}</h5>
+								<h5 class="fs-16 mb-3">{{ tender.title ?? ''}}</h5>
+							</a>
+							<p class="text-muted">
+								<span style="padding-right:10px;">
+									<i class="fa fa-map-marker" aria-hidden="true"></i>
+									&nbsp;{{ (tender.country.name ?? '') ~ ', ' ~ (tender.city.name ?? '')}}
+								</span>
+								{# <i class="fa fa-briefcase" aria-hidden="true"></i>
+								&nbsp;{{ job.numberPosition}}
+								Rols available #}
+							</p>
+						</div>
+						<div class="job-grid-content mt-2">
+							<p class="text-muted">{{ (tender.description)|shorten(220) }}</p>
+							<ul class="list-inline">
+								{# {% for type in job.jobTypes %}
+									<li class="list-inline-item">
+										<span class="badge rounded-pill bg-secondary">{{ type.name }}</span>
+									</li>
+								{% endfor %} #}
+							</ul>
+							<div class="d-flex align-items-center justify-content-between border-top mt-2 pt-1">
+								<p class="text-mutedse float-start mb-0">Expires in
+									<span style="font-weight:500;color:#666;">{{ tender.expiresAt }}</span>
+								</p>
+								<div class="text-end">
+									<i>
+										Posted
+										{{ tender.postedAt }}</i>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!--end card-body-->
+				</div>
+				<!--end job-grid-box-->
+			</div>
+		{% endfor %}
+	</div>
+	{% if this.home == false%}
+
+		<div class="col-lg-12">
+			<div class="section-title text-center">
+				<p class="text-muted mb-5 mt-5 fs-14">Did not find what you’re looking for? &nbsp;
+					{% if this.hasMore %}
+						<a data-loading="hide" href="#" data-action="live#action:prevent" data-live-action-param="more" data-scroll-target="loader">
+							View More
+							<i class="fa fa-arrow-right" aria-hidden="true"></i>
+						</a>
+					{% else %}
+						<a href="{{ path('app_home') }}">
+							Home Page<i class="fa fa-arrow-right" aria-hidden="true"></i>
+						</a>
+					{% endif %}
+					<span data-loading class="text-success fw-bold">Loading ...</span>
+				</p>
+
+			</div>
+		</div>
+	{% endif %}
+</div>

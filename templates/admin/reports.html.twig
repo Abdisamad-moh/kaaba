@@ -1,0 +1,91 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}
+	Contacts List
+{% endblock %}
+
+{% block body %}
+
+	<div class="container-fluid" data-controller="employer">
+		<div class="row">
+			<div class="col-12">
+				<div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+					<div class="card-body px-4 py-3">
+						<div class="row align-items-center">
+							<div class="col-9">
+								<h4 class="fw-semibold mb-8">
+									<i class="ti ti-users fs-8 "></i>
+									Reports</h4>
+								<nav aria-label="breadcrumb">
+									<ol class="breadcrumb">
+										<li class="breadcrumb-item">
+											<a class="text-muted text-decoration-none" href="#">Reports</a>
+										</li>
+										<li class="breadcrumb-item" aria-current="page">User Reports List</li>
+									</ol>
+								</nav>
+							</div>
+							<div class="col-3">
+								<div class="text-center">
+									<!-- <img src="{{ asset('assets/images/candidate.png') }}" alt="modernize-img" class="iconn img-fluid mb-n4"> -->
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div
+
+			class="datatables">
+			<!-- start File export -->
+			<div class="card">
+				<div
+					class="card-body">
+					<div class="table-responsive">
+						<table id="accounts" class="table w-100 table-striped table-bordered display text-nowrap reports-table" width="100%">
+							<thead>
+								<!-- start row -->
+								<tr>
+									<th>From</th>
+									<th>Email</th>
+									<th>Date</th>
+									<th>Description</th>
+									<th>Job ID</th>
+									<th>Job Title</th>
+									<th>Actions</th>
+								</tr>
+								<!-- end row -->
+							</thead>
+							<tbody>
+								<!-- start row -->
+								{% for item in reports %}
+
+									<tr>
+										<td>{{item.reportedBy.name ?? ""}}</td>
+										<td>{{item.reportedBy.email ?? ""}}</td>
+										<td>{{item.createdat|date("m-d-Y")}}</td>
+										<td>{{item.description}}</td>
+										<td>{{ item.job.id }}</td>
+										<td>{{item.job.title ?? ""}}</td>
+											
+										
+										<td>
+											<div class="button-group"></div>
+										</td>
+									</tr>
+								{% endfor %}
+
+								<!-- end row -->
+							<!-- start row -->
+								<!-- end row -->
+							</tbody>
+						</tfoot>
+					</table>
+				</div>
+			</div>
+		</div>
+		<!-- end File export -->
+	</div>
+</div>{% endblock %}

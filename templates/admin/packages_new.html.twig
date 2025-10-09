@@ -1,0 +1,227 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Plans !
+{% endblock %}
+
+{% block body %}
+	 <div class="row">
+              <div class="col-xl-12">
+                <div class="card m-b-30">
+                  <div class="card-body">
+                    <section class="section-re-de ">
+
+
+                      <div class=" p-3 d-flex align-items-center rounded-3 row">
+                        <div class="col-lg-9 pa-les-img">
+                          <div class="flex-grow-1 ms-3 mt-3 mx-3">
+                            <h6 class="fs-21 mt-0 sufont ">
+                              <div class="boxlogoiconcm text-dark"> <i class="fa fa-book" aria-hidden="true"></i>
+                              </div>
+                              &#160; Plans
+                            </h6>
+                          </div>
+                        </div>
+                        <div class="col-lg-3 right-end" style="padding-left: 7%;">
+
+                          <button type="button" class=" btn btn-danger waves-effect waves-light waves-effect mb-2"
+                            data-toggle="modal" data-target=".tender-example-modal-lg">Create a new plan</button>
+                        </div>
+                      </div>
+                    </section>
+
+                    <!-- start -->
+
+                    <!--  Modal content for the above example -->
+                    <div class="modal fade tender-example-modal-lg" tabindex="-1" role="dialog"
+                      aria-labelledby="myLargeModalLabel" aria-hidden="true">
+                      <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title mt-0" id="myLargeModalLabel">Create a new Course</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span
+                                aria-hidden="true">&times;</span> </button>
+                          </div>
+                          <div class="modal-body">
+
+                            <div class="container">
+                              <div class="row">
+                                <div class="col-lg-6">
+                                  <label class="form-label">Course Title </label>
+                                  <input name="name" id="name" type="text" class="form-control"
+                                    placeholder="Course Title" required="">
+                                </div>
+                                <div class="col-lg-6">
+                                  <label class="form-label">Course Category </label>
+                                  <div class="input-div">
+                                    <select class="form-select choices__input choices__list choices__list--single"
+                                      id="dropdown" type="dropdown">
+                                      <option> Course Category </option>
+                                      <option> Course Category</option>
+                                      <option> Course Category</option>
+                                    </select>
+                                  </div>
+                                </div>
+                              </div>
+
+
+
+                              <div class="row mt-4">
+                                <div class="col-lg-6">
+                                  <label class="form-label">Course Level </label>
+                                  <input name="name" id="name" type="text" class="form-control"
+                                    placeholder="Course Title" required="">
+                                </div>
+                                <div class="col-lg-6">
+                                  <label class="form-label">Course Duration </label>
+                                  <div class="input-div">
+                                    <select class="form-select choices__input choices__list choices__list--single"
+                                      id="dropdown" type="dropdown">
+                                      <option> Course Duration</option>
+                                      <option> Course Duration</option>
+                                      <option> Course Duration</option>
+                                    </select>
+                                  </div>
+                                </div>
+                              </div>
+
+
+
+                              <div class="row mt-4">
+                                <div class="col-lg-6">
+                                  <label class="form-label">Description <span class="text-red">*</span></label>
+                                  <textarea class="form-control" id="meassageInput" placeholder="Description"
+                                    name="comments" rows="3"></textarea>
+                                </div>
+                                <div class="col-lg-6">
+                                  <div class="mb-4">
+                                    <label class="form-label" for="inputGroupFile01">File To Upload</label>
+                                    <input type="file" class="form-control" id="inputGroupFile01">
+                                    <p class="mt-3"><i class="fa fa-upload" aria-hidden="true"></i>
+                                      Tender Description File Upload</p>
+                                  </div>
+                                </div>
+
+                              </div>
+
+
+                              <div class="row mt-4">
+                                <div class="col-lg-6">
+                                  <label class="form-label">Course Price </label>
+                                  <input name="name" id="name" type="text" class="form-control"
+                                    placeholder="Duration of the tender period" required="">
+                                </div>
+                                <div class="col-lg-6">
+                                  <label class="form-label">Course Start Date </label>
+                                  <input name="name" id="name" type="text" class="form-control"
+                                    placeholder="Course Start Date" required="">
+                                </div>
+
+                              </div>
+
+                              <div class="row mt-5">
+                                <div class="col-lg-12">
+                                  <div class="text-end">
+                                    <button type="submit" id="submit" name="submit" class="btn btn-primary"> Submit <i
+                                        class="uil uil-message ms-1"></i></button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                          </div>
+                        </div>
+                        <!-- /.modal-content -->
+                      </div>
+                      <!-- /.modal-dialog -->
+                    </div>
+                    <!-- /.modal -->
+
+                    <!-- end -->
+
+                       <div class="container">
+                                <div class="row ma_top-inner">
+                                  <div class="col-lg-8">
+                                    <div class="p-2">Filterd By</div>
+                                    <div class="btn-group m-b-10">
+                                      <button type="button" class="btn btn-outline-primary dropdown-toggle"
+                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Plan
+                                        ID</button>
+                                      <div class="dropdown-menu" style=""> <a class="dropdown-item" href="#">Plan ID
+                                          1</a> <a class="dropdown-item" href="#">Plan ID 2</a> <a
+                                          class="dropdown-item" href="#">Plan ID 3</a> </div>
+                                    </div>
+                                    <div class="btn-group m-b-10 mx-3">
+                                      <button type="button" class="btn btn-outline-primary dropdown-toggle"
+                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Plan
+                                        Title</button>
+                                      <div class="dropdown-menu" style=""> <a class="dropdown-item" href="#">Plan
+                                          Title 1</a> <a class="dropdown-item" href="#">Plan Title 2</a> <a
+                                          class="dropdown-item" href="#"> Plan Title 3</a> </div>
+                                    </div>
+
+                                  </div>
+                                  <div class="col-lg-4 p-3">
+                                    <div id="custom-search-input">
+                                      <div class="input-group col-md-12">
+                                        <input type="text" class="form-control input-lg"
+                                          placeholder="Search the list below" />
+                                        <span class="input-group-btn">
+                                          <button class="btn btn-info btn-lg" type="button"> <i class="ion-search"></i>
+                                          </button>
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div class="table-responsive">
+                                    <table class="table table-striped mb-0 mt-4">
+                                      <thead>
+                                        <tr style="font-size: 15px;">
+                                          <th>Plan ID</th>
+                                          <th>Plan Title</th>
+                                          <th>Type </th>
+                                          <th>Description</th>
+                                          <th>Price</th>
+                                          <th>Status</th>
+                                          <th>Actions</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody>
+									  {% for item in packages %}
+										
+									 
+                                        <tr>
+                                          <th scope="row">{{item.id}}</th>
+                                          <td>{{item.name}}</td>
+                                          <td>{{item.type}}</td>
+                                          <td>{{item.description}}</td>
+                                          <td>{{item.amount}}</td>
+										  <td><span class="badge badge-pill badge-success">Active</span></td>
+                                          <td>
+
+                                            <a class="text-gr " href="" data-toggle="modal"
+                                              data-target=".tender-example-modal-lg"> &nbsp;&nbsp;<i
+                                                class="ion-compose"></i> </a>
+
+                                            &nbsp; <a class="text-red " href=""> <i class="ion-trash-a"></i></a>
+                                          </td>
+
+
+
+
+                                        </tr>
+										 {% endfor %}
+
+
+
+
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                </div>
+                              </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+</div>{% endblock %}

@@ -1,0 +1,88 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}
+	Ads List
+{% endblock %}
+
+{% block body %}
+
+	<div class="container-fluid" data-controller="employer">
+		<div class="containerss">
+
+			<div class="card">
+				<div class="card-body">
+				<div class="action-btn layout-top-spacing mb-7 d-flex align-items-center justify-content-between flex-wrap gap-6">
+						<div class="col-md-6"></div>
+						<a href="{{ path("app_admin_ad_temp") }}" class="btn rounded-pill waves-effect waves-light btn-primary">
+							Create ad
+						</a>
+					</div>
+				</div>
+				<div class="col-md-6"></div>
+				<div class="col-md-6">
+					<div class="form-group"></div>
+				</div>
+			</div>
+
+
+		</div>
+		
+		
+		<div
+
+			class="datatables">
+			<!-- start File export -->
+			<div class="card">
+				<div
+					class="card-body">
+					<div class="table-responsive">
+						<table id="accounts" class="table w-100 table-striped table-bordered display text-nowrap" width="100%">
+							<thead>
+								<!-- start row -->
+								<tr>
+									<th>Client</th>
+									<th>Contact Email</th>
+									<th>Link</th>
+									<th>Image</th>
+									<th>Status</th>
+									<th>Company</th>
+									<th>Actions</th>
+								</tr>
+								<!-- end row -->
+							</thead>
+							<tbody>
+								<!-- start row -->
+								{% for item in ads %}
+
+									<tr>
+										<td>{{item.client ?? ""}}</td>
+										<td>{{item.contactemail}}</td>
+										<td>{{item.link}}</td>
+										<td>{{item.image}}</td>
+										<td>{{item.status ? "Active" : "In-Active"}}</td>
+										<td>{{item.requestedby ? item.requestedby.name : ""}}</td>
+											
+										
+										<td>
+											<a class="text-red m-1" href="{{ path("app_admin_ad_temp",{'ad': item.id}) }}">
+													<i class="fa fa-edit alert alert-primary"></i>
+													</a>
+											<a class="text-red " href="{{ path("app_admin_ad_delete",{'ad': item.id}) }}">
+														<i class="fa fa-trash alert alert-danger"></i>
+													</a>
+										</td>
+									</tr>
+								{% endfor %}
+
+								<!-- end row -->
+							<!-- start row -->
+								<!-- end row -->
+							</tbody>
+						</tfoot>
+					</table>
+				</div>
+			</div>
+		</div>
+		<!-- end File export -->
+	</div>
+</div>{% endblock %}

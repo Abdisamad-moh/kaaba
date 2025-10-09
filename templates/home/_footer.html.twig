@@ -1,0 +1,78 @@
+<!-- start footer -->
+<footer class="footer-dark pt-20px bg-dark-gray sm-pt-35px">
+    <div class="container">
+        <div class="row justify-content-evenly fs-17 fw-300 mt-5 mb-4 md-mt-45px md-mb-45px xs-mt-35px xs-mb-35px">
+            <!-- start footer column -->
+            <div class="col-6 col-lg-3 order-sm-1 md-mb-40px xs-mb-30px last-paragraph-no-margin">
+                <a href="{{ path('app_home') }}" class="footer-logo mb-15px d-inline-block">
+                    <img src="{{ asset('assets/images/hero-logo.png') }}" data-at2x="{{ asset('assets/images/hero-logo.png') }}" alt="">
+                </a>
+                <p class="w-85 xl-w-95 sm-w-100 text-white">
+                    {% if lang == 'so' %}
+                        Hiigsiga horumarka haweenka iyadoo la adeegsanayo xirfad iyo tacliin.
+                    {% else %}
+                        Empowering women through skills and education.
+                    {% endif %}
+                </p>
+                <div class="elements-social social-icon-style-02 mt-20px lg-mt-20px"></div>
+            </div>
+            <!-- end footer column -->
+            
+            <!-- start footer column -->
+            <div class="col-6 col-lg-2 col-sm-4 xs-mb-30px order-sm-3 order-lg-2">
+                <span class="fs-18 fw-400 d-block text-white mb-5px">
+                    {% if lang == 'so' %}Socdaal{% else %}Navigation{% endif %}
+                </span>
+                <ul>
+                    {% if lang == 'so' %}
+                        <li><a href="#eligibility">Shuruudaha</a></li>
+                        <li><a href="#required-documents">Dukumiintiyada Loo Baahan Yahay</a></li>
+                        <li><a href="#how-to-apply">Sida Loo Codsado</a></li>
+                        <li><a href="#scholarships">Bixinta Waxbarasho</a></li>
+                        <li><a href="#contact-us">Nala Soo Xiriir</a></li>
+                    {% else %}
+                        <li><a href="#eligibility">Eligibility</a></li>
+                        <li><a href="#required-documents">Required Documents</a></li>
+                        <li><a href="#how-to-apply">How to Apply</a></li>
+                        <li><a href="#scholarships">Scholarships</a></li>
+                        <li><a href="#contact-us">Contact</a></li>
+                    {% endif %}
+                </ul>
+            </div>
+            <!-- end footer column -->
+
+            <!-- start footer column -->
+            <div class="col-6 col-lg-2 col-sm-4 xs-mb-30px order-sm-5 order-lg-4">
+                <span class="fs-18 fw-400 d-block text-white mb-5px">
+                    {% if lang == 'so' %}Nala Soo Xiriir{% else %}Get in touch{% endif %}
+                </span>
+                <span class="mb-5px text-white">
+                    {% if lang == 'so' %}Iimaylka{% else %}Email{% endif %}
+                </span>
+                <a href="mailto:info@rajo-kaaba.org" class="text-white lh-16 d-block mb-15px">
+                    info@rajo-kaaba.org
+                </a>
+                <span class="mb-5px text-white">
+                    {% if lang == 'so' %}Lambarka Taleefanka{% else %}Support Line{% endif %}
+                </span>
+                <p class="text-white lh-16 d-block">+2522-528494</p>
+            </div>
+            <!-- end footer column -->
+        </div>
+        <div class="row align-items-center fs-16 fw-300">
+            <!-- start copyright -->
+            <div class="col-12 text-center">
+                <p class="text-white">
+                    Copyright &copy; {{ "now"|date("Y") }}
+                    {% if lang == 'so' %}
+                        Mashruuca Rajo Kaaba
+                    {% else %}
+                        Rajo Kaaba Project
+                    {% endif %}
+                </p>
+            </div>
+            <!-- end copyright -->
+        </div>
+    </div>
+</footer>
+<!-- end footer -->

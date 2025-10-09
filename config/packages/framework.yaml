@@ -1,0 +1,27 @@
+# see https://symfony.com/doc/current/reference/configuration/framework.html
+framework:
+    secret: '%env(APP_SECRET)%'
+    csrf_protection: true
+    http_client:
+            default_options:
+                verify_peer: false
+                verify_host: false
+
+    # Note that the session will be started ONLY if you read or write from it.
+    session:
+        handler_id: ~  # Use the default PHP session handler
+        save_path: '%kernel.project_dir%/var/sessions/%kernel.environment%'  # Custum direct
+        cookie_lifetime: 86400     # 1 day in seconds (24 * 60 * 60)
+        gc_maxlifetime: 86400      # 1 day in seconds (24 * 60 * 60)
+
+    #esi: true
+    #fragments: true
+    asset_mapper:
+        excluded_patterns: ['public/controllers/*']
+
+when@test:
+    framework:
+        test: true
+        session:
+            storage_factory_id: session.storage.factory.mock_file
+        

@@ -1,0 +1,135 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Blog Details
+{% endblock %}
+
+{% block body %}
+	<style>
+		[data-f-id="pbf"] {
+			display: none;
+		}
+	</style>
+	<div class="page-content">
+		<section class="bg-home4" id="home">
+			<div class="container">
+				<div class="row text-lg-start ">
+					<div class="col-lg-12">
+						<div class="mb-2 pb-3 me-lg-5 text-dark">
+							<nav class="d-inline-block" aria-label="breadcrumb ">
+								<ol class="breadcrumb justify-content-center fs-12">
+									<li class="">
+										<a href="{{ path('app_home_blogs') }}">More &nbsp; /
+										</a>
+									</li>
+									<li class="pl-1">
+										<a href="{{ path('app_home_blogs') }}">Blogs &nbsp;
+										</a>
+									</li>
+									<li class=" active" aria-current="page">
+										/{{blog.title}}
+									</li>
+								</ol>
+							</nav>
+							<div class="card-body mt-3">
+								<h6 class="fs-20">{{blog.title}}</h6>
+								<ul class="list-inline d-flex justify-content-between mb-3">
+									<li
+										class="list-inline-item">{# <p class="text-muted mb-0">
+																						<span class="text-muted fw-medium">
+																							{{ blog.category.name }} &nbsp; . {{blog.date|date("d-m-Y")}}</span>
+																					</p> #}
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<section class="section-re-de ">
+			<div class="container">
+				<div class="row justify-content-center">
+					<div
+						class="text-lg-start">
+						<!-- ---------------------------- -->
+
+						<div class="col-lg-12">
+							<div class="">
+								{{blog.description|raw}}
+							</div>
+						</div>
+						<!-- ---------------------------- -->
+
+					</div>
+				</div>
+			</div>
+		</section>
+		<section class="pa-les">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-12 py-3">
+						<div class="section-title text-center">
+							<h3 class="title mb-2">Similar
+								<span class="text-primary fw-bold">
+									Blogs</span>
+							</h3>
+							<p class="text-muted mb-5 fs-13">Find the right blogs recommended for you.</p>
+						</div>
+					</div>
+					<!-- -------------------------- -->
+					<div class="col-lg-12 col-md-7">
+						<div class="blog-post">
+							<div class="row">
+								{% for similar_blog in similar_blogs %}
+									{% set description = similar_blog.description|striptags %}
+									<div class="col-lg-4 mb-4">
+										<div class="card blog-grid-box p-2">
+											<img src="assets/images/bl1.png" alt="" class="img-fluid">
+											<div class="card-body">
+												<ul class="list-inline d-flex justify-content-between mb-3">
+													<li
+														class="list-inline-item">{# <p class="text-muted mb-0">
+																														<a href="blog-author.html" class="text-muted fw-medium">{{ similar_blog.category.name }}</a>
+																														- {{ blog.date|date('F j, Y')}}</p> #}
+													</li>
+												</ul>
+
+												{% if controller_name and controller_name == "MetierEmController" %}
+													<a href="{{ path("app_home_read_em_post", {"blog": similar_blog.id}) }}" class="primary-link">
+														<h6 class="fs-17">{{ similar_blog.title }}</h6>
+													</a>
+												{% else %}
+													<a href="{{ path("app_home_read-post", {"blog": similar_blog.id}) }}" class="primary-link">
+														<h6 class="fs-17">{{ similar_blog.title }}</h6>
+													</a>
+												{% endif %}
+												<p class="text-muted">{{ description|slice(0, 120) ~ '...' }}</p>
+												<div>
+													
+													{% if controller_name and controller_name == "MetierEmController" %}
+												
+													<a href="{{ path("app_home_read_em_post", {"blog": similar_blog.id}) }}" class="form-text text-primary">Read post
+														<i class="fa fa-external-link-square" aria-hidden="true"></i>
+													</a>
+												{% else %}
+													<a href="{{ path("app_home_read-post", {"blog": similar_blog.id}) }}" class="form-text text-primary">Read post
+														<i class="fa fa-external-link-square" aria-hidden="true"></i>
+													</a>
+												{% endif %}
+												</div>
+											</div>
+										</div>
+									</div>
+								{% endfor %}
+							</div>
+						</div>
+					</div>
+
+					<!-- -------------------------- -->
+				</div>
+			</div>
+		</section>
+
+	</div>
+	{% include 'home/_footer.html.twig' %}
+{% endblock %}

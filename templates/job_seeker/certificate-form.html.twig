@@ -1,0 +1,119 @@
+{{ form_start(form, {'action': path('job_seeker_certificate_form', {'certificate': certificate.id })}) }}
+{# Display all error messages at the top of the form #}
+<div data-controller="sync-location"
+		data-sync-location-cities-url-value="{{ path('app_fetch_cities') }}" 
+		data-sync-location-states-url-value="{{ path('app_fetch_states') }}" 
+	>
+	<div class="form-errors">
+		{% for fieldName, fieldErrors in errors %}
+			{% for error in fieldErrors %}
+				<p class="alert alert-danger">
+					{{ fieldName|capitalize }}: {{ error }}
+				</p>
+			{% endfor %}
+		{% endfor %}
+	</div>
+	<div class="row">
+		<div class="col-lg-12">
+			<label class="form-label">Certificate Name <span class="text-danger">*</span></label>
+			
+			<span class="d-block label_note">
+				Example: Certified Public Accountant (CPA), Project Management Professional (PMP), Certificate of Completion in First Aid
+			</span>
+		</div>
+		<div class="col-lg-12">
+			{{ form_widget(form.name) }}
+		</div>
+	</div>
+	<div class="row mt-2">
+		<div class="col-lg-12 ">
+			<label class="form-label">Certificate ID <span class="text-danger">*</span></label>
+			
+		</div>
+		<div class="col-lg-12">
+			{{ form_widget(form.certificateId) }}
+		</div>
+	</div>
+
+	<div class="row mt-4">
+		<div class="col-lg-12 ">
+			<label class="form-label">Institution <span class="text-danger">*</span></label>
+			
+			<span class="d-block label_note">
+				Please type what institution issued your certificate. 
+				Example: Standard University, Project Management Institute, Coursera
+			</span>
+		</div>
+		<div class="col-lg-12">
+			{{ form_widget(form.institute) }}
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-lg-12">
+			<label class="form-label">
+			Certification URL 
+			</label>
+			<span class="d-block label_note">
+				Example: Example: https://projectmanagementinstitute.org/certifications/pmp
+			</span>
+		</div>
+		<div class="col-lg-12">
+			<div class="input-div">
+				{{ form_widget(form.certificateUrl) }}
+			</div>
+		</div>
+	</div>
+	<!-- ---------------------------------- -->
+
+	<!-- ---------------------------------- -->
+	<hr>
+	<div class="row">
+		<div class="col-lg-12">
+			<label class="form-label">This certification does not expire
+			</label>
+		{{ form_widget(form.expirable) }}
+		</div>
+	</div>
+	<!-- ---------------------------------- -->
+
+	<!-- ---------------------------------- -->
+	<hr>
+
+	<div class="row">
+		<div class="col-lg-12">
+			<label class="form-label">Expiration date
+			</label>
+			{{ form_widget(form.expiresAt) }}
+		</div>
+	</div>
+	<hr>
+	<div class="row">
+		<div class="col-lg-6">
+			<label class="form-label">Country <span class="text-danger">*</span></label></label>
+			<div class="input-div">
+				{{ form_widget(form.country) }}
+			</div>
+		</div>
+		<div class="col-lg-6">
+			<label class="form-label">City <span class="text-danger">*</span></label></label>
+			<div class="input-div">
+				{{ form_widget(form.city) }}
+			</div>
+		</div>
+	</div>
+	<hr>
+
+	<div class="row finish_date" data-jobseeker-profile-target="finishDate">
+		<div class="col-lg-12">
+			<label class="form-label">Upload Certificate
+			</label>
+			{{ form_widget(form.file) }}
+		</div>
+	</div>
+	<div class="modal-footer mt-3">
+		<a href="#" class="btn btn-outline-primary" style="border-radius: 50px;" data-bs-dismiss="modal">Cancel</a>
+		<button type="submit" class="btn btn-primary waves-effect waves-light">Save</button>
+	</div>
+</div>
+{{ form_end(form) }}

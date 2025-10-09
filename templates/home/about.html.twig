@@ -1,0 +1,293 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}About us
+{% endblock %}
+
+{% block stylesheets %}
+	<style>
+		.tick-list {
+			list-style: none; /* Remove default list styling */
+			padding-left: 0; /* Remove padding if not needed */
+		}
+
+		.tick-list li {
+			position: relative;
+			padding-left: 30px; /* Space for the tick mark */
+			line-height: 1.5; /* Adjust line height for better readability */
+			margin-bottom: 5px; /* Space between items */
+		}
+
+		.tick-list li::before {
+			content: "\2713"; /* Unicode character for a checkmark */
+			position: absolute;
+			left: 0; /* Align to the left */
+			color: green; /* Color of the checkmark */
+			font-size: 20px; /* Size of the checkmark */
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+	<section class="bg-home4" id="home">
+		<div class="container">
+			<div class="row align-items-center">
+				<div class="col-lg-12">
+					<div class=" pb-2 me-lg-6 text-center mt-4">
+						<h1 class="display-5 fw-semibold mb-3 mt-3 fs-22">Who we are &amp;
+							<span class="text-primary fw-bold">What we believe.
+							</span>
+						</h1>
+						<p class="lead text-muted mb-0 pc-da">Métier Quest is at the forefront of revolutionizing the job market, fostering a dynamic and supportive space where job seekers and employers can connect seamlessly. Our mission is to empower every individual and company to achieve their fullest potential by providing innovative tools and services. Together with our global partners and a community of hundreds of thousands, we're building a brighter future where everyone can find their perfect match and thrive in the digital age!</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<section class="section">
+		<div class="container">
+			<div
+				class="row justify-content-center">
+
+				<!-- ------------------------------------- -->
+				<div class="row">
+					<div class="mb-3">
+						<img class="img-fluid rounded-3" src="{{ asset('assets/images/about_us_1.jpg')}}" alt="">
+					</div>
+				</div>
+
+				<!-- ------------------------------------- -->
+			</div>
+		</div>
+	</section>
+	<section class="section bg-purple bg-halfpurple"></section>
+	<section class="section-re">
+		<div class="container">
+			<div
+				class="row justify-content-center">
+
+				<!-- ------------------------------------- -->
+				<strong class="row">
+					<div class="section-title text-md-start">
+						<h3 class="title mb-4">About
+							<span class="text-primary fw-bold">
+								Us</span>
+						</h3>
+						<p>
+							Métier Quest is a premier online platform that streamlines the recruitment process and elevates career development. Combining state-of-the-art job search functionality with robust candidate profiling, our platform seamlessly connects reputable employers with top-tier talent. Moreover, employers gain access to a comprehensive pool of candidates—from seasoned professionals to emerging talents across a variety of backgrounds—ensuring a dynamic and inclusive recruitment experience.
+						</p>
+						<p>
+							Headquartered at Meydan Grandstand, 6th Floor, Meydan Rd, Nad Al Sheba 1, Dubai, UAE, and with representatives across Kenya, Djibouti, Somalia/Somaliland, Tanzania, and Uganda, we serve individuals seeking job opportunities in the UAE and East Africa. Our one-stop, user-friendly platform is designed to cater to anyone looking for the best career prospects in these regions, using world-class recruitment tools, innovative templates, and progressive services built to meet the dynamic demands of today’s evolving landscape.
+						</p>
+					</div>
+					<div
+						class="mt-4">{# <hr> #}
+					</div>
+					<div class="row">
+						<div class="section-title text-md-start">
+							<h3 class="title mb-4">Why
+								<span class="text-primary fw-bold">
+									Us</span>
+							</h3>
+							<p>
+								Métier Quest is a dynamic platform that bridges the divide between available career opportunities and every job seeker’s potential, ensuring that talent from all backgrounds finds its perfect match. Our mission is to connect individuals—from emerging candidates to seasoned professionals—with reputable employers. The platform offers a flexible and user-friendly environment where job seekers, employers, recruiters, and temporary agencies can effortlessly connect and collaborate on meaningful projects and career opportunities.
+							</p>
+							<p>
+								Our suite of resources includes tools like psychometric and personality assessments that enable employers to streamline their candidate screening processes. In addition, we provide advertising opportunities and allow companies, organizations, and institutions to post tenders, bids, and courses competitively. Backed by a team of seasoned experts with decades of experience in career service solutions, we are dedicated to delivering outstanding recruitment results. With over 20 years of combined industry expertise, our partner clients and candidates benefit from solutions built on the core values of integrity, trust, respect, and enthusiasm.
+							</p>
+						</div>
+						<div
+							class="mt-4">{# <hr> #}
+						</div>
+						<div class="row">
+							<div class="section-title text-md-start">
+								<h3 class="title mb-4">OUR CORE
+									<span class="text-primary fw-bold">
+										VALUES</span>
+								</h3>
+								<p>Our core values reflect our mission to connect talented professionals with their ideal employers. We believe in:</p>
+								{# <ul>
+									<li>
+										<strong>Integrity:</strong>We uphold the highest standards of honesty and transparency in our work.
+									</li>
+									<li>
+										<strong>Innovation:</strong>
+										We embrace creativity and new ideas to deliver the best solutions for our clients and users.</li>
+									<li>
+										<strong>Excellence:</strong>
+										We strive for excellence in everything we do, from the quality of our services to the satisfaction of our customers.</li>
+									<li>
+										<strong>Diversity:</strong>
+										We celebrate diversity and inclusion in our team and our community, and we respect different perspectives and backgrounds.</li>
+									<li>
+										<strong>Collaboration:</strong>
+										We work together as a team, and we partner with other organizations that share our vision and values.</li>
+								</ul> #}
+								<ul class="tick-list">
+									<li class="mb-2 no-text mt-1 text-black">
+										<b>Integrity:</b>
+										We uphold the highest standards of honesty and transparency in our work.
+									</li>
+									<li class="mb-2 no-text mt-1 text-black">
+										<b>Innovation:</b>
+										We embrace creativity and new ideas to deliver the best solutions for our clients and users.
+									</li>
+									<li class="mb-2 no-text mt-1 text-black">
+										<b>Excellence:</b>
+										We strive for excellence in everything we do, from the quality of our services to the satisfaction of our customers.
+									</li>
+									<li class="mb-2 no-text mt-1 text-black">
+										<b>
+											Diversity:
+										</b>We celebrate diversity and inclusion in our team and our community, and we respect different perspectives and backgrounds.
+									</li>
+									<li class="mb-2 no-text mt-1 text-black">
+										<b>
+											Collaboration:
+										</b>
+										We work together as a team, and we partner with other organizations that share our vision and values.
+									</li>
+								</ul>
+							</div>
+							<div class="mt-4">
+								<hr>
+							</div>
+							<!-- ------------------------------------- -->
+						</div>
+					</div>
+				</section>
+				<section class="section">
+					<div class="container">
+						<div
+							class="row justify-content-center">
+
+							<!-- ------------------------------------- -->
+							<div class="row">
+								<div class="section-title text-md-start">
+									<h3 class="title mb-2">Our
+										<span class="text-primary fw-bold">
+											Vision</span>
+									</h3>
+									<p class="text-muted mb-4 fs-15 mt-2 fw-medium">To be an innovative one-stop solution platform where employers and job seekers can successfully meet their expectations.</p>
+									<h3 class="title mb-2">Our
+										<span class="text-primary fw-bold">
+											Mission</span>
+									</h3>
+									<p class="text-muted mb-4 fs-15 mt-2 fw-medium">Our mission is to provide exceptional services that make job searching and hiring in the region seamless, fast, and reliable for everyone.</p>
+								</div>
+							</div>
+
+							<!-- ------------------------------------- -->
+
+						</div>
+					</div>
+				</section>
+				<section class="section abbg">
+					<div class="container">
+						<div
+							class="row justify-content-center" style="height: 500px;">
+
+							<!-- ------------------------------------- -->
+							<div class="row">
+								{# <div class="col-lg-6 wh-bg"> #}
+									{# <div class="section-title text-md-start" style="height: 300px;"> #}
+										{# <h3 class="mb-0 mt-2 text-md-start fs-19 text-purp">
+											Our Core Values</h3>
+										<p class="text-muted mb-4 fs-15 mt-2 thin">Our core values reflect our mission to connect talented professionals with their ideal employers.<span style="color:#13A6A6;">
+												We believe in:</span>
+										</p>
+										<ul class="ab">
+											<li class="mb-2 no-text mt-1 text-black">
+												<b>Integrity:</b>
+												We uphold the highest standards of honesty and transparency in our work.
+											</li>
+											<li class="mb-2 no-text mt-1 text-black">
+												<b>Innovation:</b>
+												We embrace creativity and new ideas to deliver the best solutions for our clients and users.
+											</li>
+											<li class="mb-2 no-text mt-1 text-black">
+												<b>Excellence:</b>
+												We strive for excellence in everything we do, from the quality of our services to the satisfaction of our customers.
+											</li>
+											<li class="mb-2 no-text mt-1 text-black">
+												<b>
+													Diversity:
+												</b>We celebrate diversity and inclusion in our team and our community, and we respect different perspectives and backgrounds.
+											</li>
+											<li class="mb-2 no-text mt-1 text-black">
+												<b>
+													Collaboration:
+												</b>
+												We work together as a team, and we partner with other organizations that share our vision and values.
+											</li>
+										</ul> #}
+									{# </div> #}
+								{# </div> #}
+							</div>
+
+							<!-- ------------------------------------- -->
+
+						</div>
+					</div>
+				</section>
+
+				<!--starrt-->
+
+				<section class="section">
+					<div class="container">
+						<div class="row">
+							<div
+								class="col-lg-12">
+
+								<!-- -------------------------- -->
+
+								<div
+									class="mb-2 text-center">{# <img class="img-fluid rounded-3" src="assets/images/3dicons.png" alt=""> #}
+								</div>
+								<p class=" text-center fs-17 text-grey">Like us and follows in social media</p>
+								<div class="py-4">
+									<div class="container">
+
+										<div class="row">
+											<div class="col">
+
+												<ul class="footer-social-menu list-inline mb-0 text-center">
+													<li class="list-inline-item text-primary">
+														<a target="__blank" href="https://www.facebook.com/profile.php?id=61563278125974">
+															<i class="fa fa-facebook fs-22 text-black" aria-hidden="true"></i>
+														</a>
+													</li>
+													<li class="list-inline-item text-primary">
+														<a target="__blank" href="https://twitter.com/Metierquest">
+															<i class="fa fa-twitter  fs-22 text-black" aria-hidden="true"></i>
+														</a>
+													</li>
+													<li class="list-inline-item text-primary">
+														<a target="__blank" href="https://www.instagram.com/metier.quest">
+															<i class="fa fa-instagram fs-22 text-black" aria-hidden="true"></i>
+														</a>
+													</li>
+													<li class="list-inline-item text-primary">
+														<a target="__blank" href="https://www.linkedin.com/company/metier-quest/">
+															<i class="fa fa-linkedin fs-22 text-black" aria-hidden="true"></i>
+														</a>
+													</li>
+												</ul>
+											</div>
+										</div>
+
+										<!--end row-->
+									</div>
+									<!--end container-->
+								</div>
+								<!-- -------------------------- -->
+
+							</div>
+						</div>
+					</div>
+				</section>
+
+				<!-- company-LISTEnd -->
+
+				 
+				{% include 'home/_footer.html.twig' %}
+			{% endblock %}

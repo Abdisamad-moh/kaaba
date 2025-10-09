@@ -1,0 +1,92 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Interview Questions & Answers - Metier Quest
+{% endblock %}
+
+{% block body %}
+	<section class="bg-home4" id="home">
+		<div class="container">
+			<div class="row align-items-center">
+				<div class="col-lg-12">
+					<div class="mb-2 pb-3 me-lg-6 text-center">
+						<h1 class="display-5 fw-semibold mb-3 mt-3 fs-22">Interview Questions &
+							<span class="text-primary fw-bold">Answers</span>
+						</h1>
+						<p class="lead text-muted mb-0 pc-da">Looking for interview questions? We've got you covered! These sample questions are designed to guide the conversation and help you gain deeper insights. Please note that the actual interview questions may differ. Feel free to use these samples as a reference.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+
+	<section class="section-re-de  mb-5">
+		<div class="container  mb-5">
+			<div class="row justify-content-center">
+				<div
+					class="text-lg-start">
+					<!-- ---------------------------- -->
+
+					<div class="col-lg-10">
+						<div>
+							{{ component('Qa') }}
+						</div>
+					</div>
+
+					<!-- ---------------------------- -->
+
+				</div>
+			</div>
+		</div>
+	</section>
+	{% set page = 'IA' %}
+	{% if ads %}
+		<section class="section">
+			<div class="container">
+				<div class="row justify-content-center">
+					<div class="text-center">
+						<div class="section-title text-center mb-5 mt-4 pb-2">
+							<h3 class="title mb-2 mt-4">
+								Trusted
+								<span class="text-primary fw-bold">Companies Ads</span>
+							</h3>
+							<p class="text-muted mb-1 fs-14">
+								Explore advertisements from trusted companies across various industries and sectors.
+							</p>
+						</div>
+
+						<div class="carousel-container">
+							{% for item in ads|filter(ad => ad.pages|filter(p => p.name == page)|length > 0)|shuffle %}
+								{% set url = item.link %}
+								<div class="mySlides animate">
+									{% if url starts with 'http' %}
+										<a href="{{ url }}" class="btn btn-primary btn-hover">
+											<img src="{{ path('profile_image', {'filename': item.image}) }}" alt="slide">
+										</a>
+									{% else %}
+										<a href="http://{{ url }}" class="btn btn-primary btn-hover">
+											<img src="{{ path('profile_image', {'filename': item.image}) }}" alt="slide">
+										</a>
+									{% endif %}
+								</div>
+							{% endfor %}
+
+							<a class="prev" style="left:0%;" onclick="prevSlide()">&#10094;</a>
+							<a class="next" onclick="nextSlide()">&#10095;</a>
+
+							<div class="dots-container">
+								<span class="dots" onclick="currentSlide(1)"></span>
+								<span class="dots" onclick="currentSlide(2)"></span>
+								<span class="dots" onclick="currentSlide(3)"></span>
+								<span class="dots" onclick="currentSlide(4)"></span>
+								<span class="dots" onclick="currentSlide(5)"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	{% endif %}
+
+	{% include 'home/_footer.html.twig' %}
+{% endblock %}

@@ -1,0 +1,21 @@
+<div {{ attributes }}>
+	{{ include('job_seeker/languages-list.html.twig', {languages: this.languages}) }}
+	<div data-loading class="p5 text-success fw-bold text-center">
+		Loading ...
+	</div>
+
+	{% component BootstrapModal with {id: 'languages-form-modal', dialog_classes: ['modal-dialog-centered']} %}
+	{% block modal_header %}
+		<h5 class="modal-title mt-0" id="myModalLabel">Add Languages</h5>
+		<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="close-modal"></button>
+	{% endblock %}
+
+	{% block modal_body %}
+		{{ component('JobSeekerLanguagesForm') }}
+	{% endblock %}
+
+	{% block modal_footer %}
+		{# <button type="button" data-action="live#action" data-live-action-param="save_resume_title" class="btn btn-primary waves-effect waves-light">Save</button> #}
+	{% endblock %}
+	{% endcomponent %}
+</div>

@@ -1,0 +1,117 @@
+<div {{ attributes }}>
+	<div class="card-body">
+		{{ form_start(form, {'attr': {'class': 'validation-wizard wizard-circle mt-5'}}) }}
+
+		<ul class="error-list">
+			{% for error in form_errors(form) %}
+				<li>{{ error.message }}</li>
+			{% endfor %}
+		</ul>
+
+		<div class="col-lg-12">
+			<div>
+
+				<table class="table table-borderless form-no-mb">
+					<thead>
+						<tr>
+							<th>Question Title</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for key, itemForm in form.employerJobQuestions %}
+							<tr>
+								<td>
+									{{ form_row(itemForm.title, {
+                    label: false,
+                    row_attr: { class: 'mb-1' },
+                    attr: {
+                      placeholder: 'Question Title',
+                      class: 'form-control',
+                    }
+                  }) }}
+								</td>
+
+								<td>
+									{{ form_row(itemForm.vars.button_delete, { label: 'X', attr: { class: 'btn btn-outline-danger' } }) }}
+								</td>
+							</tr>
+
+							<tr>
+								<td colspan="2">
+									<div class="d-flex flex-wrap justify-content-between">
+										<table class="table table-sm table-borderless form-no-mb nested-answers">
+											<tbody>
+												{% set counter = 0 %}
+												{% for key, subItemForm in itemForm.employerJobQuestionAnswers %}
+													{% set counter = counter + 1 %}
+													<tr class="d-flex align-items-center d-flex justify-content-start">
+														<td class="w-100">
+															<div class="d-flex align-items-center ">
+
+																<div>
+																	{{counter}}
+																	-
+																</div>
+																{{ form_row(subItemForm.title, {
+                                label: false,
+                                row_attr: { class: 'mb-1' },
+                                attr: {
+                                  placeholder: 'Answer Title',
+                                  class: 'form-control',
+                                }
+                              }) }}
+															</div>
+
+														</td>
+
+														<td>
+															{{ form_row(subItemForm.is_right, {
+                                label: false,
+                                row_attr: { class: 'mb-1' },
+                                attr: {
+                                  placeholder: 'Right',
+                                  class: 'form-control',
+                                }
+                              }) }}
+
+														</td>
+
+														<td>
+															<div class="d-flex align-items-center">
+																{{ form_row(subItemForm.vars.button_delete, { label: 'X', attr: { class: 'btn btn-outline-danger' } }) }}
+															</div>
+
+														</td>
+													</tr>
+
+												{% endfor %}
+											</tbody>
+										</table>
+
+										{{ form_widget(itemForm.employerJobQuestionAnswers.vars.button_add, { label: '+ Add Answer', attr: { class: 'btn btn-outline-primary btn-sm mt-2' } }) }}
+									</div>
+								</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+
+				{{ form_widget(form.employerJobQuestions.vars.button_add, { label: '+ Add Question', attr: { class: 'btn btn-outline-primary mt-3' } }) }}
+
+			</div>
+		</div>
+
+		<div class="col-md-offset-3 col-md-9 mt-4">
+			<button type="submit" class="btn btn-success">
+				Save
+			</button>
+			<a type="{{path('app_employer_post_job', {'job': job.id})}}" class="btn btn-primary">
+				<i class="ti ti-edit fs-5"></i>
+				Edit Job
+			</a>
+		</div>
+
+		{{ form_end(form) }}
+	</div>
+</div>

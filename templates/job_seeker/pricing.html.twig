@@ -1,0 +1,246 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+	Pricing
+{% endblock %}
+{% block body %}
+	<style>
+		.min-height-200 {
+			min-height: 200px;
+		}
+		.discount-banner {
+			display: flex;
+			align-items: center;
+			gap: 5px;
+			margin-bottom: 10px;
+		}
+
+		.old-price {
+			text-decoration: line-through;
+			color: #ff0a0a;
+			font-size: 20px;
+			font-weight: bold;
+		}
+
+		.new-price {
+			font-weight: bold;
+		}
+
+		.discount-percentage {
+			color: #00ff00;
+		}
+
+		.discount-badge {
+			position: relative;
+			padding: 0.75rem 1.5rem; /* Adjust padding as needed */
+			border-radius: 50%;
+			font-weight: bold;
+			color: #fff;
+			background-color: #ff5555;
+			z-index: 1;
+			display: inline-flex; /* Ensure text aligns within the circle */
+			align-items: center; /* Center text vertically */
+			justify-content: center; /* Center text horizontally */
+		}
+
+		.discount-badge::before,
+		.discount-badge::after {
+			content: "";
+			position: absolute;
+			top: 0;
+			right: 0;
+			width: 100%;
+			height: 100%;
+			border-radius: 50%;
+			background-color: rgba(0, 0, 0, 0.2); /* Adjust opacity for shadow */
+			z-index: -1; /* Place behind the badge content */
+		}
+
+		.discount-badge::before {
+			clip-path: polygon(0% 40%, 20% 0%, 80% 0%, 100% 40%); /* Top gear teeth */
+		}
+
+		.discount-badge::after {
+			clip-path: polygon(0% 60%, 20% 100%, 80% 100%, 100% 60%); /* Bottom gear teeth */
+		}
+	</style>
+
+	<section class="bg-home4" id="home">
+		<div class="container">
+			<div class="row align-items-center">
+				<div class="col-lg-12">
+					<div class="mb-2 pb-3 me-lg-6 text-center">
+						<h1 class="display-5 fw-semibold mb-3 mt-3 fs-22">Choose the
+							<span class="text-primary fw-bold">right package
+							</span>
+						</h1>
+						<p class="lead text-muted mb-0 pc-da">Don't miss this opportunity to boost your career! For a limited time only, you can get access to all our premium features for job seekers with a 6-month subscription plan. This is the best deal you can find, as you will save 40% compared to the monthly plan. Hurry up and sign up today! 
+But remember, you can always search for jobs and apply directly for free.
+Choose The Right Plan for you Now!
+</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<section>
+		<div class="container">
+			<div class="row">
+				<div
+					class="col-lg-12">
+
+					<!-- -------------------------- -->
+
+
+					<div class="row">
+						{% set sorted_packages = packages|sort((a, b) => a.cost <=> b.cost) %}
+						{% for item in sorted_packages %}
+
+							<div class="col-lg-6  col-md-6 mt-5 pt-2 ">
+								<div class="pricing-box card bg-light text-dark pricing-box card bg-light text-dark coupon-single panel t-center">
+									{% if item.isspecial %}
+										{# <span class="badge bg-danger discount-badge">Save 75%</span> #}
+									{% endif %}
+
+									{% if item.isoffer %}
+										<div class="ribbon-wrapper is-hidden-xs-down">
+											<div class="ribbon">Free Trial</div>
+										</div>
+									{% endif %}
+									<div class="card-body p-4 px-lg-5">
+										<div class="pricing-name text-md-start mt-4 pt-1">
+											<div class="text-center">
+												{% if item.ispopular %}
+													<small class="text-success fw-bold d-block mb-1">★ Most Popular</small>
+												{% endif %}
+												<h4 class="fs-19">{{ item.name }}</h4>
+											</div>
+											<div class="text-center">
+												<span class="fs-17">{{item.description}}</span>
+											</div>
+										</div>
+
+										{% if item.discount %}
+											<div class="discount-banner">
+												<span class="old-price">${{item.oldprice}}</span>
+												{# <span class="new-price">$80</span> #}
+												{# <span class="discount-percentage">-20%</span> #}
+												<div class="pricing-price text-md-start mt-2">
+													<h2 class="fw-semibold">${{item.cost}}<small class="fs-16">
+														{% if item.durationcategory == "weekly" %}
+															Week
+															{% else %}
+															{{item.duration|packageType}}
+														{% endif %}
+													</small>
+													</h2>
+												</div>
+											</div>
+										{% elseif item.isoffer %}
+											<div class="discount-banner">
+
+												<span class="old-price">${{item.cost}}</span>
+												{# <span class="new-price">$80</span> #}
+												{# <span class="discount-percentage">-20%</span> #}
+												<div class="pricing-price text-md-start mt-2">
+													<h2 class="fw-semibold">$0.00</small>
+												</h2>
+											</div>
+										</div>
+									{% else %}
+										<div class="pricing-price text-md-start mt-2">
+											<h2 class="fw-semibold">${{item.cost}}<small class="fs-16">
+												{% if item.durationcategory == "weekly" %}
+													/Week
+													{% else %}
+													{{item.duration|packageType}}
+												{% endif %}
+											</small>
+											</h2>
+
+										</div>
+									{% endif %}
+									{# <p class="fs-13 text-dark">{{item.description}}</p> #}
+
+
+									<ul class="list-unstyled pricing-details fs-13  mt-2 text-dark">
+										{% for plan in item.metierPackagePlans %}
+											{% if plan.inclusive %}
+												<li class="pricing-item font-weight-bold">
+													<i class="fa fa-check img-fluid text-green  fs-19"></i>
+													{# <img class="img-fluid" src="{{ asset('assets/images/circle-check.png') }}" alt=""> #}
+													{{plan.feature.name}}</li>
+											{% else %}
+												<li class="pricing-item font-weight-bold">
+													<i class="fa fa-times img-fluid text-red fs-19"></i>
+													<img class="img-fluid" src="{{ asset('assets/images/close.png') }}" alt="">
+													{{plan.feature.name}}
+												</li>
+											{% endif %}
+										{% endfor %}
+									</ul>
+									{% if activeplan and item == activeplan.plan %}
+										<h1>You have a active plan which will end
+											{{activeplan.validto|date("d-m-Y")}}</h1>
+
+									{% elseif item.isoffer %}
+										<div class="text-md-start mt-4 mb-2">
+											<a href="{{ path('app_jobseeker_offer_purchase_checkout', {'package': item.id}) }}" class="btn btn-soft-primary rounded-pill">Start Now
+											</a>
+										</div>
+									{% else %}
+										<div class="text-md-start mt-4 mb-2">
+											<a href="{{ path('app_jobseeker_purchase_checkout', {'package': item.id}) }}" class="btn btn-soft-primary rounded-pill">Buy Now
+											</a>
+										</div>
+									{% endif %}
+
+								</div>
+							</div>
+
+							<!--end pricing-box-->
+						</div>
+					{% endfor %}
+
+				</div>
+				<div class=" pb-3 pt-4">
+					<hr></div>
+				<div class="text-center mt-4 mb-2">
+					<span class="badge bg-danger-subtle text-danger p-4 fs-18  px-lg-5">*VAT &amp; other taxes are not included</span>
+				</div>
+				<!-- -------------------------- -->
+
+			</div>
+		</div>
+	</div>
+</section>
+<section class="section mt-4 ">
+	<div class="container">
+		<div class="row justify-content-center">
+			<div
+				class="text-lg-start">
+				<!-- ---------------------------- -->
+
+				<div class="alert  bg-primary-subtle text-primary" role="alert">
+					<div class="row">
+						<div class="col-lg-2">
+							<img class="img-fluid py-4" src="{{ asset('assets/images/subscription.png') }}" alt="">
+						</div>
+						<div class="col-lg-7">
+							<h5 class="fs-18 mb-3 mt-4 ptla ">Job seekers subscription packages</h5>
+							<p class="lead text-muted mb-0 pc-da pb-3">Please contact us for further details on the pricing of our Career Psychometric Test, which can help you assess your strengths and interests in various fields based on your personality. We also offer other job readiness services, such as creating personalized CVs and cover letters that highlight your skills and achievements.</p>
+
+						</div>
+						<div class="col-lg-3 mt-5 text-center" style="margin-top: 6% !important;">
+							<a href="{{ path('app_home_contacts') }}" class="btn btn-primary btn-hover">Contact us
+								<i class="fa fa-arrow-right" aria-hidden="true"></i>
+							</a>
+						</div>
+					</div>
+				</div>
+
+				<!-- ---------------------------- -->
+
+			</div>
+		</div>
+	</div>
+</section>{% endblock %}

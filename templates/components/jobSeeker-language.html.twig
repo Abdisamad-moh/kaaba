@@ -1,0 +1,64 @@
+<div {{ attributes }}>
+	{{ form_start(form, {attr: {
+        'data-action': 'live#action:prevent',
+        'data-live-action-param': 'save'
+    }}) }}
+	<div class="modal-body">
+		{% for language in form.jobSeekerLanguages %}
+			<div class="row py-1 pb-3">
+				<div class="col-lg-5">
+					<label class="form-label">Language
+					</label>
+					{{ form_widget(language.language, {attr: {'class': 'form-select'}}) }}
+					{{ form_errors(language.language) }}
+				</div>
+				<div class="col-lg-5">
+					<label class="form-label">Proficiency</label>
+					{{ form_widget(language.proficiency, {attr: {'class': 'form-select'}}) }}
+				</div>
+				<div class="col-sm-2 col-lg-2 d-flex align-items-end">
+					{{ form_row(language.vars.button_delete, {label: 'X', attr: {class: 'btn btn-outline-danger'}}) }}
+				</div>
+			</div>
+			<div class="row py-1">
+				<div class="col-lg-2">
+					{# <div class="my-3"> #}
+						<div class="form-check mb-2">
+							{{ form_widget(language.reading, {attr: {'class' : 'form-check-input' }}) }}
+							{# <label class="form-check-label ms-2" for="read">Read</label> #}
+                            {{ form_label(language.reading) }}
+						</div>
+					{# </div> #}
+				</div>
+				<div class="col-lg-2">
+					{# <div class="my-3"> #}
+						<div class="form-check mb-2">
+							{{ form_widget(language.writing, {attr: {'class' : 'form-check-input' }}) }}
+							{# <label class="form-check-label ms-2" for="read">Read</label> #}
+                            {{ form_label(language.writing) }}
+						</div>
+					{# </div> #}
+				</div>
+                <div class="col-lg-2">
+					{# <div class="my-3"> #}
+						<div class="form-check mb-2">
+							{{ form_widget(language.speaking, {attr: {'class' : 'form-check-input' }}) }}
+							{# <label class="form-check-label ms-2" for="read">Read</label> #}
+                            {{ form_label(language.speaking) }}
+						</div>
+					{# </div> #}
+				</div>
+			</div>
+			<hr>
+		{% endfor %}
+		{# {{ dump(_errors ?? '') }} #}
+	</div>
+	<div class="">
+		{{ form_widget(form.jobSeekerLanguages.vars.button_add, {label: '+ Add another language', attr: {class: 'btn btn-none fw-bold border-light text-primary'}}) }}
+	</div>
+    <div class="d-flex justify-content-end gap-2">
+        <button  class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+		<button class="btn btn-primary {{ this.hasValidationErrors ? 'disabled' : '' }}">Save</button>
+    </div>
+	{{ form_end(form) }}
+</div>

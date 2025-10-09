@@ -1,0 +1,427 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Employer
+{% endblock %}
+
+{% block body %}
+	<div class="page-content">
+		<section class="bg-home2" id="home">
+			<div class="container">
+				<div class="row align-items-center">
+					<div class="col-lg-9">
+						<div class="mb-2 pb-3 me-lg-5">
+							<h1 class="display-5 fw-semibold mb-3 mt-3">Find the
+								<span class="text-primary fw-bold">
+									perfect candidate.</span>
+							</h1>
+							<p class="lead text-muted mb-0 pc-da">You’ve come to the right place! Métier Quest is the ultimate destination for finding and hiring the best talent in the market. 
+							</p>
+							<p>
+							<strong class="fst-italic">Whether you need a developer, a teacher, designer, or a manager,</strong> we have them all. Use our platform to source and hire the best talent faster. Post your jobs, browse through resumes, and chat with candidates in our easy-to-use employer portal. 
+							</p>
+							<p>
+							Come benefit from our smart tools at every step of the hiring journey.</p>
+						</div>
+						{# <p class="lead text-muted mb-0 mt-4 pc-da">
+							<a href="#" class="upbu">
+								<i class="fa fa-exchange" aria-hidden="true"></i>
+								&nbsp; Now Register</a>
+						</p> #}
+
+
+					</div>
+					<div class="col-lg-3">
+						<div class="mt-3 mt-md-0">
+							<img class="img-fluid home-img" src="{{ asset("assets/images/em_bg.png") }}" alt=""/>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		{% set page = 'IA' %}
+	{% if ads %}
+		<section class="section">
+			<div class="container">
+				<div class="row justify-content-center">
+					<div class="text-center">
+						<div class="section-title text-center mb-5 mt-4 pb-2">
+							<h3 class="title mb-2 mt-4">
+								Trusted
+								<span class="text-primary fw-bold">Companies Ads</span>
+							</h3>
+							<p class="text-muted mb-1 fs-14">
+								Explore advertisements from trusted companies across various industries and sectors.
+							</p>
+						</div>
+
+						<div class="carousel-container">
+							{% for item in ads|filter(ad => ad.pages|filter(p => p.name == page)|length > 0)|shuffle %}
+								{% set url = item.link %}
+								<div class="mySlides animate">
+									{% if url starts with 'http' %}
+										<a href="{{ url }}" class="btn btn-primary btn-hover">
+											<img src="{{ path('profile_image', {'filename': item.image}) }}" alt="slide">
+										</a>
+									{% else %}
+										<a href="http://{{ url }}" class="btn btn-primary btn-hover">
+											<img src="{{ path('profile_image', {'filename': item.image}) }}" alt="slide">
+										</a>
+									{% endif %}
+								</div>
+							{% endfor %}
+
+							<a class="prev" style="left:0%;" onclick="prevSlide()">&#10094;</a>
+							<a class="next" onclick="nextSlide()">&#10095;</a>
+
+							<div class="dots-container">
+								<span class="dots" onclick="currentSlide(1)"></span>
+								<span class="dots" onclick="currentSlide(2)"></span>
+								<span class="dots" onclick="currentSlide(3)"></span>
+								<span class="dots" onclick="currentSlide(4)"></span>
+								<span class="dots" onclick="currentSlide(5)"></span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	{% endif %}
+
+
+		<section class="section">
+			<div class="container">
+				<div class="row justify-content-center">
+					<div class="col-lg-12">
+						<div class="section-title text-center">
+							<h3 class="title mb-2 mt-3">How
+								<span class="text-primary fw-bold">
+									it works
+								</span>
+							</h3>
+
+						</div>
+					</div>
+				</div>
+				<!--end row-->
+				<div class="row">
+					<div class="col-lg-4 col-md-6">
+						<div class="card service-box mt-4">
+							<div class="card-body p-4 text-center">
+								<div class="service-icon icons-md">
+									<img class="img-fluid rounded-3" src="{{ asset("assets/images/e3.png") }}" alt="">
+								</div>
+								<div class="mt-4">
+									<h5>Create your account</h5>
+									<p class="text-muted">All you need is to fill registration details to create an account and start building your job post.</p>
+								</div>
+
+							</div>
+
+						</div>
+						<!--end service-->
+					</div>
+					<!--end col-->
+
+					<div class="col-lg-4 col-md-6">
+						<div class="card service-box mt-4">
+							<div class="card-body p-4 text-center">
+								<div class="service-icon icons-md">
+									<img class="img-fluid rounded-3" src="{{ asset("assets/images/em2.png") }}" alt="">
+								</div>
+								<div class="mt-4">
+									<h5>Job Description</h5>
+									<p class="text-muted">Writing a clear and compelling job description is an essential step in attracting qualified candidates to your company. We can easily create and post job descriptions that showcase your origination brand and highlight your unique value proposition.</p>
+
+								</div>
+							</div>
+						</div>
+						<!--end service-->
+					</div>
+					<!--end col-->
+
+					<div class="col-lg-4 col-md-6">
+						<div class="card service-box mt-4 text-center">
+							<div class="card-body p-4">
+								<div class="service-icon icons-md">
+									<img class="img-fluid rounded-3" src="{{ asset("assets/images/em1.png") }}" alt="">
+								</div>
+								<div class="mt-4">
+									<h5>Priority Job Post</h5>
+									<p class="text-muted">Boost your job post visibility with our Priority service! Your listing will be featured at the top of search results for 30 days, attracting more qualified candidates. Increase your clicks and find the perfect hire faster.</p>
+
+								</div>
+							</div>
+						</div>
+						<!--end service-->
+					</div>
+					<!--end col-->
+
+
+				</div>
+				<!--end row-->
+			</div>
+			<!--end container-->
+		</section>
+
+
+		<section class="section-re">
+			<div class="container">
+
+
+				<div
+					class="row justify-content-center">
+
+					<!-- ------------------------------------- -->
+
+					<div class="row">
+
+						<div class="sm-bg-pr alert bg-success-subtle text-success">
+
+							<div class="section-title text-md-start">
+								<h3 class="mb-0 mt-2 text-md-start fs-20 ">
+									Post a Job</h3>
+								<p class="text-mutedse mb-4 fs-15 mt-2">
+									Looking for the best talent for your company? Post jobs on our job board portal and reach tons of qualified candidates in minutes. Here are some of the benefits of posting jobs with us:</p>
+								<ul class="abd">
+									<li class="mb-3 no-text mt-1 text-black">
+										<img class="img-fluid teimg" src="{{ asset("assets/images/ico.png") }}" alt="">
+										&nbsp; Save time and money by using our easy-to-use platform and tools</li>
+
+									<li class="mb-3 no-text mt-1 text-black">
+										<img class="img-fluid teimg" src="{{ asset("assets/images/ico.png") }}" alt="">
+										&nbsp; Get access to exclusive features such as AI candidate shortlisting, candidate matching, and analytics</li>
+									<li class="mb-3 no-text mt-1 text-black">
+										<img class="img-fluid teimg" src="{{ asset("assets/images/ico.png") }}" alt="">
+										&nbsp; Boost your employer brand and attract more applicants with our premium services</li>
+
+
+								</ul>
+
+								<div class="top-login buyresse  mt-4 text-center">
+								{% if is_granted('ROLE_JOBSEEKER') %}
+
+								{% else %}
+									<a href="{{ path("app_employer_post_job") }}">&nbsp; Post Now &nbsp;
+									</a>
+								{% endif %}
+								</div>
+
+
+							</div>
+
+
+						</div>
+						<div class="sm-bg-pr alert  bg-warning-subtle text-warning">
+
+
+							<div class="section-title text-md-start">
+								<h3 class="mb-0 mt-2 text-md-start fs-20 ">
+									Post Bids & Courses</h3>
+								<p class="text-mutedse mb-4 fs-15 mt-2">
+									Attract the best talent for your projects or Institute with our job board portal. Post bids/tenders and courses to showcase your expertise, budget and requirements to potential candidates.</p>
+								<ul class="abd">
+
+
+									<li class="mb-3 no-text mt-1 text-black">
+										<img class="img-fluid teimg" src="{{ asset("assets/images/ico.png") }}" alt="">
+										&nbsp; Reach a large pool of qualified professionals across various domains and sectors.</li>
+
+									<li class="mb-3 no-text mt-1 text-black">
+										<img class="img-fluid teimg" src="{{ asset("assets/images/ico.png") }}" alt="">
+										&nbsp;Boost your brand visibility and reputation by creating engaging and informative posts.</li>
+									<li class="mb-3 no-text mt-1 text-black">
+										<img class="img-fluid teimg" src="{{ asset("assets/images/ico.png") }}" alt="">
+										&nbsp;Increase your chances of finding the right match for your needs and expectations.</li>
+
+								</ul>
+
+								<div class="top-login buyresse  mt-4 text-center">
+									{% if is_granted('ROLE_JOBSEEKER') %}
+
+								{% else %}
+									<a href="{{ path("app_employer_post_job") }}">&nbsp; Post Now &nbsp;
+									</a>
+								{% endif %}
+								</div>
+								</div>
+
+
+							</div>
+
+
+						</div>
+
+
+					</div>
+
+
+					<!-- ------------------------------------- -->
+				</div>
+			</div>
+		</section>
+
+		
+
+
+
+		<section class="sectionme mt-5">
+			<div class="container">
+				<div class="row justify-content-center">
+					<div
+						class="text-lg-start">
+						<!-- ---------------------------- -->
+
+						<div class="alert  bg-primary-subtle text-primary" role="alert">
+							<div class="row">
+								<div class="col-lg-2">
+									<img class="img-fluid teimg" src="assets/images/hired.png" alt="">
+								</div>
+								<div class="col-lg-7">
+									<h5 class="fs-18 mb-3 mt-5 ptla">Want to fill your job faster</h5>
+									<p class="lead text-muted mb-0 pc-da">Top companies use Métier Quest to hire. See why these fantastic companies use us as their platform for hiring dream talent.</p>
+
+								</div>
+								<div class="col-lg-3 mt-5 text-center" style="margin-top: 6% !important;">
+									<a href="{{ path('app_signup_employer') }}" class="btn btn-primary btn-hover">Login / Register
+										<i class="fa fa-arrow-right" aria-hidden="true"></i>
+									</a>
+								</div>
+							</div>
+						</div>
+
+						<!-- ---------------------------- -->
+
+					</div>
+				</div>
+			</div>
+		</section>
+
+
+		<section class="section mt-3">
+			<div class="container">
+				<div class="row justify-content-center">
+					<div class="col-lg-12">
+						<div class="section-title text-center">
+							<h3 class="title mb-2 ">Available 
+								<span class="text-primary fw-bold">Candidates
+								</span>
+							</h3>
+							<p class="text-muted mb-5 fs-14">Discover top talent with ease! Search our active candidates in our resume database and shortlist them directly. Our platform helps you find the perfect match for your job openings quickly and efficiently.</p>
+
+						</div>
+					</div>
+				</div>
+				<!--end row-->
+				<section class="section">
+					<div class="container">
+						<div class="row justify-content-center">
+							<div class="text-center">
+								<div class="carousel-containers">
+									<img src="{{ asset("assets/images/ff.png") }}" alt="slide">
+
+									<!-- The dots/circles -->
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</section>
+				<!--end row-->
+			</div>
+			<!--end container-->
+		</section>
+
+		
+
+		<section class="section bg-purple">
+			<div class="container">
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="text-center text-white">
+							<h3 class="mt-4 mb-4">Recent Blog</h3>
+
+						</div>
+					</div>
+
+
+					<div class="row text-center mb-4"></div>
+					<!-- -------------------------- -->
+					<div class="col-lg-12 col-md-7">
+						<div class="blog-post">
+							<div class="row">
+								<div class="col-lg-4 mb-4">
+									<div class="blog-grid-box p-2">
+										<a href="#">
+											<img class="img-fluid" src="{{ asset("assets/images/em11.png") }}" alt=""></a>
+										<div class="card-body">
+											<a href="#" class="primary-link">
+
+												<p class=" text-white fs-12 mb-2 mt-4">Enterprise IT World . January 16, 2023</p>
+												<h6 class="fs-17 text-white">How to find a successful job</h6>
+											</a>
+											<p class=" text-white fs-12 mb-2 mt-1">Tech blogs are one of the best ways to stay updated with the latest technologies. But every blog offers a unique perspective
+											</p>
+											<a class="fw-bold" href="">Read post &nbsp;<i class="fa fa-external-link" aria-hidden="true"></i>
+											</a>
+										</div>
+									</div>
+								</div>
+
+								<div class="col-lg-4 mb-4">
+									<div class="blog-grid-box p-2">
+										<a href="#">
+											<img class="img-fluid" src="{{ asset("assets/images/em12.png") }}" alt=""></a>
+										<div class="card-body">
+											<a href="#" class="primary-link">
+
+												<p class=" text-white fs-12 mb-2 mt-4">Enterprise IT World . January 16, 2023</p>
+												<h6 class="fs-17 text-white">How to find a successful job</h6>
+											</a>
+											<p class=" text-white fs-12 mb-2 mt-1">Tech blogs are one of the best ways to stay updated with the latest technologies. But every blog offers a unique perspective
+											</p>
+											<a class="fw-bold" href="">Read post &nbsp;<i class="fa fa-external-link" aria-hidden="true"></i>
+											</a>
+										</div>
+									</div>
+								</div>
+
+
+								<div class="col-lg-4 mb-4">
+									<div class="blog-grid-box p-2">
+										<a href="#">
+											<img class="img-fluid" src="{{ asset("assets/images/em13.png") }}" alt=""></a>
+										<div class="card-body">
+											<a href="#" class="primary-link">
+
+												<p class=" text-white fs-12 mb-2 mt-4">Enterprise IT World . January 16, 2023</p>
+												<h6 class="fs-17 text-white">How to find a successful job</h6>
+											</a>
+											<p class=" text-white fs-12 mb-2 mt-1">Tech blogs are one of the best ways to stay updated with the latest technologies. But every blog offers a unique perspective
+											</p>
+											<a class="fw-bold" href="">Read post &nbsp;<i class="fa fa-external-link" aria-hidden="true"></i>
+											</a>
+										</div>
+									</div>
+								</div>
+
+
+							</div>
+						</div>
+					</div>
+					<div class="text-center mt-3">
+						<a href="#" class="btn btn-primary btn-hover">View All Blogs</a>
+					</div>
+
+					<!-- -------------------------- -->
+				</div>
+			</div>
+		</section>
+
+
+		<section class="ftimg mb-4">
+			<img class="img-fluid" src="{{ asset("assets/images/Vector6.png") }} " alt=" ">
+		</section>
+		{% include 'home/_footer.html.twig' %}
+	</div>
+{% endblock %}

@@ -1,0 +1,160 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Kaaba Qualifications{% endblock %}
+
+{% block body %}
+    <!-- Page Header -->
+    <div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+        <div class="card-body px-4 py-3">
+            <div class="row align-items-center">
+                <div class="col-9">
+                    <h4 class="fw-semibold mb-8">Kaaba Qualifications</h4>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a class="text-muted text-decoration-none" href="#">Admin</a>
+                            </li>
+                            <li class="breadcrumb-item" aria-current="page">Qualifications</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-3">
+                    <a href="{{ path('app_admin_kaaba_qualifications', { create: 1 }) }}" class="btn btn-primary float-end">
+                        Add New Qualification
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form for Creating/Editing -->
+    {% if showForm %}
+    <div class="card">
+        <div class="card-header text-bg-primary">
+            <h5 class="mb-0 text-white">{{ editUuid ? 'Edit Qualification' : 'Add New Qualification' }}</h5>
+        </div>
+        <div class="form-horizontal">
+            <div class="form-body">
+                <div class="card-body">
+                    <h5 class="card-title mb-0">Qualification Information</h5>
+                </div>
+                <hr class="m-0">
+                <div class="card-body">
+                    {{ form_start(form) }}
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3">{{ form_label(form.name) }}</label>
+                                <div class="col-md-9">
+                                    {{ form_widget(form.name, { 'attr': { 'class': 'form-control' } }) }}
+                                    {{ form_errors(form.name) }}
+                                    <small class="form-text text-muted">Enter the highest qualification level (e.g., Bachelor's Degree, Master's Degree, PhD, etc.)</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="m-0">
+                    <div class="form-actions border-top">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="col-md-offset-3 col-md-9">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="ti ti-edit fs-5"></i>
+                                                {{ editUuid ? 'Save Changes' : 'Create Qualification' }}
+                                            </button>
+                                            <a href="{{ path('app_admin_kaaba_qualifications') }}" class="btn bg-danger-subtle text-danger ms-6">
+                                                Cancel
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6"></div>
+                            </div>
+                        </div>
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Table of Existing Qualifications -->
+    <div class="card mt-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title mb-0">Existing Kaaba Qualifications</h5>
+                <span class="badge bg-primary">Total: {{ qualifications|length }}</span>
+            </div>
+            
+            {% if qualifications|length > 0 %}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>UUID</th>
+                            <th>Qualification Name</th>
+                            <th>Used By Applications</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for qualification in qualifications %}
+                            <tr>
+                                <td>{{ loop.index }}</td>
+                                <td>
+                                    <small class="text-muted" title="{{ qualification.uuid }}">
+                                        {{ qualification.uuid|slice(0, 8) }}...
+                                    </small>
+                                </td>
+                                <td>
+                                    <strong>{{ qualification.name }}</strong>
+                                </td>
+                                <td>
+                                    {% set applicationsCount = qualification.kaabaApplications|length %}
+                                    <span class="badge {% if applicationsCount > 0 %}bg-warning{% else %}bg-success{% endif %}">
+                                        {{ applicationsCount }} application(s)
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{{ path('app_admin_kaaba_qualifications', { edit: qualification.uuid }) }}" 
+                                           class="btn btn-sm btn-warning" 
+                                           title="Edit qualification">
+                                            <i class="ti ti-edit"></i> Edit
+                                        </a>
+                                        {% if qualification.kaabaApplications|length == 0 %}
+                                            <a href="{{ path('app_admin_kaaba_qualifications', { delete: qualification.uuid }) }}" 
+                                               class="btn btn-sm btn-danger" 
+                                               onclick="return confirm('Are you sure you want to delete \"{{ qualification.name }}\"?')"
+                                               title="Delete qualification">
+                                                <i class="ti ti-trash"></i> Delete
+                                            </a>
+                                        {% else %}
+                                            <button class="btn btn-sm btn-secondary" 
+                                                    title="Cannot delete - qualification is in use"
+                                                    disabled>
+                                                <i class="ti ti-trash-off"></i> Delete
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info text-center">
+                <i class="ti ti-info-circle me-2"></i>
+                No qualifications found. 
+                <a href="{{ path('app_admin_kaaba_qualifications', { create: 1 }) }}" class="alert-link">Create the first qualification</a>.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

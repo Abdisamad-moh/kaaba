@@ -1,0 +1,600 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Application Review - {{ application.full_name }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .badgia {
+            white-space: normal;
+            display: inline-block;
+            word-break: break-word;
+            text-align: left;
+        }
+        .document-link {
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .document-link:hover {
+            transform: translateY(-2px);
+        }
+        .status-badge {
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+        <div class="card-body px-4 py-3">
+            <div class="row align-items-center">
+                <div class="col-9">
+                    <h4 class="fw-semibold mb-8">Application Review</h4>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a class="text-muted text-decoration-none" href="{{ path('app_admin_kaaba_applications') }}">Applications</a>
+                            </li>
+                            <li class="breadcrumb-item" aria-current="page">Application Review</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-3">
+                    <div class="text-center mb-n5">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header text-bg-primary d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 text-white">Application Details</h5>
+            <span class="status-badge badge 
+                {% if application.status.name == 'Approved' %}bg-success
+                {% elseif application.status.name == 'Rejected' %}bg-danger
+                {% elseif application.status.name == 'Pending' %}bg-warning text-dark
+                {% elseif application.status.name == 'Shortlisted' %}bg-info
+                {% elseif application.status.name == 'Under Review' %}bg-primary
+                {% else %}bg-secondary{% endif %}">
+                {{ application.status.name ?? 'Pending' }}
+            </span>
+        </div>
+        
+        <form class="form-horizontal">
+            <div class="form-body">
+                <!-- Personal Information Section -->
+                <div class="card-body">
+                    <h5 class="card-title mb-0">Personal Information</h5>
+                </div>
+                <hr class="m-0"/>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3">Full Name:</label>
+                                <div class="col-md-9">
+                                    <p class="fw-semibold">{{ application.fullname }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3">Gender:</label>
+                                <div class="col-md-9">
+                                    <p>{{ application.gender.name ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3">Date of Birth:</label>
+                                <div class="col-md-9">
+                                    <p>{{ application.dateofbirth ? application.dateofbirth|date('d-m-Y') : 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3">Phone:</label>
+                                <div class="col-md-9">
+                                    <p>{{ application.phone }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3">Email:</label>
+                                <div class="col-md-9">
+                                    <p>{{ application.email ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3">Nationality:</label>
+                                <div class="col-md-9">
+                                    <p>{{ application.nationality.name ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3">Disability:</label>
+                                <div class="col-md-9">
+                                    <p>{{ application.disability ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3">Application Date:</label>
+                                <div class="col-md-9">
+                                    <p>{{ application.applicationdate|date('d-m-Y') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Address Information Section -->
+                <div class="card-body">
+                    <h5 class="card-title mb-0">Address Information</h5>
+                </div>
+                <hr class="m-0"/>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3">Region:</label>
+                                <div class="col-md-9">
+                                    <p>{{ application.region.name ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3">District:</label>
+                                <div class="col-md-9">
+                                    <p>{{ application.district.name ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3">Town:</label>
+                                <div class="col-md-9">
+                                    <p>{{ application.town ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3">Village:</label>
+                                <div class="col-md-9">
+                                    <p>{{ application.village ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Scholarship Information Section -->
+                <div class="card-body">
+                    <h5 class="card-title mb-0">Scholarship Information</h5>
+                </div>
+                <hr class="m-0"/>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3">Scholarship:</label>
+                                <div class="col-md-9">
+                                    <p class="fw-semibold">{{ application.scholarship.title ?? 'N/A' }}</p>
+                                    {% if application.scholarship %}
+                                        <small class="text-muted">Closing Date: {{ application.scholarship.closingDate|date('d-m-Y') }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3">Institute:</label>
+                                <div class="col-md-9">
+                                    <p>{{ application.institute.name ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3">Course:</label>
+                                <div class="col-md-9">
+                                    <p>{{ application.course.name ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3">Highest Qualification:</label>
+                                <div class="col-md-9">
+                                    <p>{{ application.highestqualification.name ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Educational Background Section -->
+                <div class="card-body">
+                    <h5 class="card-title mb-0">Educational Background</h5>
+                </div>
+                <hr class="m-0"/>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3">Secondary School:</label>
+                                <div class="col-md-9">
+                                    <p>{{ application.secondaryschool ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3">Secondary Region:</label>
+                                <div class="col-md-9">
+                                    <p>{{ application.secondaryregion.name ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3">Graduation Year:</label>
+                                <div class="col-md-9">
+                                    <p>{{ application.secondarygraduationyear ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3">Secondary Grade:</label>
+                                <div class="col-md-9">
+                                    <p>{{ application.secondarygrade ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3">Qualification Details:</label>
+                                <div class="col-md-9">
+                                    <p>{{ application.highestqualificationdetail ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Higher Education Section -->
+                <div class="card-body">
+                    <h5 class="card-title mb-0">Higher Education</h5>
+                </div>
+                <hr class="m-0"/>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3">Institution Name:</label>
+                                <div class="col-md-9">
+                                    <p>{{ application.institutionname ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3">Location:</label>
+                                <div class="col-md-9">
+                                    <p>{{ application.location ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3">Start Year:</label>
+                                <div class="col-md-9">
+                                    <p>{{ application.startyear ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3">End Year:</label>
+                                <div class="col-md-9">
+                                    <p>{{ application.endyear ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3">Qualification:</label>
+                                <div class="col-md-9">
+                                    <p>{{ application.qualification ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3">Minimum Grade:</label>
+                                <div class="col-md-9">
+                                    <p>{{ application.minimumrade ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Documents Section -->
+                <div class="card-body">
+                    <h5 class="card-title mb-0">Supporting Documents</h5>
+                </div>
+                <hr class="m-0"/>
+                <div class="card-body">
+                    <div class="row">
+                       <div class="col-md-6">
+        <div class="form-group row">
+            <label class="form-label text-end col-md-3">Identity Type:</label>
+            <div class="col-md-9">
+                <p>{{ application.identitytype.name ?? 'N/A' }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group row">
+            <label class="form-label text-end col-md-3">Identity Attachment:</label>
+            <div class="col-md-9">
+                {% if application.identityattachment %}
+                    <a href="{{ path('app_application_attachments', {'filename': application.identityattachment}) }}" 
+                       target="_blank" 
+                       class="btn btn-primary btn-sm document-link">
+                        <i class="ti ti-file-text me-1"></i>
+                        View Identity Document
+                    </a>
+                {% else %}
+                    <p class="text-muted">No identity attachment</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+                    </div>
+                    
+                   <div class="row">
+    <div class="col-md-6">
+        <div class="form-group row">
+            <label class="form-label text-end col-md-3">Certificate Attachment:</label>
+            <div class="col-md-9">
+                {% if application.certificateattachment %}
+                    <a href="{{ path('app_application_attachments', {'filename': application.certificateattachment}) }}" 
+                       target="_blank" 
+                       class="btn btn-info btn-sm document-link">
+                        <i class="ti ti-certificate me-1"></i>
+                        View Certificate
+                    </a>
+                {% else %}
+                    <p class="text-muted">No certificate attachment</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group row">
+            <label class="form-label text-end col-md-3">Willingness Declaration:</label>
+            <div class="col-md-9">
+                {% if application.willingnessdeclarationattachment %}
+                    <a href="{{ path('app_application_attachments', {'filename': application.willingnessdeclarationattachment}) }}" 
+                       target="_blank" 
+                       class="btn btn-warning btn-sm document-link">
+                        <i class="ti ti-file-description me-1"></i>
+                        View Declaration
+                    </a>
+                {% else %}
+                    <p class="text-muted">No willingness declaration</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group row">
+            <label class="form-label text-end col-md-3">Needs Statement:</label>
+            <div class="col-md-9">
+                {% if application.needsstatementattachment %}
+                    <a href="{{ path('app_application_attachments', {'filename': application.needsstatementattachment}) }}" 
+                       target="_blank" 
+                       class="btn btn-success btn-sm document-link">
+                        <i class="ti ti-notes me-1"></i>
+                        View Needs Statement
+                    </a>
+                {% else %}
+                    <p class="text-muted">No needs statement</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group row">
+            <label class="form-label text-end col-md-3">Other Documents:</label>
+            <div class="col-md-9">
+                {% if application.otherdocumentsattachment %}
+                    <a href="{{ path('app_application_attachments', {'filename': application.otherdocumentsattachment}) }}" 
+                       target="_blank" 
+                       class="btn btn-secondary btn-sm document-link">
+                        <i class="ti ti-files me-1"></i>
+                        View Other Documents
+                    </a>
+                {% else %}
+                    <p class="text-muted">No other documents</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+                </div>
+
+              <!-- Action Buttons -->
+<hr class="m-0" />
+<div class="card-body">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+            <a href="{{ path('app_admin_kaaba_applications') }}" class="btn btn-outline-secondary">
+                <i class="ti ti-arrow-left me-1 fs-5"></i>
+                Back to Applications
+            </a>
+        </div>
+        <div class="d-flex gap-2">
+            <button type="button"
+                    class="btn btn-success update-status-btn"
+                    data-status-action="shortlisted"
+                    data-application-id="{{ application.id }}"
+                    data-applicant-name="{{ application.fullname }}">
+                <i class="ti ti-check me-1 fs-5"></i>
+                Shortlist
+            </button>
+
+            <button type="button"
+                    class="btn btn-danger update-status-btn"
+                    data-status-action="rejected"
+                    data-application-id="{{ application.id }}"
+                    data-applicant-name="{{ application.fullname }}">
+                <i class="ti ti-x me-1 fs-5"></i>
+                Reject
+            </button>
+        </div>
+    </div>
+</div>
+
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.update-status-btn').forEach(button => {
+        button.addEventListener('click', function (e) {
+            e.preventDefault();
+
+            const applicationId = this.getAttribute('data-application-id');
+            const statusAction = this.getAttribute('data-status-action');
+            const applicantName = this.getAttribute('data-applicant-name');
+
+            // Define dynamic SweetAlert titles and colors
+            let actionText = '';
+            let title = '';
+            let icon = 'question';
+            let confirmColor = '#3085d6';
+
+            switch(statusAction) {
+                case 'shortlisted':
+                    actionText = 'shortlist';
+                    title = 'Shortlist Application';
+                    icon = 'info';
+                    confirmColor = '#198754'; // green
+                    break;
+                case 'rejected':
+                    actionText = 'reject';
+                    title = 'Reject Application';
+                    icon = 'warning';
+                    confirmColor = '#d33'; // red
+                    break;
+            }
+
+            Swal.fire({
+                title: title,
+                html: `Are you sure you want to <strong>${actionText}</strong> the application for <strong>${applicantName}</strong>?`,
+                icon: icon,
+                showCancelButton: true,
+                confirmButtonColor: confirmColor,
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, update it!',
+                cancelButtonText: 'Cancel',
+                showLoaderOnConfirm: true,
+                preConfirm: () => {
+                    return fetch('{{ path("app_admin_kaaba_application_update_status") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({
+                            applicationId: applicationId,
+                            statusAction: statusAction,
+                            _token: '{{ csrf_token("update_application_status") }}'
+                        })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                title: 'Success!',
+                                text: data.message,
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                // Reload the page to show updated badge or status
+                                window.location.reload();
+                            });
+                        } else {
+                            throw new Error(data.message || 'Failed to update status');
+                        }
+                    })
+                    .catch(error => {
+                        Swal.showValidationMessage(`Request failed: ${error.message}`);
+                    });
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

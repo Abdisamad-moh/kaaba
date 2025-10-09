@@ -1,0 +1,10 @@
+controllers:
+    resource:
+        path: ../src/Controller/
+        namespace: App\Controller
+    type: attribute
+access_denied_route:
+    path: /access_denied
+    controller: App\Controller\HomeController::app_home_access_denied
+
+    

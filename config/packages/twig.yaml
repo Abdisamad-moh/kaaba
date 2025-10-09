@@ -1,0 +1,16 @@
+twig:
+    file_name_pattern: '*.twig'
+    globals:
+        joboffer_directory: '%joboffer_directory%'
+        logo_directory: '%logo_directory%'
+        blogs_directory: '%blogs_directory%'
+        user_profile_directory: '%user_profile_directory%'
+        employer_profile_images_directory: '%employer_profile_images_directory%'
+        product_images_directory: '%product_images_directory%'
+        ps_report_directory: '%ps_report_directory%'
+        tender_application_attachments: '%tender_application_attachments%'
+   
+
+when@test:
+    twig:
+        strict_variables: true

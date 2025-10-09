@@ -1,0 +1,367 @@
+{
+    "base_url": "",
+    "routes": {
+        "app_employer_shortlist_application": {
+            "tokens": [
+                [
+                    "variable",
+                    "\/",
+                    "[^\/]++",
+                    "candidate",
+                    true
+                ],
+                [
+                    "text",
+                    "\/employer\/shortlistCandidate"
+                ]
+            ],
+            "defaults": {
+            },
+            "requirements": [],
+            "hosttokens": [],
+            "methods": [],
+            "schemes": []
+        },
+        "app_employer_message_candidate": {
+            "tokens": [
+                [
+                    "variable",
+                    "\/",
+                    "[^\/]++",
+                    "candidate",
+                    true
+                ],
+                [
+                    "text",
+                    "\/employer\/messageCandidate"
+                ]
+            ],
+            "defaults": {
+            },
+            "requirements": [],
+            "hosttokens": [],
+            "methods": [],
+            "schemes": []
+        },
+        "app_employer_reject_candidate": {
+            "tokens": [
+                [
+                    "variable",
+                    "\/",
+                    "[^\/]++",
+                    "candidate",
+                    true
+                ],
+                [
+                    "text",
+                    "\/employer\/rejectCandidate"
+                ]
+            ],
+            "defaults": {
+            },
+            "requirements": [],
+            "hosttokens": [],
+            "methods": [],
+            "schemes": []
+        },
+        "app_employer_shortlist_manual_candidate": {
+            "tokens": [
+                [
+                    "variable",
+                    "\/",
+                    "[^\/]++",
+                    "candidate",
+                    true
+                ],
+                [
+                    "text",
+                    "\/employer\/manualShortListCandidate"
+                ]
+            ],
+            "defaults": {
+            },
+            "requirements": [],
+            "hosttokens": [],
+            "methods": [],
+            "schemes": []
+        },
+        "app_employer_schedule_interview": {
+            "tokens": [
+                [
+                    "variable",
+                    "\/",
+                    "[^\/]++",
+                    "candidate",
+                    true
+                ],
+                [
+                    "text",
+                    "\/employer\/scheduleInterview"
+                ]
+            ],
+            "defaults": {
+            },
+            "requirements": [],
+            "hosttokens": [],
+            "methods": [],
+            "schemes": []
+        },
+        "app_employer_zaad_purchase": {
+            "tokens": [
+                [
+                    "variable",
+                    "\/",
+                    "[^\/]++",
+                    "package",
+                    true
+                ],
+                [
+                    "text",
+                    "\/employer\/zaadPurchase"
+                ]
+            ],
+            "defaults": {
+            },
+            "requirements": [],
+            "hosttokens": [],
+            "methods": [],
+            "schemes": []
+        },
+        "app_jobseeker_zaad_purchase": {
+            "tokens": [
+                [
+                    "variable",
+                    "\/",
+                    "[^\/]++",
+                    "package",
+                    true
+                ],
+                [
+                    "text",
+                    "\/jobseeker\/zaadPurchase"
+                ]
+            ],
+            "defaults": {
+            },
+            "requirements": [],
+            "hosttokens": [],
+            "methods": [],
+            "schemes": []
+        },
+        "app_jobseeker_edahab_purchase": {
+            "tokens": [
+                [
+                    "variable",
+                    "\/",
+                    "[^\/]++",
+                    "package",
+                    true
+                ],
+                [
+                    "text",
+                    "\/jobseeker\/edahabPurchase"
+                ]
+            ],
+            "defaults": {
+            },
+            "requirements": [],
+            "hosttokens": [],
+            "methods": [],
+            "schemes": []
+        },
+        "app_employer_edahab_purchase": {
+            "tokens": [
+                [
+                    "variable",
+                    "\/",
+                    "[^\/]++",
+                    "package",
+                    true
+                ],
+                [
+                    "text",
+                    "\/employer\/edahabPurchase"
+                ]
+            ],
+            "defaults": {
+            },
+            "requirements": [],
+            "hosttokens": [],
+            "methods": [],
+            "schemes": []
+        },
+        "app_admin_change_user_status": {
+            "tokens": [
+                [
+                    "variable",
+                    "\/",
+                    "[^\/]++",
+                    "email",
+                    true
+                ],
+                [
+                    "text",
+                    "\/admin\/changeUser"
+                ]
+            ],
+            "defaults": {
+            },
+            "requirements": [],
+            "hosttokens": [],
+            "methods": [],
+            "schemes": []
+        },
+        "app_admin_verify_user": {
+            "tokens": [
+                [
+                    "variable",
+                    "\/",
+                    "[^\/]++",
+                    "email",
+                    true
+                ],
+                [
+                    "text",
+                    "\/admin\/verifyUser"
+                ]
+            ],
+            "defaults": {
+            },
+            "requirements": [],
+            "hosttokens": [],
+            "methods": [],
+            "schemes": []
+        },
+        "app_employer_resume": {
+            "tokens": [
+                [
+                    "variable",
+                    "\/",
+                    "[^\/]++",
+                    "candidate",
+                    true
+                ],
+                [
+                    "text",
+                    "\/employer\/resume"
+                ]
+            ],
+            "defaults": {
+            },
+            "requirements": [],
+            "hosttokens": [],
+            "methods": [],
+            "schemes": []
+        },
+        "app_employer_add_tender": {
+            "tokens": [
+                [
+                    "variable",
+                    "\/",
+                    "[^\/]++",
+                    "tender",
+                    true
+                ],
+                [
+                    "text",
+                    "\/employer\/addTender"
+                ]
+            ],
+            "defaults": {
+            },
+            "requirements": [],
+            "hosttokens": [],
+            "methods": [],
+            "schemes": []
+        },
+        "app_employer_view_tender": {
+            "tokens": [
+                [
+                    "variable",
+                    "\/",
+                    "[^\/]++",
+                    "tender",
+                    false
+                ],
+                [
+                    "text",
+                    "\/employer\/view_tender"
+                ]
+            ],
+            "defaults": {
+            },
+            "requirements": [],
+            "hosttokens": [],
+            "methods": [],
+            "schemes": []
+        },
+        "app_employer_add_course": {
+            "tokens": [
+                [
+                    "variable",
+                    "\/",
+                    "[^\/]++",
+                    "course",
+                    true
+                ],
+                [
+                    "text",
+                    "\/employer\/addCourse"
+                ]
+            ],
+            "defaults": {
+            },
+            "requirements": [],
+            "hosttokens": [],
+            "methods": [],
+            "schemes": []
+        },
+        "app_employer_interview_result": {
+            "tokens": [
+                [
+                    "variable",
+                    "\/",
+                    "[^\/]++",
+                    "candidate",
+                    true
+                ],
+                [
+                    "text",
+                    "\/employer\/interviewResult"
+                ]
+            ],
+            "defaults": {
+            },
+            "requirements": [],
+            "hosttokens": [],
+            "methods": [],
+            "schemes": []
+        },
+        "app_employer_send_offer": {
+            "tokens": [
+                [
+                    "variable",
+                    "\/",
+                    "[^\/]++",
+                    "candidate",
+                    true
+                ],
+                [
+                    "text",
+                    "\/employer\/hireOffer"
+                ]
+            ],
+            "defaults": {
+            },
+            "requirements": [],
+            "hosttokens": [],
+            "methods": [],
+            "schemes": []
+        }
+    },
+    "prefix": "",
+    "host": "localhost",
+    "port": "",
+    "scheme": "http",
+    "locale": ""
+}

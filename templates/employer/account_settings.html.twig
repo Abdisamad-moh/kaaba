@@ -1,0 +1,238 @@
+{% extends 'admin_base2.html.twig' %}
+{% block title %}Account Settings
+{% endblock %}
+{% block body %}
+	<style>
+		th,
+		td {
+			font-family: inherit;
+			font-size: 0.875em;
+			line-height: 1.45;
+			color: #444;
+			vertical-align: middle;
+			padding: 1em;
+		}
+		th {
+			font-weight: 600;
+		}
+		colgroup:nth-child(1) {
+			width: 31%;
+			border: 0 none;
+		}
+		colgroup:nth-child(2) {
+			width: 22%;
+			border: 1px solid #ccc;
+		}
+		colgroup:nth-child(3) {
+			width: 25%;
+			border: 10px solid #59c7fb;
+		}
+		colgroup:nth-child(4) {
+			width: 22%;
+			border: 1px solid #ccc;
+		}
+		/* Tablehead */
+		.packages thead th {
+			background: #def4fe;
+			background: -moz-linear-gradient(top, #ffffff 0%, #f5f5f5 100%);
+			background: -webkit-linear-gradient(top, #ffffff 0%, #f5f5f5 100%);
+			background: -o-linear-gradient(top, #ffffff 0%, #f5f5f5 100%);
+			background: -ms-linear-gradient(top, #ffffff 0%, #f5f5f5 100%);
+			background: linear-gradient(to bottom, #ffffff 0%, #f5f5f5 100%);
+			text-align: center;
+			position: relative;
+			border-bottom: 1px solid #ccc;
+			padding: 3em 0 2em;
+			font-weight: 400;
+			color: #999;
+		}
+		.packages thead th:nth-child(1) {
+			background: transparent;
+		}
+		.packages thead th:nth-child(3) {
+			padding: 2em 0 5em;
+		}
+		.packages thead th h2 {
+			font-weight: 300;
+			font-size: 2.4em;
+			line-height: 1.2;
+			color: #59c7fb;
+		}
+		.packages thead th h2 + p {
+			font-size: 1.25em;
+			line-height: 1.4;
+		}
+		.packages thead th:nth-child(3) h2 {
+			font-size: 3.6em;
+		}
+		.packages thead th:nth-child(3) h2 + p {
+			font-size: 1.5em;
+		}
+		.packages thead th p.promo {
+			font-size: 1em;
+			color: #fff;
+			position: absolute;
+			top: 9em;
+			left: -17px;
+			z-index: 1000;
+			width: 100%;
+			margin: 0;
+			padding: 0.625em 17px 0.75em;
+			background: #c00;
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+			border-bottom: 1px solid #900;
+		}
+		.packages thead th p.promo:before {
+			content: "";
+			position: absolute;
+			display: block;
+			width: 0;
+			height: 0;
+			border-style: solid;
+			border-width: 0 7px 7px 0;
+			border-color: transparent #900 transparent transparent;
+			bottom: -7px;
+			left: 0;
+		}
+		.packages thead th p.promo:after {
+			content: "";
+			position: absolute;
+			display: block;
+			width: 0;
+			height: 0;
+			border-style: solid;
+			border-width: 7px 7px 0 0;
+			border-color: #900 transparent transparent transparent;
+			bottom: -7px;
+			right: 0;
+		}
+		/* Tablebody */
+		.packages tbody th {
+			background: #fff;
+			border-left: 1px solid #ccc;
+		}
+		.packages tbody th span {
+			font-weight: normal;
+			font-size: 87.5%;
+			color: #999;
+			display: block;
+		}
+		.packages tbody td {
+			background: #fff;
+			text-align: center;
+		}
+		.packages tbody tr:nth-child(even) th,
+		.packages tbody tr:nth-child(even) td {
+			background: #f5f5f5;
+			border: 1px solid #ccc;
+			border-width: 1px 0 1px 1px;
+		}
+		.packages tbody tr:last-child td {
+			border-bottom: 0 none;
+		}
+		/* Tablefooter */
+		.packages tfoot th {
+			padding: 2em 1em;
+			border-top: 1px solid #ccc;
+		}
+		.packages tfoot td {
+			text-align: center;
+			padding: 2em 1em;
+			border-top: 1px solid #ccc;
+		}
+		.packages tfoot a {
+			font-weight: bold;
+			color: #fff;
+			text-decoration: none;
+			text-transform: uppercase;
+			display: block;
+			padding: 1.125em 2em;
+			background: #59c7fb;
+			border-radius: 0.5em;
+		}
+	</style>
+	<div class="container-fluid">
+		<div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+			<div class="card-body px-4 py-3">
+				<div class="row align-items-center">
+					<div class="col-9">
+						<h4 class="fw-semibold mb-8">
+							<i class="ti ti-settings fs-8 "></i>
+							Account Settings
+						</h4>
+						<nav aria-label="breadcrumb">
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item">
+									<a class="text-muted text-decoration-none" href="#">Settings</a>
+								</li>
+							</ol>
+						</nav>
+					</div>
+					<div class="col-3">
+						
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="row justify-content-center">
+					<div class="row">
+						
+						<div class="col-lg-6 d-flex align-items-stretch">
+							<div class="card w-100 border position-relative overflow-hidden">
+								<div class="card-body p-4">
+									<h4 class="card-title">Change Password</h4>
+									<p class="card-subtitle mb-4">To change your password please confirm here</p>
+									{{ form_start(form) }}
+									<div class="mb-3">
+										<label for="exampleInputPassword2" class="form-label">New Password</label>
+										{{ form_widget(form.oldPassword, {'attr': {'class': 'form-control', 'placeholder': 'old Password'}}) }}
+										{{ form_errors(form.oldPassword) }}
+									</div>
+									<div class="mb-3">
+										<label for="exampleInputPassword1" class="form-label">Current Password</label>
+										{{ form_widget(form.newPassword.first, {'attr': {'class': 'form-control', 'placeholder': 'New Password'}}) }}
+										{{ form_errors(form.newPassword.first) }}
+									</div>
+									<div>
+										<label for="exampleInputPassword3" class="form-label">Confirm Password</label>
+										{{ form_row(form.newPassword.second, {'attr': {'class': 'form-control', 'placeholder': 'Confirm Password'}}) }}
+										{{ form_errors(form.newPassword.second) }}
+									</div>
+									<div>
+										<div class="d-flex align-items-center justify-content-end mt-4 gap-6">
+											<button type="submit" class="btn btn-primary">Update</button>
+											<button class="btn bg-danger-subtle text-danger">Cancel</button>
+										</div>
+									</div>
+									{{ form_end(form) }}
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-6 d-flex align-items-stretch">
+							<div class="card w-100 border position-relative overflow-hidden">
+								<div class="card-body p-4">
+									<h4 class="card-title">Deactivate/Activate Account</h4>
+									<p class="card-subtitle mb-4">To change your password please confirm here</p>
+									{{ form_start(statusForm) }}
+									<div class="mb-3">
+										<label for="exampleInputPassword2" class="form-label">Deactivate/Activate Account</label>
+										{{ form_widget(statusForm.status, {'attr': {'class': 'form-select', 'placeholder': 'status'}}) }}
+										{{ form_errors(statusForm.status) }}
+									</div>
+									<div>
+										<div class="d-flex align-items-center justify-content-end mt-4 gap-6">
+											<button type="submit" class="btn btn-primary">Save</button>
+											<button class="btn bg-danger-subtle text-danger">Cancel</button>
+										</div>
+									</div>
+									{{ form_end(statusForm) }}
+								</div>
+							</div>
+						</div>
+						
+					</div>
+				</div>
+	</div>
+
+	<!-- end File export -->
+{% endblock %}

@@ -1,0 +1,258 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Search Jobs!
+{% endblock %}
+{% block stylesheets %}
+	<style>
+		.no-border {
+			border: none !important; /* Removes the border */
+			outline: none !important; /* Removes the focus outline */
+		}
+		.no-border:focus {
+			box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Bootstrap-like focus shadow */
+		}
+		.logo-size {
+			width: 58px;
+			height: 58px;
+		}
+	</style>
+{% endblock %}
+{% block body %}
+	<div data-controller="jobs" data-jobs-url-value="{{ path('app_home_jobs') }}" data-jobs-cities-url-value="{{ path('app_home_fetch_cities') }}">
+		<section class="bg-home2" id="home">
+			<div class="container">
+				<div class="row align-items-center">
+					<div class="col-lg-12 mt-5 ">
+						<form>
+							<div class="registration-form">
+								<div class="row g-0">
+									<div class="col-md-3">
+										<div class="filter-search-form filter-border mt-3 mt-md-0">
+											<i class="fa fa-briefcase icopa" aria-hidden="true"></i>
+											<input type="search" value="" data-jobs-target="title" name="job_title" id="job-title" class="form-control filter-input-box" placeholder="Search Job Title">
+										</div>
+									</div>
+									<!--end col-->
+									<div class="col-md-2 bg-white d-flex align-items-center">
+										<div class="filter-border w-100 d-flex justify-content-center align-items-center">
+											<i class="fa fa-globe icopa" aria-hidden="true"></i>
+											<select data-jobs-target="country" class="form-select no-border" data-trigger name="country" id="" aria-label="Default select example" style="color: #999b9d !important;">
+												<option value="">Country</option>
+												{% for country in countries %}
+													<option value="{{ country.id }}">{{ country.name }}</option>
+												{% endfor %}
+											</select>
+										</div>
+									</div>
+									<div class="col-md-2 bg-white d-flex align-items-center">
+										<div class="filter-border d-flex align-items-center justify-content-center w-100">
+											<i class="fa fa-map-marker icopa" aria-hidden="true"></i>
+											<select data-jobs-target="city" class="form-select no-border" data-trigger name="country" id="" aria-label="Default select example" style="color: #999b9d !important;">
+												<option value="">City</option>
+											</select>
+										</div>
+									</div>
+
+									<div class="col-md-2 bg-white d-flex align-items-center">
+										<div class="d-flex align-items-center justify-content-center w-100">
+											<i class="fa fa-sticky-note" aria-hidden="true"></i>
+											<select class="form-select no-border" data-jobs-target="jobType" data-trigger name="job_category" id="" aria-label="Default select example">
+												<option value="">Job Type</option>
+												{% for type in job_types %}
+													<option value="{{ type.id }}">{{ type.name }}</option>
+												{% endfor %}
+											</select>
+										</div>
+									</div>
+
+									<!--end col-->
+									<div class="col-md-1 ">
+										<div class="mt-2 mt-md-0 h-100">
+											<button class="btn btn-primary submit-btn w-100 h-100" type="button" data-action="click->jobs#applyFilter">
+												<i class="fa fa-search" aria-hidden="true"></i>
+											</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</section>
+		<section class="section-re">
+			<div class="container">
+				<div class="row justify-content-center">
+					<div class="col-lg-12">
+						<div class="section-title text-center">
+							<h3 class="title mb-2">All Filters<span class="text-muted">
+									&nbsp;
+									<a href="" onclick="event.preventDefault();location.reload();">(Clear filter)</a>
+								</span>
+							</h3>
+						</div>
+
+					</div>
+					<div class="col-lg-12">
+						<div class="col-lg-12">
+							<div class="candidate-list-widgets mb-2">
+								<form action="#">
+									<div class="row g-2">
+										<div class="col-lg-2">
+											<div class="filler-job-form">
+												<select data-action="change->jobs#applyFilter" data-jobs-target="experience" class="form-select" name="experience" id="experience" aria-label="Default select example">
+													<option value="">Experience</option>
+													{% for experience, value in experience_list %}
+														<option value="{{ value }}">{{ experience }}</option>
+													{% endfor %}
+												</select>
+											</div>
+										</div>
+										<!--end col-->
+										<div class="col-lg-2">
+											<div class="filler-job-form">
+												<select data-action="change->jobs#applyFilter" data-jobs-target="salary" class="form-select" name="salary" id="salary" aria-label="Default select example">
+													<option value="">Salary</option>
+													{% for range in salary_ranges %}
+														{% if range[0] == 'Over' %}
+															<option value="{{ range[1] }}-">{{ range[0] ~ ' ' }}
+																{{ range[1] }}</option>
+														{% else %}
+															<option value="{{ range|join('-')}}">{{ range|join(' - ') }}</option>
+														{% endif %}
+													{% endfor %}
+												</select>
+											</div>
+										</div>
+										<!--end col-->
+										<div class="col-lg-2">
+											<div class="filler-job-form">
+												<select data-action="change->jobs#applyFilter" data-jobs-target="jobCategory" data-jobs-target="department" class="form-select" data-trigger name="department" id="department" aria-label="Default select example">
+													<option value="">Job Category</option>
+													{% for category in job_categories %}
+														<option value="{{ category.id }}">{{ category.name }}</option>
+													{% endfor %}
+												</select>
+											</div>
+										</div>
+										<!--end col-->
+										<div class="col-lg-2">
+											<div class="filler-job-form">
+												<select data-action="change->jobs#applyFilter" data-jobs-target="education" class="form-select " data-trigger name="education" id="education" aria-label="Default select example">
+													<option value="">Education</option>
+													{% for education, value in education_list %}
+														<option value="{{ value }}">{{ education }}</option>
+													{% endfor %}
+												</select>
+											</div>
+										</div>
+										<div class="col-lg-2">
+											<div class="filler-job-form">
+												<select data-action="change->jobs#applyFilter" data-jobs-target="postedDate" class="form-select " data-trigger name="postedDate" id="postedDate" aria-label="Default select example">
+													<option value="">Date Posted</option>
+													<option value="">Anytime</option>
+													<option value="-30 days">Last 30 days</option>
+													<option value="-10 days">Last 10 days</option>
+													<option value="-5 days">Last 5 days</option>
+													<option value="-24 hours">Last 24 hours</option>
+												</select>
+											</div>
+										</div>
+										<!--end col-->
+										<div class="col-lg-2">
+											<div class="filler-job-form">
+												<div data-action="change->jobs#applyFilter" class="filler-job-form">
+													<label for="immediateHiring">Immediate Hiring</label>
+													<br/>
+													<input data-jobs-target="immediateHiring" type="checkbox" name="immediate_hiring" id="immediateHiring" class="form-check-input">
+												</div>
+											</div>
+										</div>
+									</div>
+									<!--end col-->
+								</form>
+							</div>
+							<!--end row-->
+							<!--end form-->
+						</div>
+						<hr/>
+					</div>
+					<!--end col-->
+				</div>
+				<!--end row-->
+
+				<!--end-->
+			</div>
+			<!--end container-->
+		</section>
+		<section class="pa-les">
+		<div class="container">
+
+			<div class="row" data-jobs-target="jobs">
+				{% if jobs|length < 1 %}
+					<p class="text-center">No jobs found</p>
+				{% endif %}
+				{% include 'home/job-cards.html.twig' with {jobs: jobs, saved_jobs: saved_jobs} %}
+
+			</div>
+			<div class="col-lg-12">
+				<div class="section-title text-center">
+					<p class="text-muted mb-5 mt-5 fs-14">Did not find what you’re looking for? &nbsp;
+						<a data-loading="hide" href="#" data-action="click->jobs#loadMore" data-jobs-target="loadMore">
+							<span>View More
+								{{ remaining > 0 ? ' (' ~ remaining ~ ')' : '' }}</span>
+							<span>
+								<i class="fa fa-arrow-right" aria-hidden="true"></i>
+							</a>
+						</p>
+					</p>
+				</div>
+			</div>
+
+			<!-- end placeholder card -->
+		<!--end col-->
+			<!--end col-->
+
+			<!--end row-->
+
+
+			<!-- end row -->
+		</div><!--end container--></section>
+	<section class="section mt-5">
+		<div class="container">
+			<div class="row justify-content-center">
+				<div
+					class="text-lg-start">
+					<!-- ---------------------------- -->
+
+					<div class="alert  bg-primary-subtle text-primary" role="alert">
+						<div class="row">
+							<div class="col-lg-2">
+								<img class="img-fluid teimg" src="assets/images/hired.png" alt="">
+							</div>
+							<div class="col-lg-7">
+								<h5 class="fs-18 mb-3 mt-4 ptla">Accelerate your job offers with our resume template</h5>
+								<p class="lead text-muted mb-0 pc-da">Our Resume-Library is a true performance-based job board.
+																																																																																																																																																																	                      Enjoy custom hiring products and access thousands of new resume registrations.</p>
+								<h5 class="fs-14 mb-3 mt-2"><img class="img-fluid teimg" src="assets/images/rating.png" alt="">
+									&nbsp;500+ Purchases</h5>
+							</div>
+							<div class="col-lg-3 mt-5 text-center" style="margin-top: 5% !important;">
+								<a href="{{ path("app_resumes") }}" class="btn btn-primary btn-hover">LEARN MORE
+									<i class="fa fa-arrow-right" aria-hidden="true"></i>
+								</a>
+							</div>
+						</div>
+					</div>
+
+					<!-- ---------------------------- -->
+
+				</div>
+			</div>
+		</div>
+	</section>
+	</div>
+	
+	<section class="ftimg"> </section>
+{# </div> #}
+{% include 'home/_footer.html.twig' %}{% endblock %}

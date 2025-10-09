@@ -1,0 +1,120 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Psychometric
+{% endblock %}
+
+{% block body %}
+	<!--starrt-->
+	<section class="bg-home4" id="home">
+		<div class="container">
+			<div class="row align-items-center">
+				<div class="col-lg-12">
+					<div class=" pb-2 me-lg-6 text-center mt-4">
+						<h1 class="display-5 fw-semibold mb-3 mt-3 fs-22">Complete the questionnaire in your 
+							<span class="text-primary fw-bold">preferred language.
+							</span>
+						</h1>
+						<p class="lead text-muted fs-20 mb-0 pc-da">Please do not rush. Take your time and consider each question carefully, especially those that you feel <b>most or least</b> connected to. Ensure that you register using the email associated with your Métier Quest account. Remember, the report will be provided in English 
+							<br>
+							and sent to you within 24 to 72 hours, or at most within a week.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<section class="section bg-purple">
+		<div class="container">
+			<div class="row justify-content-center">
+				<div class="text-center text-white">
+					<h3 class="mb-0 mt-4">Once you complete the  questionnaire here,<br>
+						 you don't need to use the link in your email again.</h3>
+					<div class="text-center mb-2"><img class="img-fluid" src="{{ asset("assets/images/line.png") }}" width="150" height="7"></div>
+
+					<!-- ---------------------------- -->
+					<div class="row">
+                    <div class="col-lg-4 mt-4">
+							<h3 class="mb-4 mt-4 fs-20">ARABIC</h3>
+							<div class="text-center">
+								<script type="text/javascript" src="https://www.peoplemaps.com/widgets/power-widget.php?aid=20053&sid=1259"></script>
+							</div>
+						</div>
+                        <div class="col-lg-4 mt-4">
+							<h3 class="mb-4 mt-4 fs-20">ENGLISH</h3>
+							<div class="text-center">
+								<script type="text/javascript" src="https://www.peoplemaps.com/widgets/power-widget.php?aid=20053&sid=1256"></script>
+							</div>
+						</div>
+                        <div class="col-lg-4 mt-4">
+							<h3 class="mb-4 mt-4 fs-20">FRENCH</h3>
+							<div class="text-center">
+								<script type="text/javascript" src="https://www.peoplemaps.com/widgets/power-widget.php?aid=20053&sid=1257"></script>
+							</div>
+						</div>
+                        <div class="col-lg-4 mt-4">
+							<h3 class="mb-4 mt-4 fs-20">SOMALI</h3>
+							{# <div class="text-center"><img class="img-fluid" src="assets/images/la-soma.png"></div> #}
+							<div class="text-center">
+								<script type="text/javascript" src="https://www.peoplemaps.com/widgets/power-widget.php?aid=20053&sid=1260"></script>
+							</div>
+						</div>
+						<div class="col-lg-4 mt-4">
+							<h3 class="mb-4 mt-4 fs-20">SPANISH</h3>
+							<div class="text-center">
+								<script type="text/javascript" src="https://www.peoplemaps.com/widgets/power-widget.php?aid=20053&sid=1258"></script>
+							</div>
+						</div>
+						
+						
+						
+						
+					</div>
+					<div class="row">
+						<div class="col-lg-4 mt-4"></div>
+
+						<div class="col-lg-4 mt-4"></div>
+					</div>
+					<!-- ---------------------------- -->
+
+				</div>
+			</div>
+		</div>
+	</section>
+	<section class="pa-min-les">
+		<div class="container">
+			<div class="row">
+				<div
+					class="col-lg-12">
+
+					<!-- -------------------------- -->
+					<div class="alert  bg-info-subtle text-info" role="alert">
+						<div class="text-center">
+							<img class="gifsize" src="assets/images/gifqu.gif" alt="">
+						</div>
+						<div class="section-title text-center mb-5 mt-3 pb-2">
+							<h3 class="title mb-2 fo-co">Ask
+								<span class="text-primary fw-bold">
+									your question?</span>
+							</h3>
+							<p class="text-re mb-1 fw-medium fs-14 ">Get answers from Metier.</p>
+							<a href="{{ path("app_home_contacts") }}" class="btn btn-primary waves-effect waves-light mt-4" >Post Question &nbsp;
+								<i class="fa fa-arrow-right" ></i>
+							</a>
+						
+							<!-- SIMPLE MODALS -->
+
+						</div>
+					</div>
+					<!-- -------------------------- -->
+
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<!-- company-LISTEnd -->
+
+	 
+
+
+	{% include 'home/_footer.html.twig' %}
+{% endblock %}

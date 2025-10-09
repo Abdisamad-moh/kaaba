@@ -1,0 +1,22 @@
+name: 🚀 Deploy on push production  in contabo
+
+on: 
+  push:
+    branches:    
+      - master 
+    
+jobs:
+  web-deploy:
+    name: 🎉 Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📂 Deploy to server via ssh
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.metier_host }}
+          username: ${{ secrets.metier_username }}
+          password: ${{ secrets.metier_password }}
+          port: ${{ secrets.port }}
+          script: "cd /home/metierquest/public_html/demo.metier-quest.com && sh deploy.sh"
+# added again the commen

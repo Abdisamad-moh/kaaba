@@ -1,0 +1,190 @@
+<div class="card-body" {{ attributes }}>
+	<div id="myModaledu" class="modal fade" tabindex="-1" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header text-black">
+					<h5 class="modal-title mt-0" id="myModalLabel">{{ (this.education.id ?? null) ? 'Update Education' : 'Add education' }}</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+
+					<div class="row">
+						<div class="col-lg-12">
+							<label class="form-label">Education type</label>
+						</div>
+						<div class="col-lg-12">
+							<input type="radio" id="html" name="fav_language" value="HTML">
+							&nbsp;
+							<label for="html">Completed</label>
+							&nbsp;
+							<input type="radio" id="css" name="fav_language" value="CSS">
+							&nbsp;
+							<label for="css">Still Enrolled</label>
+						</div>
+					</div>
+					<hr>
+					<div class="row">
+						<div class="col-lg-12">
+							<label class="form-label">University/Institute
+							</label>
+							<input name="name" id="name" type="text" class="form-control" placeholder="Enter University/Institute name" required>
+						</div>
+					</div>
+					<hr>
+					<div class="row">
+						<div class="col-lg-12">
+							<label class="form-label">Course
+							</label>
+							<div class="input-div">
+								<select class="form-select choices__input choices__list choices__list--single" id="dropdown" type="dropdown">
+									<option>
+										Select Course</option>
+									<option>
+										Mba</option>
+									<option>
+										BCA</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<hr>
+					<div class="row">
+						<div class="col-lg-12">
+							<label class="form-label">Specialization
+							</label>
+							<div class="input-div">
+								<select class="form-select choices__input choices__list choices__list--single" id="dropdown" type="dropdown">
+									<option>
+										Select Specialization</option>
+									<option>
+										English</option>
+									<option>
+										Malayalam</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<hr>
+					<div class="row">
+						<div class="col-lg-12">
+							<label class="form-label">Course type</label>
+						</div>
+						<div class="col-lg-12">
+							<input type="radio" id="html" name="fav_language" value="HTML">
+							<label for="html">Full Time</label>
+							<input type="radio" id="css" name="fav_language" value="CSS">
+							<label for="css">Part Time</label>
+							<input type="radio" id="javascript" name="fav_language" value="JavaScript">
+							<label for="javascript">Distant Learning</label>
+						</div>
+					</div>
+					<hr>
+					<div class="row">
+						<label class="form-label">Course duration
+						</label>
+						<div class="col-lg-5">
+							<div class="input-div">
+								<select class="form-select choices__input choices__list choices__list--single" id="dropdown" type="dropdown">
+									<option>
+										Starting Year</option>
+									<option>
+										20</option>
+									<option>
+										40</option>
+								</select>
+							</div>
+						</div>
+						<div class="col-lg-2 text-center py-2">To</div>
+						<div class="col-lg-5">
+							<div class="input-div">
+								<select class="form-select choices__input choices__list choices__list--single" id="dropdown" type="dropdown">
+									<option>
+										Ending Year</option>
+									<option>
+										20</option>
+									<option>
+										40</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<hr>
+					<div class="row">
+						<div class="col-lg-12">
+							<label class="form-label">Grading system</label>
+							<div class="input-div">
+								<select class="form-select choices__input choices__list choices__list--single" id="dropdown" type="dropdown">
+									<option>
+										Select Grading system</option>
+									<option>
+										English</option>
+									<option>
+										Malayalam</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<hr>
+					<div class="row">
+						<div class="col-lg-12">
+							<label class="form-label">Location</label>
+							<input name="name" id="name" type="text" class="form-control" placeholder="Enter full address" required>
+						</div>
+					</div>
+					<hr>
+					<div class="row">
+						<div class="col-lg-6">
+							<label class="form-label">City</label>
+							<div class="input-div">
+								<select class="form-select choices__input choices__list choices__list--single" id="dropdown" type="dropdown">
+									<option>
+										City</option>
+									<option>
+										City1</option>
+									<option>City 2</option>
+								</select>
+							</div>
+						</div>
+						<div class="col-lg-6">
+							<label class="form-label">Country</label>
+							<div class="input-div">
+								<select class="form-select choices__input choices__list choices__list--single" id="dropdown" type="dropdown">
+									<option>
+										Country</option>
+									<option>
+										Country2</option>
+									<option>
+										Country5</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<hr>
+					<div class="row">
+						<div class="col-lg-6">
+							<label class="form-label">Region/District
+							</label>
+							<input name="name" id="name" type="text" class="form-control" placeholder="Enter Region/District" required>
+						</div>
+						<div class="col-lg-6">
+							<label class="form-label">Zip Code/ Postal Code</label>
+							<input name="name" id="name" type="text" class="form-control" placeholder="Enter Zip Code" required>
+						</div>
+					</div>
+
+
+				</div>
+				<div class="modal-footer">
+					<a href="#" class="btn btn-outline-primary" style="border-radius: 50px;" data-bs-dismiss="modal">Cancel</a>
+					<button type="button" class="btn btn-primary waves-effect waves-light">Save</button>
+				</div>
+			</div>
+			<!-- /.modal-content -->
+		</div>
+		<!-- /.modal-dialog -->
+	</div>
+
+    <div class="card-body">
+        <button data-action="live#action" data-live-action-param="add_education" class="btn btn-primary waves-effect waves-light" data-bs-toggle="modal" data-bs-target="#myModaledu">edit</button>
+    </div>
+</div>

@@ -1,0 +1,382 @@
+{% extends 'admin_base2.html.twig' %}
+{% import 'macros/_form_macros.html.twig' as macros %}
+
+{% block title %}
+    Scholarship Applications
+{% endblock %}
+
+{% block body %}
+<div class="" data-controller="employer">
+    <div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+        <div class="card-body px-4 py-3">
+            <div class="row align-items-center">
+                <div class="col-9">
+                    <h4 class="fw-semibold mb-8">
+                        <i class="ti ti-users fs-8"></i>
+                        Scholarship Applications
+                    </h4>
+                    <span class="badge bg-primary">Total: {{ total_count }}</span>
+                </div>
+                <div class="col-3">
+                    <div class="text-center">
+                        <img src="{{ asset('assets/images/application.png') }}" alt="modernize-img" class="iconn img-fluid mb-n4">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="datatables">
+                <div class="card">
+                    <div class="card-body">
+                        {{ macros.render_search_form(searchForm, 'Filter Applications') }}
+
+                        <div class="table-responsive">
+                            <table id="file_export" class="table w-100 table-striped table-bordered display text-nowrap" width="100%">
+                                <thead>
+                                    <tr>
+                                        <th>Applicant Name</th>
+                                        <th>Phone</th>
+                                        <th>Email</th>
+                                        <th>Scholarship</th>
+                                        <th>Region</th>
+                                        <th>District</th>
+                                        <th>Institute</th>
+                                        <th>Qualification</th>
+                                        <th>Gender</th>
+                                        <th>Application Date</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for application in applications %}
+                                        <tr id="application-{{ application.id }}">
+                                            <td>
+                                                <strong>{{ application.fullname }}</strong>
+                                                {% if application.dateofbirth %}
+                                                    <br><small class="text-muted">DOB: {{ application.dateofbirth|date('d-m-Y') }}</small>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ application.phone }}</td>
+                                            <td>{{ application.email ?? 'N/A' }}</td>
+                                            <td>
+                                                {% if application.scholarship %}
+                                                    <span class="badge bg-purple" title="{{ application.scholarship.title }}">
+                                                        {{ application.scholarship.title|length > 30 ? application.scholarship.title|slice(0, 30) ~ '...' : application.scholarship.title }}
+                                                    </span>
+                                                    {% if not application.scholarship.status %}
+                                                        <br><small class="text-danger">(Inactive)</small>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <span class="badge bg-secondary">N/A</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if application.region %}
+                                                    <span class="badge bg-info">{{ application.region.name }}</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">N/A</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if application.district %}
+                                                    <span class="badge bg-light text-dark">{{ application.district.name }}</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">N/A</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if application.institute %}
+                                                    <span class="badge bg-primary">{{ application.institute.name }}</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">N/A</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if application.highestqualification %}
+                                                    <span class="badge bg-warning text-dark">{{ application.highestqualification.name }}</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">N/A</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if application.gender %}
+                                                    <span class="badge bg-success">{{ application.gender.name }}</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">N/A</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ application.applicationdate|date('d-m-Y') }}</td>
+                                            <td id="status-{{ application.id }}">
+                                                {% if application.status %}
+                                                    <span class="badge 
+                                                        {% if application.status.name == 'applied' or application.status.name == 'applied' %}bg-primary
+                                                        {% elseif application.status.name == 'rejected' %}bg-danger
+                                                        {% elseif application.status.name == 'applied' or application.status.name == 'applied' %}bg-info text-white
+                                                        {% elseif application.status.name == 'shortlisted' %}bg-secondary
+                                                        {% elseif application.status.name == 'Under Review' %}bg-primary
+                                                        {% else %}bg-secondary{% endif %}">
+                                                        {{ application.status.name }}
+                                                    </span>
+                                                {% else %}
+                                                    <span class="badge bg-warning text-dark">Pending</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+                                                    <div class="btn-group me-2 mb-2" role="group" aria-label="Application actions">
+                                                       <a href="{{ path('app_admin_kaaba_application_view', {'uuid': application.uuid}) }}" 
+   class="btn btn-primary btn-sm" 
+   title="View Application Details">
+    <i class="ti ti-eye fs-4"></i>
+    View
+</a>
+
+                                                        
+                                                       {% set statusName = application.status ? application.status.name|lower : '' %}
+
+{# Only show Update Status dropdown if NOT rejected #}
+{% if statusName != 'rejected' %}
+    <div class="btn-group dropend" role="group">
+        <button type="button"
+                class="btn btn-secondary btn-sm dropdown-toggle"
+                data-bs-toggle="dropdown"
+                data-bs-boundary="viewport"
+                aria-expanded="false"
+                {% if statusName in ['accepted'] %}disabled{% endif %}>
+            <i class="ti ti-edit fs-4"></i>
+            Update Status
+        </button>
+
+        <ul class="dropdown-menu">
+            {# Show Shortlist option only if not already shortlisted, accepted, or rejected #}
+            {% if not application.status or (statusName not in ['shortlisted', 'accepted', 'rejected']) %}
+                <li class="bg-info">
+                    <a class="dropdown-item update-status bg-info text-white" href="#"
+                       data-application-id="{{ application.id }}"
+                       data-status-action="shortlisted"
+                       data-applicant-name="{{ application.fullname }}">
+                        <i class="ti ti-check text-white me-2 fs-20"></i>
+                        Shortlist Application
+                    </a>
+                </li>
+            {% endif %}
+
+            {# Show Accept option only if currently shortlisted #}
+            {% if statusName == 'shortlisted' %}
+                <li class="bg-success">
+                    <a class="dropdown-item update-status bg-success text-white" href="#"
+                       data-application-id="{{ application.id }}"
+                       data-status-action="accepted"
+                       data-applicant-name="{{ application.fullname }}">
+                        <i class="ti ti-check text-white me-2 fs-20"></i>
+                        Accept Application
+                    </a>
+                </li>
+            {% endif %}
+
+            <li><hr class="dropdown-divider"></li>
+
+            {# Always show Reject option unless already rejected #}
+            {% if statusName != 'rejected' %}
+                <li class="bg-danger">
+                    <a class="dropdown-item update-status bg-danger text-white" href="#"
+                       data-application-id="{{ application.id }}"
+                       data-status-action="rejected"
+                       data-applicant-name="{{ application.fullname }}">
+                        <i class="ti ti-x text-white me-2 fs-20"></i>
+                        Reject Application
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+{% endif %}
+
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="13" class="text-center py-4">
+                                                <div class="alert alert-info mb-0">
+                                                    <i class="ti ti-info-circle me-2"></i>
+                                                    No scholarship applications found.
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Pagination -->
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <div class="text-muted">
+                                Showing {{ applications.getCurrentPageNumber }} of {{ applications.getPageCount }} pages
+                                (Total: {{ total_count }} applications)
+                            </div>
+                            <div>
+                                {{ knp_pagination_render(applications) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+
+.bg-danger{
+background-color:red !important;
+} 
+.fs-20{
+font-size:20px;
+}
+.bg-purple {
+    background-color: #6f42c1 !important;
+}
+
+.btn-loading {
+    position: relative;
+    color: transparent !important;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    top: 50%;
+    left: 50%;
+    margin-left: -8px;
+    margin-top: -8px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    border-right-color: transparent;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.table-responsive .dropdown-menu {
+    position: absolute;
+    z-index: 1060;
+}
+</style>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<!-- Include SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Status update functionality with SweetAlert confirmation
+    document.querySelectorAll('.update-status').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const applicationId = this.getAttribute('data-application-id');
+            const statusAction = this.getAttribute('data-status-action');
+            const applicantName = this.getAttribute('data-applicant-name');
+            
+            // Set confirmation message based on status
+            let actionText = '';
+            let title = '';
+            let icon = 'question';
+            
+            switch(statusAction) {
+                case 'shortlisted':
+                    actionText = 'shortlist';
+                    title = 'Shortlist Application';
+                    icon = 'info';
+                    break;
+                case 'accepted':
+                    actionText = 'accept';
+                    title = 'Accept Application';
+                    icon = 'success';
+                    break;
+                case 'rejected':
+                    actionText = 'reject';
+                    title = 'Reject Application';
+                    icon = 'warning';
+                    break;
+            }
+            
+            const message = `Are you sure you want to ${actionText} the application for <strong>${applicantName}</strong>?`;
+            
+            // Show SweetAlert confirmation
+            Swal.fire({
+                title: title,
+                html: message,
+                icon: icon,
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, update status!',
+                cancelButtonText: 'Cancel',
+                showLoaderOnConfirm: true,
+                preConfirm: () => {
+                    return fetch('{{ path("app_admin_kaaba_application_update_status") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({
+                            applicationId: applicationId,
+                            statusAction: statusAction,
+                            _token: '{{ csrf_token("update_application_status") }}',
+                        }),
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            // Update status badge
+                            const statusBadge = document.getElementById(`status-${applicationId}`);
+                            if (statusBadge) {
+                                statusBadge.innerHTML = data.newStatusBadge;
+                            }
+                            
+                            // Show success message
+                            Swal.fire({
+                                title: 'Success!',
+                                text: data.message,
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+                                // Reload the page to reflect changes in the dropdown
+                                window.location.reload();
+                            });
+                        } else {
+                            throw new Error(data.message || 'Failed to update status');
+                        }
+                    })
+                    .catch(error => {
+                        Swal.showValidationMessage(
+                            `Request failed: ${error.message}`
+                        );
+                    });
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

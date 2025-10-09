@@ -1,0 +1,67 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Order Receipt
+{% endblock %}
+
+{% block body %}
+	<div class="container-fluid">
+
+
+		<div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+			<div class="card-body px-4 py-3">
+				<div class="row align-items-center">
+					<div class="col-9">
+						<h4 class="fw-semibold mb-8">
+							<i class="ti ti-briefcase fs-8 "></i>
+							Order Receipt</h4>
+						<nav aria-label="breadcrumb">
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item">
+									<a class="text-muted text-decoration-none" href="#">Orders</a>
+								</li>
+								<li class="breadcrumb-item" aria-current="page">Order Receipt</li>
+							</ol>
+						</nav>
+					</div>
+					<div class="col-3">
+						<div class="text-center mb-n5">
+							<img src="{{ asset('assets/de/images/breadcrumb/ChatBc.png') }}" alt="modernize-img" class="img-fluid mb-n4">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="card">
+			<div class="card-body">
+				<section class="payment-method text-center body current" id="steps-uid-0-p-2" role="tabpanel" aria-labelledby="steps-uid-0-h-2" aria-hidden="false" style="">
+					<h5 class="fw-semibold fs-5">Thank you for your purchase!</h5>
+					<h6 class="fw-semibold text-primary mb-7">Your order id: MQ-{{order.id}}</h6>
+					{% if order.plan.type == "employer" and order.plan.class == "description" %}
+						<p class="lead  mb-0 pc-da fs-5 strong">Thank you for your payment<br>
+							Please check your email to follow the instructions and provide the requirement information.
+							<br>
+							. This will help us tailor your job description specifically for you. Your draft will be emailed to you within 24-72 hours after completion. Please note, incomplete information will delay the delivery timeline.
+						</p>
+					{% endif %}
+					{% if order.plan.type == "employer" and order.plan.class == "description_offer" %}
+						<p class="lead  mb-0 pc-da fs-5">Thank you for your payment.<br>
+							Please check your email to follow the instructions and provide the requirement information. This will help us tailor your Job Description and Offer Letter specifically for you. 
+							<br>
+							Your draft will be emailed to you within 24-72 hours after completion. Please note, incomplete information will delay the delivery timeline. 
+						</p>
+					{% endif %}
+					<img src="{{ asset('assets/images/payment_s.gif') }}" alt="matdash-img" class="img-fluid mb-4" width="350">
+					<p class="mb-0 fs-2">If you have questions about this order
+						<br>don't hesistate to contact with us.
+					</p>
+					<div class="d-sm-flex align-items-center justify-content-between my-4">
+						<a href="/employer/" class="btn btn-success d-block mb-2 mb-sm-0">Back to dashboard</a>
+						<a target="__blank" href="{{ path('app_home_receipt', {'order': order.orderuid}) }}"
+									class="btn btn-primary d-block"><i class="fa fa-file"></i> Download Receipt</a>
+					</div>
+				</section>
+			</div>
+		</div>
+
+	</div>
+{% endblock %}

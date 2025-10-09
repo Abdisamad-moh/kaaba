@@ -1,0 +1,60 @@
+{% if languages|length < 1 %}
+	<div class="card-body p-2 pb-3 "></div>
+{% else %}
+	<div class="card-body p-4">
+		<div class="row">
+			{% set basic_languages = languages|filter(lang => lang.proficiency == 'basic') %}
+			{% set intermediate_languages = languages|filter(lang => lang.proficiency == 'intermediate') %}
+			{% set proficient_languages = languages|filter(lang => lang.proficiency == 'proficient') %}
+			{% set native_languages = languages|filter(lang => lang.proficiency == 'native') %}
+
+			{% if basic_languages|length > 0 %}
+				<div class="col-md-12 d-flex flex-wrap gap-2">
+					<h6 class="fs-15 pe-2 sufont">
+						Basic</h6>
+					{% for language in basic_languages %}
+						<p class="badge rounded-pill primary_four text-white fw-bold">{{ language.language.name }}
+							<i>{{ language.skills|length > 0 ? ' (' ~ language.skills|join(', ') ~ ')' : '' }}</i>
+						</p>
+					{% endfor %}
+				</div>
+			{% endif %}
+
+			{% if intermediate_languages|length > 0 %}
+				<div class="col-md-12 d-flex flex-wrap gap-2">
+					<h6 class="fs-15 pe-2 sufont">
+						Intermediate</h6>
+					{% for language in intermediate_languages %}
+						<p class="badge rounded-pill primary_three">{{ language.language.name }}
+							<i>{{ language.skills|length > 0 ? ' (' ~ language.skills|join(', ') ~ ')' : '' }}</i>
+						</p>
+					{% endfor %}
+				</div>
+			{% endif %}
+
+			{% if proficient_languages|length > 0 %}
+				<div class="col-md-12 d-flex flex-wrap gap-2">
+					<h6 class="fs-15 pe-2 sufont">
+						Proficient</h6>
+					{% for language in proficient_languages %}
+						<p class="badge rounded-pill primary_two">{{ language.language.name }}
+							<i>{{ language.skills|length > 0 ? ' (' ~ language.skills|join(', ') ~ ')' : '' }}</i>
+						</p>
+					{% endfor %}
+				</div>
+			{% endif %}
+
+			{% if native_languages|length > 0 %}
+				<div class="col-md-12 d-flex flex-wrap gap-2">
+					<h6 class="fs-15 pe-2 sufont">
+						Native</h6>
+					{% for language in native_languages %}
+						<span class="badge rounded-pill primary_one">{{ language.language.name }}
+							<i>{{ language.skills|length > 0 ? ' (' ~ language.skills|join(', ') ~ ')' : '' }}</i>
+						</span>
+					{% endfor %}
+				</div>
+			{% endif %}
+		</div>
+	</div>
+{% endif %}

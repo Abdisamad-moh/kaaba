@@ -1,0 +1,100 @@
+<div
+	class="section-title text-center mt-10 mb-10">{# <div class="section-title text-center">
+				<h3 class="title mb-90 mt-90">Similar <span class="text-primary fw-bold">
+						Jobs</span>
+				</h3>
+			</div> #}
+</div>
+{% for job in jobs %}
+	<div class="col-lg-4 col-md-6 mt-4">
+		<div class="card job-grid-box">
+			<div class="card-body p-4">
+				<div>
+					<div class="favorite-icon d-flex flex-column align-items-end">
+						{% if app.user %}
+							<a href="#" {% if app.user %} data-jobs-url-param="{{ path('job_seeker_save_job', {'job': job.id}) }}" data-action="click->jobs#saveJob" {% endif %} style="font-family: 'Inter', sans-serif;">
+								<i id="save{{job.id}}" class="fa  {{ job.id in saved_jobs ? 'fa-bookmark text-success' : 'fa-bookmark-o' }}" aria-hidden="true"></i>
+								<span class="job-cont">
+									Save</span>
+							</a>
+						{% else %}
+							<a href="{{ path('app_login') }}" {% if app.user %} data-jobs-url-param="{{ path('job_seeker_save_job', {'job': job.id}) }}" data-action="click->jobs#saveJob" {% endif %} style="font-family: 'Inter', sans-serif;">
+								<i id="save{{job.id}}" class="fa  {{ job.id in saved_jobs ? 'fa-bookmark text-success' : 'fa-bookmark-o' }}" aria-hidden="true"></i>
+								<span class="job-cont">
+									Save</span>
+							</a>
+						{% endif %}
+
+						{% if job.isImmediateHiring %}
+							<span class="badge rounded-pill bg-warning text-dark">Immediate Hiring</span>
+						{% endif %}
+					</div>
+					<div class="boxlogoicon">
+						<a href="#">
+							{% if job.employer.employerDetails %}
+
+								<img class="logo-size" src="{{ path('profile_image', {'filename': job.employer.employerDetails.logo }) }}" alt="" class="img-fluid rounded-3">
+							{% else %}
+								<img class="logo-size" src="{{ asset('uploads/profile/no-image.jpg') }}" alt="" class="img-fluid rounded-3">
+							{% endif %}
+						</a>
+					</div>
+				</div>
+				<div class="mt-4">
+					<a href="{{ path('job_seeker_job_details', {'slug': job.title|slugify, 'uuid': job.uuid }) }}" class="primary-link">
+						<h5>{{ job.employer.name|capitalizeWords}}</h5>
+						<h5 class="fs-16 mb-3 text-primary">{{ job.title}} {{job.isrepost ? " <span class='badge rounded-pill bg-primary'>Repost</span>" : ""}}</h5>
+					</a>
+					<p class="text-muted">
+						<span style="padding-right:10px;">
+							<i class="fa fa-map-marker" aria-hidden="true"></i>
+							&nbsp;{{ (job.city.name ?? '') }}
+							{# &nbsp;{{ (job.country.name ?? '') ~ ', ' ~ (job.city.name ?? '') }} #}
+						</span>
+						<i class="fa fa-briefcase" aria-hidden="true"></i>
+						&nbsp;{{ job.numberPosition}}
+						{% if job.numberPosition == 0 %}
+
+							{% elseif job.numberPosition  == 1 %}
+								Role Available
+							{% elseif job.numberPosition > 1 %}
+								Roles Available
+						{% endif %}
+						{% if job.localsOnly %}
+							<span class='badge rounded-pill bg-success' style="background-color: #2f495e !important">Locals Only</span>
+						{% endif %}
+					</p>
+				</div>
+				<div class="job-grid-content mt-2">
+					<p class="text-muted">{{ job.jobDescription|shortenHtml(220)|raw }}</p>
+					<ul class="list-inline">
+						{% for type in job.jobTypes %}
+							<li class="list-inline-item">
+								<span class="badge rounded-pill bg-secondary">{{ type.name }}</span>
+							</li>
+						{% endfor %}
+					</ul>
+					<div class="d-flex align-items-center justify-content-between border-top mt-2 pt-1">
+						<p class="text-mutedse float-start mb-0">Expires in
+							<span style="font-weight:500;color:#666;">{{ job.expiresAt }}</span>
+						</p>
+						<div class="text-end">
+							<i>
+								Posted
+								{{ job.postedAt }}</i>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!--end card-body-->
+		</div>
+		<!--end job-grid-box-->
+	</div>
+{% endfor %}
+
+{% if jobs|length < 1 %}
+	<div class="text-center">
+		<p class="fw-bold">No jobs found</p>
+	</div>
+{% endif %}
+<div class="section-title text-center mt-10 mb-10"></div>

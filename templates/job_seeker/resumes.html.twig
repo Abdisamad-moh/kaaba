@@ -1,0 +1,206 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+	Resume Templates
+{% endblock %}
+{% block body %}
+	<style>
+		.min-height-200 {
+			min-height: 200px;
+		}
+		.product-price-tag {
+			height: 48px;
+			line-height: 48px;
+			font-weight: 700;
+			font-size: 20px;
+			background-color: #621a79;
+			text-align: center;
+			padding: 0 10px;
+			border-radius: 3px;
+			color: white;
+		}
+	</style>
+<div data-controller="packages" data-packages-url-value="{{ path('app_resumes', {'type': type}) }}" data-packages-cities-url-value="{{ path('app_home_fetch_cities') }}">
+	<section class="bg-home4" id="home">
+		<div class="container">
+			<div class="row align-items-center">
+				<div class="col-lg-12">
+					<div class="mb-2 pb-3 me-lg-6 text-center">
+						<h1 class="display-5 fw-semibold mb-3 mt-3 fs-22">Top
+							<span class="text-primary fw-bold">resume templates build for you.</span>
+						</h1>
+						<p class="lead text-muted mb-0 pc-da">
+							These templates help you write a resume that highlights your skills and achievements. Pick a template that suits your style and job. Then, customize it with your own information, like your name, contact, education, work, and accomplishments. <span class="fw-bold" style="font-style: italic; text-decoration: underline;">Do not use a generic resume</span> that doesn't show your unique strengths and qualifications.
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<section class="pa-les">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-12">
+				
+						<div class="row justify-content-center">
+							<div class="col-lg-8">
+								<ul class="job-list-menu nav nav-pills nav-justified flex-column flex-sm-row mb-4" id="pills-tab" role="tablist">
+									<li class="nav-item {{type == "resume" ? "active" : ""}}" role="presentation">
+										<a class="nav-link {{type == "resume" ? "active" : ""}}" id="recent-jobs-tab"  href="{{ path('app_resumes', {'type': 'resume' }) }}" role="tab" aria-controls="recent-jobs" aria-selected="false" tabindex="-1">Resume by Profession</a>
+									</li>
+									<li class="nav-item {{type == "resume2" ? "active" : ""}}" role="presentation">
+										<a class="nav-link {{type == "resume2" ? "active" : ""}}" id="featured-jobs-tab"  href="{{ path('app_resumes', {'type': 'resume2' }) }}" role="tab" aria-controls="featured-jobs" aria-selected="true">Resume Templates</a>
+									</li>
+									<li class="nav-item {{type == "cover" ? "active" : ""}}" role="presentation">
+										<a class="nav-link {{type == "cover" ? "active" : ""}}" id="freelancer-tab"  href="{{ path('app_resumes', {'type': 'cover' }) }}" role="tab" aria-controls="freelancer" aria-selected="false" tabindex="-1">Cover Letter Templates</a>
+									</li>
+								</ul>
+							</div>
+							<!--end col-->
+						</div>
+
+						<div class="row justify-content-center">
+							<p>
+								{% if type == 'resume' %}
+									With our pre-written 300+ ATS friendly resume for different industry and career type, create a resume that works for you. Customize with your own information and download your resume as Word in minutes.
+								{% endif %}
+
+								{% if type == 'resume2' %}
+									Do you want a resume that stands out? Our Resume Templates can help you get your dream job, no matter your industry or experience level. Try it today and see the difference!
+								{% endif %}
+								{% if type == 'cover' %}
+									You don't need to spend hours designing a cover letter. Just use our templates and fill in your details. Choose from professional, creative, or simple design and formats, and download now as a Word format.
+								{% endif %}
+							</p>
+						</div>
+						<div class="section-title text-center">
+							<div class="filter-search-form mt-3 mt-md-0">
+								<i class="fa fa-comment-o" aria-hidden="true"></i>
+								<input style='border: 4px solid #7a3ba3;border-radius: 12px;' type="text" data-packages-target="search" placeholder="Results update as you type..." class="form-control comformin">
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- -------------------------- -->
+				<div class="col-lg-12 col-md-7">
+					<div class="blog-post">
+					<div class="row mt-2">
+					{# <p>
+						With our pre-written 300+ ATS friendly resume for different industry and career type, create a resume that works for you. Customize with your own information and download your resume as Word in minutes.
+					</p> #}
+					</div>
+						<div class="row" data-packages-target="packages">
+							<div class="col-lg-4 col-md-6 mt-4 loader-item">
+								<div class="card job-grid-box">
+									<div class="card-body p-4">
+										<div class="row">
+											<div class="col-8">
+												<p class="card-text placeholder-glow">
+												<span class="placeholder col-7 placeholder-lg" style="height: 54px; width: 30%"></span>
+												</p>
+											</div>
+											<div class="col-4">
+												<p class="card-text placeholder-glow">
+												<span class="placeholder col-7"></span>
+												<span class="placeholder col-4"></span>
+												</p>
+											</div>
+										</div>
+										<div class="mt-4">
+											<p class="card-text placeholder-glow">
+											<span class="placeholder col-7 placeholder-lg"></span>
+											<span class="placeholder col-4 placeholder-lg"></span>
+											<span class="placeholder col-4 placeholder-lg"></span>
+											</p>
+										</div>
+										<div class="job-grid-content mt-2">
+											<p class="card-text placeholder-glow">
+												<span class="placeholder col-7 placeholder-xs"></span>
+												<span class="placeholder col-4 placeholder-xs"></span>
+												<span class="placeholder col-4 placeholder-xs"></span>
+												<span class="placeholder col-6 placeholder-xs"></span>
+												<span class="placeholder col-8 placeholder-xs"></span>
+											</p>
+											<ul class="list-inline py-3">
+											</ul>
+											<div class="row">
+												<div class="col-8">
+													<p class="card-text placeholder-glow">
+														<span class="placeholder col-7 "></span>
+														<span class="placeholder col-4 "></span>
+													</p>
+												</div>
+												<div class="col-4">
+													<p class="card-text placeholder-glow">
+														<span class="placeholder col-7 "></span>
+													
+													</p>
+												</div>
+											</div>
+										</div>
+									</div>
+								
+								</div>
+							</div>
+							{# {% include 'home/package-cards.html.twig' with {packages: packages} %} #}
+							{# {% for item in packages %}
+
+								<div class="col-lg-3 mb-4">
+									<div class="card blog-grid-box p-2">
+											<img class="img-fluid" src="{{ path('profile_serve_only_image', {'filename': item.thumbnail }) }}" alt=""></a>
+										<div class="card-body">
+												<h6 class="fs-17">{{item.name}}</h6>
+											<div class="product-info">
+												<div class="row align-items-center">
+													<div class="col">
+														<div class="text-warning mb-2 font-13">
+															<i class="fa fa-star"></i>
+															<i class="fa fa-star"></i>
+															<i class="fa fa-star"></i>
+															<i class="fa fa-star"></i>
+															<i class="fa fa-star"></i>
+														</div>
+														<h5 class="m-0">
+															<span class="text-muted">
+																Type :
+																<b>DOCX</b>
+															</span>
+														</h5>
+													</div>
+													<div class="col-auto">
+														<div class="product-price-tag">
+															${{item.cost}}
+														</div>
+													</div>
+												</div>
+
+												<!-- end row -->
+											</div>
+										</div>
+										<div class="card-footer">
+											<div class="text-center">
+												<a href="{{ path('app_jobseeker_purchase_checkout', {'package': item.id}) }}" class="btn btn-primary btn-hover">Buy Now
+													<i class="fa fa-arrow-right" aria-hidden="true"></i>
+												</a>
+											</div>
+										</div>
+									</div>
+								</div>
+							{% endfor %} #}
+						</div>
+					</div>
+				</div>
+			
+				<div class="text-center mt-4 d-none">
+					<button 
+						data-packages-target="more" id="load_more"
+						data-action="packages#loadMore"
+						class="btn btn-primary">
+						Load More
+					</button>
+				</div>
+				<!-- -------------------------- -->
+			</div>
+		</div>
+	</section>
+</div>
+{% endblock %}

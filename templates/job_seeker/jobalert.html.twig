@@ -1,0 +1,111 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+	Messages Center
+{% endblock %}
+{% block body %}
+	<style>
+		.min-height-200 {
+			min-height: 200px;
+		}
+		.form-control {
+			border: 1px solid black !important;
+		}
+	</style>
+	<div class="page-content">
+		<section class="bg-homelogin" id="home">
+			<div class="container">
+				<div class="row align-items-center">
+					<div class="col-lg-12">
+						<div class="mb-2 pb-1 me-lg-6 text-center">
+							<h1 class="display-5 fw-semibold mb-3 mt-3 fs-22">Get Job Alert</h1>
+							<p class="lead text-muted mb-0 pc-da">Never miss a chance to land your dream job with Métier Quest’s real-time job alerts! Get notified the moment a new opportunity matches your profile, so you can be the first to apply!</p>
+							{# <img width="100px" class="" src="{{ asset('assets/images/job-alert-image.jpeg') }}" alt="job-alert-image"> #}
+
+						</div>
+						<div class="col-12 text-center">
+							<img style="width: 300px;" class="img-fluid " src="{{ asset('assets/images/job-alert-image.jpeg') }}" alt="">
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<section class="pa-min-les">
+			<div class="container">
+				<div
+					class="row">
+					<!-- -------------------------- -->
+					<div class="col-lg-3"></div>
+					<div
+						class="col-lg-6">
+						<!--end col-->
+						{{ form_start(form) }}
+						<div class="row">
+							<div class="col-lg-12">
+								<div class="mb-3">
+									<label for="nameInput" class="form-label fs-13">Select multiple preferred job categories.</label>
+									{{ form_widget(form.jobcategory) }}
+								</div>
+							</div>
+							<!-- <div class="col-lg-12">
+								<div class="alert  bg-warning-subtle text-warning mt-4" role="alert">
+									<div class="row">
+										<div class="col-lg-2 pt-4">
+											<img class="img-fluid teimg" src="{{ asset('assets/images/hand.png') }}" alt="">
+										</div>
+										<div class="col-lg-8">
+											<h5 class="fs-18 mb-3 mt-4 ptla">SMS Notifications Will Be Sent Exclusively via Somtel</h5>
+											<p class="lead text-muted mb-0 pc-da">All SMS notifications will be sent exclusively through a Somtel phone number. Please be aware that no other numbers will be used for SMS communications. Those without a Somtel number will receive notifications via email.</p>
+										</div>
+										<div class="col-lg-2 pt-5">
+											<img class="img-fluid teimg" src="{{ asset('assets/images/sologo.png') }}" alt="">
+										</div>
+									</div>
+								</div>
+							</div> -->
+							<div class="col-lg-12">
+								<div class="mb-3">
+									<label for="nameInput" class="form-label fs-13">
+										Please type below your Number with the Area Code (ex 62x xxx xxx, 65x xxx xxx, 66x xxx xxx)
+									</label>
+									{{ form_widget(form.phone, {
+        'attr': {
+            'placeholder': 'Please type below your Number with the Area Code (ex 62x xxx xxx, 65x xxx xxx, 66x xxx xxx)'
+        }
+    }) }}
+								</div>
+							</div>
+						</div>
+						<div class="text-center mt-3">
+							{% if active is none %}
+								<div class="alert alert-danger mt-3" role="alert">
+									This feature is not part of your plan.
+									<a href="{{ path('app_packages_pricing') }}" target='__blank' class="alert-link text-black">Please click here</a>
+									to upgrade now.
+								</div>
+								<button type="submit" id="submit" name="submit" class="btn btn-primary" disabled>
+									Submit
+								</button>
+							{% else %}
+								<button type="submit" id="submit" name="submit" class="btn btn-primary">
+									Submit
+								</button>
+							{% endif %}
+						</div>
+						{{ form_end(form) }}
+
+						<div class="col-lg-12 mt-3">
+							<div class="mb-3">
+								<p class=" ms-2 fs-11 text-center text-muted">By submitting this, you will get updates on the latest job depending the categories you selected<br>
+
+								</p>
+							</div>
+						</div>
+						<!--end col-->
+					</div>
+					<div class="col-lg-3"></div>
+					<!-- -------------------------- -->
+				</div>
+			</div>
+		</section>
+	</div>
+{% endblock %}

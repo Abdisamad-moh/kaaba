@@ -1,0 +1,87 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Ad{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+	<div class="card bg-info-subtle shadow-sm position-relative overflow-hidden mb-4">
+		<div class="card-body px-4 py-3">
+			<div class="row align-items-center">
+				<div class="col-12 col-md-9">
+					<h4 class="fw-semibold mb-3">
+						{% if order.id %}
+							Edit {{ order.category|capitalize }} Order
+						{% else %}
+							New {{ (type ?? app.request.get('type'))|capitalize }} Order
+						{% endif %}
+					</h4>
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb mb-0">
+							<li class="breadcrumb-item">
+								<a class="text-muted text-decoration-none" href="{{ path('app_admin_metier_orders') }}">Orders</a>
+							</li>
+							<li class="breadcrumb-item active" aria-current="page">
+								{% if order.id %} Edit Order {% else %} New Order {% endif %}
+							</li>
+						</ol>
+					</nav>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="card shadow-sm">
+		<div class="card-body">
+			{{ form_start(form) }}
+			<div class="row g-4">
+				<div class="col-md-4">
+					<label class="form-label">Amount <span class="text-danger">*</span></label>
+					<div class="input-group">
+						<span class="input-group-text"><i class="bi bi-cash-coin"></i></span>
+						{{ form_widget(form.amount, {'attr': {'class': 'form-control'}}) }}
+					</div>
+				</div>
+
+				<div class="col-md-4">
+					<label class="form-label">Payment Status <span class="text-danger">*</span></label>
+					<div class="input-group">
+						<span class="input-group-text"><i class="bi bi-credit-card"></i></span>
+						{{ form_widget(form.payment_status, {'attr': {'class': 'form-select'}}) }}
+					</div>
+				</div>
+
+				<div class="col-md-4">
+					<label class="form-label">Customer <span class="text-danger">*</span></label>
+					<div class="input-group">
+						<span class="input-group-text"><i class="bi bi-person"></i></span>
+						{{ form_widget(form.customer, {'attr': {'class': 'form-select'}}) }}
+					</div>
+				</div>
+
+				<div class="col-md-4">
+					<label class="form-label">Valid From <span class="text-danger">*</span></label>
+					{{ form_widget(form.valid_from, {'attr': {'class': 'form-control'}}) }}
+				</div>
+
+				<div class="col-md-4">
+					<label class="form-label">Valid To <span class="text-danger">*</span></label>
+					{{ form_widget(form.valid_to, {'attr': {'class': 'form-control'}}) }}
+				</div>
+
+				<div class="col-md-4">
+					<label class="form-label">Plan <span class="text-danger">*</span></label>
+					{{ form_widget(form.plan, {'attr': {'class': 'form-select'}}) }}
+				</div>
+
+				<div class="col-12 text-end">
+					<button type="submit" class="btn btn-primary mt-3">
+						<i class="bi bi-check-circle me-1"></i>
+						{% if order.id %}Update Order{% else %}Create Order{% endif %}
+					</button>
+				</div>
+			</div>
+			{{ form_end(form) }}
+		</div>
+	</div>
+</div>
+{% endblock %}

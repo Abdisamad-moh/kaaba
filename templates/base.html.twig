@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>
+			{% block title %}Rajo Kaaba Project
+			{% endblock %}
+		</title>
+		<meta name="robots" content="index, follow">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<link rel="icon" href="{{ asset('assets/images/hero-logo.png') }}"> {% block stylesheets %}{% endblock %}
+
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link
+		rel="preconnect" href="https://fonts.googleapis.com">
+
+		<!-- CSS Links -->
+		<link href="{{ asset('assets/css/vendors.min.css') }}" rel="stylesheet" type="text/css"/>
+		<link href="{{ asset('assets/css/icon.min.css') }}" rel="stylesheet" type="text/css"/>
+
+		<link href="{{ asset('assets/css/style.css') }}" rel="stylesheet" type="text/css"/>
+
+		<link href="{{ asset('assets/css/responsive.css') }}" rel="stylesheet" type="text/css"/>
+
+
+		<style>
+			.file-drop-area {
+				transition: all 0.3s ease;
+				cursor: pointer;
+				min-height: 120px;
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+			}
+
+			.file-drop-area:hover {
+				background-color: #f8f9fa !important;
+				border-color: #1b5e20 !important;
+			}
+
+			.bg-light-green {
+				background-color: #e8f5e8 !important;
+			}
+
+			.file-item {
+				font-size: 13px;
+				background-color: #f8f9fa;
+				border-radius: 4px;
+				margin-bottom: 5px;
+			}
+
+			.file-name {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.file-drop-area.dragover {
+				background-color: #e8f5e8 !important;
+				border: 2px dashed #1b5e20 !important;
+			}
+
+			.file-drop-area {
+				text-align: center;
+				align-items: anchor-center;
+			}
+
+
+			/* inner dot when checked */
+			.form-check-input[type="radio"]:checked::before {
+				content: "";
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				width: 0.5em;
+				height: 0.5em;
+				background-color: #1b5e20; /* your theme green */
+				border-radius: 50%;
+				transform: translate(-50%, -50%);
+			}
+
+.ml-20px{
+margin-left: 20px !important;
+}
+		</style>
+
+
+	</head>
+
+	<body
+		data-mobile-nav-style="full-screen-menu" data-mobile-nav-bg-color="">
+	  {# Include Header Partial #}
+    {% include 'home/_header.html.twig' %}
+
+    {# Main Content Block #}
+    {% block body %}{% endblock %}
+
+    {# Include Footer Partial #}
+    {% include 'home/_footer.html.twig' %}
+
+
+	
+
+	 <script>
+		  // Toggle textarea on "Yes"
+		  document.addEventListener('DOMContentLoaded', () => {
+		    const yes = document.getElementById('disYes');
+		    const no = document.getElementById('disNo');
+		    const prefer = document.getElementById('disPrefer');
+		    const details = document.getElementById('disabilityDetails');
+		
+		    [yes, no, prefer].forEach(el => {
+		      el.addEventListener('change', () => {
+		        details.style.display = (yes.checked) ? 'block' : 'none';
+		      });
+		    });
+		
+		    // Initialize file drop areas
+		    initFileDropAreas();
+		  });
+		
+		  // Function to switch tabs
+		  function switchTab(tabId) {
+		    const tabTrigger = document.querySelector(`[href="#${tabId}"]`);
+		    if (tabTrigger) {
+		      const tab = new bootstrap.Tab(tabTrigger);
+		      tab.show();
+		    }
+		  }
+		
+		  // File drop area functionality
+		  function initFileDropAreas() {
+		    const areas = document.querySelectorAll('.file-drop-area');
+		    
+		    areas.forEach(area => {
+		      const input = area.querySelector('.file-input');
+		      const list = area.querySelector('.file-list');
+		      
+		      // Click to open file dialog
+		      area.addEventListener('click', (e) => {
+		        if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'SPAN') {
+		          input.click();
+		        }
+		      });
+		      
+		      // Handle file selection
+		      input.addEventListener('change', (e) => {
+		        handleFiles(e.target.files, list);
+		      });
+		      
+		      // Drag and drop functionality
+		      area.addEventListener('dragover', (e) => {
+		        e.preventDefault();
+		        area.classList.add('bg-light-green');
+		        area.style.borderColor = '#1b5e20';
+		      });
+		      
+		      area.addEventListener('dragleave', () => {
+		        area.classList.remove('bg-light-green');
+		        area.style.borderColor = '';
+		      });
+		      
+		      area.addEventListener('drop', (e) => {
+		        e.preventDefault();
+		        area.classList.remove('bg-light-green');
+		        area.style.borderColor = '';
+		        handleFiles(e.dataTransfer.files, list);
+		      });
+		    });
+		  }
+		
+		  // Handle uploaded files
+		  function handleFiles(files, listElement) {
+		    if (!files.length) return;
+		    
+		    // Clear existing files if you want single file upload, or keep for multiple
+		    // listElement.innerHTML = ''; // Uncomment this if you want single file upload
+		    
+		    for (let i = 0; i < files.length; i++) {
+		      const file = files[i];
+		      const fileItem = document.createElement('div');
+		      fileItem.className = 'file-item d-flex justify-content-between align-items-center p-2 border-bottom';
+		      fileItem.innerHTML = `
+		        <span class="file-name text-start flex-grow-1 me-2" style="font-size:12px;">
+		          <i class="feather icon-feather-file me-1"></i>${file.name}
+		        </span>
+		        <span class="file-size text-muted me-2" style="font-size:11px;">
+		          (${formatFileSize(file.size)})
+		        </span>
+		        <button type="button" class="btn btn-sm btn-outline-danger py-0 px-2" onclick="this.parentElement.remove()">
+		          <i class="feather icon-feather-x" style="font-size:12px;"></i>
+		        </button>
+		      `;
+		      listElement.appendChild(fileItem);
+		    }
+		  }
+		
+		  // Format file size
+		  function formatFileSize(bytes) {
+		    if (bytes === 0) return '0 Bytes';
+		    const k = 1024;
+		    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+		    const i = Math.floor(Math.log(bytes) / Math.log(k));
+		    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+		  }
+		</script>
+
+		 <script>
+				document.querySelector('.scroll-to-scholarships').addEventListener('click', function(e) {
+				  e.preventDefault();
+				  document.querySelector('.scholarships-section').scrollIntoView({ behavior: 'smooth' });
+				});
+				</script>
+		 <script src="{{ asset('assets/js/jquery.js') }}"></script>
+		 <script src="{{ asset('assets/js/vendors.min.js') }}"></script>
+		 <script src="{{ asset('assets/js/main.js') }}"></script>
+	</body>
+</html>

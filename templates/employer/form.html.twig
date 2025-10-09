@@ -1,0 +1,2531 @@
+{% if type == "reject" %}
+	{{ form_start(form, {action: path('app_recruitment_status_reject_candidate', {'candidate': candidate.id})}) }}
+	<div class="row">
+		<div class="col-12">
+			<div class="{{msg.class}}" role="alert">
+				{{msg.msg}}
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Candidate</label>
+				<h4>{{candidate.fullname}}</h4>
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Vacancy</label>
+				<h4>{{candidate.vacancy.name ?? ""}}</h4>
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Current Status</label>
+				<h4>{{candidate.hiringstatus}}</h4>
+			</div>
+		</div>
+		<div class="col-12">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">{{ form_label(form.note, 'Note') }}</label>
+				{{ form_widget(form.note, {'attr': {'class': 'form-control', 'placeholder': 'Note'}}) }}
+				{{ form_errors(form.note) }}
+			</div>
+		</div>
+	</div>
+
+	<button type="submit" class="btn btn-primary">Submit</button>
+	{{ form_end(form) }}
+{% elseif type == "post tender" %}
+	{% if tender.id %}
+		{{ form_start(form, {action: path('app_employer_add_tender', {'tender': tender.id})}) }}
+	{% else %}
+		{{ form_start(form, {action: path('app_employer_add_tender')}) }}
+
+	{% endif %}
+
+	<div class="row" data-controller="sync-location" data-sync-location-cities-url-value="{{ path('app_fetch_cities') }}" data-sync-location-states-url-value="{{ path('app_fetch_states') }}">
+		<div class="col-12">
+			<h5 class="fs-4 fw-semibold mb-4">Tender Basic Details</h5>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Tender Title *</label>
+				{{ form_widget(form.title, {'attr': {'class': 'form-control', 'placeholder': 'Title'}}) }}
+				{{ form_errors(form.title) }}
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Tender Value</label>
+				{{ form_widget(form.value, {'attr': {'class': 'form-control', 'placeholder': 'example e.g. $100,000'}}) }}
+				{{ form_errors(form.value) }}
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Tender duration *</label>
+				{{ form_widget(form.duration, {'attr': {'class': 'form-control', 'placeholder': 'Tender duration'}}) }}
+				{{ form_errors(form.duration) }}
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Funded By</label>
+				{{ form_widget(form.funded_by, {'attr': {'class': 'form-control', 'placeholder': 'Funded By'}}) }}
+				{{ form_errors(form.funded_by) }}
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Tender closing date *</label>
+				{{ form_widget(form.closing_date, {'attr': {'class': 'form-control', 'placeholder': 'Tender closing_date'}}) }}
+				{{ form_errors(form.closing_date) }}
+			</div>
+		</div>
+		<div class="col-12">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Scope *</label>
+				{{ form_widget(form.description, {'attr': {'class': 'form-control', 'placeholder': 'Scope'}}) }}
+				{{ form_errors(form.description) }}
+			</div>
+		</div>
+		<div class="col-12">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Skill and Experience Requirements</label>
+				{{ form_widget(form.skill_and_experience, {'attr': {'class': 'form-control', 'placeholder': 'Skill and Experience Requirements'}}) }}
+				{{ form_errors(form.skill_and_experience) }}
+			</div>
+		</div>
+
+
+		<div class="col-12">
+			<h5 class="fs-4 fw-semibold mb-4">More Details</h5>
+		</div>
+		<div class="col-6">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Company Name*</label>
+				{{ form_widget(form.company_name, {'attr': {'class': 'form-control', 'placeholder': 'Company Name'}}) }}
+				{{ form_errors(form.company_name) }}
+			</div>
+		</div>
+		<div class="col-6">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Contact Name</label>
+				{{ form_widget(form.contact_name, {'attr': {'class': 'form-control', 'placeholder': 'Contact Name'}}) }}
+				{{ form_errors(form.contact_name) }}
+			</div>
+		</div>
+		<div class="col-6">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Contact Email*</label>
+				{{ form_widget(form.contact_email, {'attr': {'class': 'form-control', 'placeholder': 'Company Email'}}) }}
+				{{ form_errors(form.contact_email) }}
+			</div>
+		</div>
+		<div class="col-6">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Contact Phone</label>
+				{{ form_widget(form.contact_phone, {'attr': {'class': 'form-control', 'placeholder': 'Contact Phone'}}) }}
+				{{ form_errors(form.contact_phone) }}
+			</div>
+		</div>
+
+		<div class="col-3">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Country*</label>
+				{{ form_widget(form.country) }}
+				{{ form_errors(form.country) }}
+			</div>
+		</div>
+		<div class="col-3">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">City*</label>
+				{{ form_widget(form.city) }}
+				{{ form_errors(form.city) }}
+			</div>
+		</div>
+		<div class="col-3">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">States</label>
+				{{ form_widget(form.states) }}
+				{{ form_errors(form.states) }}
+			</div>
+		</div>
+
+		<div class="col-3">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Zip/Postal Code</label>
+				{{ form_widget(form.zip, {'attr': {'class': 'form-control', 'placeholder': 'Zip Code'}}) }}
+				{{ form_errors(form.zip) }}
+			</div>
+		</div>
+
+		<div class="col-6">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">External Link</label>
+				{{ form_widget(form.external_link, {'attr': {'class': 'form-control', 'placeholder': 'Insert email or link here for external applications'}}) }}
+				{{ form_errors(form.external_link) }}
+			</div>
+		</div>
+		<div class="col-6">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Tender Description File (Please upload a valid PDF or ZIP file.)</label>
+				{{ form_widget(form.attachment, {'attr': {'class': 'form-control', 'placeholder': 'External Link'}}) }}
+				{{ form_errors(form.attachment) }}
+			</div>
+		</div>
+	</div>
+
+	<button type="submit" class="btn btn-primary">Submit</button>
+	{{ form_end(form) }}
+
+	{# …existing blocks … #}
+
+{% elseif type == "view tender" %}
+    {# ⚠️ DO NOT call form_start / form_end here — we’re just showing data #}
+    <div class="row">
+        <div class="col-12">
+            <h5 class="fs-4 fw-semibold mb-4">Tender Basic Details</h5>
+        </div>
+
+        <div class="col-4">
+            <label class="form-label">Tender Title</label>
+            <p class="form-control-plaintext">{{ tender.title }}</p>
+        </div>
+
+        <div class="col-4">
+            <label class="form-label">Tender Value</label>
+            <p class="form-control-plaintext">{{ tender.value }}</p>
+        </div>
+
+        <div class="col-4">
+            <label class="form-label">Tender Duration</label>
+            <p class="form-control-plaintext">{{ tender.duration }}</p>
+        </div>
+
+        <div class="col-4">
+            <label class="form-label">Funded By</label>
+            <p class="form-control-plaintext">{{ tender.fundedBy }}</p>
+        </div>
+
+        <div class="col-4">
+            <label class="form-label">Closing Date</label>
+            <p class="form-control-plaintext">{{ tender.closingDate|date('Y-m-d') }}</p>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label">Scope</label>
+            <p class="form-control-plaintext">{{ tender.description }}</p>
+        </div>
+
+        <div class="col-12">
+            <label class="form-label">Skill &amp; Experience Requirements</label>
+            <p class="form-control-plaintext">{{ tender.skillAndExperience }}</p>
+        </div>
+
+        <div class="col-12">
+            <h5 class="fs-4 fw-semibold mb-4">More Details</h5>
+        </div>
+
+        <div class="col-6">
+            <label class="form-label">Company Name</label>
+            <p class="form-control-plaintext">{{ tender.companyName }}</p>
+        </div>
+
+        <div class="col-6">
+            <label class="form-label">Contact Name</label>
+            <p class="form-control-plaintext">{{ tender.contactName }}</p>
+        </div>
+
+        <div class="col-6">
+            <label class="form-label">Contact Email</label>
+            <p class="form-control-plaintext">{{ tender.contactEmail }}</p>
+        </div>
+
+        <div class="col-6">
+            <label class="form-label">Contact Phone</label>
+            <p class="form-control-plaintext">{{ tender.contactPhone }}</p>
+        </div>
+
+        <div class="col-3">
+            <label class="form-label">Country</label>
+            <p class="form-control-plaintext">{{ tender.country.name }}</p>
+        </div>
+
+        <div class="col-3">
+            <label class="form-label">City</label>
+            <p class="form-control-plaintext">{{ tender.city.name }}</p>
+        </div>
+
+        <div class="col-3">
+            <label class="form-label">State</label>
+            <p class="form-control-plaintext">{{ tender.states ? tender.states.name : '—' }}</p>
+        </div>
+
+        <div class="col-3">
+            <label class="form-label">ZIP / Postal Code</label>
+            <p class="form-control-plaintext">{{ tender.zip }}</p>
+        </div>
+
+        <div class="col-6">
+            <label class="form-label">External Link</label>
+            {% if tender.externalLink %}
+                <p class="form-control-plaintext">
+                    <a href="{{ tender.externalLink }}" target="_blank">{{ tender.externalLink }}</a>
+                </p>
+            {% else %}
+                <p class="form-control-plaintext">—</p>
+            {% endif %}
+        </div>
+
+        <div class="col-6">
+            <label class="form-label">Tender File</label>
+            {% if tender.attachment %}
+                <p class="form-control-plaintext">
+                    <a href="{{ asset('uploads/tenders/' ~ tender.attachment) }}" target="_blank">
+                        {{ tender.attachment }}
+                    </a>
+                </p>
+            {% else %}
+                <p class="form-control-plaintext">—</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <a href="{{ path('app_employer_add_tender', {tender: tender.id}) }}" class="btn btn-primary mt-3">
+        Edit Tender
+    </a>
+
+{% elseif type == "post course" %}
+	{% if course.id %}
+		{{ form_start(form, {action: path('app_employer_add_course', {'course': course.id})}) }}
+	{% else %}
+		{{ form_start(form, {action: path('app_employer_add_course')}) }}
+
+	{% endif %}
+
+	<div class="row" data-controller="sync-location" data-sync-location-cities-url-value="{{ path('app_fetch_cities') }}" data-sync-location-states-url-value="{{ path('app_fetch_states') }}">
+		<div class="col-12">
+			<h5 class="fs-4 fw-semibold mb-4">Course Basic Details</h5>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Course Title *</label>
+				{{ form_widget(form.title, {'attr': {'class': 'form-control', 'placeholder': 'title'}}) }}
+				{{ form_errors(form.title) }}
+			</div>
+		</div>
+
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Course Category</label>
+				{{ form_widget(form.category, {'attr': {'class': 'form-control', 'placeholder': 'Category'}}) }}
+				{{ form_errors(form.category) }}
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Course duration *</label>
+				{{ form_widget(form.course_duration, {'attr': {'class': 'form-control', 'placeholder': 'Course duration'}}) }}
+				{{ form_errors(form.course_duration) }}
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Course starting date *</label>
+				{{ form_widget(form.start_date, {'attr': {'class': 'form-control', 'placeholder': 'Tender duration'}}) }}
+				{{ form_errors(form.start_date) }}
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Course closing date *</label>
+				{{ form_widget(form.close_date, {'attr': {'class': 'form-control', 'placeholder': 'Tender closing_date'}}) }}
+				{{ form_errors(form.close_date) }}
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">External Link</label>
+				{{ form_widget(form.external_link, {'attr': {'class': 'form-control', 'placeholder': 'External Link'}}) }}
+				{{ form_errors(form.external_link) }}
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Price</label>
+				{{ form_widget(form.price, {'attr': {'class': 'form-control', 'placeholder': 'Price'}}) }}
+				{{ form_errors(form.price) }}
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">File Attachment</label>
+				{{ form_widget(form.attachment, {'attr': {'class': 'form-control', 'placeholder': 'Attachment'}}) }}
+				{{ form_errors(form.attachment) }}
+			</div>
+		</div>
+		<div class="col-12">
+			<h5 class="fs-4 fw-semibold mb-4">Location Details</h5>
+		</div>
+		<div class="col-3">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Country</label>
+				{{ form_widget(form.country) }}
+				{{ form_errors(form.country) }}
+			</div>
+		</div>
+		<div class="col-3">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">City</label>
+				{{ form_widget(form.city) }}
+				{{ form_errors(form.city) }}
+			</div>
+		</div>
+		<div class="col-3">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">States</label>
+				{{ form_widget(form.states) }}
+				{{ form_errors(form.states) }}
+			</div>
+		</div>
+
+		<div class="col-3">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Zip/Postal Code</label>
+				{{ form_widget(form.zip, {'attr': {'class': 'form-control', 'placeholder': 'Zip Code'}}) }}
+				{{ form_errors(form.zip) }}
+			</div>
+		</div>
+
+
+		<div class="col-12">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Description</label>
+				{{ form_widget(form.description, {'attr': {'class': 'form-control', 'placeholder': 'Description'}}) }}
+				{{ form_errors(form.description) }}
+			</div>
+		</div>
+
+	</div>
+
+	<button type="submit" class="btn btn-primary">Submit</button>
+	{{ form_end(form) }}
+{% elseif type == "shortlisted" %}
+	{{ form_start(form, {action: path('app_employer_shortlist_application', {'candidate': candidate.id})}) }}
+	<div class="row">
+		<div class="col-12">
+			<div class="{{msg.class}}" role="alert">
+				{{msg.msg}}
+			</div>
+		</div>
+		<div class="col-12"></div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Candidate</label>
+				<div class="d-flex align-items-center">
+					<div class="position-relative">
+						<img src="{{ asset('uploads/profile/' ~ (candidate.profile ?? 'no-image.jpg')) }}" alt="user1" width="54" height="54" class="rounded-circle">
+						<span class="position-absolute bottom-0 end-0 p-1 badge rounded-pill bg-success">
+							<span class="visually-hidden">New alerts</span>
+						</span>
+					</div>
+					<div
+						class="ms-3">
+						{# {{ dump(candidate) }} #}
+						<h4 class="fw-semibold mb-2">{{candidate.jobseeker.name}}</h4>
+						{# <p class="mb-0 fs-2">Designer</p> #}
+					</div>
+				</div>
+				<h4></h4>
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Job</label>
+				<h4>
+					{% if candidate.job.jobtitle %}
+						{{candidate.job.jobtitle.name}}
+					{% elseif candidate.job.title %}
+						{{candidate.job.title}}
+					{% endif %}
+				</h4>
+			</div>
+		</div>
+		<div class="col-4">
+			<div
+				class="mb-3">{# <label for="formGroupExampleInput" class="form-label">Current Status</label>
+																																																																																																																																																<h4>{{candidate.status}}</h4> #}
+			</div>
+		</div>
+
+		<div class="col-12">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">{{ form_label(form.note, 'Note') }}</label>
+				{{ form_widget(form.note, {'attr': {'class': 'form-control', 'placeholder': 'Note'}}) }}
+				{{ form_errors(form.note) }}
+			</div>
+		</div>
+	</div>
+
+	<button type="submit" class="btn btn-primary">Submit</button>
+	{{ form_end(form) }}
+{% elseif type == "message" %}
+	{{ form_start(form, {action: path('app_employer_message_candidate', {'candidate': candidate.id})}) }}
+	<div class="row">
+		<div class="col-12">
+			<label for="formGroupExampleInput" class="form-label">Candidate</label>
+			<div class="mb-3 input-group">
+				<input type="email" value="{{candidate.name}}" readonly class="form-control" id="text-email" placeholder="Recipients">
+				<input type="radio" class="btn-check" name="options" id="option1" autocomplete="off" checked="">
+				<label class="btn btn-primary" for="option1">Auto</label>
+
+			</div>
+		</div>
+		<div class="col-12">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">{{ form_label(form.message, 'Message') }}</label>
+				{{ form_widget(form.message, {'attr': {'class': 'form-control', 'placeholder': 'Message', 'rows': 6}}) }}
+				{{ form_errors(form.message) }}
+			</div>
+		</div>
+	</div>
+
+	<button type="submit" class="btn btn-primary">Send</button>
+	{{ form_end(form) }}
+{% elseif type == "manual shortlisted" %}
+	{{ form_start(form, {action: path('app_employer_shortlist_manual_candidate', {'candidate': candidate.id})}) }}
+	<div class="row">
+		<div class="col-12">
+			<div class="{{msg.class}}" role="alert">
+				{{msg.msg}}
+			</div>
+		</div>
+		<div class="col-12"></div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Candidate</label>
+				<div class="d-flex align-items-center">
+					<div class="position-relative">
+						<img src="{{ asset('uploads/profile/' ~ (candidate.profile ?? 'no-image.jpg')) }}" alt="user1" width="54" height="54" class="rounded-circle">
+						<span class="position-absolute bottom-0 end-0 p-1 badge rounded-pill bg-success">
+							<span class="visually-hidden">New alerts</span>
+						</span>
+					</div>
+					<div class="ms-3">
+						<h4 class="fw-semibold mb-2">{{candidate.name}}</h4>
+						<p class="mb-0 fs-2">
+							{% if candidate.jobSeekerResume %}
+								{{candidate.jobSeekerResume.jobtitle.name}}
+							{% endif %}
+						</p>
+					</div>
+				</div>
+				<h4></h4>
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Job</label>
+				<h4>N/A</h4>
+			</div>
+		</div>
+		<div class="col-4">
+			<div
+				class="mb-3">{# <label for="formGroupExampleInput" class="form-label">Current Status</label>
+																																																																																																																																																<h4>{{candidate.status}}</h4> #}
+			</div>
+		</div>
+
+		{# <div class="col-12">
+																																																											<div class="mb-3">
+																																																												<label for="formGroupExampleInput" class="form-label">{{ form_label(form.note, 'Note') }}</label>
+																																																												{{ form_widget(form.note, {'attr': {'class': 'form-control', 'placeholder': 'Note'}}) }}
+																																																												{{ form_errors(form.note) }}
+																																																											</div>
+																																																										</div> #}
+	</div>
+
+	<button type="submit" class="btn btn-primary">Submit</button>
+	{{ form_end(form) }}
+{% elseif type == "rejected" %}
+	{{ form_start(form, {action: path('app_employer_reject_candidate', {'candidate': candidate.id})}) }}
+	<div class="row">
+		<div class="col-12">
+			<div class="{{msg.class}}" role="alert">
+				{{msg.msg}}
+			</div>
+		</div>
+		<div class="col-12"></div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Candidate</label>
+				<div class="d-flex align-items-center">
+					<div class="position-relative">
+						<img src="{{ asset('uploads/profile/' ~ (candidate.profile ?? 'no-image.jpg')) }}" alt="user1" width="54" height="54" class="rounded-circle">
+						<span class="position-absolute bottom-0 end-0 p-1 badge rounded-pill bg-success">
+							<span class="visually-hidden">New alerts</span>
+						</span>
+					</div>
+					<div class="ms-3">
+						<h4 class="fw-semibold mb-2">{{candidate.jobSeeker.name}}</h4>
+						<p class="mb-0 fs-2">
+							{% if candidate.jobSeeker.jobSeekerResume %}
+								{{candidate.jobSeeker.jobSeekerResume.jobtitle.name}}
+							{% endif %}
+						</p>
+					</div>
+				</div>
+				<h4></h4>
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Job</label>
+				<h4>{{candidate.job ?  candidate.job.title :  "N/A"}}</h4>
+			</div>
+			{# <div class="mb-3">
+																												<label for="formGroupExampleInput" class="form-label">Note</label>
+																												{{ form_widget(form.note, {'attr': {'class': 'form-control  form-control-lg', 'placeholder': 'Note'}}) }}
+																												{{ form_errors(form.note) }}
+																											</div> #}
+		</div>
+		<div class="col-4">
+			<div
+				class="mb-3">{# <label for="formGroupExampleInput" class="form-label">Current Status</label>
+																																																																																																																																																<h4>{{candidate.status}}</h4> #}
+			</div>
+		</div>
+
+		<div class="col-12">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">{{ form_label(form.message, 'message') }}</label>
+				{{ form_widget(form.message, {'attr': {'class': 'form-control', 'placeholder': 'message'}}) }}
+				{{ form_errors(form.message) }}
+			</div>
+		</div>
+	</div>
+
+	<button type="submit" class="btn btn-primary">Submit</button>
+	{{ form_end(form) }}
+{% elseif type == "interview scheduled" %}
+	{{ form_start(form, {action: path('app_employer_schedule_interview', {'candidate': candidate.id})}) }}
+	<div class="row" data-controller="sync-location" data-sync-location-cities-url-value="{{ path('app_fetch_cities') }}" data-sync-location-states-url-value="{{ path('app_fetch_states') }}">
+		<div class="col-12">
+			<div class="card">
+				<div class="card-body">
+					<div class="row">
+						<div class="col-12"></div>
+						<div class="col-4">
+							<div class="mb-3">
+								<label for="formGroupExampleInput" class="form-label">Candidate</label>
+								<div class="d-flex align-items-center">
+									<div class="position-relative">
+										<img src="{{ asset('uploads/profile/' ~ (candidate.jobseeker.profile ?? 'no-image.jpg')) }}" alt="user1" width="54" height="54" class="rounded-circle">
+										<span class="position-absolute bottom-0 end-0 p-1 badge rounded-pill bg-success">
+											<span class="visually-hidden">New alerts</span>
+										</span>
+									</div>
+									<div class="ms-3">
+										<h4 class="fw-semibold mb-2">{{candidate.jobseeker.name}}</h4>
+										<p class="mb-0 fs-2">
+											{% if candidate.jobSeeker.jobSeekerResume %}
+												{{candidate.jobSeeker.jobSeekerResume.jobtitle.name}}
+											{% endif %}
+										</p>
+									</div>
+								</div>
+								<h4></h4>
+							</div>
+						</div>
+						<div class="col-4">
+							<div class="mb-3">
+								<label for="formGroupExampleInput" class="form-label">Job</label>
+								<h4>{{candidate.job ?  candidate.job.title :  ""}}</h4>
+							</div>
+						</div>
+						<div class="col-4">
+							<div class="mb-3">
+								<label for="formGroupExampleInput" class="form-label">Current Status</label>
+								<h4>{{candidate.status|capitalize}}</h4>
+							</div>
+						</div>
+
+						<div class="col-4">
+							<div class="mb-3">
+								<label for="formGroupExampleInput" class="form-label">Total Number of rounds in the process</label>
+								{{ form_widget(form.rounds, {'attr': {'class': 'form-control  form-control-lg', 'placeholder': 'Rounds'}}) }}
+								{{ form_errors(form.rounds) }}
+							</div>
+						</div>
+						<div class="col-4">
+							<div class="mb-3">
+								<label for="formGroupExampleInput" class="form-label">Choose Inteview Round</label>
+								{{ form_widget(form.which_round, {'attr': {'class': 'form-control  form-control-lg', 'placeholder': 'Which Round'}}) }}
+								{{ form_errors(form.which_round) }}
+							</div>
+						</div>
+						<div class="col-4">
+							<div class="mb-3">
+								<label for="formGroupExampleInput" class="form-label">Select Interview Date</label>
+								{{ form_widget(form.date, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'date'}}) }}
+								{{ form_errors(form.date) }}
+							</div>
+						</div>
+						<div class="col-12">
+							<div class="mb-3">
+								<label for="formGroupExampleInput" class="form-label">{{ form_label(form.notes, 'Notes') }}</label>
+								{{ form_widget(form.notes, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'Note'}}) }}
+								{{ form_errors(form.notes) }}
+							</div>
+						</div>
+
+
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-12 ">
+			<div class="card">
+				<div class="card-body">
+
+					<h4 class="card-title">Interview Type</h4>
+
+					<p
+						class="mb-3 card-subtitle">{# Use default tab with class #}
+					</p>
+					<div>
+						<!-- Nav tabs -->
+						<ul class="nav nav-tabs" role="tablist" data-controller="employer sync-select sync-location" data-sync-location-cities-url-value="{{ path('app_fetch_cities') }}" data-sync-location-states-url-value="{{ path('app_fetch_states') }}">
+							<li class="nav-item" role="presentation">
+								<a data-type="in person" data-action="click->employer#setType" class="nav-link d-flex justify-content align-items-center active btn btn-block btn-block btn-large" data-bs-toggle="tab" href="#home2" role="tab" aria-selected="true">
+									<span>
+										<i class="ti ti-home-2 fs-8"></i>
+									</span>
+									<span class="d-none d-md-block ms-2">In Person Interview</span>
+								</a>
+							</li>
+							<li class="nav-item" role="presentation">
+								<a data-type="virtual" data-action="click->employer#setType" class="nav-link d-flex justify-content align-items-center  btn-block" data-bs-toggle="tab" href="#profile2" role="tab" aria-selected="false" tabindex="-1">
+									<span>
+										<i class="ti ti-video fs-8"></i>
+									</span>
+									<span class="d-none d-md-block ms-2">Virtual Interview</span>
+								</a>
+							</li>
+						</ul>
+						<!-- Tab panes -->
+						<div class="tab-content">
+							<div class="tab-pane active" id="home2" role="tabpanel">
+								<div class="p-3">
+
+									<div class="row">
+										<div class="col-4">
+											<div class="mb-3">
+												<label for="formGroupExampleInput" class="form-label">Address</label>
+												{{ form_widget(form.location, {'attr': {'class': 'form-control'}}) }}
+												{{ form_errors(form.location) }}
+											</div>
+										</div>
+										<div class="col-4">
+											<div class="mb-3">
+												<label for="formGroupExampleInput" class="form-label">Country</label>
+												{{ form_widget(form.country) }}
+												{{ form_errors(form.country) }}
+											</div>
+										</div>
+										<div class="col-4">
+											<div class="mb-3">
+												<label for="formGroupExampleInput" class="form-label">City</label>
+												{{ form_widget(form.city) }}
+												{{ form_errors(form.city) }}
+											</div>
+										</div>
+
+									</div>
+								</div>
+							</div>
+							<div class="tab-pane p-3" id="profile2" role="tabpanel">
+								<h4>Virtual Meeting</h4>
+								<div class="row">
+									<div class="col-6">
+										<div class="mb-3">
+											<label for="formGroupExampleInput" class="form-label">Virtual Meeting Link</label>
+											{{ form_widget(form.meeting_link, {'attr': {'class': 'form-control  form-control-lg', 'placeholder': 'meeting_link'}}) }}
+											{{ form_errors(form.meeting_link) }}
+										</div>
+									</div>
+
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<button type="submit" class="btn btn-primary  btn-large">Submit</button>
+	{{ form_end(form) }}
+{% elseif type == "resume" %}
+	<div class="row">
+		<div class="col-12">
+			<div class="card">
+				<div class="card-body">
+					<div class="action-btn layout-top-spacing mb-7 d-flex align-items-center justify-content-between flex-wrap gap-6">
+						<div class="">
+							<div class="d-flex align-items-center">
+								<div
+									class="position-relative">
+									{# <img src="{{ asset('uploads/profile/' ~ (candidate.jobseeker.profile ?? 'no-image.jpg')) }}" alt="user1" width="80" height="80" class="rounded-circle"> #}
+									<img src="{{ candidate.profile starts with 'http' ? candidate.profile : asset('uploads/profile/' ~ (candidate.profile ?? 'no-image.jpg')) }}" alt="user1" width="80" height="80" class="rounded-circle">
+
+									<span class="position-absolute bottom-0 end-0 p-1 badge rounded-pill bg-success">
+										<span class="visually-hidden">New alerts</span>
+									</span>
+								</div>
+								<div class="ms-3">
+									<h4 class="fw-semibold mb-2">{{candidate.name}}</h4>
+									<p class="mb-0 fs-2">Last active:
+										{{candidate.lastLogin }}</p>
+								</div>
+							</div>
+							<h4></h4>
+						</div>
+
+
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-7">
+			<div class="card">
+
+				<div class="card-body p-4">
+					<div>
+						<h4 class="fw-semibold mb-8">Personal Informations</h4>
+					</div>
+					<div class="row">
+						<div class="col-md-6 mt-4">
+							<div class="  d-flex align-items-center rounded-3">
+								<div class="boxlogoiconj">
+									<a href="#"><img class="img-fluid" src="/assets/images/pr_1.png" alt=""></a>
+								</div>
+								<div class="flex-grow-1 ms-3">
+									<p class="texthead mt-1">Name</p>
+									<h6 class="fs-15  sufont">{{jobseeker.name}}</h6>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-6 mt-4">
+							<div class="  d-flex align-items-center rounded-3">
+								<div class="boxlogoiconj">
+									<a href="#"><img class="img-fluid" src="/assets/images/pr_2.png" alt=""></a>
+								</div>
+								<div class="flex-grow-1 ms-3">
+									<p class="texthead mt-1">Email address</p>
+									<h6 class="fs-15  sufont">{{jobseeker.email}}</h6>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-6 mt-4">
+							<div class="  d-flex align-items-center rounded-3">
+								<div class="boxlogoiconj">
+									<a href="#"><img class="img-fluid" src="/assets/images/pr_3.png" alt=""></a>
+								</div>
+								<div class="flex-grow-1 ms-3">
+									<p class="texthead mt-1">Gender</p>
+									<h6 class="fs-15  sufont">{{jobseeker.jobseekerDetails.gender ? jobseeker.jobseekerDetails.gender.name : "N/A"}}</h6>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-6 mt-4">
+							<div class="  d-flex align-items-center rounded-3">
+								<div class="boxlogoiconj">
+									<a href="#"><img class="img-fluid" src="/assets/images/pr_4.png" alt=""></a>
+								</div>
+								<div class="flex-grow-1 ms-3">
+									<p class="texthead mt-1">Age</p>
+									<h6 class="fs-15  sufont">{{jobseeker.jobseekerDetails.age}}</h6>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-6 mt-4">
+							<div class="  d-flex align-items-center rounded-3">
+								<div class="boxlogoiconj">
+									<a href="#"><img class="img-fluid" src="/assets/images/pr_5.png" alt=""></a>
+								</div>
+								<div class="flex-grow-1 ms-3">
+									<p class="texthead mt-1">Phone number</p>
+									<h6 class="fs-15  sufont">{{jobseeker.jobseekerDetails.phone}}</h6>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-6 mt-4">
+							<div class="  d-flex align-items-center rounded-3">
+								<div class="boxlogoiconj">
+									<a href="#"><img class="img-fluid" src="/assets/images/pr_6.png" alt=""></a>
+								</div>
+								<div class="flex-grow-1 ms-3">
+									<p class="texthead mt-1">WhatsApp no</p>
+									<h6 class="fs-15  sufont">-</h6>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-6 mt-4">
+							<div class="  d-flex align-items-center rounded-3">
+								<div class="boxlogoiconj">
+									<a href="#"><img class="img-fluid" src="/assets/images/pr_7.png" alt=""></a>
+								</div>
+								<div class="flex-grow-1 ms-3">
+									<p class="texthead mt-1">Location</p>
+									<h6 class="fs-15  sufont">
+										{{jobseeker.jobseekerdetails.country.name ?? '' }},{{jobseeker.jobseekerdetails.city.name ?? '' }}
+									</h6>
+								</div>
+							</div>
+						</div>
+						<div class="col-md-6 mt-4">
+							<div class="  d-flex align-items-center rounded-3">
+								<div class="boxlogoiconj">
+									<a href="#"><img class="img-fluid" src="/assets/images/pr_7.png" alt=""></a>
+								</div>
+								<div class="flex-grow-1 ms-3">
+									<p class="texthead mt-1">Preferred Method of Contact</p>
+									<h6 class="fs-15  sufont">
+										{{jobseeker.jobseekerDetails.contacttype}}</h6>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="border-top mt-7 pt-7"></div>
+					<div class="row">
+						<div class="col-12">
+							<div class="card">
+								<div class="card-body">
+									<h4 class="fw-semibold mb-8">About Me</h4>
+									<div class="row">
+										<div class="col-lg-12 mt-4">
+											<p class="mb-3">
+												{{jobseeker.jobseekerDetails.aboutme ?? ""}}
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="border-top mt-7 pt-7"></div>
+						<div class="col-12">
+							<div class="card">
+								<div class="card-body">
+									<h4 class="fw-semibold mb-8">Resume Headline</h4>
+									<p>{{jobseeker.jobseekerDetails.resumeheadline ?? ""}}</p>
+									<div class="row">
+										{% if jobseeker.jobSeekerResume.resumeVisible %}
+											<div class="col-lg-12 mt-4">
+												<div class="vstack gap-3 mt-4">
+													{% if jobseeker.jobseekerDetails.cv %}
+
+														<div class="hstack gap-6">
+															<h6 class=" mb-0">
+																<a class="btn primary_two" target="_blank" href="{{ asset('uploads/'~ jobseeker.jobseekerDetails.cv)}}">
+																	<i class="ti ti-file text-white fs-6"></i>
+																	Resume File</a>
+															</h6>
+														</div>
+													{% else %}
+														<p>N/A</p>
+													{% endif %}
+
+												</div>
+											</div>
+										{% endif %}
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="border-top mt-7 pt-7"></div>
+
+					<div
+						class="row">
+						{# education  #}
+
+						<div class="col-12">
+							<div class="card-body p-4">
+								<div>
+									<h4 class="fw-semibold mb-8">Education</h4>
+
+								</div>
+
+								{% if jobseeker.jobSeekerEducation|length < 1 %}
+									<div class="p3 d-flex justify-content-center">
+										<h5 class="mb-0 fw-bold">No education registered</h5>
+									</div>
+								{% endif %}
+								<div class="accordion" id="accordionFlushExample">
+									{% for education in jobseeker.jobSeekerEducation %}
+										<div class="accordion-item" data-controller="accordion">
+											<h2 class="accordion-header" id="flush-heading{{ education.id }}">
+												<button
+													class="accordion-button fw-bold collapsed" type="button" data-bs-target="#flush-collapse{{ education.id }}" aria-expanded="false" aria-controls="flush-collapse{{ education.id }}" data-action="click->accordion#toggle" data-accordion-target="button">
+													<!-- Target the button -->
+													{{ education.course ~ ' - ' ~ education.school }}
+												</button>
+											</h2>
+											<div
+												id="flush-collapse{{ education.id }}" class="accordion-collapse collapse" aria-labelledby="flush-heading{{ education.id }}" data-bs-parent="#accordionFlushExample" data-accordion-target="content">
+												<!-- Target the content panel -->
+												<div class="accordion-body">
+													<p>
+														<strong class="fw-bold">Type:
+														</strong>
+														{{ education.enrolled ? 'Still Enrolled' : 'Completed' }}</p>
+													<p>
+														<strong class="fw-bold">Specialization:
+														</strong>
+														{{ education.specialization }}</p>
+													<p>
+														<strong class="fw-bold">Course Type:
+														</strong>
+														{{ education.courseTypeName }}</p>
+													<p>
+														<strong class="fw-bold">Course Duration:
+														</strong>
+														{{ education.fromyear|date('Y-m-d') ~ ' To ' ~ education.toyear|date('Y-m-d') }}</p>
+													<p>
+														<strong class="fw-bold">Grading System:
+														</strong>
+														{{ education.gradingSystem }}</p>
+													<p>
+														<strong class="fw-bold">Location:
+														</strong>
+														{% if education.country %}
+															{{ education.country.name }}
+														{% endif %}
+														{% if education.city %}
+															{{ ' ' ~ education.city.name }}
+														{% endif %}
+														{% if education.state %}
+															{{ ', ' ~ education.state.name ~ ', ' ~ education.zipCode }}
+														{% endif %}
+													</p>
+													{% if education.address %}
+														<p>
+															<strong class="fw-bold">Address:
+															</strong>
+															{{ education.address }}</p>
+													{% endif %}
+												</div>
+											</div>
+										</div>
+									{% endfor %}
+								</div>
+
+							</div>
+						</div>
+						<div class="col-12">
+
+							<div class="card-body p-4" id="education_form">
+								<div>
+									<h4 class="fw-semibold mb-8">Work Experience</h4>
+								</div>
+								{% if jobseeker.jobSeekerExperiences|length < 1 %}
+									<div class="p3 d-flex justify-content-center">
+										<h5 class="mb-0 fw-bold">No Experience</h5>
+									</div>
+								{% endif %}
+								<div class="accordion" id="accordionFlushExample" data-controller="accordion">
+
+									<div class="accordion" id="accordionFlushExample">
+										{% for experience in jobseeker.jobSeekerExperiences %}
+											<div class="accordion-item" data-controller="accordion">
+												<h2 class="accordion-header" id="workEx-heading{{ experience.id }}">
+													<button
+														class="accordion-button fw-bold collapsed" type="button" data-bs-target="#workEx-collapse{{ experience.id }}" aria-expanded="false" aria-controls="workEx-collapse{{ experience.id }}" data-action="click->accordion#toggle" data-accordion-target="button">
+														<!-- Target the button -->
+														{{ experience.companyName ~ ' - ' ~ experience.experienceYears ?? (experience.experienceMonths ?? '') }}
+													</button>
+												</h2>
+												<div
+													id="workEx-collapse{{ experience.id }}" class="accordion-collapse collapse" aria-labelledby="workEx-heading{{ experience.id }}" data-bs-parent="#accordionFlushExample" data-accordion-target="content">
+													<!-- Target the content panel -->
+													<div class="accordion-body">
+														<p>
+															<strong class="fw-bold">Company/Organization Name:
+															</strong>
+															{{ experience.companyName }}
+														</p>
+														<p>
+															<strong class="fw-bold">Total Experience:
+															</strong>
+															{% if (experience.experienceYears) %}
+																{{ experience.experienceYears }}
+																Years
+															{% endif %}
+															{% if (experience.experienceMonths) %}
+																{{ experience.experienceYears ? ', ' : '' }}
+																{{ experience.experienceMonths }}
+																Months
+															{% endif %}
+														</p>
+														<p>
+															<strong class="fw-bold">Joined Date:
+															</strong>
+															{{ experience.joinedDate|date('Y-m-d') }}
+														</p>
+														{% if experience.finishDate %}
+															<p>
+																<strong class="fw-bold">Finished Date:
+																</strong>
+																{{ experience.finishDate|date('Y-m-d') }}
+															</p>
+														{% endif %}
+														<p>
+															<strong class="fw-bold">Location:
+															</strong>
+															{% if experience.country %}
+																{{ experience.country.name }}
+															{% endif %}
+															{% if experience.city %}
+																{{ ' ' ~ experience.city.name }}
+															{% endif %}
+															{% if experience.state %}
+																{{ ', '  ~ experience.state.name ~ ', '  ~ experience.zipCode }}
+															{% endif %}
+														</p>
+														<p>
+															<strong class="fw-bold">Notice Period:
+															</strong>
+															{{ experience.noticePeriod }}
+														</p>
+														{% if experience.salary %}
+															<p>
+																<strong class="fw-bold">Salary:
+																</strong>
+																{{ experience.salary }}
+															</p>
+														{% endif %}
+														<p>
+															<strong class="fw-bold">Duties:
+															</strong>
+															{{ experience.duties|raw }}
+														</p>
+													</div>
+												</div>
+											</div>
+										{% endfor %}
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+						<div class="col-12">
+							<div class="card-body p-4">
+								<div>
+									<h4 class="fw-semibold mb-8 ">Certifications</h4>
+								</div>
+								{% if jobseeker.jobSeekerCertificates|length < 1 %}
+									<div class="p3 d-flex justify-content-center">
+										<h5 class="mb-0 fw-bold">No certifications registered</h5>
+									</div>
+								{% endif %}
+								<div class="accordion active show" id="accordionFlushExample">
+									{% for certificate in jobseeker.jobSeekerCertificates %}
+										<div class="accordion-item active show">
+											<h2 class="accordion-header" id="flush-headingOne{{ certificate.id }}">
+												<button class="accordion-button collapsed fw-bold btn-primary text-white" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOneCertificate{{ certificate.id }}" aria-expanded="true" aria-controls="flush-collapseOneCertificate{{ certificate.id }}">
+													{{ certificate.name ~ ' - ' ~ certificate.certificateId ?? (certificate.certificateId ?? '') }}
+												</button>
+											</h2>
+											<div id="flush-collapseOneCertificate{{ certificate.id }}" class="accordion-collapse collapse show" aria-labelledby="flush-headingOne{{ certificate.id }}" data-bs-parent="#accordionFlushExample">
+												<div class="accordion-body">
+													<p>
+														<strong class="fw-bold">Certification Name:
+														</strong>
+														{{ certificate.name }}
+													</p>
+													<p>
+														<strong class="fw-bold">Institution Name:
+														</strong>
+														{{ certificate.institute }}
+													</p>
+													<p>
+														<strong class="fw-bold">Certification Id:
+														</strong>
+														{{ certificate.id }}
+													</p>
+													{% if certificate.expirable %}
+														<p>
+															<strong class="fw-bold">Expiration Date:
+															</strong>
+															{{ certificate.expiresAt|date('Y-m-d') }}
+														</p>
+													{% endif %}
+													{# <p>
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																<strong class="fw-bold">Certification ID:
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																</strong>
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																{% if (certificate.experienceYears) %}
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																	{{ certificate.experienceYears }}
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																	Years
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																{% endif %}
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																{% if (certificate.experienceMonths) %}
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																	{{ certificate.experienceYears ? ', ' : '' }}
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																	{{ certificate.experienceMonths }}
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																	Months
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																{% endif %}
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																															</p> #}
+													<p>
+														{% set link = certificate.certificateUrl %}
+														{% set prefix = 'https://' %}
+														{% if link|slice(0, 7) == 'http://' or link|slice(0, 8) == 'https://' %}
+															{% set prefix = '' %}
+														{% endif %}
+														<strong class="fw-bold">URL:
+														</strong>
+														<a class="text-primary" href="{{ prefix ~ link }}">{{ prefix ~ link }}</a>
+
+													</p>
+													{% if certificate.file %}
+														<p class="py-2">
+															<a target="blank" class="text-primary" href="{{ asset('uploads/certifications/' ~ certificate.file)}}">
+																<strong class="fw-bold Text">Preview Certification
+
+																</strong>
+															</a>
+														</p>
+													{% endif %}
+													{# <div class="d-flex justify-content-end">
+																																								<button data-jobseeker-profile-action-param="update" data-jobseeker-profile-url-param="{{ path('job_seeker_certificate_form', {'certificate': certificate.id}) }}" data-action="click->jobseeker-profile#certificationForm" class="btn btn-outline-success btn-sm rounded fw-bold">
+																																									<i class="fa fa-edit">
+																																										Edit</i>
+																																								</button>
+																																							</div> #}
+												</div>
+											</div>
+										</div>
+									{% endfor %}
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="border-top mt-7 pt-7"></div>
+
+				</div>
+			</div>
+
+		</div>
+		<div class="col-5">
+			<div class="row">
+				<div class="col-12">
+					<div class="card-body p-4">
+						<div>
+							<h4 class="fw-semibold mb-8">Resume Summary</h4>
+						</div>
+						{% if jobseeker.jobSeekerResume %}
+							<div class="p-2">
+								<div class="">
+									<strong>Job Title</strong>
+									{% if jobseeker.jobSeekerResume %}
+										<p>{{ jobseeker.jobSeekerResume.jobTitle.name  }}</p>
+									{% endif %}
+
+								</div>
+								<div class="">
+									<strong>Experience</strong>
+									{% if jobseeker.jobSeekerResume.experience %}
+										<p>{{ jobseeker.jobSeekerResume.experience|numberToString  }}</p>
+									{% endif %}
+
+								</div>
+								<div class="">
+									<strong>Job Education</strong>
+									{% if jobseeker.jobSeekerResume.education %}
+										<p>{{ jobseeker.jobSeekerResume.education|educationNumberToString  }}</p>
+									{% endif %}
+								</div>
+								<div class="">
+									<strong>Skills</strong>
+									<div>
+										{% for skill in (jobseeker.jobSeekerResume.skills ?? []) %}
+											<li class="list-inline-item">
+												<span class="badge rounded-pill primary_two mb-1">{{ skill.name }}</span>
+											</li>
+										{% endfor %}
+									</div>
+								</div>
+								<div class="my-2">
+									<strong>Willing To Relocate</strong>
+									<div>
+										{% if jobseeker.jobSeekerResume.willingToRelocate is null %}
+											N/A
+										{% else %}
+											<p>
+												<span class="badge rounded-pill primary_four fw-bold text-white">{{ jobseeker.jobSeekerResume.willingToRelocate ? 'Yes' : 'No' }}</span>
+											</p>
+										{% endif %}
+									</div>
+								</div>
+							</div>
+						{% else %}
+							<div class="tex-center">
+								<strong>No Data</strong>
+							</div>
+						{% endif %}
+					</div>
+				</div>
+
+				<div class="col-12">
+					<div class="card">
+
+						<div class="card-body p-4">
+							<div>
+								<h4 class="fw-semibold mb-8">Career Status</h4>
+							</div>
+
+							<div class="col-lg-12 mt-5 text-left" style="margin-top: 5% !important;">
+								{% if jobseeker.jobSeekerDetails.careerStatus %}
+									<button class="btn btn-success">{{ jobseeker.jobSeekerDetails.careerStatus.value|capitalizeWords }}</button>
+								{% endif %}
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-12">
+					<div class="card">
+
+						<div class="card-body p-4">
+							<div>
+								<h4 class="fw-semibold mb-8">Preferred Method of Contact</h4>
+							</div>
+							<div class="col-lg-12 mt-5 text-left" style="margin-top: 5% !important;">
+								{% if jobseeker.jobSeekerDetails.careerStatus %}
+									{% if jobseeker.jobSeekerDetails.contactType %}
+										<p class="m-0 mb-1 badge rounded-pill primary_three">{{jobseeker.jobSeekerDetails.contactType|capitalizeWords}}</p>
+									{% endif %}
+									{# <p class="">{{ jobseeker.jobSeekerDetails.contactType ? jobseeker.jobSeekerDetails.contactType|capitalizeWords : 'N/A' }}</p> #}
+								{% endif %}
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-12">
+					<div class="card">
+
+						<div class="card-body p-4">
+							<div>
+								<h4 class="fw-semibold mb-8">Psychometric Report</h4>
+							</div>
+
+							<div class="">
+								{% if  jobseeker.jobSeekerResume %}
+									{% if jobseeker.jobSeekerResume.sreport is not empty or jobseeker.jobSeekerResume.sreport != "" and jobseeker.jobSeekerResume.sreport is not null %}
+										<div class="px-4">
+											<a href="{{ path('profile_serve_employer_image', {'filename': jobseeker.jobSeekerResume.sreport, 'type': 'sreport' }) }}" class="btn btn-primary d-flex align-items-center px-3 gap-6" id="add-notes">
+												<i class="ti ti-file fs-4"></i>
+												<span class="d-none d-md-block fw-medium fs-3">Psychometric Report</span>
+											</a>
+										</div>
+									{% endif %}
+								{% endif %}
+
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-12">
+					<div class="card">
+
+						<div class="card-body p-4">
+							<div>
+								<h4 class="fw-semibold mb-8">Portfolio Links</h4>
+							</div>
+							<div class="mb-3">
+								<label for="linkedin" class="form-label">Linked In</label>
+								{% if jobseeker.jobSeekerResume %}
+									{% if jobseeker.jobSeekerResume.linkedin %}
+										{% set linkedinUrl = jobseeker.jobSeekerResume.linkedin %}
+										{% set prefix = 'https://' %}
+										{% if linkedinUrl|slice(0, 7) == 'http://' or linkedinUrl|slice(0, 8) == 'https://' %}
+											{% set prefix = '' %}
+										{% endif %}
+										<a target="_blank" class="d-block text-primary" href="{{ prefix ~ linkedinUrl }}">{{ prefix ~ linkedinUrl }}</a>
+									{% else %}
+										<p>---</p>
+									{% endif %}
+								{% else %}
+									<p>---</p>
+								{% endif %}
+							</div>
+							<div class="mb-3">
+								<label for="portfolio" class="form-label">Portfolio</label>
+								{% if jobseeker.jobSeekerResume %}
+									{% if jobseeker.jobSeekerResume.portfolio %}
+										{% set portfolioUrl = jobseeker.jobSeekerResume.portfolio %}
+										{% set prefix = 'https://' %}
+										{% if portfolioUrl|slice(0, 7) == 'http://' or portfolioUrl|slice(0, 8) == 'https://' %}
+											{% set prefix = '' %}
+										{% endif %}
+										<a target="_blank" class="d-block text-primary" href="{{ prefix ~ portfolioUrl }}">{{ prefix ~ portfolioUrl }}</a>
+									{% else %}
+										<p>---</p>
+									{% endif %}
+								{% else %}
+									<p>---</p>
+								{% endif %}
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-12">
+					<div class="card">
+
+						<div class="card-body p-4">
+							<div>
+								<h4 class="fw-semibold mb-8">Languages</h4>
+							</div>
+							<div>
+								{% if jobseeker.jobSeekerLanguages|length < 1 %}
+									<div class="card-body p-2 pb-3 "></div>
+								{% else %}
+									{% set languages = jobseeker.jobSeekerLanguages %}
+									<div class="card-body p-4">
+										<div class="row">
+											{% set basic_languages = languages|filter(lang => lang.proficiency == 'basic') %}
+											{% set intermediate_languages = languages|filter(lang => lang.proficiency == 'intermediate') %}
+											{% set proficient_languages = languages|filter(lang => lang.proficiency == 'proficient') %}
+											{% set native_languages = languages|filter(lang => lang.proficiency == 'native') %}
+
+											{% if basic_languages|length > 0 %}
+												<div class="col-md-12 gap-2">
+													<h6 class="fs-15 pe-2 sufont">
+														Basic</h6>
+													{% for language in basic_languages %}
+														<p class="m-0 mb-1 badge rounded-pill primary_four text-white fw-bold">{{ language.language.name }}
+															<i>{{ language.skills|length > 0 ? ' (' ~ language.skills|join(', ') ~ ')' : '' }}</i>
+														</p>
+													{% endfor %}
+												</div>
+											{% endif %}
+
+											{% if intermediate_languages|length > 0 %}
+												<div class="col-md-12 gap-2">
+													<h6 class="fs-15 pe-2 sufont">
+														Intermediate</h6>
+													{% for language in intermediate_languages %}
+														<p class="m-0 mb-1 badge rounded-pill primary_three">{{ language.language.name }}
+															<i>{{ language.skills|length > 0 ? ' (' ~ language.skills|join(', ') ~ ')' : '' }}</i>
+														</p>
+													{% endfor %}
+												</div>
+											{% endif %}
+
+											{% if proficient_languages|length > 0 %}
+												<div class="col-md-12 gap-2">
+													<h6 class="fs-15 pe-2 sufont">
+														Proficient</h6>
+													{% for language in proficient_languages %}
+														<p class="m-0 mb-1 badge rounded-pill primary_two">{{ language.language.name }}
+															<i>{{ language.skills|length > 0 ? ' (' ~ language.skills|join(', ') ~ ')' : '' }}</i>
+														</p>
+													{% endfor %}
+												</div>
+											{% endif %}
+
+											{% if native_languages|length > 0 %}
+												<div class="col-md-12 gap-2">
+													<h6 class="fs-15 pe-2 sufont">
+														Native</h6>
+													{% for language in native_languages %}
+														<p class="m-0 mb-1 badge rounded-pill primary_one">{{ language.language.name }}
+															<i>{{ language.skills|length > 0 ? ' (' ~ language.skills|join(', ') ~ ')' : '' }}</i>
+														</p>
+													{% endfor %}
+												</div>
+											{% endif %}
+										</div>
+									</div>
+								{% endif %}
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+{% elseif type == "interview result" %}
+	<div class="row" data-controller="employer">
+
+		<div class="col-12">
+			<div class="card">
+				<div class="card-body">
+					<div class="action-btn layout-top-spacing mb-7 d-flex align-items-center justify-content-between flex-wrap gap-6">
+						<div class="">
+							<div class="d-flex align-items-center">
+								<div class="position-relative">
+									<img src="{{ asset('uploads/profile/' ~ (candidate.jobseeker.profile ?? 'no-image.jpg')) }}" alt="user1" width="80" height="80" class="rounded-circle">
+									<span class="position-absolute bottom-0 end-0 p-1 badge rounded-pill bg-success">
+										<span class="visually-hidden">New alerts</span>
+									</span>
+								</div>
+								<div class="ms-3">
+									<h4 class="fw-semibold mb-2">{{candidate.jobseeker.name}}</h4>
+									<p class="mb-0 fs-2">{{ candidate.jobseeker.lastactive|diffForHumans }}</p>
+								</div>
+							</div>
+							<h4></h4>
+						</div>
+						<div class="">
+							{% if candidate.status == "selected" %}
+								{# <a href="#" class="btn rounded-pill waves-effect waves-light btn-primary">
+																																																																																																																																																																																																																																																																																																																									Send Offer/ Hire
+																																																																																																																																																																																																																																																																																																																								</a> #}
+								<a data-bs-dismiss="modal" data-type="send offer" href="#" data-status="send offer" data-can="{{candidate.id}}" data-action="click->employer#scheduleInterview" class="btn btn-primary">
+									<i class="ti ti-calendar fs-4"></i>
+									Send Offer/ Hire
+								</a>
+							{% endif %}
+							{% if candidate.status == "sent offer" %}
+								{# <a href="#" class="btn rounded-pill waves-effect waves-light btn-primary">
+																																																																																																																																																																																																																																																																																																																									Send Offer/ Hire
+																																																																																																																																																																																																																																																																																																																								</a> #}
+								<a data-bs-dismiss="modal" data-type="send offer" href="#" data-status="send offer" data-can="{{candidate.id}}" data-action="click->employer#scheduleInterview" class="btn btn-primary">
+									<i class="ti ti-calendar fs-4"></i>
+									Hire
+								</a>
+							{% endif %}
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-12">
+			<div>
+				<!-- Nav tabs -->
+				<ul class="nav nav-tabs" role="tablist">
+					<li class="nav-item" role="presentation">
+						<a class="nav-link d-flex" data-bs-toggle="tab" href="#home2" role="tab" aria-selected="false" tabindex="-1">
+							<span>
+								<i class="ti ti-user fs-6"></i>
+							</span>
+							<span class="d-none d-md-block ms-2">Profile Information</span>
+						</a>
+					</li>
+					<li class="nav-item" role="presentation">
+						<a class="nav-link d-flex active" data-bs-toggle="tab" href="#profile2" role="tab" aria-selected="true">
+							<span>
+								<i class="ti ti-calendar fs-6"></i>
+							</span>
+							<span class="d-none d-md-block ms-2">Interview Process</span>
+						</a>
+					</li>
+
+				</ul>
+				<!-- Tab panes -->
+				<div class="tab-content">
+					<div class="tab-pane" id="home2" role="tabpanel">
+						<div class="p-3">
+							<div class="container-fluid">
+								<div class="row">
+									<div class="col-7">
+										<div class="card">
+
+											<div class="card-body p-4">
+												<div>
+													<h4 class="fw-semibold mb-8">Personal Informations</h4>
+												</div>
+												<div class="row">
+													<div class="col-md-6 mt-4">
+														<div class="  d-flex align-items-center rounded-3">
+															<div class="boxlogoiconj">
+																<a href="#"><img class="img-fluid" src="/assets/images/pr_1.png" alt=""></a>
+															</div>
+															<div class="flex-grow-1 ms-3">
+																<p class="texthead mt-1">Name</p>
+																<h6 class="fs-15  sufont">{{jobseeker.name}}</h6>
+															</div>
+														</div>
+													</div>
+													<div class="col-md-6 mt-4">
+														<div class="  d-flex align-items-center rounded-3">
+															<div class="boxlogoiconj">
+																<a href="#"><img class="img-fluid" src="/assets/images/pr_2.png" alt=""></a>
+															</div>
+															<div class="flex-grow-1 ms-3">
+																<p class="texthead mt-1">Email address</p>
+																<h6 class="fs-15  sufont">{{jobseeker.email}}</h6>
+															</div>
+														</div>
+													</div>
+													<div class="col-md-6 mt-4">
+														<div class="  d-flex align-items-center rounded-3">
+															<div class="boxlogoiconj">
+																<a href="#"><img class="img-fluid" src="/assets/images/pr_3.png" alt=""></a>
+															</div>
+															<div class="flex-grow-1 ms-3">
+																<p class="texthead mt-1">Gender</p>
+																<h6 class="fs-15  sufont">{{jobseeker.jobseekerDetails.gender ? jobseeker.jobseekerDetails.gender.name : "N/A"}}</h6>
+															</div>
+														</div>
+													</div>
+													<div class="col-md-6 mt-4">
+														<div class="  d-flex align-items-center rounded-3">
+															<div class="boxlogoiconj">
+																<a href="#"><img class="img-fluid" src="/assets/images/pr_4.png" alt=""></a>
+															</div>
+															<div class="flex-grow-1 ms-3">
+																<p class="texthead mt-1">Age</p>
+																<h6 class="fs-15  sufont">{{jobseeker.jobseekerDetails.age}}</h6>
+															</div>
+														</div>
+													</div>
+													<div class="col-md-6 mt-4">
+														<div class="  d-flex align-items-center rounded-3">
+															<div class="boxlogoiconj">
+																<a href="#"><img class="img-fluid" src="/assets/images/pr_5.png" alt=""></a>
+															</div>
+															<div class="flex-grow-1 ms-3">
+																<p class="texthead mt-1">Phone number</p>
+																<h6 class="fs-15  sufont">{{jobseeker.jobseekerDetails.phone}}</h6>
+															</div>
+														</div>
+													</div>
+													<div class="col-md-6 mt-4">
+														<div class="  d-flex align-items-center rounded-3">
+															<div class="boxlogoiconj">
+																<a href="#"><img class="img-fluid" src="/assets/images/pr_6.png" alt=""></a>
+															</div>
+															<div class="flex-grow-1 ms-3">
+																<p class="texthead mt-1">WhatsApp no</p>
+																<h6 class="fs-15  sufont">-</h6>
+															</div>
+														</div>
+													</div>
+													<div class="col-md-6 mt-4">
+														<div class="  d-flex align-items-center rounded-3">
+															<div class="boxlogoiconj">
+																<a href="#"><img class="img-fluid" src="/assets/images/pr_7.png" alt=""></a>
+															</div>
+															<div class="flex-grow-1 ms-3">
+																<p class="texthead mt-1">Location</p>
+																<h6 class="fs-15  sufont">
+																	{{jobseeker.jobseekerdetails.country.name ?? '' }},{{jobseeker.jobseekerdetails.city.name ?? '' }}
+																</h6>
+															</div>
+														</div>
+													</div>
+												</div>
+
+												<div class="border-top mt-7 pt-7"></div>
+
+												<div class="row">
+													<div class="col-12">
+														<div class="card">
+															<div class="card-body">
+																<h4 class="fw-semibold mb-8">About Work</h4>
+																<div class="row">
+																	<div class="col-md-6 mt-4">
+																		<div class="  d-flex align-items-center rounded-3">
+																			<div class="boxlogoiconj">
+																				<a href="#"><img class="img-fluid" src="/assets/images/pr_8.png" alt=""></a>
+																			</div>
+																			<div class="flex-grow-1 ms-3">
+																				<p class="texthead mt-1">Profession</p>
+																				<h6 class="fs-15  sufont">{{jobseeker.lastwork ? (jobseeker.lastwork.profession.name ?? '') : ""}}</h6>
+																			</div>
+																		</div>
+																	</div>
+																	<div class="col-md-6 mt-4">
+																		<div class="  d-flex align-items-center rounded-3">
+																			<div class="boxlogoiconj">
+																				<a href="#"><img class="img-fluid" src="/assets/images/pr_9.png" alt=""></a>
+																			</div>
+																			<div class="flex-grow-1 ms-3">
+																				<p class="texthead mt-1">Experience</p>
+																				<h6 class="fs-15  sufont">{{jobseeker.lastwork.experience ?? ""}}</h6>
+																			</div>
+																		</div>
+																	</div>
+																	<div class="col-md-6 mt-4">
+																		<div class="  d-flex align-items-center rounded-3">
+																			<div class="boxlogoiconj">
+																				<a href="#"><img class="img-fluid" src="/assets/images/pr_10.png" alt=""></a>
+																			</div>
+																			<div class="flex-grow-1 ms-3">
+																				<p class="texthead mt-1">Salary</p>
+																				<h6 class="fs-15  sufont">{{jobseeker.lastwork.salary ?? ""}}</h6>
+																			</div>
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+												<div class="border-top mt-7 pt-7"></div>
+
+												<div class="row">
+													<div class="col-12">
+														<div class="card">
+															<div class="card-body">
+																<h4 class="fw-semibold mb-8">About Me</h4>
+																<div class="row">
+																	<div class="col-lg-12 mt-4">
+																		<p class="mb-3">
+																			{{jobseeker.jobseekerDetails.aboutme ?? ""}}
+																		</p>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+												<div class="border-top mt-7 pt-7"></div>
+
+												<div class="row">
+
+
+													<div class="col-12">
+														<div class="card-body p-4">
+															<div>
+																<h4 class="fw-semibold mb-8">Work Experience</h4>
+															</div>
+															{% if jobseeker.jobSeekerExperiences|length < 1 %}
+																<div class="p3 d-flex justify-content-center">
+																	<h5 class="mb-0 fw-bold">No Experience</h5>
+																</div>
+															{% endif %}
+															<div class="accordion" id="accordionFlushExample">
+																{% for experience in jobseeker.jobSeekerExperiences %}
+																	<div class="accordion-item">
+																		<h2 class="accordion-header" id="flush-headingOne{{ experience.id }}">
+																			<button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOneExperience{{ experience.id }}" aria-expanded="false" aria-controls="flush-collapseOneExperience{{ experience.id }}">
+																				{{ experience.companyName ~ ' - ' ~ experience.experienceYears ?? (experience.experienceMonths ?? '') }}
+																			</button>
+																		</h2>
+																		<div id="flush-collapseOneExperience{{ experience.id }}" class="accordion-collapse collapse" aria-labelledby="flush-headingOne{{ experience.id }}" data-bs-parent="#accordionFlushExample">
+																			<div class="accordion-body">
+																				<p>
+																					<strong class="fw-bold">Company/Organization Name:
+																					</strong>
+																					{{ experience.companyName }}
+																				</p>
+																				<p>
+																					<strong class="fw-bold">Total Experience:
+																					</strong>
+																					{% if (experience.experienceYears) %}
+																						{{ experience.experienceYears }}
+																						Years
+																					{% endif %}
+																					{% if (experience.experienceMonths) %}
+																						{{ experience.experienceYears ? ', ' : '' }}
+																						{{ experience.experienceMonths }}
+																						Months
+																					{% endif %}
+																				</p>
+																				<p>
+																					<strong class="fw-bold">Joined Date:
+																					</strong>
+																					{{ experience.joinedDate|date('Y-m-d') }}
+																				</p>
+																				{% if experience.finishDate %}
+																					<p>
+																						<strong class="fw-bold">Finished Date:
+																						</strong>
+																						{{ experience.finishDate|date('Y-m-d') }}
+																					</p>
+																				{% endif %}
+																				<p>
+																					<strong class="fw-bold">Location:
+																					</strong>
+																					{% if experience.country %}
+																						{{ experience.country.name }}
+																					{% endif %}
+																					{% if experience.city %}
+																						{{ ' ' ~ experience.city.name }}
+																					{% endif %}
+																					{% if experience.state %}
+																						{{ ', '  ~ experience.state.name ~ ', '  ~ experience.zipCode }}
+																					{% endif %}
+																				</p>
+																				<p>
+																					<strong class="fw-bold">Notice Period:
+																					</strong>
+																					{{ experience.noticePeriod }}
+																				</p>
+																				{% if experience.salary %}
+																					<p>
+																						<strong class="fw-bold">Salary:
+																						</strong>
+																						{{ experience.salary }}
+																					</p>
+																				{% endif %}
+																			</div>
+																		</div>
+																	</div>
+																{% endfor %}
+															</div>
+														</div>
+													</div>
+													<div class="col-12">
+														<div class="card-body p-4">
+															<div>
+																<h4 class="fw-semibold mb-8">Certifications</h4>
+															</div>
+															{% if jobseeker.jobSeekerCertificates|length < 1 %}
+																<div class="p3 d-flex justify-content-center">
+																	<h5 class="mb-0 fw-bold">No certifications registered</h5>
+																</div>
+															{% endif %}
+															<div class="accordion" id="accordionFlushExample">
+																{% for certificate in jobseeker.jobSeekerCertificates %}
+																	<div class="accordion-item">
+																		<h2 class="accordion-header" id="flush-headingOne{{ certificate.id }}">
+																			<button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOneCertificate{{ certificate.id }}" aria-expanded="false" aria-controls="flush-collapseOneCertificate{{ certificate.id }}">
+																				{{ certificate.name ~ ' - ' ~ certificate.certificateId ?? (certificate.certificateId ?? '') }}
+																			</button>
+																		</h2>
+																		<div id="flush-collapseOneCertificate{{ certificate.id }}" class="accordion-collapse collapse" aria-labelledby="flush-headingOne{{ certificate.id }}" data-bs-parent="#accordionFlushExample">
+																			<div class="accordion-body">
+																				<p>
+																					<strong class="fw-bold">Certification Name:
+																					</strong>
+																					{{ certificate.name }}
+																				</p>
+																				<p>
+																					<strong class="fw-bold">Institution Name:
+																					</strong>
+																					{{ certificate.institute }}
+																				</p>
+																				<p>
+																					<strong class="fw-bold">Certification Id:
+																					</strong>
+																					{{ certificate.id }}
+																				</p>
+																				{% if certificate.expirable %}
+																					<p>
+																						<strong class="fw-bold">Expiration Date:
+																						</strong>
+																						{{ certificate.expiresAt|date('Y-m-d') }}
+																					</p>
+																				{% endif %}
+																				{# <p>
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									<strong class="fw-bold">Certification ID:
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									</strong>
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									{% if (certificate.experienceYears) %}
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																										{{ certificate.experienceYears }}
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																										Years
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									{% endif %}
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									{% if (certificate.experienceMonths) %}
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																										{{ certificate.experienceYears ? ', ' : '' }}
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																										{{ certificate.experienceMonths }}
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																										Months
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									{% endif %}
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																								</p> #}
+																				<p>
+																					{% set link = certificate.certificateUrl %}
+																					{% set prefix = 'https://' %}
+																					{% if link|slice(0, 7) == 'http://' or link|slice(0, 8) == 'https://' %}
+																						{% set prefix = '' %}
+																					{% endif %}
+																					<strong class="fw-bold">URL:
+																					</strong>
+																					<a class="text-primary" href="{{ prefix ~ link }}">{{ prefix ~ link }}</a>
+
+																				</p>
+																				{% if certificate.file %}
+																					<p class="py-2">
+																						<a target="blank" class="text-primary" href="{{ asset('uploads/certifications/' ~ certificate.file)}}">
+																							<strong class="fw-bold Text">Preview Certification
+
+																							</strong>
+																						</a>
+																					</p>
+																				{% endif %}
+																				{# <div class="d-flex justify-content-end">
+																																																													<button data-jobseeker-profile-action-param="update" data-jobseeker-profile-url-param="{{ path('job_seeker_certificate_form', {'certificate': certificate.id}) }}" data-action="click->jobseeker-profile#certificationForm" class="btn btn-outline-success btn-sm rounded fw-bold">
+																																																														<i class="fa fa-edit">
+																																																															Edit</i>
+																																																													</button>
+																																																												</div> #}
+																			</div>
+																		</div>
+																	</div>
+																{% endfor %}
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+
+									</div>
+									<div class="col-5">
+										<div class="row">
+											<div class="col-12">
+												<div class="card">
+
+													<div class="card-body p-4">
+														<div>
+															<h4 class="fw-semibold mb-8">Skills</h4>
+														</div>
+														{% for skill in jobseeker.jobseekerDetails.skills %}
+															<span class="mb-1 badge rounded-pill text-bg-light">{{skill.name}}</span>
+														{% endfor %}
+													</div>
+												</div>
+											</div>
+											<div class="col-12">
+												<div class="card">
+
+													<div class="card-body p-4">
+														<div>
+															<h4 class="fw-semibold mb-8">Career Status</h4>
+														</div>
+
+														<div class="form-group">
+															<input type="text" class="form-control form-control-lg" id="readonly" placeholder="{{jobseeker.jobseekerDetails.opentowork}}" readonly="">
+														</div>
+													</div>
+												</div>
+											</div>
+										</div>
+
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane p-3 active show" id="profile2" role="tabpanel">
+						{% if candidate.lastInterview %}
+
+							<div class="card">
+								<div class="card-body p-4">
+									<div>
+										<h4 class="fw-semibold mb-8">Interview Details
+										</h4>
+									</div>
+									<div class="row">
+										<div class="col-4">
+											<div class="  d-flex align-items-center rounded-3">
+												<div class="boxlogoiconj" style="background-color: #f0f3f5;padding: 10px;">
+													<a href="#">
+														<span>
+															<i class="ti ti-list-numbers fs-9 ti_coloring"></i>
+														</span>
+													</a>
+												</div>
+												<div class="flex-grow-1 ms-3">
+													<p class="texthead mt-1">Total Rounds Of Interview</p>
+													<h5 class="card-title fw-semibold">{{candidate.lastInterview.rounds}}</h5>
+												</div>
+											</div>
+										</div>
+										<div class="col-4">
+											<div class="  d-flex align-items-center rounded-3">
+												<div class="boxlogoiconj" style="background-color: #f0f3f5;padding: 10px;">
+													<a href="#">
+														<span>
+															<i class="ti ti-grain fs-9 ti_coloring"></i>
+														</span>
+													</a>
+												</div>
+												<div class="flex-grow-1 ms-3">
+													<p class="texthead mt-1">current round</p>
+													<h5 class="card-title fw-semibold">{{candidate.lastInterview.lastRound.round}}</h5>
+												</div>
+											</div>
+										</div>
+										<div class="col-4">
+											<div class="  d-flex align-items-center rounded-3">
+												<div class="boxlogoiconj" style="background-color: #f0f3f5;padding: 10px;">
+													<a href="#">
+														<span>
+															<i class="ti ti-calendar fs-9 ti_coloring"></i>
+														</span>
+													</a>
+												</div>
+												<div class="flex-grow-1 ms-3">
+													<p class="texthead mt-1">Interview Date & Time</p>
+													<h5 class="card-title fw-semibold">{{candidate.lastInterview.date|date("d-m-Y g:i A")}}</h5>
+												</div>
+											</div>
+										</div>
+										<div class="col-4">
+											<div class="  d-flex align-items-center rounded-3">
+												<div class="boxlogoiconj" style="background-color: #f0f3f5;padding: 10px;">
+													<a href="#">
+														<span>
+															<i class="ti ti-live-view fs-9 ti_coloring"></i>
+														</span>
+													</a>
+												</div>
+												<div class="flex-grow-1 ms-3">
+													<p class="texthead mt-1">Mode of interview</p>
+													<h5 class="card-title fw-semibold">{{candidate.lastInterview.type}}</h5>
+												</div>
+											</div>
+										</div>
+										<div class="col-4">
+											<div class="  d-flex align-items-center rounded-3">
+												<div class="boxlogoiconj" style="background-color: #f0f3f5;padding: 10px;">
+													<a href="#">
+														<span>
+															<i class="ti ti-notes fs-9 ti_coloring"></i>
+														</span>
+													</a>
+												</div>
+												<div class="flex-grow-1 ms-3">
+													<p class="texthead mt-1">Notes</p>
+													<h5 class="card-title fw-semibold">{{candidate.lastInterview.notes}}</h5>
+												</div>
+											</div>
+										</div>
+										<div class="col-3"></div>
+										<div class="col-3"></div>
+										<div class="col-3"></div>
+									</div>
+								</div>
+							</div>
+							{% if candidate.lastInterview.lastRound %}
+
+								<div class="card" data-controller="interview-result">
+									<div class="card-body p-4">
+										<div>
+											<h4 class="fw-semibold mb-8">Results of interview
+											</h4>
+										</div>
+										{% for item in candidate.lastInterview.jobApplicationInterviewRounds %}
+											{% if item.status != "interview scheduled" %}
+
+												<h4 class="fw-semibold mt-5 mb-4">Round
+													{{item.round}}</h4>
+												<div class="row">
+													<div class="col-6">
+														<div class="  d-flex align-items-center rounded-3">
+															<div class="boxlogoiconj" style="background-color: #f0f3f5;padding: 10px;">
+																<a href="#">
+																	<span>
+																		<i class="ti ti-report-analytics fs-9 ti_coloring"></i>
+																	</span>
+																</a>
+															</div>
+															<div class="flex-grow-1 ms-3">
+																<p class="texthead mt-1">Result</p>
+																<h5 class="card-title fw-semibold">
+																	{% if item.status == "next round" %}
+																		Moved to Next Round
+																	{% else %}
+																		{{item.status}}
+																	{% endif %}
+																</h5>
+															</div>
+														</div>
+													</div>
+													<div class="col-6">
+														<div class="  d-flex align-items-center rounded-3">
+															<div class="boxlogoiconj" style="background-color: #f0f3f5;padding: 10px;">
+																<a href="#">
+																	<span>
+																		<i class="ti ti-message fs-9 ti_coloring"></i>
+																	</span>
+																</a>
+															</div>
+															<div class="flex-grow-1 ms-3">
+																<p class="texthead mt-1">Comments</p>
+																<h5 class="card-title fw-semibold">{{item.comments}}</h5>
+															</div>
+														</div>
+													</div>
+												</div>
+											{% endif %}
+
+										{% endfor %}
+
+
+										{% if round %}
+											{% if round.status == "next round" or round.status == "interview scheduled" %}
+
+												{{ form_start(roundForm, {action: path('app_employer_interview_result', {'candidate': candidate.id})}) }}
+
+
+												<h4 class="fw-semibold mt-5 mb-4">Round
+													{{ candidate.lastInterview.jobApplicationInterviewRounds|length + 1 }}</h4>
+												<div class="card">
+													<div class="card-body">
+														<div class="row">
+															<div class="col-6">
+																<p class="texthead">Result</p>
+																{{ form_row(roundForm.status, { 'attr': {'class': 'd-flex flex-wrap gap-6', 'data-action': 'interview-result#change'} }) }}
+																{% for child in roundForm.status.children %}
+																	<div class="form-check">
+																		<input
+																		type="radio" data-action="interview-result#change" class="btn-check" id="{{ child.vars.id }}" name="{{ roundForm.vars.name }}[{{ child.vars.name }}]" value="{{ child.vars.value }}" {% if child.vars.checked %} checked {% endif %}>
+																	{# <label class="btn btn-outline-primary " for="{{ child.vars.id }}">
+																																																																																																						{{ child.vars.label }}
+																																																																																																						</label> #}
+																	</div>
+																{% endfor %}
+															</div>
+															<div class="col-6">
+																<div class="  d-flex align-items-center rounded-3">
+																	<div class="flex-grow-1 ms-3">
+																		{{ form_row(roundForm.date) }}
+																	</div>
+																</div>
+															</div>
+															<div class="col-6">
+																<div class="  d-flex align-items-center rounded-3">
+																	<div class="flex-grow-1 ms-3">
+
+																		{{ form_row(roundForm.comments) }}
+																	</div>
+																</div>
+															</div>
+															<div class="col-4">
+																<div class="  d-flex align-items-center rounded-3">
+																	<div class="flex-grow-1 ms-3">
+																		<label for="">Interview at [Location/Link]</label>
+																		{{ form_widget(roundForm.location) }}
+																	</div>
+																</div>
+															</div>
+															<div class="col-2">
+																<div class="">
+																	<label for=""></label><br>
+																	<div class="flex-grow-1 ms-3">
+																		<button type="submit" class="btn btn-primary">Submit</button>
+																	</div>
+																</div>
+															</div>
+															<div class="col-3"></div>
+															<div class="col-3"></div>
+															<div class="col-3"></div>
+														</div>
+													</div>
+												</div>
+												{{ form_end(roundForm) }}
+											{% endif %}
+
+										{% endif %}
+
+
+									</div>
+								</div>
+							{% endif %}
+
+						{% endif %}
+					</div>
+
+				</div>
+			</div>
+		</div>
+
+	</div>
+{% elseif type == "send offer" %}
+	<div class="row">
+
+		<div class="col-12">
+			<div class="card">
+				<div class="card-body">
+					<div class="action-btn layout-top-spacing mb-7 d-flex align-items-center justify-content-between flex-wrap gap-6">
+						<div class="">
+							<div class="d-flex align-items-center">
+								<div class="position-relative">
+									<img src="{{ asset('uploads/profile/' ~ (candidate.jobseeker.profile ?? 'no-image.jpg')) }}" alt="user1" width="80" height="80" class="rounded-circle">
+									<span class="position-absolute bottom-0 end-0 p-1 badge rounded-pill bg-success">
+										<span class="visually-hidden">New alerts</span>
+									</span>
+								</div>
+								<div class="ms-3">
+									<h4 class="fw-semibold mb-2">{{candidate.jobseeker.name}}</h4>
+									<p class="mb-0 fs-2">{{ candidate.jobseeker.lastactive|diffForHumans }}</p>
+								</div>
+							</div>
+							<h4></h4>
+						</div>
+						<div class="">
+							{% if candidate.status == "selected" %}
+								<a
+									href="#" class="btn rounded-pill waves-effect waves-light btn-primary">{# Send Offer/ Hire #}
+								</a>
+							{% endif %}
+						</div>
+
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="col-12">
+			<div>
+				<!-- Nav tabs -->
+				<ul class="nav nav-tabs" role="tablist">
+					<li class="nav-item" role="presentation">
+						<a class="nav-link d-flex active" data-bs-toggle="tab" href="#home2" role="tab" aria-selected="false" tabindex="-1">
+							<span>
+								<i class="ti ti-user fs-11"></i>
+							</span>
+							<span class=" d-flex align-center align-items-center justify-content-center ms-2 fs-6">Send Offer</span>
+						</a>
+					</li>
+					<li class="nav-item" role="presentation">
+						<a class="nav-link d-flex " data-bs-toggle="tab" href="#profile2" role="tab" aria-selected="true">
+							<span>
+								<i class="ti ti-calendar fs-11"></i>
+							</span>
+							<span class=" d-flex align-center align-items-center justify-content-center ms-2 fs-6">Hire Now</span>
+						</a>
+					</li>
+
+				</ul>
+				<!-- Tab panes -->
+				<div class="tab-content">
+					<div class="tab-pane  active show" id="home2" role="tabpanel">
+						<div class="p-3">
+							<div class="container-fluid">
+								<div class="row">
+									<div class="col-12">
+										<div class="card">
+
+											<div class="card-body p-4">
+												<div class="mt-8 mb-8"></div>
+												{{ form_start(jobOfferForm) }}
+												{% if jobOfferForm.vars.errors is not empty %}
+													<ul class="error-messages">
+														{% for error in jobOfferForm.vars.errors %}
+															<li>{{ error.message }}</li>
+														{% endfor %}
+													</ul>
+												{% endif %}
+												<div class="row">
+													<div class="col-4">
+														<div class="mb-3">
+															<div class="mb-3">
+																<label for="formGroupExampleInput" class="form-label">Salary Package</label>
+																{{ form_widget(jobOfferForm.salary, {'attr': {'class': 'form-control  form-control-lg', 'placeholder': 'Salary'}}) }}
+																{{ form_errors(jobOfferForm.salary) }}
+															</div>
+
+														</div>
+													</div>
+													<div class="col-4">
+														<div class="mb-3">
+															<div class="mb-3">
+																<label for="formGroupExampleInput" class="form-label">Joining Date</label>
+																{{ form_widget(jobOfferForm.joining_date, {'attr': {'class': 'form-control  form-control-lg', 'placeholder': 'Joining Date'}}) }}
+																{{ form_errors(jobOfferForm.joining_date) }}
+															</div>
+
+														</div>
+													</div>
+													<div class="col-4">
+														<div class="mb-3">
+															<div class="mb-3">
+																<label for="formGroupExampleInput" class="form-label">Probation Period</label>
+																{{ form_widget(jobOfferForm.probation_period, {'attr': {'class': 'form-control  form-control-lg', 'placeholder': 'Probation Period'}}) }}
+																{{ form_errors(jobOfferForm.probation_period) }}
+															</div>
+
+														</div>
+													</div>
+													<div class="col-6">
+														<div class="mb-3">
+															<div class="mb-3">
+																<label for="formGroupExampleInput" class="form-label">Upload Offer Letter</label>
+																{{ form_widget(jobOfferForm.offer_letter, {'attr': {'class': 'form-control  form-control-lg', 'placeholder': 'Probation Period'}}) }}
+																{{ form_errors(jobOfferForm.offer_letter) }}
+															</div>
+
+														</div>
+													</div>
+													<div class="col-12">
+														<div class="row">
+															<div class="col-8">
+																<button type="submit" {{offer.id ? "disabled" : ""}} class="mb-8 mt-8 btn btn-lg btn-rounded btn-primary">
+																	Submit
+																</button>
+															</div>
+														</div>
+													</div>
+												</div>
+												{{ form_end(jobOfferForm) }}
+
+											</div>
+										</div>
+
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane p-3" id="profile2" role="tabpanel">
+						<div class="rwo">
+							<div class="container-fluid">
+								<div class="row">
+									<div class="col-12">
+										<div class="card">
+
+											<div class="card-body p-4">
+												<div class="mt-8 mb-8"></div>
+												{{ form_start(hiringForm) }}
+												{% if hiringForm.vars.errors is not empty %}
+													<ul class="error-messages">
+														{% for error in hiringForm.vars.errors %}
+															<li>{{ error.message }}</li>
+														{% endfor %}
+													</ul>
+												{% endif %}
+												<div class="row">
+													<div class="col-4">
+														<div class="mb-3">
+															<div class="mb-3">
+																<label for="formGroupExampleInput" class="form-label">Salary Package</label>
+																{{ form_widget(hiringForm.salary_package, {'attr': {'class': 'form-control  form-control-lg', 'placeholder': 'Salary'}}) }}
+																{{ form_errors(hiringForm.salary_package) }}
+															</div>
+
+														</div>
+													</div>
+													<div class="col-4">
+														<div class="mb-3">
+															<div class="mb-3">
+																<label for="formGroupExampleInput" class="form-label">Hired Date</label>
+																{{ form_widget(hiringForm.joining_date, {'attr': {'class': 'form-control  form-control-lg', 'placeholder': 'Joining Date'}}) }}
+																{{ form_errors(hiringForm.joining_date) }}
+															</div>
+
+														</div>
+													</div>
+													<div class="col-4">
+														<div class="mb-3">
+															<div class="mb-3">
+																<label for="formGroupExampleInput" class="form-label">Probation Period</label>
+																{{ form_widget(hiringForm.probation_period, {'attr': {'class': 'form-control  form-control-lg', 'placeholder': 'Probation Period'}}) }}
+																{{ form_errors(hiringForm.probation_period) }}
+															</div>
+
+														</div>
+													</div>
+													<div class="col-12">
+														<div class="row">
+															<div class="col-8">
+																<button type="submit" {{hiring.id ? "disabled" : ""}} class="mb-8 mt-8 btn btn-lg btn-rounded btn-primary">
+																	Submit
+																</button>
+															</div>
+														</div>
+													</div>
+												</div>
+												{{ form_end(hiringForm) }}
+
+											</div>
+										</div>
+
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+		</div>
+
+	</div>
+{% elseif type == "Interview Failed" %}
+	{{ form_start(form, {action: path('app_recruitment_status_interview_failed', {'candidate': candidate.id})}) }}
+	<div class="row">
+		<div class="col-12">
+			<div class="{{msg.class}}" role="alert">
+				{{msg.msg}}
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Candidate</label>
+				<h4>{{candidate.fullname}}</h4>
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Vacancy</label>
+				<h4>{{candidate.vacancy.name ?? ""}}</h4>
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Current Status</label>
+				<h4>{{candidate.hiringstatus}}</h4>
+			</div>
+		</div>
+
+		<div class="col-12">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">{{ form_label(form.note, 'Note') }}</label>
+				{{ form_widget(form.note, {'attr': {'class': 'form-control', 'placeholder': 'Note'}}) }}
+				{{ form_errors(form.note) }}
+			</div>
+		</div>
+	</div>
+
+	<button type="submit" class="btn btn-primary">Submit</button>
+	{{ form_end(form) }}
+{% elseif type == "Interview Passed" %}
+	{{ form_start(form, {action: path('app_recruitment_status_interview_passed', {'candidate': candidate.id})}) }}
+	<div class="row">
+		<div class="col-12">
+			<div class="{{msg.class}}" role="alert">
+				{{msg.msg}}
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Candidate</label>
+				<h4>{{candidate.fullname}}</h4>
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Vacancy</label>
+				<h4>{{candidate.vacancy.name ?? ""}}</h4>
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Current Status</label>
+				<h4>{{candidate.hiringstatus}}</h4>
+			</div>
+		</div>
+
+		<div class="col-12">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">{{ form_label(form.note, 'Note') }}</label>
+				{{ form_widget(form.note, {'attr': {'class': 'form-control', 'placeholder': 'Note'}}) }}
+				{{ form_errors(form.note) }}
+			</div>
+		</div>
+	</div>
+
+	<button type="submit" class="btn btn-primary">Submit</button>
+	{{ form_end(form) }}
+{% elseif type == "Job Offered" %}
+	{{ form_start(form, {action: path('app_recruitment_status_offer_job', {'candidate': candidate.id})}) }}
+	<div class="row">
+		<div class="col-12">
+			<div class="{{msg.class}}" role="alert">
+				{{msg.msg}}
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Candidate</label>
+				<h4>{{candidate.fullname}}</h4>
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Vacancy</label>
+				<h4>{{candidate.vacancy.name ?? ""}}</h4>
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Current Status</label>
+				<h4>{{candidate.hiringstatus}}</h4>
+			</div>
+		</div>
+
+		<div class="col-12">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">{{ form_label(form.note, 'Note') }}</label>
+				{{ form_widget(form.note, {'attr': {'class': 'form-control', 'placeholder': 'Note'}}) }}
+				{{ form_errors(form.note) }}
+			</div>
+		</div>
+	</div>
+
+	<button type="submit" class="btn btn-primary">Submit</button>
+	{{ form_end(form) }}
+{% elseif type == "Offer Declined" %}
+	{{ form_start(form, {action: path('app_recruitment_status_offer_declined', {'candidate': candidate.id})}) }}
+	<div class="row">
+		<div class="col-12">
+			<div class="{{msg.class}}" role="alert">
+				{{msg.msg}}
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Candidate</label>
+				<h4>{{candidate.fullname}}</h4>
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Vacancy</label>
+				<h4>{{candidate.vacancy.name ?? ""}}</h4>
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Current Status</label>
+				<h4>{{candidate.hiringstatus}}</h4>
+			</div>
+		</div>
+
+		<div class="col-12">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">{{ form_label(form.note, 'Note') }}</label>
+				{{ form_widget(form.note, {'attr': {'class': 'form-control', 'placeholder': 'Note'}}) }}
+				{{ form_errors(form.note) }}
+			</div>
+		</div>
+	</div>
+
+	<button type="submit" class="btn btn-primary">Submit</button>
+	{{ form_end(form) }}
+{% elseif type == "Hired" %}
+	{{ form_start(form, {action: path('app_recruitment_status_hired', {'candidate': candidate.id})}) }}
+	<div class="row">
+		<div class="col-12">
+			<div class="{{msg.class}}" role="alert">
+				{{msg.msg}}
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Candidate</label>
+				<h4>{{candidate.fullname}}</h4>
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Vacancy</label>
+				<h4>{{candidate.vacancy.name ?? ""}}</h4>
+			</div>
+		</div>
+		<div class="col-4">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">Current Status</label>
+				<h4>{{candidate.hiringstatus}}</h4>
+			</div>
+		</div>
+
+		<div class="col-12">
+			<div class="mb-3">
+				<label for="formGroupExampleInput" class="form-label">{{ form_label(form.note, 'Note') }}</label>
+				{{ form_widget(form.note, {'attr': {'class': 'form-control', 'placeholder': 'Note'}}) }}
+				{{ form_errors(form.note) }}
+			</div>
+		</div>
+	</div>
+
+	<button type="submit" class="btn btn-primary">Submit</button>
+	{{ form_end(form) }}
+{% endif %}

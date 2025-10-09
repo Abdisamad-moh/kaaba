@@ -1,0 +1,154 @@
+{% extends 'admin_base2.html.twig' %}
+{% import 'macros/_form_macros.html.twig' as macros %}
+
+{% block title %}
+	Accounts
+{% endblock %}
+
+{% block body %}
+</div>
+<div
+	class="container-fluid" data-controller="employer">
+	<!-- Modern Header with Button -->
+	<div class="card custom-header shadow-sm mb-4">
+		<div class="card-body p-4">
+			<div class="d-flex justify-content-between align-items-center">
+				<div>
+					<h4 class="fw-semibold mb-0 text-white">
+						<i class="ti ti-mail fs-4 me-2"></i>
+						Accounts
+					</h4>
+					<p class="mb-0 text-white-50">Manage your Accounts efficiently.</p>
+				</div>
+				<div class="d-flex gap-2">
+					<a href="{{ path('app_admin_register_employer') }}" class="btn btn-light btn-lg text-primary fw-semibold">
+						<i class="ti ti-user me-2"></i>
+						Add Employer
+					</a>
+					<a href="{{ path('app_admin_jobseeker_register') }}" class="btn btn-light btn-lg text-success fw-semibold">
+						<i class="ti ti-user-plus me-2"></i>
+						Add Job Seeker
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	{{ macros.render_search_form(searchForm, 'Filter') }}
+
+	<!-- Data Table Section -->
+	<div class="card custom-card shadow-sm">
+		<div class="card-body p-4">
+			<div class="table-responsive">
+				<table id="accounts" data-controller='admin' class="table table-striped table-hover w-100">
+					<thead class="custom-table-header">
+						<tr>
+							<th>#</th>
+							<th>Name</th>
+							<th>Email</th>
+							<th>Type</th>
+							<th>Status - Verification</th>
+							<th></th>
+							<th>Date Created</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for user in accounts %}
+							<tr>
+								<td>{{ loop.index }}</td>
+								<td>{{ user.name }}</td>
+								<td>{{ user.email }}</td>
+								<td>
+									<span class="badge
+																																																																																								                        {% if user.type == 'employer' %} bg-primary
+																																																																																								                        {% elseif user.type == 'jobseeker' %} bg-success
+																																																																																								                        {% else %} bg-secondary {% endif %}">
+										{{ user.type|capitalize }}
+									</span>
+								</td>
+								<td>
+									<span class="badge {% if user.status %} bg-success {% else %} bg-danger {% endif %}">
+										{{ user.status ? 'Active' : 'Inactive' }}
+									</span>
+									-
+									<span class="badge {% if user.isVerified %} bg-success {% else %} bg-danger {% endif %}">
+										{{ user.isVerified ? 'Verified' : 'Unverified' }}
+									</span>
+								</td>
+
+								<td>
+									<div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+										<div class="btn-group" role="group">
+											<button id="btnGroupDrop1" type="button" class="btn bg-primary-subtle text-primary dropdown-toggle rounded-end" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+												Actions
+											</button>
+											<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+												<a data-type="change status" data-status="{{ user.status ? 'disable' : 'activate' }}" data-account="{{ user.email }}" data-action="click->admin#operation" class="dropdown-item" href="javascript:void(0)">
+													{{ user.status ? 'Disable' : 'Activate' }}
+												</a>
+												<a data-type="verify" data-status="{{ user.isVerified ? 'unverify' : 'verify' }}" data-account="{{ user.email }}" data-action="click->admin#operation" class="dropdown-item" href="javascript:void(0)">
+													{{ user.status ? 'Verify' : 'Unverify' }}
+												</a>
+												{% if user.type == "employer" %}
+													<a class="dropdown-item" href="{{ path("app_admin_company_settings",{company: user.id}) }}">
+														Edit
+													</a>
+												{% endif %}
+												<a class="dropdown-item" href="{{ path("app_admin_company_settings",{company: user.id}) }}">
+													Delete
+												</a>
+
+											</div>
+										</div>
+									</div>
+									<div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+										<div class="btn-group" role="group">
+											<button id="btnGroupDrop1" type="button" class="btn bg-primary-subtle text-primary dropdown-toggle rounded-end" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+												Activity
+											</button>
+											<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+
+												{% if user.type == "employer" %}
+													<a class="dropdown-item" href="{{ path("app_admin_company_settings",{company: user.id}) }}">
+														Edit
+													</a>
+
+												{% else %}
+													{% if user.jobseekerresume %}
+														<a data-type="resume" data-can="{{user.id}}" data-action="click->employer#scheduleInterview" href="#" class="btn primary_one">
+															<i class="ti ti-user-circle fs-4"></i>
+															View Profile
+														</a>
+													{% endif %}
+
+
+												{% endif %}
+
+											</div>
+										</div>
+									</div>
+								</td>
+								<td>
+									<!-- Format the created_at date (assuming it's a DateTime object) -->
+									{{ user.createdAt ? user.createdAt|date('m-d-Y') : 'N/A' }}
+								</td>
+
+							</tr>
+						{% else %}
+							<tr>
+								<td colspan="6" class="text-center">No records found.</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+
+			</div>
+
+			<!-- Pagination -->
+			<div class="navigation mt-4">
+				{% do accounts.setPageRange(2) %}
+				{{ knp_pagination_render(accounts, 'pagination.html.twig') }}
+			</div>
+		</div>
+	</div>
+</div>{% endblock %}

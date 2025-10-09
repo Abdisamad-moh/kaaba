@@ -1,0 +1,39 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}
+	Notifications
+{% endblock %}
+
+{% block body %}
+
+	<div class="container-fluid" >
+
+
+		
+		 <div class="container">
+        <div class="row justify-content-center">
+          <div class="text-lg-start"> 
+            <!-- ---------------------------- -->
+            <div class="card mt-4 pb-3">
+            {% for item in nots %}
+                
+              <div class="d-sm-flex align-items-top p-4">
+                <div class="flex-grow-1 ms-sm-3">
+                  <div>
+                    <p class="texthead text-md-end"> {{item.postedAt}}</p>
+                    <h6 class="mt-0 mb-1 fs-16 text-md-start hed-minuslow">{{item.content}}</h6>
+                  </div>
+                </div>
+              </div>
+              <hr>
+            {% endfor %}
+            </div>
+            <!-- ---------------------------- -->
+            <div class="text-center mt-4 pt-2"> <a href="#" class="btn btn-outline-primary" style="border-radius: 50px;">Load More Notifications <i class="fa fa-long-arrow-right" aria-hidden="true"></i></a> </div>
+          </div>
+        </div>
+      </div>
+	
+		<!-- end File export -->
+	</div>
+</div>{% endblock %}

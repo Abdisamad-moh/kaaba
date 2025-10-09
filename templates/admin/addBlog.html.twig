@@ -1,0 +1,130 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Add Blog
+{% endblock %}
+
+{% block body %}
+	<div class="container-fluid">
+
+
+		<div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+			<div class="card-body px-4 py-3">
+				<div class="row align-items-center">
+					<div class="col-9">
+						<h4 class="fw-semibold mb-8">Add Blog</h4>
+						<nav aria-label="breadcrumb">
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item">
+									<a class="text-muted text-decoration-none" href="#">Add Blogs</a>
+								</li>
+								<li class="breadcrumb-item" aria-current="page">Blogs</li>
+							</ol>
+						</nav>
+					</div>
+
+				</div>
+			</div>
+		</div>
+		<div class="containerss">
+
+			<div class="row">
+				<div class="col-12"></div>
+				<div class="col-md-6"></div>
+				<div class="col-md-6">
+					<div class="form-group"></div>
+				</div>
+			</div>
+
+
+		</div>
+		<div class="card">
+			<div class="card-body">
+				{{ form_start(form) }}
+				<div class="row">
+					<div class="col-4">
+						<div class="mb-4">
+							<label class="form-label">Title</label>
+							<span class="text-danger">*</span>
+							<div class="input-group">
+								{{ form_widget(form.title) }}
+							</div>
+						</div>
+					</div>
+					<div class="col-4">
+						<div class="mb-4">
+							<label class="form-label">Sub title</label>
+							<span class="text-danger">*</span>
+							<div class="input-group">
+								{{ form_widget(form.subtitle) }}
+							</div>
+						</div>
+					</div>
+					<div class="col-4">
+						<div class="mb-4">
+							<label class="form-label">Date</label>
+							<span class="text-danger">*</span>
+							<div class="input-group">
+								{{ form_widget(form.date) }}
+							</div>
+						</div>
+					</div>
+					<div class="col-4">
+						<div class="mb-4">
+							<label class="form-label">Type</label>
+							<span class="text-danger">*</span>
+							<div class="input-group">
+								{{ form_widget(form.blog_type) }}
+							</div>
+						</div>
+					</div>
+					<div class="col-4">
+						<div class="mb-4">
+							<label class="form-label">Category</label>
+							<span class="text-danger">*</span>
+							<div class="input-group">
+								{{ form_widget(form.category) }}
+							</div>
+						</div>
+					</div>
+					<div class="col-4">
+						<div class="mb-4">
+							<label class="form-label">Status</label>
+							<span class="text-danger">*</span>
+							<div class="input-group">
+								{{ form_widget(form.status) }}
+							</div>
+						</div>
+					</div>
+					<div class="col-4">
+						<div class="mb-4">
+							{% if blog.image != "" %}
+								<img src="{{ asset('uploads/blogs/' ~ blog.image) }}" alt="modernize-img" class="iconn img-fluid mb-n4">
+							{% endif %}
+						</div>
+					</div>
+					<div class="col-4">
+						<div class="mb-4">
+							<label class="form-label">Image</label>
+							<span class="text-danger">*</span>
+							<div class="input-group">
+								{{ form_widget(form.image) }}
+							</div>
+						</div>
+					</div>
+					<div class="col-12">
+						{{ form_widget(form.description) }}
+					</div>
+
+					<div class="col-12">
+						<div class="ssmb-3 mt-3">
+							<button type="submit" class="btn btn-primary">Create</button>
+						</div>
+					</div>
+				</div>
+
+				{{ form_end(form) }}
+			</div>
+		</div>
+
+	</div>
+{% endblock %}

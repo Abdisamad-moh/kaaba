@@ -1,0 +1,37 @@
+<style>
+	select option[value=""] {
+		color: #999;
+		font-style: italic;
+	}
+</style>
+{{ form_start(form, {'attr': {'id': 'contact_form'}}) }}
+<div class="col-12 pb-3">
+	{{ form_row(form.subject) }}
+</div>
+{% if app.user is null %}
+	<div class="col-12 pb-3">
+		{{ form_row(form.email) }}
+	</div>
+{% endif %}
+<div class="col-12 pb-3">
+	{{ form_row(form.message) }}
+</div>
+<div class="col-12 pb-3 text-center">
+	<button class="btn btn-primary btn-lg g-recaptcha" data-sitekey="{{ site_key }}" data-callback='onSubmit' data-size="invisible">Submit</button>
+</div>
+{{ form_end(form) }}
+	<script>
+
+			function onSubmit(token) {
+var form = document.getElementById('contact_form');
+
+if (form.reportValidity()) {
+HTMLFormElement.prototype.submit.call(form);
+}
+// console.log('Form is being submitted'); // Debugging to see if this gets called
+// console.log(document.getElementById('register_form'))
+// document.getElementById('register_form').submit(); // Correctly targeting the form by ID
+}
+		</script>
+
+		<script src="https://www.google.com/recaptcha/api.js" async defer></script>

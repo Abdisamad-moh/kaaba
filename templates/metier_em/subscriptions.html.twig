@@ -1,0 +1,103 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+	Pricing
+{% endblock %}
+{% block body %}
+	<style>
+		.min-height-200 {
+			min-height: 200px;
+		}
+	</style>
+
+	<section class="bg-home4" id="home">
+		<div class="container">
+			<div class="row align-items-center">
+				<div class="col-lg-12">
+					<div class="mb-2 pb-3 me-lg-6 text-center">
+						<h1 class="display-5 fw-semibold mb-3 mt-3 fs-22">Choose the
+							<span class="text-primary fw-bold">right package
+							</span>
+						</h1>
+						<p class="lead text-muted mb-0 pc-da">Find the best talent for your business with Métier Quest. Our features are designed to make your recruitment process more efficient and effective. We are committed to providing you with the best possible service. 
+And for a limited time only, you can try us for free for 6 months. 
+</p>
+<p class="pt-2">Don't miss this chance. 
+
+</p>
+	<p>
+Compare the services and pick a right plan today!</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<section>
+		<div class="container">
+			<div class="row">
+				<div
+					class="col-lg-12">
+
+					<!-- -------------------------- -->
+
+
+					<div class="row">
+						{% for item in packages %}
+
+							<div class="col-lg-4 col-md-6 mt-5 pt-2 ">
+								<div class="pricing-box card bg-light text-dark">
+									<div class="card-body p-4 px-lg-5">
+
+										<div class="pricing-name text-md-start mt-4 pt-1">
+											<h4 class="fs-19">{{item.name}}</h4>
+										</div>
+										<div class="pricing-price text-md-start mt-2">
+											<h2 class="fw-semibold">${{item.cost}}<small class="fs-16">{{item.duration|packageType}}</small>
+											</h2>
+											<p class="fs-13 text-dark">{{item.description}}</p>
+										</div>
+										<ul class="list-unstyled pricing-details fs-13  mt-2 text-dark">
+											{% for plan in item.metierPackagePlans %}
+												{% if plan.inclusive %}
+													<li class="pricing-item font-weight-bold">
+														<i class="fa fa-check img-fluid text-green  fs-19"></i>
+														{# <img class="img-fluid" src="{{ asset('assets/images/circle-check.png') }}" alt=""> #}
+														{{plan.feature.name}}</li>
+												{% else %}
+													<li class="pricing-item font-weight-bold">
+														<i class="fa fa-times img-fluid text-red fs-19"></i>
+														<img class="img-fluid" src="{{ asset('assets/images/close.png') }}" alt="">
+														{{plan.feature.name}}
+													</li>
+												{% endif %}
+											{% endfor %}
+										</ul>
+
+
+										{% if is_granted('ROLE_EMPLOYER')  %}
+											<a href="{{ path('app_employer_purchase_checkout', {'package': item.id}) }}" class="btn btn-primary fw-bolder py-6 w-100 text-capitalize">Buy Now</a>
+										{% else %}
+											<a href="{{ path('app_employer_purchase_checkout', {'package': item.id}) }}" class="btn btn-primary fw-bolder py-6 w-100 text-capitalize">Buy Now</a>
+										{% endif %}
+									</div>
+								</div>
+
+								<!--end pricing-box-->
+							</div>
+						{% endfor %}
+
+					</div>
+					<div class=" pb-3 pt-4">
+						<hr></div>
+					<div class="text-center mt-4 mb-2">
+						<span class="badge bg-danger-subtle text-danger p-4 fs-18  px-lg-5">*VAT &amp; other taxes not included</span>
+					</div>
+					<!-- -------------------------- -->
+
+				</div>
+			</div>
+		</div>
+	</section>
+	<section class="ftimg">
+		 </section>
+	{% include 'home/_footer.html.twig' %}
+{% endblock %}

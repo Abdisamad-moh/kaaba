@@ -1,0 +1,181 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Kaaba Institutes{% endblock %}
+
+{% block body %}
+    <!-- Page Header -->
+    <div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+        <div class="card-body px-4 py-3">
+            <div class="row align-items-center">
+                <div class="col-9">
+                    <h4 class="fw-semibold mb-8">Kaaba Institutes</h4>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a class="text-muted text-decoration-none" href="#">Admin</a>
+                            </li>
+                            <li class="breadcrumb-item" aria-current="page">Institutes</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-3">
+                    <a href="{{ path('app_admin_kaaba_institutes', { create: 1 }) }}" class="btn btn-primary float-end">
+                        <i class="ti ti-plus me-2"></i>
+                        Add New Institute
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form for Creating/Editing -->
+    {% if showForm %}
+    <div class="card">
+        <div class="card-header text-bg-primary">
+            <h5 class="mb-0 text-white">
+                <i class="ti ti-{{ editUuid ? 'edit' : 'plus' }} me-2"></i>
+                {{ editUuid ? 'Edit Institute' : 'Add New Institute' }}
+            </h5>
+        </div>
+        <div class="form-horizontal">
+            <div class="form-body">
+                <div class="card-body">
+                    <h5 class="card-title mb-0">Institute Information</h5>
+                </div>
+                <hr class="m-0">
+                <div class="card-body">
+                    {{ form_start(form) }}
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3 col-form-label">
+                                    {{ form_label(form.name) }}
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="col-md-9">
+                                    {{ form_widget(form.name, { 
+                                        'attr': { 
+                                            'class': 'form-control',
+                                            'placeholder': 'e.g., University of Example, College of Science, etc.'
+                                        } 
+                                    }) }}
+                                    {{ form_errors(form.name) }}
+                                    <small class="form-text text-muted">
+                                        Enter the full name of the educational institute or university
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="m-0">
+                    <div class="form-actions border-top">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="col-md-offset-3 col-md-9">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="ti ti-{{ editUuid ? 'check' : 'plus' }} fs-5 me-2"></i>
+                                                {{ editUuid ? 'Update Institute' : 'Create Institute' }}
+                                            </button>
+                                            <a href="{{ path('app_admin_kaaba_institutes') }}" class="btn bg-danger-subtle text-danger ms-6">
+                                                <i class="ti ti-x me-2"></i>
+                                                Cancel
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6"></div>
+                            </div>
+                        </div>
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Table of Existing Institutes -->
+    <div class="card mt-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title mb-0">Existing Kaaba Institutes</h5>
+                <span class="badge bg-primary">Total: {{ institutes|length }}</span>
+            </div>
+            
+            {% if institutes|length > 0 %}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th width="50">#</th>
+                            <th width="120">UUID</th>
+                            <th>Institute Name</th>
+                            <th width="150">Used By Applications</th>
+                            <th width="200" class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for institute in institutes %}
+                            <tr>
+                                <td class="text-muted">{{ loop.index }}</td>
+                                <td>
+                                    <small class="text-muted font-monospace" title="{{ institute.uuid }}">
+                                        {{ institute.uuid|slice(0, 8) }}...
+                                    </small>
+                                </td>
+                                <td>
+                                    <strong>{{ institute.name }}</strong>
+                                </td>
+                                <td>
+                                    {% set applicationsCount = institute.kaabaApplications|length %}
+                                    <span class="badge {% if applicationsCount > 0 %}bg-warning{% else %}bg-success{% endif %}">
+                                        <i class="ti ti-{{ applicationsCount > 0 ? 'users' : 'user-off' }} me-1"></i>
+                                        {{ applicationsCount }} application(s)
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a href="{{ path('app_admin_kaaba_institutes', { edit: institute.uuid }) }}" 
+                                           class="btn btn-warning" 
+                                           title="Edit institute">
+                                            <i class="ti ti-edit me-1"></i> Edit
+                                        </a>
+                                        {% if institute.kaabaApplications|length == 0 %}
+                                            <a href="{{ path('app_admin_kaaba_institutes', { delete: institute.uuid }) }}" 
+                                               class="btn btn-danger" 
+                                               onclick="return confirm('Are you sure you want to delete \"{{ institute.name }}\"? This action cannot be undone.')"
+                                               title="Delete institute">
+                                                <i class="ti ti-trash me-1"></i> Delete
+                                            </a>
+                                        {% else %}
+                                            <button class="btn btn-secondary" 
+                                                    title="Cannot delete - institute is being used by applications"
+                                                    disabled>
+                                                <i class="ti ti-trash-off me-1"></i> Delete
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info text-center py-4">
+                <div class="mb-3">
+                    <i class="ti ti-school text-primary" style="font-size: 3rem;"></i>
+                </div>
+                <h5 class="alert-heading">No Institutes Found</h5>
+                <p class="mb-3">Get started by creating your first educational institute.</p>
+                <a href="{{ path('app_admin_kaaba_institutes', { create: 1 }) }}" class="btn btn-primary">
+                    <i class="ti ti-plus me-2"></i>Create First Institute
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

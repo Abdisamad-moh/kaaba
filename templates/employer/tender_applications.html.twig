@@ -1,0 +1,133 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Jobs
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+
+
+	<div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+		<div class="card-body px-4 py-3">
+			<div class="row align-items-center">
+				<div class="col-9">
+					<h4 class="fw-semibold mb-8">
+						<i class="ti ti-contract fs-8 "></i>
+						Tender: <b>{{tender.id}} - {{tender.title}}</b> Applications
+					</h4>
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item">
+								<a class="text-muted text-decoration-none" href="#">Tender Applications</a>
+							</li>
+							<li class="breadcrumb-item" aria-current="page">Tender Applications List</li>
+						</ol>
+					</nav>
+				</div>
+				<div class="col-3">
+					<div class="text-center mb-n5">
+						<img src="{{ asset('assets/de/images/breadcrumb/ChatBc.png') }}" alt="modernize-img"
+							class="img-fluid mb-n4">
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="container">
+
+		<div class="row">
+			<div class="col-12"></div>
+			<div class="col-md-6"></div>
+			<div class="col-md-6">
+				<div class="form-group"></div>
+			</div>
+		</div>
+
+
+	</div>
+	<div class="datatables">
+		<!-- start File export -->
+		<div class="card" data-controller="employer">
+			<div class="card-body">
+				{# <div class="mb-2">
+					<h4 class="card-title mb-0">File export</h4>
+					<img src="data:image/png;base64,iVBORwkhzAAQAAAABJRU5ErkJggg==" alt="Placeholder Image">
+				</div> #}
+				<div
+					class="action-btn layout-top-spacing mb-7 d-flex align-items-center justify-content-between flex-wrap gap-6">
+					<ul class="nav nav-pills user-profile-tab" id="pills-tab" role="tablist">
+						<li class="nav-item" role="presentation">
+							<button
+								class="nav-link position-relative rounded-0 active d-flex align-items-center justify-content-center bg-transparent fs-3 py-3"
+								id="pills-account-tab" data-bs-toggle="pill" data-bs-target="#pills-account"
+								type="button" role="tab" aria-controls="pills-account" aria-selected="true">
+								<span class="d-none d-md-block">Tender Applications: {{ tender.tenderApplications|length
+									}}</span>
+							</button>
+						</li>
+
+					</ul>
+				</div>
+				<div class="table-responsive">
+					<table id="file_export" class="table w-100 table-striped table-bordered display text-nowrap">
+						<thead>
+							<!-- start row -->
+							<tr>
+								<th>Tender ID</th>
+								<th>Applicant Name</th>
+								<th>Location</th>
+								<th>Company Name</th>
+								<th>Company Email</th>
+								<th>Company Phone</th>
+								<th>Description</th>
+								<th>Application File</th>
+								<th>Actions</th>
+							</tr>
+							<!-- end row -->
+						</thead>
+						<tbody>
+							<!-- start row -->
+							{% for item in tender.tenderApplications %}
+
+							<tr>
+								<td>BID-APP{{item.id}}</td>
+								<td>{{item.applicant.name}}</td>
+								<td>{{item.country.name}}</td>
+								<td>{{item.companyname}}</td>
+								<td>{{item.companyemail}}</td>
+								<td>{{item.companyphone}}</td>
+								<td>{{item.description}}</td>
+								<td>
+									{% if item.attachment %}
+								
+									<a class="btn btn-primary" target="_blank"
+										href="{{ asset('uploads/' ~ item.attachment) }}">Application Document</a>
+									{% endif %}
+
+								</td>
+								<td>
+									<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+										<div class="btn-group me-2 mb-2" role="group" aria-label="First group">
+											<button type="button" class="btn btn-danger">
+												<i class="ti ti-trash fs-4"></i>
+												Delete
+											</button>
+										</div>
+
+									</div>
+								</td>
+							</tr>
+							{% endfor %}
+
+							<!-- end row -->
+							<!-- start row -->
+							<!-- end row -->
+						</tbody>
+						</tfoot>
+					</table>
+				</div>
+			</div>
+		</div>
+		<!-- end File export -->
+	</div>
+</div>{% endblock %}

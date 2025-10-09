@@ -1,0 +1,370 @@
+{% extends 'admin_base2.html.twig' %}
+{% block title %}Company Settings
+{% endblock %}
+{% block body %}
+	<style>
+		th,
+		td {
+			font-family: inherit;
+			font-size: 0.875em;
+			line-height: 1.45;
+			color: #444;
+			vertical-align: middle;
+			padding: 1em;
+		}
+		th {
+			font-weight: 600;
+		}
+		colgroup:nth-child(1) {
+			width: 31%;
+			border: 0 none;
+		}
+		colgroup:nth-child(2) {
+			width: 22%;
+			border: 1px solid #ccc;
+		}
+		colgroup:nth-child(3) {
+			width: 25%;
+			border: 10px solid #59c7fb;
+		}
+		colgroup:nth-child(4) {
+			width: 22%;
+			border: 1px solid #ccc;
+		}
+		/* Tablehead */
+		.packages thead th {
+			background: #def4fe;
+			background: -moz-linear-gradient(top, #ffffff 0%, #f5f5f5 100%);
+			background: -webkit-linear-gradient(top, #ffffff 0%, #f5f5f5 100%);
+			background: -o-linear-gradient(top, #ffffff 0%, #f5f5f5 100%);
+			background: -ms-linear-gradient(top, #ffffff 0%, #f5f5f5 100%);
+			background: linear-gradient(to bottom, #ffffff 0%, #f5f5f5 100%);
+			text-align: center;
+			position: relative;
+			border-bottom: 1px solid #ccc;
+			padding: 3em 0 2em;
+			font-weight: 400;
+			color: #999;
+		}
+		.packages thead th:nth-child(1) {
+			background: transparent;
+		}
+		.packages thead th:nth-child(3) {
+			padding: 2em 0 5em;
+		}
+		.packages thead th h2 {
+			font-weight: 300;
+			font-size: 2.4em;
+			line-height: 1.2;
+			color: #59c7fb;
+		}
+		.packages thead th h2 + p {
+			font-size: 1.25em;
+			line-height: 1.4;
+		}
+		.packages thead th:nth-child(3) h2 {
+			font-size: 3.6em;
+		}
+		.packages thead th:nth-child(3) h2 + p {
+			font-size: 1.5em;
+		}
+		.packages thead th p.promo {
+			font-size: 1em;
+			color: #fff;
+			position: absolute;
+			top: 9em;
+			left: -17px;
+			z-index: 1000;
+			width: 100%;
+			margin: 0;
+			padding: 0.625em 17px 0.75em;
+			background: #c00;
+			box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+			border-bottom: 1px solid #900;
+		}
+		.packages thead th p.promo:before {
+			content: "";
+			position: absolute;
+			display: block;
+			width: 0;
+			height: 0;
+			border-style: solid;
+			border-width: 0 7px 7px 0;
+			border-color: transparent #900 transparent transparent;
+			bottom: -7px;
+			left: 0;
+		}
+		.packages thead th p.promo:after {
+			content: "";
+			position: absolute;
+			display: block;
+			width: 0;
+			height: 0;
+			border-style: solid;
+			border-width: 7px 7px 0 0;
+			border-color: #900 transparent transparent transparent;
+			bottom: -7px;
+			right: 0;
+		}
+		/* Tablebody */
+		.packages tbody th {
+			background: #fff;
+			border-left: 1px solid #ccc;
+		}
+		.packages tbody th span {
+			font-weight: normal;
+			font-size: 87.5%;
+			color: #999;
+			display: block;
+		}
+		.packages tbody td {
+			background: #fff;
+			text-align: center;
+		}
+		.packages tbody tr:nth-child(even) th,
+		.packages tbody tr:nth-child(even) td {
+			background: #f5f5f5;
+			border: 1px solid #ccc;
+			border-width: 1px 0 1px 1px;
+		}
+		.packages tbody tr:last-child td {
+			border-bottom: 0 none;
+		}
+		/* Tablefooter */
+		.packages tfoot th {
+			padding: 2em 1em;
+			border-top: 1px solid #ccc;
+		}
+		.packages tfoot td {
+			text-align: center;
+			padding: 2em 1em;
+			border-top: 1px solid #ccc;
+		}
+		.packages tfoot a {
+			font-weight: bold;
+			color: #fff;
+			text-decoration: none;
+			text-transform: uppercase;
+			display: block;
+			padding: 1.125em 2em;
+			background: #59c7fb;
+			border-radius: 0.5em;
+		}
+	</style>
+	<div class="container-fluid">
+		<div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+			<div class="card-body px-4 py-3">
+				<div class="row align-items-center">
+					<div class="col-9">
+						<h4 class="fw-semibold mb-8">
+							<i class="ti ti-settings fs-8 "></i>
+							Settings
+						</h4>
+						<nav aria-label="breadcrumb">
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item">
+									<a class="text-muted text-decoration-none" href="#">Company Information Settings</a>
+								</li>
+							</ol>
+						</nav>
+					</div>
+					<div class="col-3">
+						<div class="text-center">
+							<img src="{{ asset('assets/images/settings.png') }}" alt="modernize-img" class="iconn img-fluid mb-n4">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="container">
+			<div class="row">
+				<div class="col-12"></div>
+				<div class="col-md-6"></div>
+				<div class="col-md-6">
+					<div class="form-group"></div>
+				</div>
+			</div>
+		</div>
+		<div class="card">
+			<ul class="nav nav-pills user-profile-tab" id="pills-tab" role="tablist">
+				<li class="nav-item" role="presentation">
+					<button class="nav-link position-relative rounded-0  active d-flex align-items-center justify-content-center bg-transparent fs-3 py-3" id="accountSettings-tab" data-bs-toggle="pill" data-bs-target="#accountSettings" type="button" role="tab" aria-controls="accountSettings" aria-selected="false">
+						<i class="ti ti-settings me-2 fs-6"></i>
+						<span class="d-none d-md-block">Company Settings</span>
+					</button>
+				</li>
+			</ul>
+			<div class="card-body">
+				
+			</div>
+			<div class="tab-pane show active fade" id="accountSettings" role="tabpanel" aria-labelledby="accountSettings-tab" tabindex="0">
+				<div class="row justify-content-center">
+					<div class="row">
+						<div class="col-lg-12 d-flex align-items-stretch">
+							<div class="card w-100 border position-relative overflow-hidden">
+								<div class="card-body p-4">
+									<h4 class="card-title">Company Logo</h4>
+									<p class="card-subtitle mb-4">Change your profile picture from here</p>
+									<div class="text-center">
+										{{ form_start(logoForm) }}
+										{% set checkImage = false %}
+										{# <img src="../assets/images/profile/user-1.jpg" alt="modernize-img" class="img-fluid rounded-circle" width="120" height="120"> #}
+										{% if employer.employerDetails %}
+											{% if employer.employerDetails.logo %}
+												{% set checkImage = true %}
+												<img src="{{ path('profile_image', {'filename': employer.employerDetails.logo }) }}" alt="modernize-img" class="img-fluid rounded-circle" width="120" height="120">
+											{% endif %}
+										{% endif %}
+										{{ form_widget(logoForm.logo, {'attr': {'class': 'form-control form-control-lg mt-3'}}) }}
+										{% if checkImage %}
+											<div class="d-flex align-items-center justify-content-center my-4 gap-6">
+												<button type="submit" class="btn btn-primary">Change Image</button>
+											</div>
+										{% else %}
+											<button type="submit" class="btn btn-primary">Upload Logo</button>
+										{% endif %}
+										<p class="mb-0">Allowed JPG, GIF, PNG, or Webp. Max size of 800KB</p>
+										{{ form_end(logoForm) }}
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-12">
+							<div class="card w-100 border position-relative overflow-hidden mb-0">
+								<div class="card-body p-4" data-controller="sync-location" data-sync-location-cities-url-value="{{ path('app_fetch_cities') }}" data-sync-location-states-url-value="{{ path('app_fetch_states') }}">
+									<h4 class="card-title">Company Information</h4>
+									<p class="card-subtitle mb-4">To change company's detail , edit and save from here</p>
+									{{ form_start(userDetails) }}
+									<div class="row">
+										<div class="col-md-6">
+											<div class="mb-3">
+												<label for="exampleInputPassword3" class="form-label">Company Name</label>
+												<span class="text-danger">*</span>
+												{{ form_widget(userDetails.name, {'attr': {'class': 'form-control'}}) }}
+												{{ form_errors(userDetails.name) }}
+											</div>
+										</div>
+										<div class="col-lg-6">
+											<div class="mb-3">
+												<label for="exampleInputtext2" class="form-label">Company Phone</label>
+												<span class="text-danger">*</span>
+												{{ form_widget(userDetails.phone, {'attr': {'class': 'form-control', 'placeholder': 'Phone Number'}}) }}
+												{{ form_errors(userDetails.phone) }}
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="mb-3">
+												<label for="exampleInputtext3" class="form-label">Address</label>
+												<span class="text-danger">*</span>
+												{{ form_widget(userDetails.address, {'attr': {'class': 'form-control', 'placeholder': 'address'}}) }}
+												{{ form_errors(userDetails.address) }}
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="mb-3">
+												<label class="form-label">Country</label>
+												<span class="text-danger">*</span>
+												{{ form_widget(userDetails.country) }}
+												{{ form_errors(userDetails.country) }}
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="mb-3">
+												<label class="form-label">City</label>
+												<span class="text-danger">*</span>
+												{{ form_widget(userDetails.city) }}
+												{{ form_errors(userDetails.city) }}
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="mb-3">
+												<label for="exampleInputtext1" class="form-label">State/Region</label>
+												{{ form_widget(userDetails.state) }}
+												{{ form_errors(userDetails.state) }}
+											</div>
+										</div>
+										<div class="col-6">
+											<div class="mb-3">
+												<label for="exampleInputtext4" class="form-label">Zip/Postal Code</label>
+												{{ form_widget(userDetails.zipcode, {'attr': {'class': 'form-control', 'placeholder': 'Zip Code'}}) }}
+												{{ form_errors(userDetails.zipcode) }}
+											</div>
+										</div>
+										<div class="col-6">
+											<div class="mb-3">
+												<label class="form-label">Industry</label>
+												<span class="text-danger">*</span>
+												{{ form_widget(userDetails.industry, {'attr': {'class': 'form-control'}}) }}
+												{{ form_errors(userDetails.industry) }}
+											</div>
+										</div>
+										<div class="col-6">
+											<div class="mb-3">
+												<label class="form-label">Number Of Employees</label>
+												{{ form_widget(userDetails.number_of_employees, {'attr': {'class': 'form-control'}}) }}
+												{{ form_errors(userDetails.number_of_employees) }}
+											</div>
+										</div>
+										<div class="col-6">
+											<div class="mb-3">
+												<label class="form-label">Company Establishment Date</label>
+												<span class="text-danger">*</span>
+												{{ form_widget(userDetails.company_stablishment_date, {'attr': {'class': 'form-control'}}) }}
+												{{ form_errors(userDetails.company_stablishment_date) }}
+											</div>
+										</div>
+										<div class="col-12 my-2">
+											<label for="" class="form-label">Please enter Company Bio/About Us detail in here</label>
+											<span class="text-danger">*</span>
+											{{ form_widget(userDetails.description) }}
+										</div>
+										<div class="col-12">
+											<h2>Contact Details</h2>
+										</div>
+										<div class="col-4">
+											<div class="mb-3">
+												<label class="form-label">Website</label>
+												{{ form_widget(userDetails.website, {'attr': {'class': 'form-control'}}) }}
+												{{ form_errors(userDetails.website) }}
+											</div>
+										</div>
+										<div class="col-4">
+											<div class="mb-3">
+												<label class="form-label">Facebook</label>
+												{{ form_widget(userDetails.social_facebook, {'attr': {'class': 'form-control'}}) }}
+												{{ form_errors(userDetails.social_facebook) }}
+											</div>
+										</div>
+										<div class="col-4">
+											<div class="mb-3">
+												<label class="form-label">Twitter</label>
+												{{ form_widget(userDetails.social_twitter, {'attr': {'class': 'form-control'}}) }}
+												{{ form_errors(userDetails.social_twitter) }}
+											</div>
+										</div>
+										<div class="col-4">
+											<div class="mb-3">
+												<label class="form-label">Linkedin</label>
+												{{ form_widget(userDetails.social_linkedin, {'attr': {'class': 'form-control'}}) }}
+												{{ form_errors(userDetails.social_linkedin) }}
+											</div>
+										</div>
+										<div class="col-12">
+											<div class="d-flex align-items-center justify-content-end mt-4 gap-6">
+												<button type="submit" class="btn btn-primary">Save</button>
+												<button class="btn bg-danger-subtle text-danger">Cancel</button>
+											</div>
+										</div>
+									</div>
+									{{ form_end(userDetails) }}
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- end File export -->
+{% endblock %}

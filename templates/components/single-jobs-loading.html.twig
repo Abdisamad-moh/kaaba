@@ -1,0 +1,56 @@
+{% for item in [1, 2, 3] %}
+    <div class="col-lg-4 col-md-6 mt-4" {{ (load_type) ? 'data-loading="show"' : '' }}>
+        <div class="card job-grid-box">
+            <div class="card-body p-4">
+                <div class="row">
+                    <div class="col-8">
+                        <p class="card-text placeholder-glow">
+                        <span class="placeholder col-7 placeholder-lg" style="height: 54px; width: 30%"></span>
+                        </p>
+                    </div>
+                    <div class="col-4">
+                        <p class="card-text placeholder-glow">
+                        <span class="placeholder col-7"></span>
+                        <span class="placeholder col-4"></span>
+                        </p>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <p class="card-text placeholder-glow">
+                    <span class="placeholder col-7 placeholder-lg"></span>
+                    <span class="placeholder col-4 placeholder-lg"></span>
+                    <span class="placeholder col-4 placeholder-lg"></span>
+                    </p>
+                </div>
+                <div class="job-grid-content mt-2">
+                    <p class="card-text placeholder-glow">
+                        <span class="placeholder col-7 placeholder-xs"></span>
+                        <span class="placeholder col-4 placeholder-xs"></span>
+                        <span class="placeholder col-4 placeholder-xs"></span>
+                        <span class="placeholder col-6 placeholder-xs"></span>
+                        <span class="placeholder col-8 placeholder-xs"></span>
+                    </p>
+                    <ul class="list-inline py-3">
+                    </ul>
+                    <div class="row">
+                        <div class="col-8">
+                            <p class="card-text placeholder-glow">
+                                <span class="placeholder col-7 "></span>
+                                <span class="placeholder col-4 "></span>
+                            </p>
+                        </div>
+                        <div class="col-4">
+                            <p class="card-text placeholder-glow">
+                                <span class="placeholder col-7 "></span>
+                            
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+        </div>
+    </div>
+    
+    <!-- end placeholder card -->
+{% endfor %}

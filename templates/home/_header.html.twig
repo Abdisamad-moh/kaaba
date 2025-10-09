@@ -1,0 +1,93 @@
+<!-- start header -->
+<header>
+    <!-- start navigation -->
+    <nav class="navbar navbar-expand-lg header-transparent  header-reverse" data-header-hover="light">
+        <div class="container-fluid">
+            <div class="col-auto col-lg-2 me-lg-0 me-auto">
+                <a class="navbar-brand" href="#">
+                    <img src="{{ asset('assets/images/hero-logo.png') }}" data-at2x="images/logo.png" alt="" class="default-logo">
+                    <img src="{{ asset('assets/images/hero-logo.png') }}" data-at2x="{{ asset('assets/images/hero-logo.png') }}" alt="" class="alt-logo">
+                    <img src="{{ asset('assets/images/hero-logo.png') }}" data-at2x="{{ asset('assets/images/hero-logo.png') }}" alt="" class="mobile-logo">
+                </a>
+            </div>
+            <div class="col-auto menu-order position-static">
+                <button class="navbar-toggler float-start" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-line"></span>
+                    <span class="navbar-toggler-line"></span>
+                    <span class="navbar-toggler-line"></span>
+                    <span class="navbar-toggler-line"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        {% if lang == 'so' %}
+                            {# Somali Navigation #}
+                            <li class="nav-item">
+                                <a href="{{ path('app_home', {'_locale': 'so'}) }}" class="nav-link">Bogga Hore</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#eligibility" class="nav-link">Shuruudaha</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#required-documents" class="nav-link">Dukumiintiyada Loo Baahan Yahay</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#how-to-apply" class="nav-link">Sida Loo Codsado</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#scholarships" class="nav-link scroll-to-scholarships">Deeqaha Waxbarashada</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#contact-us" class="nav-link">Nala Soo Xidhiidh</a>
+                            </li>
+                        {% else %}
+                            {# English Navigation #}
+                            <li class="nav-item">
+                                <a href="{{ path('app_home', {'_locale': 'en'}) }}" class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#eligibility" class="nav-link">Eligibility</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#required-documents" class="nav-link">Required Documents</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#how-to-apply" class="nav-link">How to Apply</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#scholarships" class="nav-link scroll-to-scholarships">Scholarships</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="#contact-us" class="nav-link">Contact Us</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                    
+                   <div class="header-language-icon icon ml-20px">
+    <div class="header-language dropdown">
+        <a href="javascript:void(0);" class="d-flex align-items-center">
+            <i class="feather icon-feather-globe text-white fs-18 me-2"></i>
+            <span class="ms-2 text-white fs-14" style="white-space: nowrap;">
+                {% if lang == 'en' %}EN{% else %}SO{% endif %}
+            </span>
+        </a>
+        <ul class="language-dropdown alt-font">
+            {% if lang == 'en' %}
+                <li><a href="{{ path('app_home', {'_locale': 'so'}) }}" title="Somali">
+                    <span class="icon-country"><img src="{{ asset('assets/images/SL-flag-wh.png') }}" alt="Somali"></span>Somali
+                </a></li>
+            {% else %}
+                <li><a href="{{ path('app_home', {'_locale': 'en'}) }}" title="English">
+                    <span class="icon-country"><img src="{{ asset('assets/images/United Kingdom(Great Britain).png') }}" alt="English"></span>English
+                </a></li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+                </div>
+            </div>
+            <div class="col-auto col-lg-2 text-end lg-pe-5px"></div>
+        </div>
+    </nav>
+    <!-- end navigation -->
+</header>
+<!-- end header -->

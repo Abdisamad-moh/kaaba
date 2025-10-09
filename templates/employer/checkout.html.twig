@@ -1,0 +1,279 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Jobs
+{% endblock %}
+
+{% block body %}
+	<style>
+
+
+		.btn.btn-primary {
+			width: 100%;
+			height: 55px;
+			border-radius: 0;
+			padding: 13px 0;
+			background-color: black;
+			border: none;
+			font-weight: 600;
+		}
+
+		.btn.btn-primary:hover .fas {
+			transform: translateX(10px);
+			transition: transform 0.5s ease
+		}
+
+
+		.btn-outline-primary:hover {
+			background-color: #edebff !important;
+		}
+		.btn-outline-primary .open > .dropdown-toggle.btn-primary,
+		.btn-outline-primary.active,
+		.btn-outline-primary.focus,
+		.btn-outline-primary:active,
+		.btn-outline-primary:focus,
+		.btn-outline-primary:hover,
+		.btn-outline-primary:not(:disabled):not(.disabled):active,
+		.btn-outline-primary:not(:disabled):not(.disabled):active:focus {
+			color: #fff !important;
+			background: #edebff !important;
+			-webkit-box-shadow: 0 0 0 0.15rem rgb(var(--bs-primary-rgb), 50%);
+			box-shadow: 0 0 0 0.15rem rgb(var(--bs-primary-rgb), 50%);
+		}
+	</style>
+	{# <a href="{{ path('app_employer_checkout_package', {'package': package.id}) }}" class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center">
+					<img src="{{ asset('assets/images/stripe.png') }}" alt="Stripe" class="img-fluid" width="120">
+				</a> #}
+	<div class="container-fluid">
+		<div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+			<div class="card-body px-4 py-3">
+				<div class="row align-items-center">
+					<div class="col-9">
+						<h4 class="fw-semibold mb-2">
+							<i class="ti ti-briefcase fs-8"></i>
+							Checkout
+						</h4>
+						<nav aria-label="breadcrumb">
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item">
+									<a class="text-muted text-decoration-none" href="#">Jobs</a>
+								</li>
+								<li class="breadcrumb-item active" aria-current="page">Jobs List</li>
+							</ol>
+						</nav>
+					</div>
+					<div class="col-3 text-center">
+						<img src="{{ asset('assets/de/images/breadcrumb/ChatBc.png') }}" alt="modernize-img" class="img-fluid">
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-6">
+					<div class="card">
+						<div class="card-header">
+							<h5 class="fs-5 fw-semibold">Order Summary</h5>
+						</div>
+						<div class="card-body">
+							{% if package.category != "subscription" %}
+								<div class="mb-3">
+									<img class="product_image img-fluid" src="{{ path('employer_serve_image', {'filename': package.thumbnail, 'type': 'product'}) }}" alt="Package Thumbnail">
+								</div>
+							{% endif %}
+							<p class="fw-bold fs-3 mb-3">{{ package.description }}</p>
+							<div class="table-responsive">
+								<table class="table align-middle">
+									<thead>
+										<tr>
+											<th>Product</th>
+											<th>Quantity</th>
+											<th class="text-end">Price</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td>{{ package.name }}
+												Plan<br><small>Subscription</small>
+											</td>
+											<td>1</td>
+											<td class="text-end">${{ package.cost }}</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+							{% set tax = ((package.cost * 5) / 100) | round(2) %}
+							{% set final = (package.cost + tax) | round(2) %}
+							<div class="order-summary mt-4">
+								<div class="d-flex justify-content-between">
+									<p>Sub Total</p>
+									<h6>${{ package.cost }}</h6>
+								</div>
+								<div class="d-flex justify-content-between">
+									<p>Tax</p>
+									<h6>${{ tax }}</h6>
+								</div>
+								<div class="d-flex justify-content-between">
+									<h6>Total</h6>
+									<h6>${{ final }}</h6>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="col-lg-6">
+					<div class="card">
+						<div class="card-header">
+							<h5 class="fs-5 fw-semibold">Select a Payment Method</h5>
+						</div>
+						<div
+							class="card-body">
+							<!-- Tabs -->
+							<ul class="nav nav-tabs" role="tablist">
+								<li class="nav-item" role="presentation">
+									<button class="nav-link active" id="stripe-tab" data-bs-toggle="tab" data-bs-target="#stripeTab" type="button" role="tab" aria-controls="stripeTab" aria-selected="true">
+										<img src="{{ asset('assets/images/stripe.png') }}" alt="Stripe" class="img-fluid" width="120">
+									</button>
+								</li>
+								<li class="nav-item" role="presentation">
+									<button class="nav-link" id="edahab-tab" data-bs-toggle="tab" data-bs-target="#edahabTab" type="button" role="tab" aria-controls="edahabTab" aria-selected="false">
+										<img src="{{ asset('assets/images/edahab.png') }}" alt="eDahab" class="img-fluid" width="120">
+									</button>
+								</li>
+								<li class="nav-item" role="presentation">
+									<button class="nav-link" id="waafi-tab" data-bs-toggle="tab" data-bs-target="#waafiTab" type="button" role="tab" aria-controls="waafiTab" aria-selected="false">
+										<img src="{{ asset('assets/images/waafi.png') }}" alt="Waafi" class="img-fluid" width="120">
+									</button>
+								</li>
+							</ul>
+
+							<!-- Tab Content -->
+							<div class="tab-content mt-4" data-controller="zaad">
+								<div class="tab-pane fade show active" id="stripeTab" role="tabpanel" aria-labelledby="stripe-tab">
+									<p>Proceed with Stripe Payment</p>
+									<button class="btn btn-primary w-100">Pay ${{ final }}</button>
+								</div>
+								<div class="tab-pane fade" id="edahabTab" role="tabpanel" aria-labelledby="edahab-tab">
+									<div class="row ">
+										<div class="col-12 mb-4 m-3">
+											<tr>
+												<td class="mt-4" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding-top: 10px;">
+													<p class="mt-4" style="font-size: 16px; font-weight: 400; line-height: 24px; color: #777777;">
+														Please complete the payment by filling in all the required fields carefully. Ensure that you enter the name and phone number associated with the eDahab Services you are using to successfully finalize the transaction.
+
+
+													</p>
+												</td>
+											</tr>
+										</div>
+									</div>
+									<div class="row ">
+										<div class="col-12 mb-4 m-3">
+											<label class="form-label" for="example-email"></label>
+											<p class="help fw-bold" stylel="font-size: 0.8em;">Please type below your Edahab Number with the Area Code ( ex 62x xxx xxx, 65x xxx xxx, 66X XXX XXX)</p>
+											<div class="input-group">
+												<button type="button" class="text-black font-weight-bold btn bg-secondary-subtle text-secondary ">+252</button>
+												<input type="text" placeholder="Phone Number E.g 65xxxxxx" required data-zaad-target="edahab" class="form-control form-control-lg" aria-label="Text input with segmented dropdown button">
+											</div>
+										</div>
+
+									</div>
+									<div class="row ">
+										<div class="col-12 mb-3">
+											<div class="form-check">
+												<label for="termsInput" class="form-label  fs-6">Agree Terms</label>
+												<input class="form-check-input" data-checkbox="edahabPayment" type="checkbox" id="termsInputEdahab">
+											</div>
+
+											<label class="ms-2 fs-15" for="SMS">By clicking Agree terms, you agree to the
+												<a target="__blank" class="text-primary text-decoration-underline" href="{{ path("app_home_terms") }}">Terms and Conditions</a>
+												,
+												<a target="__blank" class="text-primary text-decoration-underline" href="{{ path("app_home_privacy") }}">Privacy Policy</a>
+												&amp;
+												<a target="__blank" class="text-primary text-decoration-underline" href="{{ path("app_home_refundPolicy") }}">Refund Policy</a>
+
+												of Métier  metier-quest.com
+											</label>
+
+										</div>
+									</div>
+									<div class="row  mt-3">
+										<div class="col-12">
+											<button data-type="employer" data-status="edahabPayment" data-can="{{package.id}}" data-action="click->zaad#checkout_edahab" class="btn btn-primary mt-2">Make Payment<span class="fas fa-dollar-sign px-1"></span>${{final| number_format(2, '.', ',')}}
+											</button>
+										</div>
+
+									</div>
+									<div class="row  mt-3">
+
+										<div class="col-12">
+											<span class="fw-bold d-block text-dark mt-2" style="font-style: italic;">Please make sure the phone you are sending the payment from to be nearby in order to enter your PIN number to complete the transaction.</span>
+										</div>
+									</div>
+								</div>
+								<div class="tab-pane fade" id="waafiTab" role="tabpanel" aria-labelledby="waafi-tab">
+									<tr>
+											<td class="mt-4" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding-top: 10px;">
+												<p class="mt-4" style="font-size: 16px; font-weight: 400; line-height: 24px; color: #777777;">
+													Please complete the payment by filling in all the required fields carefully. Ensure that you enter the name and phone number associated with the EVC Plus, ZAAD, and Sahal Mobile Services you are using to successfully finalize the transaction.
+
+
+												</p>
+											</td>
+										</tr>
+										<div class="row justify-content-center mb-4 radio-group">
+											<div class="col-12">
+												<div class='radio selected mx-auto' data-value="dk">
+													<img class="fit-image" src="{{ asset('assets/images/dd_services.jpg') }}">
+												</div>
+											</div>
+										</div>
+
+										<div class="mb-4 m-3">
+											<label class="form-label" for="example-email"></label>
+											<p class="help fw-bold" stylel="font-size: 0.8em;">Please type below your EVC PLUS, Zaad or Sahal Number with the Area Code
+																																																																																																				( ex 60x xxx xxx, 61x xxx xxx, 63x xx xxxx, 68x xx xxxx)</p>
+											<div class="input-group">
+												<button type="button" class="text-black font-weight-bold btn bg-secondary-subtle text-secondary ">+252</button>
+												<input type="text" placeholder="Phone Number" required data-zaad-target="phone" class="form-control form-control-lg" aria-label="Text input with segmented dropdown button">
+											</div>
+										</div>
+										<div class="mb-3">
+											<div class="form-check">
+												<label for="termsInput" class="form-label  fs-6">Agree Terms</label>
+												<input class="form-check-input" data-checkbox="zaadPayment" type="checkbox" id="termsInput">
+											</div>
+
+											<label class="ms-2 fs-15" for="SMS">By clicking Agree terms, you agree to the
+												<a target="__blank" class="text-primary text-decoration-underline" href="{{ path("app_home_terms") }}">Terms and Conditions</a>
+												,
+												<a target="__blank" class="text-primary text-decoration-underline" href="{{ path("app_home_privacy") }}">Privacy Policy</a>
+												&amp;
+												<a target="__blank" class="text-primary text-decoration-underline" href="{{ path("app_home_refundPolicy") }}">Refund Policy</a>
+
+												of Métier  metier-quest.com
+											</label>
+
+										</div>
+										<div class="row  mt-3">
+											<div class="col-6">
+												<button data-type="employer" data-status="zaadPayment" data-can="{{package.id}}" data-action="click->zaad#checkout" class="btn btn-primary mt-2">Make Payment<span class="fas fa-dollar-sign px-1"></span>${{final}}
+												</button>
+
+											</div>
+											<div class="col-12">
+												<span class="fw-bold d-block text-dark mt-2" style="font-style: italic;">Please make sure the phone you are sending the payment from to be nearby in order to enter your PIN number to complete the transaction.</span>
+											</div>
+										</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+{% endblock %}

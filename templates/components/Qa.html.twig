@@ -1,0 +1,43 @@
+<div{{ attributes }}>
+    <div class="filter-search-form  mt-3 mt-md-0"> <i class="fa fa-comment-o" aria-hidden="true"></i>
+
+    <input type="text" data-model="query" placeholder="Search by job types e.g HR Officer" class="form-control comformin">
+
+      </div>
+
+    {% if computed.titles|length > 0 %}
+    <div data-loading="addClass(opacity-50)" class="mt-3 row">
+        <div class="row  justify-content-center mb-5">
+            {% for package in computed.titles %}
+            <div class="col-auto mb-2">
+                <a href="#" data-action="live#action:prevent" data-live-action-param="selectTitle"
+                    data-live-id-param="{{ package.id }}" class="btn btn-primary">
+                    {{ package.name }}
+                </a>
+
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    {# Display nothing if there are no titles and the query is empty #}
+    {% endif %}
+
+    {% if computed.questions %}
+    <div class="mt-3">
+        <h4>Questions:</h4>
+        <div class="row">
+            {% for question in computed.questions %}
+            {{ include('components/_questionAnswerCard.html.twig', {question}) }}
+            {# <li>
+                <strong>Q:</strong> {{ question.q }}<br>
+                <strong>A:</strong> {{ question.a }}<br>
+                {% if question.r %}
+                <strong>R:</strong> {{ question.r }}<br>
+                {% endif %}
+            </li> #}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    </div>

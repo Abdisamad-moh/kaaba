@@ -1,0 +1,402 @@
+{% if view == "employer" %}
+	<div {{attributes.defaults(stimulus_controller('t'))}}>
+		{% if contacts %}
+			<input type="hidden" data-live-view-param="employer" value="employer">
+			<div class="card overflow-hidden chat-application">
+				<div class="d-flex align-items-center justify-content-between gap-6 m-3 d-lg-none">
+					<button class="btn btn-primary d-flex" type="button" data-bs-toggle="offcanvas" data-bs-target="#chat-sidebar" aria-controls="chat-sidebar">
+						<i class="ti ti-menu-2 fs-5"></i>
+					</button>
+					<form class="position-relative w-100">
+						<input type="text" class="form-control search-chat py-2 ps-5" id="text-srh" placeholder="Search Contact">
+						<i class="ti ti-search position-absolute top-50 start-0 translate-middle-y fs-6 text-dark ms-3"></i>
+					</form>
+				</div>
+				<div class="d-flex">
+					<div class="w-30 d-none d-lg-block border-end user-chat-box">
+						<div class="px-4 pt-9 pb-6">
+							<form class="position-relative mb-4">
+								<input type="text" class="form-control search-chat py-2 ps-5" id="text-srh" placeholder="Search Contact">
+								<i class="ti ti-search position-absolute top-50 start-0 translate-middle-y fs-6 text-dark ms-3"></i>
+							</form>
+							<div class="dropdown">
+								<a class="text-muted fw-semibold d-flex align-items-center" href="javascript:void(0)" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+									Recent Chats<i class="ti ti-chevron-down ms-1 fs-5"></i>
+								</a>
+								<ul class="dropdown-menu">
+									<li>
+										<a class="dropdown-item" href="javascript:void(0)">Sort by time</a>
+									</li>
+									<li>
+										<a class="dropdown-item border-bottom" href="javascript:void(0)">Sort by Unread</a>
+									</li>
+									<li>
+										<a class="dropdown-item" href="javascript:void(0)">Hide favourites</a>
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div class="app-chat">
+							<ul class="chat-users mb-0 mh-n100 simplebar-scrollable-y" data-simplebar="init">
+								<div class="simplebar-wrapper" style="margin: 0px;">
+									<div class="simplebar-height-auto-observer-wrapper">
+										<div class="simplebar-height-auto-observer"></div>
+									</div>
+									<div class="simplebar-mask">
+										<div class="simplebar-offset" style="right: 0px; bottom: 0px;">
+											<div class="simplebar-content-wrapper" tabindex="0" role="region" aria-label="scrollable content" style="height: auto; overflow: hidden scroll;">
+												<div class="simplebar-content" style="padding: 0px;">
+													{% set count = 0 %}
+													{% for contact in contacts %}
+														{% set count = count + 1 %}
+														<li>
+
+
+															{# <a href="#"  class="px-4 py-3 bg-hover-light-black d-flex align-items-start justify-content-between chat-user {{count == 1 ? " bg-light-subtle" : " "}}" id="chat_user_1" data-user-id="1"> #}
+															<a href="#" data-action="live#action:prevent" data-live-action-param="selectContact" data-live-id-param="{{ contact.id }}" class="px-4 py-3 bg-hover-light-black d-flex align-items-start justify-content-between chat-user {{count == 1 ? " bg-light-subtle" : " "}}" id="chat_user_1" data-user-id="1">
+
+																<div class="d-flex align-items-center">
+
+																	<span class="position-relative">
+																		<img src="{{ asset('uploads/profile/' ~ (contact.profile ?? 'no-image.jpg')) }}" alt="user1" width="48" height="48" class="rounded-circle">
+																		<span class="position-absolute bottom-0 end-0 p-1 badge rounded-pill bg-success">
+																			<span class="visually-hidden">New alerts</span>
+																		</span>
+																	</span>
+																	<div class="ms-3 d-inline-block w-75">
+																		<h6 class="mb-1 fw-semibold chat-title" data-username="James Anderson">
+																			{{contact.name}}
+																		</h6>
+																		<span class="fs-3 text-truncate text-body-color d-block">{{contact|lastChat(app.user, contact).sender == app.user ? "You:" : ""}}
+																			{{contact|lastChat(app.user, contact).content}}</span>
+																	</div>
+																</div>
+																<p class="fs-2 mb-0 text-muted">{{contact|lastChat(app.user, contact).time}}</p>
+															</a>
+														</li>
+													{% endfor %}
+
+												</div>
+											</div>
+										</div>
+									</div>
+									<div class="simplebar-placeholder" style="width: 345px; height: 960px;"></div>
+								</div>
+								<div class="simplebar-track simplebar-horizontal" style="visibility: hidden;">
+									<div class="simplebar-scrollbar" style="width: 0px; display: none;"></div>
+								</div>
+								<div class="simplebar-track simplebar-vertical" style="visibility: visible;">
+									<div class="simplebar-scrollbar" style="height: 715px; display: block; transform: translate3d(0px, 0px, 0px);"></div>
+								</div>
+							</ul>
+						</div>
+					</div>
+					<div class="w-70 w-xs-100 chat-container">
+						<div class="chat-box-inner-part h-100">
+
+							{% if selectedContact %}
+								<div class="chatting-box d-block">
+									<div class="chat-box">
+										<div class="chat-list chat active-chat" data-user-id="{{ selectedContact.id }}"></div>
+									</div>
+									<div class="p-9 border-bottom chat-meta-user d-flex align-items-center justify-content-between">
+										<div class="hstack gap-3 current-chat-user-name">
+											<div class="position-relative">
+												<img src="{{ asset('uploads/profile/' ~ selectedContact.profile ?? "no-image.jpg") }}" alt="user1" width="48" height="48" class="rounded-circle">
+												<span class="position-absolute bottom-0 end-0 p-1 badge rounded-pill bg-success">
+													<span class="visually-hidden">New alerts</span>
+												</span>
+											</div>
+											<div>
+												<h6 class="mb-1 name fw-semibold"></h6>
+												<p class="mb-0">Away</p>
+											</div>
+										</div>
+										<ul class="list-unstyled mb-0 d-flex align-items-center">
+											<li>
+												<a class="text-white btn btn-danger " href="{{ path('app_employer_block_user', {'blocked': selectedContact.id }) }}">
+													block user
+												</a>
+											</li>
+											{# <li>
+												<a class="text-dark px-2 fs-7 bg-hover-primary nav-icon-hover position-relative z-index-5" href="javascript:void(0)">
+													<i class="ti ti-video"></i>
+												</a>
+											</li>
+											<li>
+												<a class="chat-menu text-dark px-2 fs-7 bg-hover-primary nav-icon-hover position-relative z-index-5 app-chat-active" href="javascript:void(0)">
+													<i class="ti ti-menu-2"></i>
+												</a>
+											</li> #}
+										</ul>
+									</div>
+									<div class="parent-chat-box app-chat-right">
+										<div class="chat-box w-100">
+											<div class="chat-box-inner p-9" data-simplebar="init">
+												<div class="simplebar-wrapper" style="margin: -20px;">
+													<div class="simplebar-height-auto-observer-wrapper">
+														<div class="simplebar-height-auto-observer"></div>
+													</div>
+													<div class="simplebar-mask">
+														<div class="simplebar-offset" style="right: 0px; bottom: 0px;">
+															<div class="simplebar-content-wrapper" tabindex="0" role="region" aria-label="scrollable content" style="height: 100%; overflow: scroll;">
+																<div class="simplebar-content" style="padding: 20px;">
+																	<div class="chat-list chat active-chat" data-user-id="1">
+																		{% for message in chatMessages %}
+																			<div class="hstack gap-3 align-items-start mb-7 {{ message.sender == app.user ? 'justify-content-end' : 'justify-content-start' }}">
+																				{% if message.sender != app.user %}
+																					<img src="{{ asset('uploads/profile/' ~ message.sender.profile) }}" alt="user" width="40" height="40" class="rounded-circle">
+																				{% endif %}
+																				<div>
+																					<h6 class="fs-2 text-muted">{{ message.time }}</h6>
+																					<div class="p-2 {{ message.sender == app.user ? 'bg-info-subtle text-dark' : 'text-bg-light' }} rounded-1 d-inline-block fs-3">
+																						{{ message.content }}
+																					</div>
+																				</div>
+																			</div>
+																		{% endfor %}
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+													<div class="simplebar-placeholder" style="width: 806px; height: 577px;"></div>
+												</div>
+												<div class="simplebar-track simplebar-horizontal" style="visibility: hidden;">
+													<div class="simplebar-scrollbar" style="width: 0px; display: none;"></div>
+												</div>
+												<div class="simplebar-track simplebar-vertical" style="visibility: hidden;">
+													<div class="simplebar-scrollbar" style="height: 0px; display: none;"></div>
+												</div>
+											</div>
+											<div class="px-9 py-6 border-top chat-send-message-footer">
+												<div class="d-flex align-items-center justify-content-between">
+													<div class="d-flex align-items-center gap-2 w-85">
+														<a class="position-relative nav-icon-hover z-index-5" href="javascript:void(0)">
+															<i class="ti ti-mood-smile text-dark bg-hover-primary fs-7"></i>
+														</a>
+														<input type="text" data-model="message" class="form-control message-type-box text-muted border-0 p-0 ms-2" placeholder="Type a Message" fdprocessedid="0p3op">
+													</div>
+													<ul class="list-unstyledn mb-0 d-flex align-items-center">
+														<li>
+															<a data-action="live#action:prevent" data-live-action-param="saveChat" class="text-dark px-2 fs-7 bg-hover-primary nav-icon-hover position-relative z-index-5" href="javascript:void(0)">
+																<i class="ti ti-send"></i>
+																Send
+															</a>
+														</li>
+													</ul>
+
+												</div>
+											</div>
+										</div>
+
+									</div>
+
+								</div>
+							{% else %}
+								<div class="chat-not-selected h-100">
+									<div class="d-flex align-items-center justify-content-center h-100 p-5">
+										<div class="text-center">
+											<span class="text-primary">
+												<i class="ti ti-message-dots fs-10"></i>
+											</span>
+											<h6 class="mt-2">Open chat from the list</h6>
+										</div>
+									</div>
+								</div>
+							{% endif %}
+
+						</div>
+					</div>
+				</div>
+			</div>
+		{% else %}
+			<div class="position-relative overflow-hidden min-vh-50 w-100 d-flex align-items-center justify-content-center">
+				<div class="d-flex align-items-center justify-content-center w-100">
+					<div class="row justify-content-center w-100">
+						<div class="col-lg-4">
+							<div class="text-center">
+								<img src="{{ asset('assets/de/images/no-message.png') }}" alt="modernize-img" class="img-fluid" width="256">
+								<h1 class="fw-semibold mb-7 fs-9">Opps!!!</h1>
+								<h4 class="fw-semibold mb-7">No messages available</h4>
+								<a class="btn btn-primary" href="#" role="button">Go Back to Home</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		{% endif %}
+	</div>
+
+{% elseif view == "job_seeker" %}
+
+	<div {{attributes.defaults(stimulus_controller('t'))}} 
+		{# data-poll="delay(2000)|$render" #}
+	>
+		{% if contacts %}
+			<input type="hidden" data-live-view-param="job_seeker" value="job_seeker">
+			<section class="section">
+				<div class="container">
+					<div class="row align-items">
+						<div class="col-lg-4">
+							<aside class="widget widget_search section-title   d-lg-block ui-elements-barse card notification-wrapper dropdown-scroll inside ">
+								<form class="position-relative">
+									<input class="form-control" type="text" placeholder="Search...">
+									<button class="bg-transparent border-0 position-absolute top-50 end-0 translate-middle-y fs-18 me-2" type="submit">
+										<span class="mdi mdi-magnify text-muted"></span>
+									</button>
+								</form>
+							</aside>
+							<div class="section-title   d-lg-block ui-elements-bar card notification-wrapper dropdown-scroll inside">
+								<div class="process-menu nav flex-column nav-pills  dropdown-scroll" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+									{% for contact in contacts %}
+
+										<a data-action="live#action:prevent" data-live-action-param="selectContact" data-live-id-param="{{ contact.id }}" class="text-dark notification-item d-block" id="v-pills-home-tab" data-bs-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="false" tabindex="-1">
+											<div class="d-flex align-items-center">
+												<div class="flex-shrink-0 me-3 top-bu">
+													<img src="{{ path('profile_serve_employer_image', {'filename': contact.employerDetails.logo ?? 'no-image.jpg' }) }}" class=" img-fluid boxlogoicon avatar-xs" alt="user-pic">
+												</div>
+												<div class="flex-grow-1">
+													<h6 class="mt-0 mb-1 fs-14">{{contact.name}}</h6>
+													<p class="mb-0 fs-12 text-mutedlogin">{{contact|lastChat(app.user, contact).sender == app.user ? "You:" : ""}}
+														{{contact|lastChat(app.user, contact).content}}</p>
+												</div>
+											</div>
+										</a>
+									{% endfor %}
+
+								</div>
+							</div>
+						</div>
+						<!--end col-->
+
+						<div class="col-lg-8">
+							{% if selectedContact %}
+								<div class="">
+									<div class="tab-content" id="v-pills-tabContent">
+										{# <div class="tab-pane fade" id="v-pills-home" role="tabpanel" aria-labelledby="v-pills-home-tab">
+											<div class="p-4 border-bottom">
+												<div class="d-flex align-items-center">
+													<div class="flex-shrink-0 me-3 ">
+														<img src="assets/images/featured-job/img-01.png" class=" img-fluid boxlogoicon avatar-xs" alt="user-pic">
+													</div>
+													<div class="flex-grow-1">
+														<h6 class="mt-0 mb-1 fs-14">Job Applied - HR Executive</h6>
+														<p class="mb-0 fs-12 text-mutedlogin">Job applied on 9 May, 2023 | Google - Capetown, SA</p>
+													</div>
+													<div class="flex-shrink-0  text-md-end">
+														<button type="button" class="btn btn-outline-primary">View job</button>
+													</div>
+												</div>
+											</div>
+
+											<!-- ----------------------------- -->
+											<div
+												class="bg-secondary-subtle text-secondary p-4 mt-3"><!-- Message boxes -->
+
+
+											</div>
+											<!-- ----------------------------- -->
+										</div> #}
+										<div class="tab-pane fade active show" id="v-pills-profile" role="tabpanel" aria-labelledby="v-pills-profile-tab">
+											<div class="p-4 border-bottom">
+												<div class="d-flex align-items-center">
+													{# <div class="flex-shrink-0 me-3 ">
+														<img src="assets/images/featured-job/img-02.png" class=" img-fluid boxlogoicon avatar-xs" alt="user-pic">
+													</div>
+													<div class="flex-grow-1">
+														<h6 class="mt-0 mb-1 fs-14">Job Applied - HR Executive</h6>
+														<p class="mb-0 fs-12 text-mutedlogin">Job applied on 9 May, 2023 | Adobe- Capetown, SA</p>
+													</div>
+													<div class="flex-shrink-0  text-md-end">
+														<button type="button" class="btn btn-outline-primary">View job</button>
+													</div> #}
+												</div>
+											</div>
+
+											<!-- ----------------------------- -->
+											<div class="bg-secondary-subtle text-secondary p-4 mt-4" style="height: 60vh; overflow-y: auto;">
+
+												{% for message in chatMessages %}
+													<div class="d-sm-flex align-items-top mt-4 ">
+														<div class="flex-shrink-0">
+															{% if message.sender != app.user %}
+																<img class="rounded-circle avatar-md img-thumbnail" src="{{ path('profile_serve_employer_image', {'filename': message.sender.employerDetails.logo ?? 'no-image.jpg' }) }}" alt="img">
+															{% endif %}
+														</div>
+														<div class="flex-grow-1 ms-sm-3">
+															<small class="float-end fs-12 text-muted">
+																<i class="uil uil-clock"></i>
+																{{ message.time }}</small>
+															<a href="javascript:(0)" class="primary-link">
+																<h6 class="fs-16 mt-sm-0 mt-3 mb-0">{{message.sender.name}}</h6>
+															</a>
+															{# <p class="text-muted fs-12 mb-0">Aug 10, 2021</p> #}
+															<p class="text-muted fst-italic mb-0  alert  bg-primary-subtle text-primary mt-3">{{ message.content }}</p>
+														</div>
+													</div>
+												{% endfor %}
+												<!-- end -->
+
+											</div>
+											<!-- ----------------------------- -->
+										</div>
+
+
+									</div>
+
+									<div class="mb-3 mt-4">
+										<label for="meassageInput" class="form-label">Your Message</label>
+										<textarea  data-model="message" class="form-control" id="meassageInput" placeholder="Enter your message" name="comments" rows="3"></textarea>
+									</div>
+									<div class="text-end">
+										<button data-action="live#action:prevent" data-live-action-param="saveChat"  type="button" id="submit" name="submit" class="btn btn-primary">
+											Send Message
+											<i class="uil uil-message ms-1"></i>
+										</button>
+									</div>
+
+								</div>
+							{% else %}
+								<div class="position-relative overflow-hidden min-vh-50 w-100 d-flex align-items-center justify-content-center">
+									<div class="d-flex align-items-center justify-content-center w-100">
+										<div class="row justify-content-center w-100">
+											<div class="col-12 ">
+												<div
+													class="text-center">
+													{# <img src="{{ asset('assets/de/images/no-message.png') }}" alt="modernize-img" class="img-fluid" width="256"> #}
+													<h1 class="fw-semibold mb-7 fs-9">No Chat Selected</h1>
+													<h4 class="fw-semibold mb-7">Select Chat Left Side</h4>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							{% endif %}
+
+						</div>
+					</div>
+
+					<!--end row-->
+				</div>
+				<!--end container-->
+			</section>
+		{% else %}
+			<div class="position-relative overflow-hidden min-vh-50 w-100 d-flex align-items-center justify-content-center">
+				<div class="d-flex align-items-center justify-content-center w-100">
+					<div class="row justify-content-center w-100">
+						<div class="col-lg-4">
+							<div class="text-center">
+								<img src="{{ asset('assets/de/images/no-message.png') }}" alt="modernize-img" class="img-fluid" width="256">
+								<h1 class="fw-semibold mb-7 fs-9">Opps!!!</h1>
+								<h4 class="fw-semibold mb-7">No messages available</h4>
+								<a class="btn btn-primary" href="#" role="button">Go Back to Home</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		{% endif %}
+
+	</div>
+{% endif %}

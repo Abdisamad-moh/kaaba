@@ -1,0 +1,1110 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ job.title }} at {{ job.employer.name }} in {{ job.formattedLocation }} | Métier Quest
+{% endblock %}
+
+{% block ogs %}
+	<meta property="og:title" content="{{ job.title }} at {{ job.employer.name }} - {{ job.formattedLocation }}" />
+    <meta property="og:description" content="{{ job.jobDescription|striptags|replace({'&nbsp;': ' '})|slice(0, 160)|raw }}..." />
+    <meta property="og:image" content="{{  absolute_url(asset('assets/images/metier-log-1.png')) }}" />
+    {# <meta property="og:image" content="{{ job.employer.employerDetails.logo ? absolute_url(asset('uploads/' ~ job.employer.employerDetails.logo)) : absolute_url(asset('assets/images/metier-log-1.png')) }}" /> #}
+    <meta property="og:url" content="{{ url('job_seeker_job_details', {slug: job.title|slugify, uuid: job.uuid }) }}" />
+    <meta property="og:type" content="article" />
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ job.title }} at {{ job.employer.name }}">
+    <meta name="twitter:description" content="{{ job.jobDescription|striptags|replace({'&nbsp;': ' '})|slice(0, 160)|raw }}...">
+    <meta name="twitter:image" content="{{ absolute_url(asset('assets/images/metier-log-1.png')) }}">
+    {# <meta name="twitter:image" content="{{ job.employer.employerDetails.logo ? absolute_url(asset('uploads/' ~ job.employer.employerDetails.logo)) : absolute_url(asset('assets/images/metier-log-1.png')) }}"> #}
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{{ url('job_seeker_job_details', {slug: job.title|slugify, uuid: job.uuid }) }}" />
+    
+    <!-- Location Meta Tags -->
+    {% if job.city and job.country %}
+        <meta name="geo.region" content="{{ job.country.iso3 }}" />
+        <meta name="geo.placename" content="{{ job.city.name }}" />
+        {% if job.country.latitude and job.country.longitude %}
+            <meta name="geo.position" content="{{ job.country.latitude }};{{ job.country.longitude }}" />
+            <meta name="ICBM" content="{{ job.country.latitude }}, {{ job.country.longitude }}" />
+        {% endif %}
+    {% endif %}
+    
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org/",
+        "@type": "JobPosting",
+        "title": "{{ job.title }}",
+        "description": "{{ job.jobDescription|striptags|replace({'&nbsp;': ' '})|raw }}",
+        "datePosted": "{{ job.createdAt|date('Y-m-d') }}",
+        "validThrough": "{{ job.applicationClosingDate|date('Y-m-d') }}",
+        "employmentType": "{{ job.jobtypes|map(type => type.name)|join(', ') }}",
+        "hiringOrganization": {
+            "@type": "Organization",
+            "name": "{{ job.employer.name }}",
+            "sameAs": "{{ job.employer.employerDetails.website ?? '#' }}",
+            "logo": "{{ job.employer.employerDetails.logo ? absolute_url(asset('uploads/' ~ job.employer.employerDetails.logo)) : absolute_url(asset('assets/images/metier-log-1.png')) }}"
+        },
+        "jobLocation": {
+            "@type": "Place",
+            "address": {
+                "@type": "PostalAddress",
+                "streetAddress": "{{ job.location }}",
+                "addressLocality": "{{ job.city ?? '' }}",
+                "addressRegion": "{{ job.state ?? '' }}",
+                "postalCode": "",
+                "addressCountry": "{{ job.country.name ?? '' }}"
+            }
+        },
+        "baseSalary": {
+            "@type": "MonetaryAmount",
+            "currency": "{{ job.currency ? job.currency.code : 'USD' }}",
+            "value": {
+                "@type": "QuantitativeValue",
+                "minValue": {{ job.minimumPay ?? 0 }},
+                "maxValue": {{ job.maximumPay ?? 0 }},
+                "unitText": "{{ job.mentionedAmountBy }}"
+            }
+        }
+    }
+    </script>
+{% endblock %}
+{% block body %}
+	<style>
+		.min-height-200 {
+			min-height: 200px;
+		}
+
+		.nowrap-100px {
+			min-width: 100px;
+			white-space: nowrap !important;
+		}
+	</style>
+	{# {{ dump(profile_percentage.percentage < 90 and app.user) }} #}
+	<div class="min-height-200" data-controller="job-details" data-job-details-title-value="{{ job.title ?? '' }}" data-job-details-jobid-value="{{ job.id }}" data-job-details-url-value="{{ path('app_home_jobs') }}" data-job-details-details-value="{{ profile_percentage.details|json_encode }}" data-job-details-percentage-value="{{ profile_percentage.percentage < 90 and app.user and is_granted('ROLE_JOBSEEKER') }}">
+		{# {{ dump(profile_percentage) }} #}
+		<section class="bg-home8" id="home">
+			{% set has_external_link = (job.externalLink starts with 'http://' or job.externalLink starts with 'https://') ? job.externalLink : (job.externalLink ? 'https://' ~ job.externalLink : false) %}
+			<div class="container-lg">
+				<nav class="d-inline-block" aria-label="breadcrumb ">
+					<ol class="breadcrumb justify-content-center fs-12">
+						<li class="">
+							<a href="{{ path('app_home') }}">Search Jobs&nbsp; /</a>
+						</li>
+						<li class="pl-1">
+							<a href="#">
+								{{ job.title }}&nbsp;
+							</a>
+						</li>
+						<li class=" active" aria-current="page">
+							/&nbsp;&nbsp;{{ job.title }},
+							{{ job.employer.name|capitalizeWords }}
+						</li>
+					</ol>
+				</nav>
+				<div class="candidate-list-box card mt-4 col-lg-12">
+					<div class="card-body p-4">
+						<div
+							class="row align-items-center">
+							<!--end col-->
+
+							<div class="row text-lg-start">
+								<div class="col-lg-6">
+									<div class="  me-lg-12 text-dark">
+										<div class="ps-3 pt-2">
+											<h6 class="fs-20">
+												{{ job.employer.name|capitalizeWords }}</h6>
+											<h6 class="text-primary fs-16">{{ job.title }}</h6>
+											<ul class="list-inline d-flex ">
+												<li class="list-inline-item ">
+													<p class="text-muted mb-0 ">
+														<span class="text-muted fw-medium">
+															<i class="fa fa-map-marker" aria-hidden="true"></i>
+															&nbsp;
+															{{ job.formattedLocation }}
+															{# ,
+															{{ job.country.name ?? '' }}</span> #}
+													</p>
+												</li>
+												<li>
+													|</li>
+												<li class="list-inline-item pl-1">
+													<p class="text-muted mb-0">
+														<span class="text-muted fw-medium">
+															<i class="fa fa-briefcase" aria-hidden="true"></i>
+															&nbsp;
+															
+															{% if job.numberPosition == 0 %}
+
+																{% elseif job.numberPosition  == 1 %}
+																	{{job.numberPosition}} Role Available
+																{% elseif job.numberPosition > 1 %}
+																	{{job.numberPosition}} Roles Available
+															{% endif %}
+															</span>
+													</p>
+												</li>
+												<li>
+													|</li>
+												<li class="list-inline-item pl-1"></li>
+											</ul>
+										</div>
+									</div>
+									{% set title = job.title ?? job.title %}
+									{% set description = job.jobDescription|raw|shorten(220) %}
+									{% set post = {
+											title: title,
+											description: description|raw,
+											image: "uploads/images/post_image.jpg"
+										} 
+									%}
+									<div class="btn-group">
+										{# <a target="__blank" href="https://www.facebook.com/sharer/sharer.php?u={{ absolute_url(app.request.pathinfo) }}" class="btn btn-primary">
+											<i class="fa fa-facebook-f"></i>
+											Share on Facebook
+										</a> #}
+										{# <a target="_blank" 
+											href="https://www.facebook.com/sharer/sharer.php?u={{ absolute_url(app.request.pathinfo) }}&amp;title={{ post.title|url_encode }}&amp;description={{ post.description|url_encode }}&amp;picture={{ path('profile_image', {'filename': job.employer.employerDetails.logo }) }}" 
+											class="btn btn-primary">
+												<i class="fa fa-facebook-f"></i>
+												Share on Facebook
+										</a> #}
+										<a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{ url('job_seeker_job_details', {slug: job.title|slugify, uuid: job.uuid }) }}" style="background-color: #1877F2 !important;color: white !important;" class="btn">
+											<i class="fa fa-facebook-f"></i>
+											Facebook
+										</a>
+										<a target="__blank" href="https://twitter.com/intent/tweet?url={{ absolute_url(app.request.pathinfo) }}&text={{ job.title ?? '' }}" class="btn bg-dark">
+											<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="30" height="20"><path  d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z" fill="white"/></svg>
+											{# Twitter #}
+										</a>
+										<a data-action="click->job-details#copyUrl" href="#" class="btn btn-success">
+											<i class="fa fa-copy"></i>
+											Copy
+										</a>
+									</div>
+								</div>
+								<div class="col-lg-6">
+									<div
+										class="modal-footer">
+										{# <div class="sh mt-2 text-center ms-2">
+																																																																																																																																			<a href="#">
+																																																																																																																																				<i class="fa fa-share" aria-hidden="true"></i>
+																																																																																																																																				&nbsp; Share Job &nbsp;
+																																																																																																																																			</a>
+																																																																																																																																		</div> #}
+										{% if job_application %}
+											<div class="sh mt-2 text-center ms-2">
+												<a
+													href="{{ path('job_seeker_apply_job', {slug: job.title|slugify, uuid: job.uuid }) }}">
+													{# <i class="fa fa-share" aria-hidden="true"></i> #}
+													&nbsp; You applied for this job  &nbsp;
+												</a>
+											</div>
+										{% else %}
+											{% if app.user == null %}
+												<div class="top-login-line mt-2 text-center ms-2 ">
+													<a href="{{ path('job_seeker_apply_job', {'slug': job.title|slugify, 'uuid': job.uuid }) }}">&nbsp; Apply Job &nbsp;
+													</a>
+												</div>
+											{% else %}
+												{# {% if profile_percentage.percentage >= 90 and has_external_link == false %} #}
+												{% if has_external_link == false %}
+													<div class="top-login-line mt-2 text-center ms-2 ">
+														<a href="{{ path('job_seeker_apply_job', {'slug': job.title|slugify, 'uuid': job.uuid }) }}">&nbsp; Apply Job &nbsp;
+														</a>
+													</div>
+												{% endif %}
+											{% endif %}
+
+											<div class="top-login-line mt-2 text-center ms-2 ">
+												<form action="{{ path('job_seeker_save_job', {'job': job.id}) }}" method="post">
+													<button class="btn {{ job.id in saved_jobs ? 'btn-light' : 'btn-outline-primary' }} fw-bold" {% if job.id in saved_jobs %} data-bs-toggle="tooltip" data-bs-placement="top" title="Un-mark this job" {% else %} data-bs-toggle="tooltip" data-bs-placement="top" title="Save this job" {% endif %} {{ (app.user == null) ? 'disabled' : '' }} style="font-family: 'Inter', sans-serif; border: none; background: none;">
+														<i class="fa {{ job.id in saved_jobs ? 'fa-bookmark text-success' : 'fa-bookmark-o' }} fw-bold" aria-hidden="true">
+															<span class="job-cont">
+																{{ job.id in saved_jobs ? 'Saved ' : 'Save For Later' }}</span>
+														</i>
+													</button>
+												</form>
+											</div>
+										{% endif %}
+									</div>
+									<div class="modal-footer">
+										<ul class="list-inline d-flex  mb-3 mt-3">
+
+											{% if job.isImmediateHiring %}
+												<li class="px-1">
+													<span class="badge bg-success p-2 fw-bold">Immediate Hiring</span>
+												</li>
+
+												<li>
+													|</li>
+											{% endif %}
+											<li class="px-1">
+												<p class="text-muted mb-0 ">
+													<span class="text-muted fw-medium">
+														Expires in<strong>
+															{{ job.expiresAt }}</strong>
+													</span>
+												</p>
+											</li>
+											<li>
+												|</li>
+											<li class=" pl-1">
+												<p class="text-muted mb-0">
+													<span class="text-muted fw-medium">
+														<i>Posted
+															{{ job.postedAt }}</i>
+													</span>
+												</p>
+											</li>
+											{% if job_application %}
+												<li class=" pl-1">
+													<p class="text-muted mb-0">
+														<span class="text-muted fw-medium">
+															<i>Applied
+																{{ job_application.createdAt|diffForHumans }}</i>
+														</span>
+													</p>
+												</li>
+											{% endif %}
+										</ul>
+									</div>
+								</div>
+							</div>
+
+							<!--end col-->
+
+						</div>
+						<!--end row-->
+
+					</div>
+				</div>
+			</div>
+		</section>
+		
+		<section class="section-re-de ">
+			<div
+				class="container-lg">
+				
+
+				<div class="card">
+					<div class="card-header text-bg-primary">
+						<h5 class="mb-0 text-white">Job Infomation details</h5>
+					</div>
+					{# <form class="form-horizontal"> #}
+					<div class="form-body">
+						<div class="card-body">
+							<h5 class="card-title mb-0">Basic Details</h5>
+						</div>
+						<hr class="m-0"/>
+						<div class="card-body">
+							<div class="row">
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Job Title:</label>
+										</div>
+										<div class="col-8">
+											<p>{{job.title}}</p>
+										</div>
+									</div>
+								</div>
+								<!--/span-->
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Address:</label>
+										</div>
+										<div class="col-8">
+											<p>{{ job.location }}</p>
+										</div>
+									</div>
+								</div>
+								<!--/span-->
+							</div>
+							<!--/row-->
+							<div class="row">
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Job Type:</label>
+										</div>
+										<div class="col-8">
+											<p>
+												{% for type in job.jobtypes %}
+													<span class="mb-1 badge text-bg-dark">{{type.name}}</span>
+												{% endfor %}
+											</p>
+										</div>
+									</div>
+								</div>
+								
+								<!--/span-->
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Job Location:</label>
+										</div>
+										<div class="col-8">
+											<p>{{ job.formattedLocation }}
+											{# ,
+												{{job.country.name ?? ''}} #}
+												</p>
+										</div>
+									</div>
+								</div>
+							</div>
+							<!--/row-->
+							<div class="row">
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Work Type:</label>
+										</div>
+										<div class="col-8">
+											<p>{{job.worktype}}</p>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Category:</label>
+										</div>
+										<div class="col-8">
+											<p>{{job.jobcategory.name}}</p>
+										</div>
+									</div>
+								</div>
+								
+								<!--/span-->
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Work Schedule:</label>
+										</div>
+										<div class="col-8">
+											<p>
+												{% for shift in job.shift %}
+													<span class="mb-1 badge text-bg-dark">{{shift.name}}</span>
+												{% endfor %}
+											</p>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Industry:</label>
+										</div>
+										<div class="col-8">
+											<p>
+												{{job.industry.name}}
+											</p>
+										</div>
+									</div>
+								</div>
+								
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Total Hours:</label>
+										</div>
+										<div class="col-8">
+											<p>{{job.hours ?? "N/A"}}</p>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Who can apply:</label>
+										</div>
+										<div class="col-8">
+											<p>
+												<span class="mb-1 badge text-bg-dark">{{job.localsonly ? "Locals/Citizens only" : "Open to everyone"}}</span>
+											</p>
+										</div>
+									</div>
+								</div>
+								
+								<!--/span-->
+							</div>
+							<!--/row-->
+
+						</div>
+						<hr class="m-0"/>
+						<div class="card-body">
+							<h5 class="card-title mb-0">More Details</h5>
+						</div>
+						<hr class="m-0"/>
+						<div class="card-body">
+							<div class="row">
+    <!-- Required Skills -->
+    <div class="col-md-6 col-12 mb-3">
+    <div class="row">
+        <div class="col-4 text-end">
+            <label class="form-label">Required Skills:</label>
+        </div>
+        <div class="col-8">
+            <p class="d-flex flex-wrap gap-2">
+                {% for skill in job.requiredskill %}
+                    <span class="badge text-bg-dark text-wrap">{{ skill.name }}</span>
+                {% endfor %}
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Preferred Skills -->
+<div class="col-md-6 col-12 mb-3">
+    <div class="row">
+        <div class="col-4 text-end">
+            <label class="form-label">Preferred Skills:</label>
+        </div>
+        <div class="col-8">
+            <p class="d-flex flex-wrap gap-2">
+                {% for skill in job.preferredskill %}
+                    <span class="badge text-bg-dark text-wrap">{{ skill.name }}</span>
+                {% endfor %}
+            </p>
+        </div>
+    </div>
+</div>
+
+</div>
+
+							<div class="row">
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Salary:</label>
+										</div>
+										<div class="col-8">
+											<p>
+												{% if job.minimumpay > 0 and job.maximumpay > 0 %}
+													{{job.minimumpay}}-{{job.maximumpay}}
+													<b>{{ job.currency ? job.currency.code ?? '' : '' }}</b>
+												{% else %}
+													N/A
+												{% endif %}
+											</p>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Salary Frequency:</label>
+										</div>
+										<div class="col-8">
+											<p>
+												{{ job.mentionedAmountBy }}
+											</p>
+										</div>
+									</div>
+								</div>
+<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Education Required:</label>
+										</div>
+										<div class="col-8">
+											<p>{{job.educationrequired|educationNumberToString}}</p>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Education Titles</label>
+										</div>
+										<div class="col-8">
+											<p>
+												{{job.educationtitles}}
+											</p>
+										</div>
+									</div>
+								</div>
+								
+							</div>
+							<div class="row">
+								
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Benefits:</label>
+										</div>
+										<div class="col-8">
+											<p>
+												{% for benefit in job.benefits %}
+													<span class="mb-1 badge text-bg-dark">{{benefit.name}}</span>
+												{% endfor %}
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Experience Level:</label>
+										</div>
+										<div class="col-8">
+											<p>{{job.experience|numberToString}}</p>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Commission:</label>
+										</div>
+										<div class="col-8">
+											<p>
+												{% if job.hasCommission %}
+													{{job.currency.code ?? ''}}
+												{% else %}
+													N/A
+												{% endif %}
+											</p>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Certificate Required:</label>
+										</div>
+										<div class="col-8">
+											<p>{{job.certificationrequired ? "Yes" : "No"}}</p>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Other Requirements:</label>
+										</div>
+										<div class="col-8">
+											<p>{{job.otherrequirements|raw}}</p>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Certifications:</label>
+										</div>
+										<div class="col-8">
+											<p>{{job.certifications ? job.certifications : "N/A"}}</p>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6 col-12">
+									{# <div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Other Requirements:</label>
+										</div>
+										<div class="col-8">
+											<p>{{job.otherrequirements}}</p>
+										</div>
+									</div> #}
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Posted Date:</label>
+										</div>
+										<div class="col-8">
+											<p>{{job.createdat|date("d-m-Y")}}</p>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Closing Date:</label>
+										</div>
+										<div class="col-8">
+											<p>{{job.applicationclosingdate|date("d-m-Y")}}</p>
+										</div>
+									</div>
+								</div>
+							</div>
+							{# <div class="row">
+								<!--/span-->
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Salary:</label>
+										</div>
+										<div class="col-8">
+											<p>
+												{% if job.minimumpay > 0 and job.maximumpay > 0 %}
+													{{job.minimumpay}}-{{job.maximumpay}}
+													<b>{{ job.currency ? job.currency.code ?? '' : '' }}</b>
+												{% else %}
+													N/A
+												{% endif %}
+											</p>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Salary Frequency:</label>
+										</div>
+										<div class="col-8">
+											<p>
+												{{ job.mentionedAmountBy }}
+											</p>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Commission:</label>
+										</div>
+										<div class="col-8">
+											<p>
+												{% if job.hasCommission %}
+													{{job.currency.code}}
+												{% else %}
+													N/A
+												{% endif %}
+											</p>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Immediate Hiring:</label>
+										</div>
+										<div class="col-8">
+											<p>
+												<span class="mb-1 badge text-bg-dark">{{job.immediatehiring ? "Yes" : "N/A"}}</span>
+											</p>
+										</div>
+									</div>
+								</div>
+								<!--/span-->
+							</div> #}
+							<!--/row-->
+							<div class="row">
+								{# <div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Posted Date:</label>
+										</div>
+										<div class="col-8">
+											<p>{{job.createdat|date("d-m-Y")}}</p>
+										</div>
+									</div>
+								</div>
+								<!--/span-->
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Closing Date:</label>
+										</div>
+										<div class="col-8">
+											<p>{{job.applicationclosingdate|date("d-m-Y")}}</p>
+										</div>
+									</div>
+								</div>
+
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Benefits:</label>
+										</div>
+										<div class="col-8">
+											<p>
+												{% for benefit in job.benefits %}
+													<span class="mb-1 badge text-bg-dark">{{benefit.name}}</span>
+												{% endfor %}
+											</p>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Experience Level:</label>
+										</div>
+										<div class="col-8">
+											<p>{{job.experience|numberToString}}</p>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Preferred Skills:</label>
+										</div>
+										<div class="col-8">
+											<p>
+												{% for benefit in job.preferredskill %}
+													<span class="mb-1 badge text-bg-dark">{{benefit.name}}</span>
+												{% endfor %}
+											</p>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Education Required:</label>
+										</div>
+										<div class="col-8">
+											<p>{{job.educationrequired|educationNumberToString}}</p>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Certificate Required:</label>
+										</div>
+										<div class="col-8">
+											<p>{{job.certificationrequired ? "Yes" : "No"}}</p>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Certifications:</label>
+										</div>
+										<div class="col-8">
+											<p>{{job.certifications ? job.certifications : "N/A"}}</p>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label">Other Requirements:</label>
+										</div>
+										<div class="col-8">
+											<p>{{job.otherrequirements}}</p>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6 col-12">
+									<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label badge text-bg-primary">Link to Apply:</label>
+										</div>
+										<div class="col-8">
+										
+											{% if has_external_link %}
+
+												<p>
+													<a class="text-danger" target="__blank" href="{{ job.externalLink }}">Click Here</a>
+												</p>
+											{% else %}
+												<p>N/A</p>
+											{% endif %}
+										</div>
+									</div>
+								</div> 
+								#}
+								<div class="col-md-6 col-12">
+									
+								</div> 
+								<div class="col-12 my-3">
+									<div class="col-md-12 col-12">
+										<div class="row">
+											<div class="col-4 text-start">
+												<label class="form-label fw-bold">Job Descriptions:</label>
+											</div>
+											<div class="col-12">
+												<p>{{job.jobdescription|raw}}</p>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<!--/span-->
+							</div>
+							<div class="row">
+										<div class="col-4 text-end">
+											<label class="form-label badge text-bg-primary">How to Apply:</label>
+										</div>
+										<div class="col-8">
+
+											{% if job_application %}
+												<strong>You applied for this job</strong>
+											{% else %}	
+												{% if has_external_link %}
+
+													<p>
+														<a class="text-primary" target="__blank" href="{{ has_external_link }}">{{ job.externalLink }}</a>
+													</p>
+												{% else %}
+													{# {% if profile_percentage.percentage >= 90 and has_external_link == false %} #}
+														<div class="top-login-line mt-2 text-start ms-2 ">
+															<a href="{{ path('job_seeker_apply_job', {'slug': job.title|slugify, 'uuid': job.uuid }) }}">&nbsp; Apply Job &nbsp;
+															</a>
+														</div>
+													{# {% endif %} #}
+												{% endif %}
+											{% endif %}
+										</div>
+									</div>
+							{% if job_report %}
+								<div class="card-body">
+									<div class="alert alert-info">
+										<h6>You reported this job</h6>
+										<p>{{ job_report.description|nl2br }}</p>
+									</div>
+								</div>
+							{% else %}
+								<div class="card-body text-start mt-5">
+									<div
+										class="card-title">
+										{# <h6 class="card-title mb-0">Questions</h6> #}
+										<div class="alert alert-warning text-center text-black">
+											<p>
+												Métier Quest never charges for job searches or applying for jobs. We also do not guarantee employment or interviews in return for payment. Be wary of scammers asking you for money for jobs or interviews. Report such offers to us at suspicionjob@metier-quest.com
+												<br>If you think this job violates our guidelines, please report it by clicking here<br>
+												<button class="btn btn-sm btn-primary" data-action="click->job-details#showReportForm">Report job</button>
+											</p>
+										</div>
+
+									</div>
+								</div>
+								<div class="card-body d-none" data-job-details-target="reportDiv">
+									<form method="POST" action="{{ path('report_job', { job: job.id }) }}">
+										<label for="description">Report Description</label>
+										<textarea class="form-control" name="description" id="description" rows="4"></textarea>
+										<button type="button" class="btn btn-primary my-2" data-job-details-user-param="{{ app.user.id ?? '' }}" data-param data-action="click->job-details#submitReportForm">Submit Report</button>
+									</form>
+								</div>
+							{% endif %}
+						</div>
+						<hr class="m-0"/>
+
+					</div>
+
+					{% if similar_jobs|length > 0 %}
+					<div class="col-12 p-4">
+						<div class="row" data-controller="jobs" data-jobs-target="jobs">
+							<div class="col-lg-12">
+								<div class="section-title text-center">
+									<h3 class="title mb-2">Similar<span class="text-primary fw-bold">
+											Jobs</span>
+									</h3>
+								</div>
+							</div>
+
+							{# {{ component('all-jobs', {loading: 'defer', 'loading-template': 'components/jobs-loading.html.twig', home: true} ) }} #}
+							{% include 'home/job-cards.html.twig' with {jobs: similar_jobs, saved_jobs: saved_jobs} %}
+
+						</div>
+					</div>
+					{% endif %}
+					<div class="col-lg-12">
+						<div class="section-title text-center">
+							{# <p class="text-muted mb-5 mt-5 fs-14">Did not find what you’re looking for? &nbsp;
+								<a data-loading="hide" href="#" data-action="click->jobs#loadMore" data-jobs-target="loadMore">
+									<span>View More
+										{{ remaining > 0 ? ' (' ~ remaining ~ ')' : '' }}</span>
+									<span>
+										<i class="fa fa-arrow-right" aria-hidden="true"></i>
+									</a>
+								</p>
+							</p> #}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		{# Alert Modal #}
+		<div class="modal fade" id="profileCompletionModal"  tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="modalLabel">Profile Incomplete</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<div class="alert alert-warning text-primary">
+							<h5>Please complete your profile information to be able to apply for this job.</h5>
+							<ul class="py-2 ms-3 profile_list text-dark">
+							
+							</ul>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+						{# <button type="button" class="btn btn-primary" onclick="window.location.href='/profile';">Edit Profile</button> #}
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section class="ftimg text-center">
+		 
+	</section>
+	<section class="bg-footer">
+		<div class="container">
+
+
+			<div class="row">
+				<div class="col-lg-4">
+					<div class="footer-item mt-4 mt-lg-0 me-lg-5">
+						<img class="img-fluid teimg" src="assets/images/logo_foot.png" alt="">
+						<p class="text-grey mt-3">Connect with us on</p>
+						<ul class="footer-social-menu list-inline mb-0">
+							<li class="list-inline-item">
+								<a href="#">
+									<i class="fa fa-facebook" aria-hidden="true"></i>
+								</a>
+							</li>
+							<li class="list-inline-item">
+								<a href="#">
+									<i class="fa fa-youtube-play" aria-hidden="true"></i>
+								</a>
+							</li>
+							<li class="list-inline-item">
+								<a href="#">
+									<i class="fa fa-twitter" aria-hidden="true"></i>
+								</a>
+							</li>
+							<li class="list-inline-item">
+								<a href="#">
+									<i class="fa fa-instagram" aria-hidden="true"></i>
+								</a>
+							</li>
+							<li class="list-inline-item">
+								<a href="#">
+									<i class="fa fa-linkedin" aria-hidden="true"></i>
+								</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<!--end col-->
+				<div class="col-lg-3 col-6">
+					<div class="footer-item mt-4 mt-lg-0">
+						<ul class="list-unstyled footer-list mb-0">
+							<li>
+								<a href="#">
+									<i class="mdi mdi-chevron-right"></i>
+									About Us</a>
+							</li>
+							<li>
+								<a href="#">
+									<i class="mdi mdi-chevron-right"></i>
+									Products</a>
+							</li>
+							<li>
+								<a href="#">
+									<i class="mdi mdi-chevron-right"></i>
+									Services</a>
+							</li>
+							<li>
+								<a href="#">
+									<i class="mdi mdi-chevron-right"></i>Contact us</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<!--end col-->
+				<div class="col-lg-3 col-6">
+					<div class="footer-item mt-4 mt-lg-0">
+						<ul class="list-unstyled footer-list mb-0">
+							<li>
+								<a href="#">
+									<i class="mdi mdi-chevron-right"></i>
+									Browse Job</a>
+							</li>
+							<li>
+								<a href="#">
+									<i class="mdi mdi-chevron-right"></i>
+									Resume templates</a>
+							</li>
+							<li>
+								<a href="#">
+									<i class="mdi mdi-chevron-right"></i>
+									Companies</a>
+							</li>
+							<li>
+								<a href="#">
+									<i class="mdi mdi-chevron-right"></i>
+									FAQ’s
+								</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<!--end col-->
+
+				<!--end col-->
+				<div class="col-lg-2 col-6">
+					<div class="footer-item mt-4 mt-lg-0">
+						<ul class="list-unstyled footer-list mb-0">
+							<li>
+								<a href="#">
+									<i class="mdi mdi-chevron-right"></i>
+									Testimonials</a>
+							</li>
+							<li>
+								<a href="#">
+									<i class="mdi mdi-chevron-right"></i>
+									Blogs</a>
+							</li>
+							<li>
+								<a href="#">
+									<i class="mdi mdi-chevron-right"></i>
+									Q&A</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+				<!--end col-->
+			</div>
+			<div class="mt-3">
+				<hr/>
+			</div>
+			<div class="row">
+				<div class="col-lg-4 col-12 text-grey text-center text-md-start">
+					<p>2023 Metier Quest. All Rights Reserved.</p>
+				</div>
+				<div class="col-lg-8  col-12">
+					<ul class="list-inline mb-0 text-grey text-md-end  text-center">
+						<li class="list-inline-item text-grey">
+							<p class="fs-13 mb-0">
+								<a href="#">Terms & Conditions</a>
+								|
+								<a href="#">
+									Privacy
+								</a>
+								|
+								<a href="#">Cookie Settings</a>
+							</p>
+						</li>
+					</ul>
+					<button onclick="topFunction()" id="back-to-top" style="display: block;">
+						<i class="mdi mdi-arrow-up"></i>
+					</button>
+				</div>
+			</div>
+		</div>
+	</section>
+	{{ include('components/live-toast.html.twig') }}
+</div>{% endblock %}

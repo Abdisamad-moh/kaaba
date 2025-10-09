@@ -1,0 +1,45 @@
+<div class="col-lg-3 mb-4">
+	<div
+		class="card blog-grid-box p-2">
+		{# <a href="#"> #}
+		<img class="img-fluid" src="{{ path('profile_serve_employer_image', {'filename': item.thumbnail, 'type': 'product' }) }}" alt=""></a>
+	<div
+		class="card-body">
+		{# <a href="#" class="primary-link"> #}
+		<h6 class="fs-17">{{item.name}}</h6>
+		{# </a> #}
+		<div class="product-info">
+			<div class="row align-items-center">
+				<div class="col">
+					<div class="text-warning mb-2 font-13">
+						<i class="fa fa-star"></i>
+						<i class="fa fa-star"></i>
+						<i class="fa fa-star"></i>
+						<i class="fa fa-star"></i>
+						<i class="fa fa-star"></i>
+					</div>
+					<h5 class="m-0">
+						<span class="text-muted">
+							Type :
+							<b>DOCX</b>
+						</span>
+					</h5>
+				</div>
+				<div class="col-auto">
+					<div class="product-price-tag">
+						${{item.cost}}
+					</div>
+				</div>
+			</div>
+
+			<!-- end row -->
+		</div>
+	</div>
+	<div class="card-footer">
+		<div class="text-center">
+			<a href="{{ path('app_jobseeker_purchase_checkout', {'package': item.id}) }}" class="btn btn-primary btn-hover">Buy Now
+				<i class="fa fa-arrow-right" aria-hidden="true"></i>
+			</a>
+		</div>
+	</div>
+</div>

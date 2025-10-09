@@ -1,0 +1,97 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Email Template
+{% endblock %}
+
+{% block body %}
+	<div class="container-fluid">
+
+
+		<div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+			<div class="card-body px-4 py-3">
+				<div class="row align-items-center">
+					<div class="col-9">
+						<h4 class="fw-semibold mb-8">Email Template</h4>
+						<nav aria-label="breadcrumb">
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item">
+									<a class="text-muted text-decoration-none" href="#">Email Templates</a>
+								</li>
+								<li class="breadcrumb-item" aria-current="page">Template</li>
+							</ol>
+						</nav>
+					</div>
+
+				</div>
+			</div>
+		</div>
+		<div class="containerss">
+
+			<div class="row">
+				<div class="col-12"></div>
+				<div class="col-md-6"></div>
+				<div class="col-md-6">
+					<div class="form-group"></div>
+				</div>
+			</div>
+
+
+		</div>
+		<div class="card">
+			<div class="card-body">
+				{{ form_start(form) }}
+				<div class="row">
+					<div class="col-6">
+						<div class="mb-4">
+							<label class="form-label">User Type</label>
+							<span class="text-danger">*</span>
+							<div class="input-group">
+								{{ form_widget(form.type) }}
+							</div>
+						</div>
+					</div>
+					<div class="col-6">
+						<div class="mb-4">
+							<label class="form-label">Header Text</label>
+							<span class="text-danger">*</span>
+							<div class="input-group">
+								{{ form_widget(form.header) }}
+							</div>
+						</div>
+					</div>
+					<div class="col-6">
+						<div class="mb-4">
+							<label class="form-label">Action</label>
+							<span class="text-danger">*</span>
+							<div class="input-group">
+								{{ form_widget(form.action, { 'attr': {'placeholder': 'Enter the action' } }) }}
+
+							</div>
+						</div>
+					</div>
+					<div class="col-6">
+						<div class="mb-4">
+							<label class="form-label">Subject</label>
+							<span class="text-danger">*</span>
+							<div class="input-group">
+								{{ form_widget(form.subject) }}
+							</div>
+						</div>
+					</div>
+
+					{{ form_row(form.content) }}
+					<div class="col-12">
+						<div class="ssmb-3 mt-3">
+							<button type="submit" class="btn btn-primary">Create</button>
+
+
+						</div>
+					</div>
+				</div>
+
+				{{ form_end(form) }}
+			</div>
+		</div>
+
+	</div>
+{% endblock %}

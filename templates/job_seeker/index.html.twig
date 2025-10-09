@@ -1,0 +1,1105 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profile !
+{% endblock %}
+
+{% block body %}
+	<style>
+		#form_current_1 {
+			margin-left: 10px;
+		}
+		.enrolled-radio label {
+			padding-right: 2em !important;
+			padding-left: 0.5em !important;
+		}
+
+		[data-jobseeker-profile="header"] {
+			cursor: pointer !important;
+		}
+		.label_note {
+			font-style: italic;
+			font-size: 0.9em !important;
+			padding: 0 0 0.2em !important;
+			color: #51006A !important;
+		}
+
+		.primary_one {
+			background-color: #350D3C !important;
+		}
+
+		.primary_two {
+			background-color: #6e3278 !important;
+		}
+
+		.primary_three {
+			background-color: #95599e !important;
+		}
+		.primary_four {
+			background-color: #917994 !important;
+		}
+	</style>
+	<div class="main-content" data-controller="jobseeker-profile" data-jobseeker-profile-details-value="{{ profile_percentage.details|json_encode }}" data-jobseeker-profile-percentage-value="{{ showAlert }}" data-jobseeker-profile-existing-skills-value="{{ job_seeker_skills|json_encode }}" data-jobseeker-profile-user-career-value="{{ user_career_skills|json_encode }}">
+		<div class="page-content">
+			<section class="bg-homelogin" id="home">
+				<div class="container">
+					<div class="row align-items-center">
+						<div class="col-lg-12">
+							<div class="mb-2 pb-3 me-lg-6 text-center">
+								<h1 class="display-5 fw-semibold mb-3 mt-3 fs-22">My
+									<span class="text-primary fw-bold">Profile</span>
+								</h1>
+								<p class="lead text-muted mb-0 pc-da">This is your profile page. Here you can tell us about your education, work experience, skills and interests. This is where you can showcase your skills, qualifications and interests to potential employers. All entries that are marked with an asterisks
+									<strong>(*)</strong>
+									are mandatory</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			{# Alert Modal #}
+			<div class="modal fade" id="profileCompletionModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="modalLabel">Profile Incomplete</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body alert alert-warning text-primary">
+							<h5>Please complete you profile with your information to apply for jobs and for Employers/Recruiter to find your profile.
+																													Here are the steps you need to follow:</h5>
+
+							<ul class="py-2 ms-3 profile_list text-dark"></ul>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+							{# <button type="button" class="btn btn-primary" onclick="window.location.href='/profile';">Edit Profile</button> #}
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<section class="section">
+				<div class="container-fluid">
+					<div class="row justify-content-center">
+						<div class="col-lg-2" style="cursor: pointer !important;" data-jobseeker-profile="header" data-action="click->jobseeker-profile#goToList" data-jobseeker-profile-url-param="{{ path('jobseeker_reports', {type: 'applied'})}}">
+							<div class="alert  bg-info-subtle p-4 pb-2" role="alert">
+								<div class="d-flex justify-content-between">
+									<div>
+										<img class="img-fluid rounded-3" src="{{asset('assets/images/p1.png')}}" alt="">
+									</div>
+									<span class="fs-22">{{ app.user.jobApplications|length}}</span>
+								</div>
+								<h6 class="">
+									APPLIED
+								</h6>
+							</div>
+						</div>
+						<div class="col-lg-2" data-jobseeker-profile="header" data-action="click->jobseeker-profile#goToList" data-jobseeker-profile-url-param="{{ path('jobseeker_reports')}}">
+							<div class="alert  bg-success-subtle p-4 pb-2" role="alert">
+								<div class="d-flex justify-content-between">
+									<div>
+										<img class="img-fluid rounded-3" src="{{asset('assets/images/p2.png')}}" alt="">
+									</div>
+									<span class="fs-22">{{ app.user.jobApplications|filter(application => application.status == 'shortlisted')|length }}</span>
+								</div>
+								<h6 class="">
+									SHORTLISTED
+								</h6>
+							</div>
+						</div>
+						<div class="col-lg-2" data-jobseeker-profile="header" data-action="click->jobseeker-profile#goToList" data-jobseeker-profile-url-param="{{ path('jobseeker_reports')}}">
+							<div class="alert  bg-primary-subtle p-4 pb-2" role="alert">
+								<div class="d-flex justify-content-between">
+									<div>
+										<img class="img-fluid rounded-3" src="{{asset('assets/images/p3.png')}}" alt="">
+									</div>
+									<span class="fs-22">{{ app.user.jobApplicationInterviews|length }}</span>
+								</div>
+								<h6 class="">
+									INTERVIEW SCHEDULED
+								</h6>
+							</div>
+						</div>
+						<div class="col-lg-2" data-jobseeker-profile="header" data-action="click->jobseeker-profile#goToList" data-jobseeker-profile-url-param="{{ path('jobseeker_reports')}}">
+							<div class="alert  bg-secondary-subtle p-4 pb-2" role="alert">
+								<div class="d-flex justify-content-between">
+									<div>
+										<img class="img-fluid rounded-3" src="{{asset('assets/images/p4.png')}}" alt="">
+									</div>
+									<span class="fs-22">{{ app.user.jobseekerSavedJobs|length }}</span>
+								</div>
+								<h6 class="">
+									SAVED
+								</h6>
+							</div>
+						</div>
+						<div class="col-lg-2" data-jobseeker-profile="header" data-action="click->jobseeker-profile#goToList" data-jobseeker-profile-url-param="{{ path('jobseeker_reports')}}">
+							<div class="alert  bg-danger-subtle p-4 pb-2" role="alert">
+								<div class="d-flex justify-content-between">
+									<div>
+										<img class="img-fluid rounded-3" src="{{asset('assets/images/p5.png')}}" alt="">
+									</div>
+									<span class="fs-22">{{ app.user.jobApplications|filter(application => application.status == 'rejected')|length }}</span>
+								</div>
+								<h6 class="">
+									REJECTED
+								</h6>
+							</div>
+						</div>
+						<div class="col-lg-2" data-jobseeker-profile="header" data-action="click->jobseeker-profile#goToList" data-jobseeker-profile-url-param="{{ path('jobseeker_reports')}}">
+							<div class="alert  bg-warning-subtle p-4 pb-2" role="alert">
+								<div class="d-flex justify-content-between">
+									<div>
+										<img class="img-fluid rounded-3" src="{{asset('assets/images/p6.png')}}" alt="">
+									</div>
+									<span class="fs-22">{{ app.user.metierProfileViews|length }}</span>
+								</div>
+								<h6 class="">
+									PROFILE VIEWED
+								</h6>
+							</div>
+						</div>
+
+						<!-- -------------------------- -->
+					</div>
+				</div>
+			</section>
+			<section class="section-re-de-pa">
+				<div class="container">
+					<div
+						class="row">
+
+						<!-- -------------------------- -->
+						<div class="blog-box card  ">
+							<div class="card-body">
+								<div class="row">
+									<div class="col-lg-2">
+										<div class="mb-4 profile-user">
+											<img src="{{ app.user.profile starts with 'http' ? app.user.profile : asset('uploads/profile/' ~ (app.user.profile ?? 'no-image.jpg')) }}" class="rounded-circle img-thumbnail profile-img" id="profile-img" alt="">
+											<div class="p-0 rounded-circle profile-photo-edit">
+												<input id="profile-img-file-input" type="file" class="profile-img-file-input" onchange="previewImg()">
+											</div>
+										</div>
+									</div>
+									<div class="col-lg-7">
+										<h5 class="fs-20 mb-2 mt-4 ptla fw-bold">{{ app.user.name ?? ''}}</h5>
+										<p class="lead text-muted mb-0 pc-da">{{ app.user.jobSeekerResume.jobTitle.name ?? '' }}</p>
+										<h5 class="fs-14 mb-3 mt-2">
+											<span class="text-purple">{{ profile_percentage.percentage|number_format(0, '.', ',') }}%
+											</span>Profile Completed</h5>
+										<div class="progress mb-4">
+											<div class="progress-bar progress-bar-striped bg-primary" role="progressbar" style="width: {{ profile_percentage.percentage|number_format(0, '.', ',') }}%" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100"></div>
+										</div>
+									</div>
+									<div class="col-lg-3 mt-5 text-center" style="margin-top: 5% !important;">
+										{% if app.user.jobSeekerDetails is not null and app.user.jobSeekerDetails.careerStatus is not null %}
+											<button class="btn btn-light fw-bold">{{ app.user.jobSeekerDetails.careerStatus.value|capitalizeWords }}</button>
+										{% endif %}
+                                        {% if countPrivateJobs > 0 %}
+
+<a href="{{ path('jobseeker_reports') }}#internaljobs-tab" class="btn btn-primary fw-bold">
+     Internal Jobs
+</a>
+                                          {% endif %}
+
+									</div>
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+			</section>
+			<section class="section-re-de-pa">
+				<div class="container">
+					<div class="row">
+						<div class="col-lg-8">
+							<div class="col-12 card mb-3">
+								<div class="card-body p-4 pt-0">
+									<div class="p-4 d-flex justify-content-between border-bottom ">
+										<h5 class="mb-0">Personal Information
+											<i class="fa fa-star fs-10 text-primary" aria-hidden="true"></i>
+										</h5>
+										<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#settingsModal" type="button">Edit</button>
+									</div>
+
+									<div class="row">
+										<div class="col-md-6 mt-4">
+											<div class="  d-flex align-items-center rounded-3">
+												<div class="boxlogoiconj">
+													<a href="#"><img class="img-fluid" src="{{ asset('assets/images/pr_1.png') }}" alt=""></a>
+												</div>
+												<div class="flex-grow-1 ms-3">
+													<p class="texthead mt-1">Name</p>
+													<h6 class="fs-15  sufont">{{ app.user.name ?? '-'}}</h6>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-6 mt-4">
+											<div class="  d-flex align-items-center rounded-3">
+												<div class="boxlogoiconj">
+													<a href="#"><img class="img-fluid" src="{{ asset('assets/images/pr_2.png') }}" alt=""></a>
+												</div>
+												<div class="flex-grow-1 ms-3">
+													<p class="texthead mt-1">Email address</p>
+													<h6 class="fs-15  sufont">{{ app.user.email ?? '-'}}</h6>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-6 mt-4">
+											<div class="  d-flex align-items-center rounded-3">
+												<div class="boxlogoiconj">
+													<a href="#"><img class="img-fluid" src="{{ asset('assets/images/pr_3.png') }}" alt=""></a>
+												</div>
+												<div class="flex-grow-1 ms-3">
+													<p class="texthead mt-1">Gender</p>
+													<h6 class="fs-15  sufont">{{ app.user.jobseekerDetails.gender.name ?? '-'}}</h6>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-6 mt-4">
+											<div class="  d-flex align-items-center rounded-3">
+												<div class="boxlogoiconj">
+													<a href="#"><img class="img-fluid" src="{{ asset('assets/images/pr_4.png') }}" alt=""></a>
+												</div>
+												<div class="flex-grow-1 ms-3">
+													<p class="texthead mt-1">D.O.B</p>
+													<h6 class="fs-15 sufont">
+    {% if app.user.jobseekerDetails is not null %}
+        {{ app.user.jobseekerDetails.dob ? app.user.jobseekerDetails.dob|date('Y-m-d') : '' }}
+    {% else %}
+        ''
+    {% endif %}
+</h6>
+
+												</div>
+											</div>
+										</div>
+										<div class="col-md-6 mt-4">
+											<div class="  d-flex align-items-center rounded-3">
+												<div class="boxlogoiconj">
+													<a href="#"><img class="img-fluid" src="{{ asset('assets/images/pr_5.png') }}" alt=""></a>
+												</div>
+												<div class="flex-grow-1 ms-3">
+													<p class="texthead mt-1">Phone number</p>
+													<h6 class="fs-15  sufont">{{ app.user.jobseekerDetails.phone ?? '-' }}</h6>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-6 mt-4">
+											<div class="  d-flex align-items-center rounded-3">
+												<div class="boxlogoiconj">
+													<a href="#"><img class="img-fluid" src="{{ asset('assets/images/pr_6.png') }}" alt=""></a>
+												</div>
+												<div class="flex-grow-1 ms-3">
+													<p class="texthead mt-1">Second Phone Line</p>
+													<h6 class="fs-15  sufont">{{ app.user.jobseekerDetails.whatsappPhone ?? '-' }}</h6>
+												</div>
+											</div>
+										</div>
+										<div class="col-md-6 mt-4">
+											<div class="  d-flex align-items-center rounded-3">
+												<div class="boxlogoiconj">
+													<a href="#"><img class="img-fluid" src="{{ asset('assets/images/pr_7.png') }}" alt=""></a>
+												</div>
+												<div class="flex-grow-1 ms-3">
+													<p class="texthead mt-1">Location</p>
+													<h6 class="fs-15 sufont">
+    {{ app.user.jobseekerDetails ? app.user.jobseekerDetails.country ?? ' - ' : ' - ' }}
+    {{ app.user.jobseekerDetails and app.user.jobseekerDetails.city ? ', ' ~ app.user.jobseekerDetails.city : ' ' }}
+    {{ app.user.jobseekerDetails and app.user.jobseekerDetails.zipCode ? ', ' ~ app.user.jobseekerDetails.zipCode ~ ', ' : ' ' }}
+    {{ app.user.jobseekerDetails and app.user.jobseekerDetails.location ? app.user.jobseekerDetails.location : '-' }}
+</h6>
+
+												</div>
+											</div>
+										</div>
+									</div>
+
+
+								</div>
+
+								<div id="settingsModal" class="modal fade" tabindex="-1" aria-labelledby="settingsModalLabel" style="display: none;" aria-hidden="true">
+									<div class="modal-dialog modal-dialog-centered">
+										<div class="modal-content">
+											<div class="modal-header text-black">
+												<h5 class="modal-title mt-0" id="settingsModalLabel">Personal Informations</h5>
+												<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+											</div>
+											{{ form_start(infoForm, {attr: {'data-jobseeker-profile-target' : 'infoForm'}}) }}
+											<div class="modal-body" data-controller="sync-location" data-sync-location-cities-url-value="{{ path('app_fetch_cities') }}" data-sync-location-states-url-value="{{ path('app_fetch_states') }}">
+												<div class="row pb-3">
+													<div class="col-lg-12">
+														<label class="form-label">Full Name
+															<span class="text-danger">*</span>
+														</label>
+														{{ form_widget(infoForm.name, {attr: {'class': 'form-control', 'placeholder': 'Type Your Full Name'}}) }}
+														{# <input name="name" id="name" type="text" class="form-control" placeholder="Type your Name" required> #}
+													</div>
+												</div>
+
+												<div class="row pb-3">
+													<div class="col-lg-6">
+														<label for="form-label">Gender
+															<span class="text-danger">*</span>
+														</label>
+														{{ form_widget(infoForm.gender, {attr: {'class': 'form-select'}}) }}
+													</div>
+													<div class="col-lg-6">
+														<label for="form-label">DOB
+															<span class="text-danger">*</span>
+														</label>
+														{{ form_widget(infoForm.dob, {attr: {'class': 'form-control'}}) }}
+													</div>
+												</div>
+												<div class="row pb-3">
+													<div class="col-lg-6">
+														<label for="form-label">Phone Number
+															<span class="text-danger">*</span>
+														</label>
+														{{ form_widget(infoForm.phone, {attr: {'class': 'form-control', 'placeholder': 'e.g. +971 50 7742222'}}) }}
+													</div>
+													<div class="col-lg-6">
+														<label for="form-label">Second Phone Line</label>
+														{{ form_widget(infoForm.whatsappPhone, {attr: {'class': 'form-control', 'data-jobseeker-profile-target': 'phones', 'placeholder': 'e.g. +971 50 7742222'}}) }}
+													</div>
+												</div>
+												<div class="row pb-3">
+													<div class="col-lg-6">
+														<label class="form-label">Country
+															<span class="text-danger">*</span>
+														</label>
+														{{ form_widget(infoForm.country) }}
+													</div>
+													<div class="col-lg-6">
+														<label class="form-label">City
+															<span class="text-danger">*</span>
+														</label>
+														{{ form_widget(infoForm.city) }}
+
+													</div>
+												</div>
+												<div class="row pb-3">
+													<div class="col-lg-12">
+														<label class="form-label">State/Region
+														</label>
+														{{ form_widget(infoForm.state) }}
+													</div>
+												</div>
+												<div class="row pb-3">
+													<div class="col-lg-6">
+														<label class="form-label">Zip/Postal Code
+														</label>
+														{{ form_widget(infoForm.zipCode) }}
+													</div>
+													<div class="col-lg-6">
+														<label for="" class="form-label">Address</label>
+														{{ form_widget(infoForm.location, {attr: {'class': 'form-control', 'placeholder':'Type Your Location'}}) }}
+													</div>
+												</div>
+											</div>
+											<div class="modal-footer">
+												<a href="#" class="btn btn-outline-primary" style="border-radius: 50px;" data-bs-dismiss="modal">Cancel</a>
+												<button type="submit" class="btn btn-primary waves-effect waves-light">Save</button>
+											</div>
+											{{ form_end(infoForm) }}
+
+										</div>
+										<!-- /.modal-content -->
+									</div>
+									<!-- /.modal-dialog -->
+								</div>
+							</div>
+							<div class="col-lg-12 card">
+								<div class="p-4 border-bottom d-flex justify-content-between align-items-center">
+									<div>
+										<h5 class="mb-0">About Me
+											<a href="#" class="prevent-link" data-bs-toggle="modal" data-bs-target="#myModal">
+												<i class="fa fa-star fs-10 text-primary" aria-hidden="true"></i>
+											</a>
+										</h5>
+										<p>Please type a short bio of your background</p>
+									</div>
+									<div class="text-md-end hed-add">
+										<button type="button" class="btn btn-primary rounded-pill " data-bs-toggle="modal" data-bs-target="#myModal">
+											<i class="fa fa-plus" aria-hidden="true"></i>
+											Add
+										</button>
+									</div>
+									<div id="myModal" class="modal fade" tabindex="-1" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+										<div class="modal-dialog modal-dialog-centered">
+											<div class="modal-content">
+												<form data-turbo="false" method="POST" action="{{ path('save_about_me_form') }}">
+													<div class="modal-header text-black">
+														<h5 class="modal-title mt-0" id="myModalLabel">About me</h5>
+														<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+													</div>
+													<p class="mop text-lg-start">Your profile summary should mention the highlights of your career and education, what your professional interests are, and what kind of a career you are looking for. Write a meaningful summary of more than 50 characters.</p>
+													<div class="modal-body">
+														<div class="col-lg-12">
+															<div class="mb-3">
+																<textarea class="form-control" id="meassageInput" placeholder="Type your question" name="about_me" rows="3">
+    {{ app.user.jobseekerDetails is not null ? app.user.jobseekerDetails.aboutMe : '' }}
+</textarea>
+
+															</div>
+														</div>
+													</div>
+													<div class="modal-footer">
+														<a href="#" class="btn btn-outline-primary" style="border-radius: 50px;" data-bs-dismiss="modal">Cancel</a>
+														<button type="submit" class="btn btn-primary waves-effect waves-light">Save</button>
+													</div>
+												</form>
+											</div>
+											<!-- /.modal-content -->
+										</div>
+										<!-- /.modal-dialog -->
+									</div>
+
+
+								</div>
+								<div class="card-body p-5 text-center">
+    {% if app.user.jobseekerDetails is not null and app.user.jobseekerDetails.aboutMe is null %}
+        <img class="img-fluid" src="{{ asset('assets/images/find.png') }}" alt="">
+    {% elseif app.user.jobseekerDetails is not null %}
+        <p class="lead text-muted mb-2 mt-3 pc-da">{{ app.user.jobseekerDetails.aboutMe|nl2br }}</p>
+    {% else %}
+        <img class="img-fluid" src="{{ asset('assets/images/find.png') }}" alt="">
+    {% endif %}
+</div>
+
+							</div>
+							 {{ component('Resume', {'type': 'danger', loading: 'defer'}) }} 
+
+
+							<div class="col-lg-12 card mt-4">
+								<div class="p-4 border-bottom">
+									<div class="d-flex justify-content-between align-items-center">
+										<h5 class="mb-0">Education
+											<i class="fa fa-star fs-10 text-primary" aria-hidden="true"></i>
+										</h5>
+										<button data-action="click->jobseeker-profile#educationForm" data-jobseeker-profile-url-param="{{ path('job_seeker_education_form') }}" type="button" class="btn btn-primary rounded-pill ">
+											<i class="fa fa-plus" aria-hidden="true"></i>
+											Add
+										</button>
+									</div>
+									<p>Complete your education background, starting with your most recent one</p>
+
+
+									<div class="modal fade" id="sharedModal" tabindex="-1" aria-labelledby="sharedModalLabel" style="display: none;" aria-hidden="true" data-jobseeker-profile-target="modal">
+										<div class="modal-dialog modal-dialog-centered">
+											<div class="modal-content">
+												<div class="modal-header text-black">
+													<h5 class="modal-title mt-0" id="sharedModalLabel" data-jobseeker-profile-target="modalTitle">Modal Title</h5>
+													<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+												</div>
+												<div class="modal-body" data-jobseeker-profile-target="modalForm"></div>
+												<div class="modal-footer"></div>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="card-body p-4" id="education_form">
+									{% if app.user.jobSeekerEducation|length < 1 %}
+										<div class="p3 d-flex justify-content-center">
+											<h5 class="mb-0 fw-bold">No education registered</h5>
+										</div>
+									{% endif %}
+									<div class="accordion" id="accordionFlushExample">
+
+										{% for education in app.user.jobSeekerEducation %}
+											<div class="accordion-item">
+												<h2 class="accordion-header" id="flush-headingOne{{ education.id }}">
+													<button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne{{ education.id }}" aria-expanded="false" aria-controls="flush-collapseOne{{ education.id }}">
+														{{ education.course ~ ' - ' ~ education.school }}
+													</button>
+												</h2>
+												<div id="flush-collapseOne{{ education.id }}" class="accordion-collapse collapse" aria-labelledby="flush-headingOne{{ education.id }}" data-bs-parent="#accordionFlushExample">
+													<div class="accordion-body">
+														<p>
+															<strong class="fw-bold">Status:
+															</strong>
+															{{ education.enrolled ? 'Still Enrolled' : 'Completed' }}
+														</p>
+														<p>
+															<strong class="fw-bold">Specialization:
+															</strong>
+															{{ education.specialization }}
+														</p>
+														<p>
+															<strong class="fw-bold">Course Type:
+															</strong>
+															{{ education.courseTypeName }}
+														</p>
+														<p>
+															<strong class="fw-bold">Course Duration:
+															</strong>
+															{{ education.fromyear|date('Y-m-d') ~ '   To   ' ~ education.toyear|date('Y-m-d') }}
+														</p>
+														<p>
+															<strong class="fw-bold">Grading System:
+															</strong>
+															{{ education.gradingSystem }}
+														</p>
+														<p>
+															<strong class="fw-bold">Location
+															</strong>
+															{% if education.country %}
+																{{ education.country.name }}
+															{% endif %}
+															{% if education.city %}
+																{{ ' ' ~ education.city.name }}
+															{% endif %}
+															{% if education.state %}
+																{{ ', '  ~ education.state.name ~ ', '  ~ education.zipCode }}
+															{% endif %}
+														</p>
+														{% if education.address %}
+															<p>
+																<strong class="fw-bold">Address:
+																</strong>
+																{{ education.address }}</p>
+														{% endif %}
+														<div class="d-flex justify-content-end">
+															<button data-jobseeker-profile-action-param="update" data-jobseeker-profile-url-param="{{ path('job_seeker_education_form', {'education': education.id}) }}" data-action="click->jobseeker-profile#educationForm" class="btn btn-outline-success btn-sm rounded fw-bold">
+																<i class="fa fa-edit">
+																	Edit</i>
+															</button>
+														</div>
+													</div>
+												</div>
+											</div>
+										{% endfor %}
+									</div>
+								</div>
+							</div>
+
+							<div class="col-lg-12 card mt-4" id="experience_form">
+								<div class="p-4 border-bottom">
+									<div class="d-flex justify-content-between align-items-center">
+										<h5 class="mb-0">Work Experience
+											<i class="fa fa-star fs-10 text-primary" aria-hidden="true"></i>
+										</h5>
+										<button
+											data-action="click->jobseeker-profile#workExperienceForm" data-jobseeker-profile-url-param="{{ path('job_seeker_experience_form') }}" type="button" class="btn btn-primary rounded-pill ">
+											{# <a href="#myModaledu" class="" data-bs-toggle="modal" data-bs-target="#myModaledu">
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																						<i class="fa fa-plus" aria-hidden="true"></i>Add</a> #}
+											<i class="fa fa-plus" aria-hidden="true"></i>
+											Add
+										</button>
+									</div>
+									<p>Complete your work history, starting with your most recent one</p>
+								</div>
+								<div class="card-body p-4">
+									{% if app.user.jobSeekerExperiences|length < 1 %}
+										<div class="p3 d-flex justify-content-center">
+											<h5 class="mb-0 fw-bold">No Experience</h5>
+										</div>
+									{% endif %}
+									<div class="accordion" id="accordionFlushExample">
+										{% for experience in app.user.jobSeekerExperiences %}
+											<div class="accordion-item">
+												<h2 class="accordion-header" id="flush-headingOne{{ experience.id }}">
+													<button class="accordion-button collapsed fw-bold fs-18 text-primary" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOneExperience{{ experience.id }}" aria-expanded="false" aria-controls="flush-collapseOneExperience{{ experience.id }}">
+														{{ experience.companyName }}
+														{{ experience.experienceYears ? ' - ' ~ experience.experienceYears ~ ' Years' : ''}}
+													</button>
+												</h2>
+												<div id="flush-collapseOneExperience{{ experience.id }}" class="accordion-collapse collapse" aria-labelledby="flush-headingOne{{ experience.id }}" data-bs-parent="#accordionFlushExample">
+													<div class="accordion-body">
+														<div class="card p-3">
+															<p>
+																<strong class="fw-bold  text-dark fs-15">Company/Organization Name:
+																</strong>
+																{{ experience.companyName }}
+															</p>
+															<p>
+																<strong class="fw-bold  text-dark fs-16">Position Name:
+																</strong>
+																{{ experience.positionName }}
+															</p>
+															<p>
+																<strong class="fw-bold  text-dark fs-16">Total Experience:
+																</strong>
+																{% if (experience.experienceYears) %}
+																	{{ experience.experienceYears }}
+																	Years
+																{% endif %}
+																{% if (experience.experienceMonths) %}
+																	{{ experience.experienceYears ? ', ' : '' }}
+																	{{ experience.experienceMonths }}
+																	Months
+																{% endif %}
+															</p>
+															<p>
+																<strong class="fw-bold  text-dark fs-16">Joined Date:
+																</strong>
+																{{ experience.joinedDate|date('Y-m-d') }}
+															</p>
+															{% if experience.finishDate %}
+																<p>
+																	<strong class="fw-bold  text-dark fs-16">Finished Date:
+																	</strong>
+																	{{ experience.finishDate|date('Y-m-d') }}
+																</p>
+															{% endif %}
+															<p>
+																<strong class="fw-bold text-dark fs-16">Location:
+																</strong>
+																{% if experience.country %}
+																	{{ experience.country.name }}
+																{% endif %}
+																{% if experience.city %}
+																	{{ ' ' ~ experience.city.name }}
+																{% endif %}
+																{% if experience.state %}
+																	{{ ', '  ~ experience.state.name ~ ', '  ~ experience.zipCode }}
+																{% endif %}
+															</p>
+															<p>
+																<strong class="fw-bold text-dark fs-16">Notice Period:
+																</strong>
+																{{ experience.noticePeriod }}
+															</p>
+
+															{% if experience.salary %}
+																<p>
+																	<strong class="fw-bold text-dark fs-16">Salary:
+																	</strong>
+																	{{ (experience.currency.symbol ?? ' ') ~ experience.salary }}
+																</p>
+															{% endif %}
+															<p>
+																<strong class="fw-bold text-dark fs-16">Duties:
+																</strong>
+																<div class="ps-2">
+																	{{ experience.duties|raw }}
+																</div>
+															</p>
+
+															<div class="d-flex justify-content-end">
+																<button data-jobseeker-profile-action-param="update" data-jobseeker-profile-url-param="{{ path('job_seeker_experience_form', {'experience': experience.id}) }}" data-action="click->jobseeker-profile#workExperienceForm" class="btn btn-outline-success btn-sm rounded fw-bold">
+																	<i class="fa fa-edit fw-bold">
+																		Edit</i>
+																</button>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+										{% endfor %}
+									</div>
+								</div>
+							</div>
+							<div class="col-lg-12 card mt-4" id="certificate_form">
+								<div class="p-4 border-bottom">
+									<div class="d-flex justify-content-between align-items-center">
+										<h5 class="mb-0">Certifications
+										</h5>
+										<p></p>
+										<button data-action="click->jobseeker-profile#certificationForm" data-jobseeker-profile-url-param="{{ path('job_seeker_certificate_form') }}" type="button" class="btn btn-primary rounded-pill ">
+											<i class="fa fa-plus" aria-hidden="true"></i>
+											Add
+										</button>
+									</div>
+								</div>
+								<div class="card-body p-4">
+									{% if app.user.jobSeekerCertificates|length < 1 %}
+										<div class="p3 d-flex justify-content-center">
+											<h5 class="mb-0 fw-bold">No certifications registered</h5>
+										</div>
+									{% endif %}
+									<div class="accordion" id="accordionFlushExample">
+										{% for certificate in app.user.jobSeekerCertificates %}
+											<div class="accordion-item">
+												<h2 class="accordion-header" id="flush-headingOne{{ certificate.id }}">
+													<button class="accordion-button collapsed fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOneCertificate{{ certificate.id }}" aria-expanded="false" aria-controls="flush-collapseOneCertificate{{ certificate.id }}">
+														{{ certificate.name ~ ' - ' ~ certificate.certificateId ?? (certificate.certificateId ?? '') }}
+													</button>
+												</h2>
+												<div id="flush-collapseOneCertificate{{ certificate.id }}" class="accordion-collapse collapse" aria-labelledby="flush-headingOne{{ certificate.id }}" data-bs-parent="#accordionFlushExample">
+													<div class="accordion-body">
+														<p>
+															<strong class="fw-bold">Certification Name:
+															</strong>
+															{{ certificate.name }}
+														</p>
+														<p>
+															<strong class="fw-bold">Institution Name:
+															</strong>
+															{{ certificate.institute }}
+														</p>
+														<p>
+															<strong class="fw-bold">Certification Id:
+															</strong>
+															{{ certificate.id }}
+														</p>
+														{% if certificate.expirable %}
+															<p>
+																<strong class="fw-bold">Expiration Date:
+																</strong>
+																{{ certificate.expiresAt|date('Y-m-d') }}
+															</p>
+														{% endif %}
+														{# <p>
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									<strong class="fw-bold">Certification ID:
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									</strong>
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									{% if (certificate.experienceYears) %}
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																										{{ certificate.experienceYears }}
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																										Years
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									{% endif %}
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									{% if (certificate.experienceMonths) %}
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																										{{ certificate.experienceYears ? ', ' : '' }}
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																										{{ certificate.experienceMonths }}
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																										Months
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																									{% endif %}
+																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																								</p> #}
+														<p>
+															{% set link = certificate.certificateUrl %}
+															{% set prefix = 'https://' %}
+															{% if link|slice(0, 7) == 'http://' or link|slice(0, 8) == 'https://' %}
+																{% set prefix = '' %}
+															{% endif %}
+															<strong class="fw-bold">URL:
+															</strong>
+															<a class="text-primary" href="{{ prefix ~ link }}">{{ prefix ~ link }}</a>
+
+														</p>
+														{% if certificate.file %}
+															<p class="py-2">
+																<a target="blank" class="text-primary" href="{{ asset('uploads/certifications/' ~ certificate.file)}}">
+																	<strong class="fw-bold Text">Preview Certification
+
+																	</strong>
+																</a>
+															</p>
+														{% endif %}
+														<div class="d-flex justify-content-end">
+															<button data-jobseeker-profile-action-param="update" data-jobseeker-profile-url-param="{{ path('job_seeker_certificate_form', {'certificate': certificate.id}) }}" data-action="click->jobseeker-profile#certificationForm" class="btn btn-outline-success btn-sm rounded fw-bold">
+																<i class="fa fa-edit">
+																	Edit</i>
+															</button>
+														</div>
+													</div>
+												</div>
+											</div>
+										{% endfor %}
+									</div>
+								</div>
+							</div>
+
+							<div class="col-lg-12 card mt-4">
+								<div class="p-4 border-bottom">
+									<div class="d-flex justify-content-between align-items-center">
+										<h5 class="mb-0">Language
+											<a href="#" class="prevent-link" data-bs-toggle="modal" data-bs-target="#languages-form-modal">
+												<i class="fa fa-star fs-10 text-primary" aria-hidden="true"></i>
+											</a>
+										</h5>
+										<button type="button" class="btn btn-primary rounded-pill " data-bs-toggle="modal" data-bs-target="#languages-form-modal">
+											<i class="fa fa-plus" aria-hidden="true"></i>
+											Add
+										</button>
+									</div>
+									<p>Please select all the language skills you have and your proficiency level</p>
+								</div>
+								{{ component('JobSeekerLanguages') }}
+							</div>
+						</div>
+						<div class="col-lg-4">
+
+							<div class="col-lg-12">
+								<div class="card">
+									<div class="p-4 border-bottom ">
+										<div class="d-flex justify-content-between  align-items-centerborder-bottom">
+											<h5 class="mb-0">Resume Summary
+												<i class="fa fa-star fs-10 text-primary" aria-hidden="true"></i>
+											</h5>
+											<button type="button" class="btn btn-primary rounded-pill " data-bs-toggle="modal" data-bs-target="#resumeProfileModal">
+												<i class="fa fa-plus" aria-hidden="true"></i>
+												Edit
+											</button>
+										</div>
+										<div>
+											<p>Please complete this section in order for employer to find you on our resume database</p>
+
+										</div>
+									</div>
+									<div></div>
+									<div class="card-body p-4">
+										{% if app.user.jobSeekerResume %}
+											<div class="p-2">
+												<div class="">
+													<strong class="base-color">Job Title</strong>
+													<p>{{ app.user.jobSeekerResume.jobTitle.name ?? '' }}</p>
+												</div>
+												<div class="">
+													<strong class="base-color">Experience</strong>
+													<p>{{ app.user.jobSeekerResume.experience|numberToString }}</p>
+												</div>
+												<div class="">
+													<strong class="base-color">Job Education</strong>
+													<p>{{ app.user.jobSeekerResume.education|educationNumberToString }}</p>
+												</div>
+												<div class="">
+													<strong class="base-color">Skills</strong>
+													<div>
+														{% for skill in (app.user.jobSeekerResume.skills ?? []) %}
+															<li class="list-inline-item">
+																<span class="badge rounded-pill bg-secondary">{{ skill.name }}</span>
+															</li>
+														{% endfor %}
+													</div>
+												</div>
+												{% if app.user.jobSeekerResume.willingToRelocate  is not null  %}
+													<div class="pt-3">
+														<strong class="base-color">Willing To Relocate</strong>
+														<p>{{ app.user.jobSeekerResume.willingToRelocate ? "Yes" : "No" }}</p>
+													</div>
+												{% endif %}
+
+											</div>
+										{% else %}
+											<div class="tex-center">
+												<strong>No Data</strong>
+											</div>
+										{% endif %}
+										<div id="resumeProfileModal" class="modal fade" tabindex="-1" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+											<div class="modal-dialog modal-dialog-centered">
+												<div class="modal-content">
+													{{ form_start(resume_form) }}
+													<div class="modal-header text-black">
+														<h5 class="modal-title mt-0" id="myModalLabel">Resume Profile</h5>
+														<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+													</div>
+													<div
+														class="modal-body">
+														<!-- ---------------------------------- -->
+
+														<div class="row">
+															<div class="col-lg-12 pb-2">
+																<label class="form-label">Job Title
+																	<span class="text-danger">*</span>
+																</label>
+																<span class="d-block label_note">Example:  Type Human Resources Manager, Web Developer Cashier, Driver, Housemaid</span>
+																{{ form_widget(resume_form.jobTitle) }}
+															</div>
+															<div class="col-lg-12 pb-2">
+																<label class="form-label">Skills
+																	<span class="text-danger">*</span>
+																</label>
+																<span class="d-block label_note">Enter your skills or/and choose from the drop-down menu.</span>
+																{{ form_widget(resume_form.skills) }}
+															</div>
+															<div class="col-lg-12 pb-2">
+																<label class="form-label">Experience
+																	<span class="text-danger">*</span>
+																</label>
+																<span class="d-block label_note">Select your experience level from the drop-down list</span>
+																{{ form_widget(resume_form.experience) }}
+															</div>
+															<div class="col-lg-12 pb-2">
+																<label class="form-label">Education
+																	<span class="text-danger">*</span>
+																</label>
+																<span class="d-block label_note">Choose your qualification from the drop-down selection</span>
+																{{ form_widget(resume_form.education) }}
+															</div>
+															<div class="col-lg-12 pb-2">
+																<label class="form-label">Are you willing to relocate
+																	<span class="text-danger">*</span>
+																</label>
+																{{ form_widget(resume_form.willingToRelocate) }}
+															</div>
+															<div class="col-lg-12 pb-2">
+																<label class="form-label">LinkedIn Link</label>
+																<span class="d-block label_note">Provide the link to your LinkedIn profile</span>
+																{{ form_widget(resume_form.linkedin) }}
+															</div>
+															<div class="col-lg-12 pb-2">
+																<label class="form-label">Portfolio Link</label>
+																<span class="d-block label_note">Enter the link to your website or any other portfolio platform</span>
+																{{ form_widget(resume_form.portfolio) }}
+															</div>
+
+														</div>
+
+														<!-- ---------------------------------- -->
+													</div>
+													<div class="modal-footer">
+														<a href="#" class="btn btn-outline-primary" style="border-radius: 50px;" data-bs-dismiss="modal">Cancel</a>
+														<button type="submit" class="btn btn-primary waves-effect waves-light">Save</button>
+													</div>
+													{{ form_end(resume_form) }}
+												</div>
+												<!-- /.modal-content -->
+											</div>
+											<!-- /.modal-dialog -->
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-lg-12 mt-4">
+								<div class="card">
+									<div class="p-4 border-bottom">
+										<h5 class="mb-0">Career Status
+											<i class="fa fa-star fs-10 text-primary" aria-hidden="true"></i>
+										</h5>
+										<p>Select your current Employment Status</p>
+									</div>
+									<div class="card-body p-4">
+										{{ form_start(careerStatusForm, {attr: {'action': path('save_job_seeker_status') }}) }}
+										<div class="form-group">
+											{{ form_widget(careerStatusForm.careerStatus) }}
+										</div>
+										<div class="d-flex justify-content-end py-2">
+											<button type="submit" class="btn btn-primary waves-effect waves-light">Update</button>
+										</div>
+										{{ form_end(careerStatusForm) }}
+									</div>
+								</div>
+							</div>
+							<div class="col-lg-12 mt-4">
+								<div class="card">
+									<div class="p-4 border-bottom">
+										<h5 class="mb-0">Contact
+											<i class="fa fa-star fs-10 text-primary" aria-hidden="true"></i>
+										</h5>
+										<p>Please select your preferred method of contact</p>
+									</div>
+									<div class="card-body p-4">
+										<form action="{{ path('save_job_seeker_contact_type') }}" method="POST">
+											<div class="input-div">
+    <select name="prefered_contact_type" class="form-select choices__input choices__list choices__list--single" id="dropdown" type="dropdown">
+        <option value="" {% if app.user.jobseekerDetails is not null and app.user.jobseekerDetails.contacttype == '' %} selected {% endif %}>Choose prefered method of contact</option>
+        <option value="phone" {% if app.user.jobseekerDetails is not null and app.user.jobseekerDetails.contacttype == 'phone' %} selected {% endif %}>Phone</option>
+        <option value="email" {% if app.user.jobseekerDetails is not null and app.user.jobseekerDetails.contacttype == 'email' %} selected {% endif %}>Email</option>
+    </select>
+</div>
+
+											<div class="d-flex justify-content-end py-2">
+												<button type="submit" class="btn btn-primary waves-effect waves-light">Update</button>
+											</div>
+										</form>
+									</div>
+								</div>
+							</div>
+							<div class="col-lg-12 mt-4">
+								<div class="card">
+									<div class="p-4 border-bottom">
+										<h5 class="mb-0">LinkedIn / Portfolio Link
+										</h5>
+									</div>
+									<div class="card-body p-4">
+										<div class="mb-3">
+											<label for="linkedin" class="form-label">LinkedIn</label>
+											{% if app.user.jobSeekerResume %}
+
+
+												{% if app.user.jobSeekerResume.linkedin %}
+													{% set linkedinUrl = app.user.jobSeekerResume.linkedin %}
+													{% set prefix = 'https://' %}
+													{% if linkedinUrl|slice(0, 7) == 'http://' or linkedinUrl|slice(0, 8) == 'https://' %}
+														{% set prefix = '' %}
+													{% endif %}
+													<a target="_blank" class="d-block text-primary" href="{{ prefix ~ linkedinUrl }}">{{ prefix ~ linkedinUrl }}</a>
+												{% else %}
+													<p>---</p>
+												{% endif %}
+											{% else %}
+												<p>---</p>
+											{% endif %}
+										</div>
+										<div class="mb-3">
+											<label for="portfolio" class="form-label">Portfolio</label>
+											{% if app.user.jobSeekerResume %}
+												{% if app.user.jobSeekerResume.portfolio %}
+													{% set portfolioUrl = app.user.jobSeekerResume.portfolio %}
+													{% set prefix = 'https://' %}
+													{% if portfolioUrl|slice(0, 7) == 'http://' or portfolioUrl|slice(0, 8) == 'https://' %}
+														{% set prefix = '' %}
+													{% endif %}
+													<a target="_blank" class="d-block text-primary" href="{{ prefix ~ portfolioUrl }}">{{ prefix ~ portfolioUrl }}</a>
+												{% else %}
+													<p>---</p>
+												{% endif %}
+											{% else %}
+												<p>---</p>
+											{% endif %}
+										</div>
+
+									</div>
+								</div>
+							</div>
+							<div class="col-lg-12 mt-4">
+								<div class="card">
+									<div class="p-4 border-bottom">
+										<h5 class="mb-0">Psychometric report</h5>
+									</div>
+									<div class="card-body p-4">
+										<div class="mb-3">
+
+											{% if app.user.jobSeekerResume %}
+
+
+												{% if app.user.jobSeekerResume.sreport != "" %}
+													<div class="px-4">
+														<div class="alert alert-success text-white bg-secondary-subtle text-secondary my-2" role="alert">
+															<h6>
+																<i class="fa fa-file"></i>
+																<a class="text-dark" target="_blank" href="{{ path('profile_serve_employer_image', {'filename': app.user.jobSeekerResume.sreport, 'type': 'sreport' }) }}">Preview Your Report</a>
+															</h6>
+														</div>
+														<div data-jobseeker-profile-target="message"></div>
+													</div>
+												{% endif %}
+												{{ form_start(psReportForm) }}
+												<div
+													class="form-group py-3">
+													{# <label class="form-label">Psychometric report file</label> #}
+													{{ form_widget(psReportForm.s_report) }}
+													<small id="textHelp" class="form-text text-muted" style="color: red !important;">Please upload pdf files only</small>
+													{% if psReportForm.s_report.vars.errors|length > 0 %}
+														<div class="alert alert-danger mt-2">
+															{{ form_errors(psReportForm.s_report) }}
+														</div>
+													{% endif %}
+												</div>
+												<div class="d-flex justify-content-center py-2">
+    <button type="submit" class="btn btn-primary waves-effect waves-light">
+        Upload
+    </button>
+</div>
+
+												{{ form_end(psReportForm) }}
+											{% endif %}
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</section>
+			<section class="pa-min-les">
+				<div class="container">
+					<div class="row">
+						<div class="col-lg-12"><!-- -------------------------- -->
+
+							<!-- -------------------------- -->
+
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="ftimg"></section>
+			{% include 'home/_footer.html.twig' %}
+
+		</div>
+	</div>
+
+
+{% endblock %}

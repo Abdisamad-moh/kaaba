@@ -1,0 +1,115 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Internal Job Approval
+{% endblock %}
+
+{% block body %}
+	<!-- Page Header -->
+	<div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+		<div class="card-body px-4 py-3">
+			<div class="row align-items-center">
+				<div class="col-9">
+					<h4 class="fw-semibold mb-8">Internal Staff (Bulk)</h4>
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item">
+								<a class="text-muted text-decoration-none" href="#">Employer</a>
+							</li>
+							<li class="breadcrumb-item" aria-current="page">internal staff bulk</li>
+						</ol>
+					</nav>
+				</div>
+				<div class="col-3">
+					<a href="{{ path('app_internal_staff') }}" class="btn btn-primary float-end">
+						Add Single Staff 
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Form for Creating/Editing -->
+	 <div class="card">
+		<div class="card-header text-bg-primary">
+			<h5 class="mb-0 text-white">Add New Staff (Bulk)</h5>
+		</div>
+		<div class="form-horizontal">
+			<div class="form-body">
+				<hr class="m-0">
+				<div class="card-body">
+					{{ form_start(form) }}
+					<div
+						class="row">
+						<!-- Jobseeker Field -->
+<div class="col-md-6 mb-3">
+    <div class="form-group row">
+        <label class="form-label text-end col-md-3 mt-2">Excel File</label>
+        <div class="col-md-9">
+            {{ form_widget(form.file, { 'attr': { 'class': 'form-control' } }) }}
+            {{ form_errors(form.file) }}
+        </div>
+    </div>
+</div>
+
+
+					</div>
+
+					<hr class="m-0">
+				<div class="form-actions border-top">
+					<div class="card-body">
+						<div class="row">
+							<div class="col-md-6">
+								<div class="row">
+									<div class="col-md-offset-3 col-md-9">
+										<button type="submit" class="btn btn-primary">
+											<i class="ti ti-edit fs-5"></i>
+											{{ editId ? 'Save Changes' : 'Create Approver' }}
+										</button>
+										<a href="{{ path('app_internal_staff') }}" class="btn bg-danger-subtle text-danger ms-6">
+											Cancel
+										</a>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6"></div>
+						</div>
+					</div>
+				</div>
+					{{ form_end(form) }}
+				</div>
+				
+			</div>
+		</div>
+	</div> 
+
+
+	<!-- Table of Existing Approvers -->
+	<div class="card mt-4">
+		<div class="card-body">
+			<h5 class="card-title">Existing Staff</h5>
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>email</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for staff in staffs %}
+						<tr>
+							<td>{{ staff.jobseeker.name }}</td>
+							<td>{{ staff.jobseeker.email }}</td>
+							
+						
+							<td>
+								{# <a href="{{ path('app_procurement_operation_approvers', { edit: approver.id }) }}" class="btn btn-sm btn-warning">Edit</a> #}
+								<a href="{{ path('app_internal_staff', { delete: staff.id }) }}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this staff?')">Delete</a>
+							</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+{% endblock %}

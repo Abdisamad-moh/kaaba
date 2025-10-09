@@ -1,0 +1,130 @@
+{{ form_start(form,  {'action': path('job_seeker_education_form', {'education': education.id }), 'data-controller': 'sync-locatin'}) }}
+<div data-controller="sync-location"
+		data-sync-location-cities-url-value="{{ path('app_fetch_cities') }}" 
+		data-sync-location-states-url-value="{{ path('app_fetch_states') }}" 
+	>
+	<div class="form-errors">
+		{% for fieldName, fieldErrors in errors %}
+			{% for error in fieldErrors %}
+				<p class="alert alert-danger fw-bold">
+					{{ fieldName|capitalize }}: {{ error }}
+				</p>
+			{% endfor %}
+		{% endfor %}
+	</div>
+	<div class="row">
+		<div class="col-lg-12">
+			<label class="form-label">Education type <span class="text-danger">*</span></label>
+		</div>
+		<div class="col-lg-12">
+			{{ form_widget(form.enrolled) }}
+		</div>
+	</div>
+	<hr>
+	<div class="row">
+		<div class="col-lg-12">
+			<label class="form-label">University/Institute <span class="text-danger">*</span></label>
+			</label>
+			{{ form_widget(form.school) }}
+		</div>
+	</div>
+	<hr>
+	<div class="row">
+		<div class="col-lg-12">
+			<label class="form-label">Degree/Course <span class="text-danger">*</span></label>
+			</label>
+			<span class="d-block label_note">
+				Example: Bachelor's, Masters, PhD
+			</span>
+			<div class="input-div">
+				{{ form_widget(form.course) }}
+			</div>
+		</div>
+	</div>
+	<hr>
+	<div class="row">
+		<div class="col-lg-12">
+			<label class="form-label">Specialization <span class="text-danger">*</span></label>
+			<span class="d-block label_note">
+				Example: Bachelor's of Science in Computer Science, Master of Business Administration (MBA), Certified Public Accountant (CPA), Diploma in Graphic Design
+			</span>
+			<div class="input-div">
+				{{ form_widget(form.specialization) }}
+			</div>
+		</div>
+	</div>
+	<hr>
+	<div class="row">
+		<div class="col-lg-12">
+			<label class="form-label">Course type <span class="text-danger">*</span></label>
+		</div>
+		<div class="col-lg-12">
+			{{ form_widget(form.courseType) }}
+		</div>
+	</div>
+	<hr>
+	<div class="row">
+		<label class="form-label">Course duration <span class="text-danger">*</span></label>
+		</label>
+		<div class="col-lg-5">
+			<div class="input-div">
+				{{ form_widget(form.fromYear) }}
+			</div>
+		</div>
+		<div class="col-lg-2 text-center py-2">To</div>
+		<div class="col-lg-5">
+			<div class="input-div">
+				{{ form_widget(form.toYear) }}
+			</div>
+		</div>
+	</div>
+	<hr>
+	{# <div class="row">
+		<div class="col-lg-12">
+			<label class="form-label">Grading system <span class="text-danger">*</span></label>
+			<div class="input-div">
+				{{ form_widget(form.gradingSystem) }}
+			</div>
+		</div>
+	</div>
+	<hr> #}
+	<div class="row">
+		<div class="col-lg-12">
+			<label class="form-label">Address</label>
+			{{ form_widget(form.address) }}
+		</div>
+	</div>
+	<hr>
+	<div class="row">
+		<div class="col-lg-6">
+			<label class="form-label">Country <span class="text-danger">*</span></label>
+			<div class="input-div">
+				{{ form_widget(form.country) }}
+			</div>
+		</div>
+		<div class="col-lg-6">
+			<label class="form-label">City <span class="text-danger">*</span></label>
+			<div class="input-div">
+				{{ form_widget(form.city) }}
+			</div>
+			
+		</div>
+	</div>
+	<hr>
+	<div class="row">
+		<div class="col-lg-6">
+			<label class="form-label">State/Region
+			</label>
+			{{ form_widget(form.state) }}
+		</div>
+		<div class="col-lg-6">
+			<label class="form-label">Zip/Postal Code </label>
+			{{ form_widget(form.zipCode) }}
+		</div>
+	</div>
+	<div class="modal-footer mt-3">
+		<a href="#" class="btn btn-outline-primary" style="border-radius: 50px;" data-bs-dismiss="modal">Cancel</a>
+		<button type="submit" class="btn btn-primary waves-effect waves-light">Save</button>
+	</div>
+</div>
+{{ form_end(form) }}

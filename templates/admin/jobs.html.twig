@@ -1,0 +1,155 @@
+{% extends 'admin_base2.html.twig' %}
+{% import 'macros/_form_macros.html.twig' as macros %}
+
+{% block title %}
+	Jobs
+{% endblock %}
+
+{% block body %}
+</div>
+<div
+	class="row">
+	<!-- Modern Header with Button -->
+	<div class="col-12">
+		<div class="card custom-header shadow-sm mb-4">
+			<div class="card-body p-4">
+				<div class="d-flex justify-content-between align-items-center">
+					<div>
+						<h4 class="fw-semibold mb-0 text-white">
+							<i class="ti ti-briefcase fs-4 me-2"></i>
+							Jobs
+						</h4>
+						<p class="mb-0 text-white-50">Manage job postings efficiently.</p>
+					</div>
+
+					<div class="d-flex gap-2">
+						<a href="{{ path('app_admin_create_job') }}" class="btn btn-light btn-lg text-primary fw-semibold">
+							<i class="ti ti-user me-2"></i>
+							Post Job
+						</a>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+
+	<div
+		class="row">
+		<!-- Modern Header with Button -->
+		<div class="col-12">
+			{{ macros.render_search_form(searchForm, 'Filter') }}
+
+		</div>
+	</div>
+
+	<!-- Data Table Section -->
+	<div class="card custom-card shadow-sm">
+		<div class="card-body p-4">
+			<div class="table-responsive">
+			{% set postedJobs = jobs|filter(job => job.status == 'posted') %}
+{% set otherJobs = jobs|filter(job => job.status != 'posted') %}
+{% set sortedJobs = postedJobs|merge(otherJobs) %}
+				<table id="jobs" data-controller='admin' class="table table-striped table-hover w-100">
+					<thead class="custom-table-header" data-controller="copy-clipboard">
+						<tr>
+							<th>Job ID</th>
+							<th>Job Title</th>
+							<th>Experience</th>
+							<th>Employer</th>
+							<th>Email</th>
+							<th>Applications</th>
+							<th>Status</th>
+							<th>Posted On</th>
+							<th>Location</th>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for job in sortedJobs  %}
+							<tr>
+								<td>{{ job.id }}</td>
+								<td>{{ job.title }}</td>
+								<td>{{ job.experience|numberToString }}</td>
+								<td>{{ job.employer.name }}</td>
+								<td>{{ job.employer.email }}</td>
+								<td>{{ job.jobApplications|length }}</td>
+								<td>
+									<span class="badge {% if job.status == 'posted' %} bg-success {% elseif job.status == 'draft' %} bg-warning {% else %} bg-danger {% endif %}">
+										{{ job.status | capitalize }}
+									</span>
+								</td>
+								<td>{{ job.createdat|date("d-m-Y") }}</td>
+								<td>{{ job.city.name ?? '' }}</td>
+								<td>
+									<div class="btn-group" role="group" aria-label="Button group with nested dropdown">
+										<div class="btn-group" role="group">
+											<button id="btnGroupDrop1" type="button" class="btn bg-primary-subtle text-primary dropdown-toggle rounded-end" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+												Actions
+											</button>
+											<div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+												{% if job.status == "paused" or job.status == "closed" or job.status == "draft" %}
+													<a href="{{ path('app_admin_job_change_status', {'job': job.id, 'encodedStatus': 'posted' | encodeStatus, 're': 'repost'}) }}" class="dropdown-item">
+														Repost
+													</a>
+												{% endif %}
+												{% if job.status == "posted" %}
+													<a href="{{ path('app_admin_job_change_status', {'job': job.id, 'encodedStatus': 'paused' | encodeStatus}) }}" class="dropdown-item">
+														Pause
+													</a>
+													<a href="{{ path('app_admin_job_change_status', {'job': job.id, 'encodedStatus': 'closed' | encodeStatus}) }}" class="dropdown-item">
+														Close
+													</a>
+												{% endif %}
+												<a href="{{ path('app_admin_create_job', {'job': job.id}) }}" class="dropdown-item">
+													Edit
+												</a>
+												<a href="{{ path('app_admin_job_change_status', {'job': job.id, 'encodedStatus': 'deleted' | encodeStatus}) }}" class="dropdown-item text-danger">
+													Delete
+												</a>
+
+											</div>
+										</div>
+									</div>
+
+									<button class="btn btn-info dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+										Share
+									</button>
+									<ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+										<li>
+											<a target="__blank" href="https://twitter.com/intent/tweet?url={{ url('job_seeker_job_details', {slug: job.title|slugify, uuid: job.uuid }) }}&text={{ job.title ?? '' }}" class="dropdown-item btn bg-dark">
+												<svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 512 512" width="30" height="20"><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z" fill="white"/></svg>
+											</a>
+										</li>
+										<li>
+											<a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u={{ url('job_seeker_job_details', {slug: job.title|slugify, uuid: job.uuid }) }}" style="background-color: #1877F2 !important;color: white !important;" class="dropdown-item btn">
+												<i class="fa fa-facebook-f"></i>
+												Facebook
+											</a>
+										</li>
+										<li>
+											<a data-action="click->copy-clipboard#copyUrl" data-copy-clipboard-url-param="{{ url('job_seeker_job_details', {slug: job.title|slugify, uuid: job.uuid }) }}" href="#" class="dropdown-item btn btn-success">
+												<i class="fa fa-copy"></i>
+												Copy
+											</a>
+										</li>
+									</ul>
+								</td>
+
+							</tr>
+						{% else %}
+							<tr>
+								<td colspan="9" class="text-center">No jobs found.</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+			<!-- Pagination -->
+			<div class="navigation mt-4">
+				{% do jobs.setPageRange(2) %}
+				{{ knp_pagination_render(jobs, 'pagination.html.twig') }}
+			</div>
+		</div>
+	</div>
+</div>{% endblock %}

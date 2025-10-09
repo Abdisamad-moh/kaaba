@@ -1,0 +1,113 @@
+<div {{ attributes.defaults(stimulus_controller('jobseeker-work', {'some': 'some'})) }}>
+    {% if this.works|length < 1 %}
+        <div class="card-body p-2 pb-3 border-bottom">
+            <div class="row">
+                <div class="col-md-6 mt-4">
+                    <div class="  d-flex align-items-center rounded-3">
+                        <div class="boxlogoiconj"> <a href="#"><img class="img-fluid" src="{{ asset('assets/images/pr_8.png') }}" alt=""></a> </div>
+                        <div class="flex-grow-1 ms-3">
+                            <p class="texthead mt-1">Profession</p>
+                            <h6 class="fs-15  sufont"> -- </h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mt-4">
+                    <div class="  d-flex align-items-center rounded-3">
+                        <div class="boxlogoiconj"> <a href="#"><img class="img-fluid" src="{{ asset('assets/images/pr_9.png') }}" alt=""></a> </div>
+                        <div class="flex-grow-1 ms-3">
+                            <p class="texthead mt-1">Experience</p>
+                            <h6 class="fs-15  sufont"> -- </h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mt-4">
+                    <div class="  d-flex align-items-center rounded-3">
+                        <div class="boxlogoiconj"> <a href="#"><img class="img-fluid" src="{{ asset('assets/images/pr_10.png') }}" alt=""></a> </div>
+                        <div class="flex-grow-1 ms-3">
+                            <p class="texthead mt-1">Salary</p>
+                            <h6 class="fs-15  sufont"> -- </h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> 
+    {% else %}
+        {% for work in this.works %}
+            <div class="card-body p-2">
+                <div class="row">
+                    <div class="col-md-6 mt-4">
+                        <div class="  d-flex align-items-center rounded-3">
+                            <div class="boxlogoiconj"> <a href="#"><img class="img-fluid" src="{{ asset('assets/images/pr_8.png') }}" alt=""></a> </div>
+                            <div class="flex-grow-1 ms-3">
+                                <p class="texthead mt-1">Profession</p>
+                                <h6 class="fs-15  sufont">{{ work.profession.name ?? '-' }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mt-4">
+                        <div class="  d-flex align-items-center rounded-3">
+                            <div class="boxlogoiconj"> <a href="#"><img class="img-fluid" src="{{ asset('assets/images/pr_9.png') }}" alt=""></a> </div>
+                            <div class="flex-grow-1 ms-3">
+                                <p class="texthead mt-1">Experience</p>
+                                <h6 class="fs-15  sufont">{{ work.experience ?? '-' }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mt-4">
+                        <div class="  d-flex align-items-center rounded-3">
+                            <div class="boxlogoiconj"> <a href="#"><img class="img-fluid" src="{{ asset('assets/images/pr_10.png') }}" alt=""></a> </div>
+                            <div class="flex-grow-1 ms-3">
+                                <p class="texthead mt-1">Salary</p>
+                                <h6 class="fs-15  sufont">{{ work.salary ?? '-' }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>  
+            <hr>
+        {% endfor %}
+    {% endif %}
+    <div data-loading class="p5 text-success fw-bold text-center">
+        Loading ...
+    </div>
+    {# <div id="ResumeTitle" class="modal fade" tabindex="-1" aria-labelledby="myModalLabel" style="display: none;" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form data-turbo="false" method="POST" action="{{ path('save_resume_headline_form') }}">
+                <div class="modal-header text-black">
+                    <h5 class="modal-title mt-0" id="myModalLabel">Resume Headline Update</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <p class="mop text-lg-start" ></p>
+                <div class="modal-body">
+                    <div class="col-lg-12">
+                        <div class="mb-3">
+                            <textarea data-model="norender|resume_title" class="form-control" id="meassageInput" placeholder="Type resume headline here " name="resume_headline" rows="3">{{ this.resume_title }}</textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer"> <a href="#" class="btn btn-outline-primary" style="border-radius: 50px;" data-bs-dismiss="modal">Cancel</a>
+                    <button type="button" data-action="live#action" data-live-action-param="save_resume_title" class="btn btn-primary waves-effect waves-light">Save</button>
+                </div>
+                </form>
+            </div>
+        <!-- /.modal-content --> 
+        </div>
+        <!-- /.modal-dialog --> 
+        
+    </div> #}
+    {% component BootstrapModal with {id: 'add-about-work', dialog_classes: ['modal-dialog-centered']} %}
+        {% block modal_header %}
+            <h5 class="modal-title mt-0" id="myModalLabel">Update About Work</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="close-modal"></button>
+        {% endblock %}
+
+        {% block modal_body %}
+            {{ component('JobSeekerWorksForm') }}
+        {% endblock %}
+
+        {% block modal_footer %}
+            {# <button type="button" data-action="live#action" data-live-action-param="save_resume_title" class="btn btn-primary waves-effect waves-light">Save</button> #}
+        {% endblock %}
+    {% endcomponent %}
+</div>

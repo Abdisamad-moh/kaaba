@@ -1,0 +1,105 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+    joboffer_directory: '%kernel.project_dir%/public/uploads'
+    logo_directory: '%kernel.project_dir%/public/uploads'
+    blogs_directory: '%kernel.project_dir%/public/uploads/blogs'
+    user_profile_directory: '%kernel.project_dir%/public/uploads/profile'
+    google_recaptcha_site_key: '%env(GOOGLE_RECAPTCHA_SITE_KEY)%'
+    employer_profile_images_directory: '%kernel.project_dir%/var/uploads/employer_images'
+    application_attachments: '%kernel.project_dir%/var/uploads/application_attachments'
+    product_images_directory: '%kernel.project_dir%/var/products'
+    ps_report_directory: '%kernel.project_dir%/var/psychometric_reports'
+    tender_application_attachments: '%kernel.project_dir%/var/tender_application_attachments'
+    recaptcha.site_key: '%env(RECAPTCHA3_KEY)%'
+    sometelSMSAPI: '%env(sometelSMSAPI)%'
+  
+
+services:
+    # default configuration for services in *this* file
+    _defaults:
+        autowire: true      # Automatically injects dependencies in your services.
+        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        bind: 
+            $stripSK: "%env(STRIPE_SK)%"
+            $merchantUid: "%env(merchantUid)%"
+            $apiUserId: "%env(apiUserId)%"
+            $apiKey: "%env(apiKey)%"
+            $waafiEndpoint: "%env(waafiEndpoint)%"
+            $eDahabAPIKey: "%env(eDahabAPIKey)%"
+            $eDahabAgentCode: "%env(eDahabAgentCode)%"
+            $eDahabSecretKey: "%env(eDahabSecretKey)%"
+            $sometelSMSTOKEN: "%env(sometelSMSTOKEN)%"
+            $sometelSMSAPI: "%env(sometelSMSAPI)%"
+            $authUrl: '%env(SOMTEL_AUTH_URL)%'
+            $smsApiUrl: '%env(SOMTEL_SMS_API)%'
+            $username: '%env(SOMTEL_SMS_USER)%'
+            $password: '%env(SOMTEL_SMS_PASS)%'
+    app.exception_listener:
+        class: App\EventListener\ExceptionListener
+        arguments:
+            - '@router.default'
+            - '%kernel.environment%'
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
+    App\Service\TranslationService:
+        arguments:
+            - '@request_stack'
+
+    App\Form\KaabaApplicationFormType:
+        arguments:
+            $translator: '@translator'
+        tags: ['form.type']
+
+    App\Twig\TranslationExtension:
+        tags: ['twig.extension']
+        arguments:
+            - '@App\Service\TranslationService'
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    App\Service\FileUploader:
+        arguments:
+            $targetDirectory: '%logo_directory%'
+    App\Service\MailService:
+        arguments: 
+                ['%env(MAILER_DSN)%','@twig']
+    App\Service\RecaptchaValidator:
+        arguments:
+            $secretKey: '%env(RECAPTCHA3_SECRET)%'
+    App\Service\OpenAIService:
+        arguments:
+            $openAIKey: '%env(OPENAI_API_KEY)%'
+                
+
+
+
+    App\Twig\AppExtension:
+        tags: ['twig.extension']
+    App\Service\CarbonExtension:
+        tags: ['twig.extension']
+    App\Twig\SlugExtension:
+        tags: ['twig.extension']
+    Symfony\Component\Security\Core\User\UserProviderInterface: '@security.user.provider.concrete.app_user_provider'
+    
+
+    # add more service definitions when explicit configuration is needed
+    # please note that last definitions always *replace* previous ones
+    # App\Command\UpdateJobStatusCommand:
+    #     arguments:
+    #         $jobsRepository: '@App\Repository\EmployerJobsRepository'
+
+    # App\Scheduler\JobUpdater:
+    #     arguments:
+    #         $cache: '@cache.app'
+    #     tags: ['scheduler']
+

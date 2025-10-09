@@ -1,0 +1,172 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Jobs
+{% endblock %}
+
+{% block body %}
+	<div class="container-fluid">
+
+
+		<div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+			<div class="card-body px-4 py-3">
+				<div class="row align-items-center">
+					<div class="col-9">
+						<h4 class="fw-semibold mb-8">
+							<i class="ti ti-contract fs-8 "></i>
+							Tenders</h4>
+						<nav aria-label="breadcrumb">
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item">
+									<a class="text-muted text-decoration-none" href="#">Tenders</a>
+								</li>
+								<li class="breadcrumb-item" aria-current="page">Tenders List</li>
+							</ol>
+						</nav>
+					</div>
+					<div class="col-3">
+						<div class="text-center">
+							<img src="{{ asset('assets/images/BID.png') }}" alt="modernize-img" class="iconn img-fluid mb-n4">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="container">
+
+			<div class="row">
+				<div class="col-12"></div>
+				<div class="col-md-6"></div>
+				<div class="col-md-6">
+					<div class="form-group"></div>
+				</div>
+			</div>
+
+
+		</div>
+		<div
+			class="datatables">
+			<!-- start File export -->
+			<div class="card" data-controller="employer">
+				<div
+					class="card-body">
+					{# <div class="mb-2">
+																										<h4 class="card-title mb-0">File export</h4>
+																										<img src="data:image/png;base64,iVBORwkhzAAQAAAABJRU5ErkJggg==" alt="Placeholder Image">
+																									</div> #}
+					<div class="action-btn layout-top-spacing mb-7 d-flex align-items-center justify-content-between flex-wrap gap-6">
+						<ul class="nav nav-pills user-profile-tab" id="pills-tab" role="tablist">
+							<li class="nav-item" role="presentation">
+								<a href="{{ path("app_employer_tenders") }}" class="nav-link {{type ? " " : " active" }} position-relative rounded-0 active d-flex align-items-center justify-content-center bg-transparent fs-3 py-3" id="pills-account-tab">
+									<span class="d-none d-md-block">All Tenders</span>
+								</a>
+							</li>
+
+							<li class="nav-item" role="presentation">
+								<a href="{{ path("app_employer_tenders",{'type': 'posted'}) }}" class="nav-link position-relative rounded-0 {{type ? " " : " active" }} d-flex align-items-center justify-content-center bg-transparent fs-3 py-3" id="pills-notifications-tab">
+									<span class="d-none d-md-block">Open Tenders</span>
+								</a>
+							</li>
+							<li class="nav-item" role="presentation">
+								<a href="{{ path("app_employer_tenders",{'type': 'closed'}) }}" class="nav-link position-relative rounded-0 d-flex align-items-center justify-content-center bg-transparent fs-3 py-3" id="pills-closed-tab">
+									<span class="d-none d-md-block">Closed Tenders</span>
+								</a>
+							</li>
+						</ul>
+						<a href="#" data-type="post tender" data-status="shortlisted" data-can="" data-tender="" data-action="click->employer#scheduleInterview" class="btn rounded-pill waves-effect waves-light btn-primary">
+							Post a tender
+						</a>
+					</div>
+					<div class="table-responsive">
+						<table id="file_export" class="table w-100 table-striped table-bordered display text-nowrap">
+							<thead>
+								<!-- start row -->
+								<tr>
+									<th>Tender ID</th>
+									<th>Tender Title</th>
+									<th>Tender Value</th>
+									<th>Duration</th>
+									<th>Company Name</th>
+									<th>Tender Received</th>
+									<th>Tender Status</th>
+									<th>Closing Date</th>
+									<th>Contact Email</th>
+									<th>Actions</th>
+								</tr>
+								<!-- end row -->
+							</thead>
+							<tbody>
+								<!-- start row -->
+								{% for item in tenders %}
+
+									<tr>
+										<td>BID
+											{{item.id}}</td>
+										<td>{{item.title}}</td>
+										<td>{{item.value}}</td>
+										<td>{{item.duration}}</td>
+										<td>{{item.companyname}}</td>
+										<td>
+											{% if item.tenderApplications|length > 0 %}
+												<a href="{{path('app_employer_tender_applications', {'tender': item.id})}}">Applications:
+													{{ item.tenderApplications|length }}</a>
+											{% else %}
+												{{ item.tenderApplications|length }}
+											{% endif %}
+
+
+										</td>
+										<td>
+
+											{% if item.status == "posted" %}
+												<button type="button" class="btn rounded-pill btn-block waves-effect waves-light btn-success">
+													Active
+												</button>
+
+											{% else %}
+												<button type="button" class="btn rounded-pill btn-block waves-effect waves-light btn-danger">
+													Closed
+												</button>
+											{% endif %}
+
+
+										</td>
+										<td>{{item.closingdate|date("d-m-Y")}}</td>
+										<td>{{item.contactemail}}</td>
+										<td>
+											<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+												<div class="btn-group me-2 mb-2" role="group" aria-label="First group">
+													<a href="{{ path("app_employer_tender_change_status",{'tender': item.id, 'status': 'closed'}) }}" type="button" class="btn primary_one">
+														<i class="ti ti-trash fs-4"></i>
+														Close
+													</a>
+													<a href="#" data-type="post tender" data-status="shortlisted" data-can="{{item.id}}" data-tender="{{item.id}}" data-action="click->employer#scheduleInterview" class="btn primary_two">
+														<i class="ti ti-edit fs-4"></i>
+														Edit
+													</a>
+													<a href="#" data-type="view tender" data-status="shortlisted" data-can="{{item.id}}" data-tender="{{item.id}}" data-action="click->employer#scheduleInterview" class="btn primary_two">
+														<i class="ti ti-eye fs-4"></i>
+														View
+													</a>
+													<a href="{{ path("app_employer_tender_change_status",{'tender': item.id, 'status': 'deleted'}) }}" class="btn primary_three">
+														<i class="ti ti-trash fs-4"></i>
+														Delete
+													</a>
+												</div>
+
+											</div>
+										</td>
+									</tr>
+								{% endfor %}
+
+								<!-- end row -->
+							<!-- start row -->
+								<!-- end row -->
+							</tbody>
+						</tfoot>
+					</table>
+				</div>
+			</div>
+		</div>
+		<!-- end File export -->
+	</div>
+</div>{% endblock %}

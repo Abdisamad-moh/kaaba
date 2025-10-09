@@ -1,0 +1,121 @@
+{% extends 'admin_base2.html.twig' %}
+{% import 'macros/_form_macros.html.twig' as macros %}
+
+{% block title %}
+	Candidates
+{% endblock %}
+
+{% block body %}
+</div>
+<div class="" data-controller="employer">
+
+
+	<div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+		<div class="card-body px-4 py-3">
+			<div class="row align-items-center">
+				<div class="col-9">
+					<h4 class="fw-semibold mb-8">
+						<i class="ti ti-users fs-8 "></i>
+						Candidates</h4>
+
+				</div>
+				<div class="col-3">
+					<div class="text-center">
+						<img src="{{ asset('assets/images/candidate.png') }}" alt="modernize-img" class="iconn img-fluid mb-n4">
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="row">
+		<div class="col-12">
+			<div
+
+				class="datatables">
+				<!-- start File export -->
+				<div class="card">
+					<div
+						class="card-body">
+						{# <div class="mb-2">
+																																																																																				<h4 class="card-title mb-0">File export</h4>
+																																																																																				<img src="data:image/png;base64,iVBORwkhzAAQAAAABJRU5ErkJggg==" alt="Placeholder Image">
+																																																																																			</div> #}
+
+						{{ macros.render_search_form(searchForm, 'Filter') }}
+
+						<div class="table-responsive">
+							<table id="file_export" class="table w-100 table-striped table-bordered display text-nowrap" width="100%">
+								<thead>
+									<!-- start row -->
+									<tr>
+										<th>Applicant Name</th>
+										<th>Applied Job Title</th>
+										<th>Employer</th>
+										<th>Job ID</th>
+										<th>Application Date</th>
+										<th>Education</th>
+										<th>Experience</th>
+										<th>Cover Letter</th>
+										<th>Status</th>
+										<th>Actions</th>
+									</tr>
+									<!-- end row -->
+								</thead>
+								<tbody>
+									<!-- start row -->
+									{% for item in applications %}
+										<tr>
+											<td>{{item.jobseeker.name}}</td>
+											<td>{{item.job ? item.job.title : ""}}</td>
+											<td>{{item.employer.name ?? ""}}</td>
+											<td>JOB-{{item.job ? item.job.id : "N/A"}}</td>
+											<td>{{ item.createdat|date('d-m-Y') }}</td>
+											<td>
+												{{item.jobseeker.jobseekerresume.education  > -1 ? item.jobseeker.jobseekerresume.education|educationNumberToString : ""}}
+											</td>
+											<td>
+												{{item.jobseeker.jobseekerresume.experience > -1 ? item.jobseeker.jobseekerresume.experience|numberToString : ""}}</td>
+											<td>
+												{% if item.coverLetter %}
+													<a class="btn primary_two" target="_blank" href="{{ asset('uploads/'~ item.coverLetter)}}">
+														<i class="ti ti-file text-white fs-6"></i>
+														Preview File</a>
+												{% endif %}
+											</td>
+											<td>
+												{% if item.status == "interview scheduled" %}
+													{# <span class="mb-1 badge text-bg-success">Interview st rd</span> #}
+												{% else %}
+													{{item.status|capitalizeWords}}
+												{% endif %}
+
+											</td>
+											<td>
+												<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+													<div class="btn-group me-2 mb-2" role="group" aria-label="First group">
+														<a data-type="resume" data-can="{{item.jobseeker.id}}" data-action="click->employer#scheduleInterview" href="#" class="btn primary_one text-white">
+															<i class="ti ti-user-circle fs-4"></i>
+															View Profile
+														</a>
+													</div>
+												</div>
+											</td>
+										</tr>
+									{% endfor %}
+
+									<!-- end row -->
+								<!-- start row -->
+									<!-- end row -->
+								</tbody>
+							</tfoot>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- end File export -->
+</div>{% endblock %}

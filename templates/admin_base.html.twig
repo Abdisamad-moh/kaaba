@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>
+			{% block title %}Admin!
+			{% endblock %}
+		</title>
+		<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+		{% block stylesheets %}
+			{# <link href="{{ asset('assets/admin/css/settings_forms.css') }}" rel="stylesheet" type="text/css"/> #}
+			<link href="{{ asset('assets/libs/choices.js/public/assets/styles/choices.min.css') }}" rel="stylesheet" type="text/css"/>
+			<link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'>
+			<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+			{# <link href="{{ asset('assets/libs/swiper/swiper-bundle.min.css') }}" rel="stylesheet" type="text/css"/> #}
+			{# <link href="{{ asset('assets/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css"/> #}
+			{# <link href="{{ asset('assets/css/app.min.css') }}" rel="stylesheet" type="text/css"/> #}
+			{# <link
+			href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet" type="text/css"/> #}
+
+
+			<!--Morris Chart CSS -->
+			<link href="{{ asset('assets/admin/plugins/morris/morris.css') }}" rel="stylesheet" type="text/css"/>
+			<link href="{{ asset('assets/admin/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css"/>
+			<link href="{{ asset('assets/admin/css/icons.css') }}" rel="stylesheet" type="text/css"/>
+			<link href="{{ asset('assets/admin/css/style.css') }}" rel="stylesheet" type="text/css"/>
+			<link href="{{ asset('assets/libs/swiper/swiper-bundle.min.css') }}" rel="stylesheet" type="text/css"/>
+			{# <link href="{{ asset('assets/css/app.min.css') }}" rel="stylesheet" type="text/css"/>
+			<link href="{{ asset('assets/css/icons.min.css') }}" rel="stylesheet" type="text/css"/> #}
+			<link href="{{ asset('assets/libs/glightbox/css/glightbox.min.css') }}" rel="stylesheet" type="text/css"/>
+
+		{% endblock %}
+
+		{% block javascripts %}
+			{% block importmap %}{{ importmap('app') }}{% endblock %}
+		{% endblock %}
+	</head>
+	<body class="fixed-left">
+   {# <div id="preloader">
+        <i>.</i>
+        <i>.</i>
+        <i>.</i>
+    </div> #}
+  <div id="wrapper">
+    <div class="left side-menu">
+      <button type="button" class="button-menu-mobile button-menu-mobile-topbar open-left waves-effect"> <i
+          class="ion-close"></i> </button>
+      <div class="left-side-logo d-block d-lg-none">
+        <div class="text-center"> 
+        {% if is_granted('ROLE_SUPER_ADMIN') %}
+          <a href="{{path("app_admin")}}" class="logo">
+             <img src="{{ asset('assets/images/logo-dark.png') }}"  alt="logo">
+          </a>
+        {% endif %}
+         </div>
+      </div>
+      {% if is_granted('ROLE_EMPLOYER') %}
+      <div class="logo_por ">
+        <div class="text-center  rounded p-3"> <img class="img-fluid mt-1" src="{{asset("assets/admin/images/cli_1.png")}}"
+            alt="Card image cap">
+            {% if app.user|default(null) %}
+																
+          <h6 class="text-white mb-1">{{  app.user.name }}</h6>
+                                {% else %}
+															{% endif %}
+          <p class="text-white-50 mb-1"> <a class="text-white-50" href="index.html">View Company Page <i
+                class="fa fa-external-link"></i></a></p>
+        </div>
+      </div>
+      {% endif %}
+      <div class="sidebar-inner slimscrollleft">
+        <div id="sidebar-menu">
+          <div id="sidebar-menu">
+            <ul>
+              {% if is_granted('ROLE_SUPER_ADMIN') %}
+              <li class="menu-title">Admin</li>
+              <li> <a href="{{ path('app_admin') }}" class="waves-effect"> <i class="fa fa-tachometer" aria-hidden="true"></i> <span>
+                    Dashboard </span> </a> </li>
+            <li> <a href="{{ path('app_admin_packages') }}" class="waves-effect"><i class="fa fa-cog" aria-hidden="true"></i> <span> 
+                    Plans</span></a> </li>
+            <li> <a href="{{ path('app_admin_blogs') }}" class="waves-effect"><i class="fa fa-edit" aria-hidden="true"></i> <span> 
+                    Blogs</span></a> </li>
+            <li> <a href="{{ path('app_admin_settings') }}" class="waves-effect"><i class="fa fa-cog" aria-hidden="true"></i> <span> 
+                    Settings</span></a> </li>
+              {% endif %}
+              {% if is_granted('ROLE_EMPLOYER') %}
+              <li> <a href="{{path('app_employer_jobs')}}" class="waves-effect"><i class="fa fa-briefcase" aria-hidden="true"></i> </i><span> Jobs
+                  </span></a> </li>
+              <li class=" di_post text-dark"> <a href="#" class="waves-effect" data-toggle="modal"
+                  data-target=".abs-example-modal-lg"> <i class="fa fa-clipboard" aria-hidden="true"></i> <span> Post a
+                    new job </span></a> </li>
+              <li> <a href="#" class="waves-effect"><i class="fa fa-users" aria-hidden="true"></i> <span> Candidates
+                  </span></a> </li>
+              <li> <a href="rebs-example-modal-lg" class="waves-effect" data-toggle="modal" data-target="#myModal"><i
+                    class="fa fa-file-text" aria-hidden="true"></i> <span> Find Resumes/CVs</span></a> </li>
+              <li> <a href="#" class="waves-effect"><i class="fa fa-user" aria-hidden="true"></i> <span>
+                    Interviews</span></a> </li>
+              <li> <a href="{{path('app_employer_tenders')}}" class="waves-effect"><i class="fa fa-trello" aria-hidden="true"></i> <span>
+                    Tender/Bid</span></a> </li>
+              <li> <a href="#" class="waves-effect"><i class="fa fa-file" aria-hidden="true"></i>
+                  <span>Course</span></a> </li>
+              <li> <a href="#" class="waves-effect"><i class="fa fa-cog" aria-hidden="true"></i> <span> Settings &
+                    Plan</span></a> </li>
+                {% endif %}
+            </ul>
+          </div>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+    </div>
+
+
+    <div id="myModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title mt-0" id="myLargeModalLabel">Resume/CV Search</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span
+                aria-hidden="true">&times;</span> </button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-lg-6"> </div>
+              <div class="col-lg-6 ">
+                <div class="" id="headingOne">
+                  <h5 class="mb-0 mt-0 font-16 text-md-end"> <a data-toggle="collapse" data-parent="#accordion"
+                      href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" class="text-dark text-end ">
+                      Advanced Search <i class="ti-close"></i> </a> </h5>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-12">
+                <label class="form-label">Job Title </label>
+              </div>
+              <div class="col-sm-12">
+                <select class="form-control">
+                  <option>UX Designer</option>
+                  <option> Designer</option>
+                  <option> Developer</option>
+                </select>
+              </div>
+              <div class="col-sm-4 mt-3">
+                <label class="form-label">Search by <b>Uploaded date</b></label>
+                <select class="form-control">
+                  <option>3 year</option>
+                  <option> 5 year</option>
+                  <option>3 year</option>
+                </select>
+              </div>
+              <div class="col-sm-4 mt-3">
+                <label class="form-label">Search by <b>Last Active</b></label>
+                <input class="form-control" type="text" value="Yesterday" id="example-text-input">
+              </div>
+              <div class="col-sm-4 mt-3">
+                <label class="form-label">Search by <b>Notice Period </b></label>
+                <input class="form-control" type="date" value="2023-08-19" id="example-date-input">
+              </div>
+            </div>
+            <div id="accordion">
+              <div class=" mt-4">
+                <div id="collapseOne" class="collapse show" aria-labelledby="headingOne" data-parent="#accordion">
+                  <div class="mb-4">
+                    <h6> <b>Current Role </b></h6>
+                    <div class="row ma_top-inner-mi">
+                      <div class="col-sm-4 mt-3">
+                        <label class="form-label">Current Company</b></label>
+                        <input class="form-control" type="text" value="Value" id="example-text-input">
+                      </div>
+                      <div class="col-sm-4 mt-3">
+                        <label class="form-label">Current CTC</b></label>
+                        <input class="form-control" type="text" value="Value" id="example-text-input">
+                      </div>
+                      <div class="col-sm-4 mt-3">
+                        <label class="form-label">Current role</b></label>
+                        <input class="form-control" type="text" value="Value" id="example-text-input">
+                      </div>
+                    </div>
+                    <h6> <b>Other Details</b></h6>
+                    <div class="row ma_top-inner-mi">
+                      <div class="col-sm-4 mt-3">
+                        <label class="form-label">Criteria 1</b></label>
+                        <input class="form-control" type="text" value="Value" id="example-text-input">
+                      </div>
+                      <div class="col-sm-4 mt-3">
+                        <label class="form-label">Criteria 2</b></label>
+                        <input class="form-control" type="text" value="Value" id="example-text-input">
+                      </div>
+                      <div class="col-sm-4 mt-3">
+                        <label class="form-label">Criteria 3</b></label>
+                        <input class="form-control" type="text" value="Value" id="example-text-input">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-5 text-end">
+                <button type="button" class="btn btn-danger waves-effect waves-light mb-2">Reset Search</button>
+                &nbsp;
+                <button type="button" class=" btn btn-outline-primary waves-effect waves-light mb-2"> Search </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div>
+
+    <!-- /.modal -->
+	    <div class="content-page">
+      <div class="content">
+        <div class="topbar">
+          <div class="topbar-left	d-none d-lg-block">
+            <div class="text-center"> <a href="index.html" class="logo img-fluid"><img
+                  src="{{ asset('assets/images/logo-dark.png') }}" alt="logo"></a> </div>
+          </div>
+          <nav class="navbar-custom">
+            <ul class="list-inline float-right mb-0">
+              <!-- <li class="list-inline-item notification-list dropdown d-none d-sm-inline-block"> -->
+              {% if is_granted('ROLE_EMPLOYER') %}
+              <li class="list-inline-item notification-list dropdown d-none d-sm-inline-block">
+                <a  href="{{path('app_employer_post_job')}}" class=" btn btn-outline-primary waves-effect waves-light" 
+                  >Post a new job</a>
+              </li>
+              {% endif %}
+              <li class="list-inline-item dropdown notification-list "> <a
+                  class="nav-link dropdown-toggle arrow-none waves-effect" data-toggle="modal"
+                  data-target=".bs-example-modal-lg" href="#" role="button" aria-haspopup="false" aria-expanded="false">
+                  <i class="mdi mdi-email-outline noti-icon"></i> <span
+                    class="badge badge-danger badge-pill noti-icon-badge ">5</span> </a> </li>
+              <li class="list-inline-item dropdown notification-list"> <a
+                  class="nav-link dropdown-toggle arrow-none waves-effect" data-toggle="dropdown" href="#" role="button"
+                  aria-haspopup="false" aria-expanded="false"> <i class="mdi mdi-bell-outline noti-icon"></i> <span
+                    class="badge badge-success badge-pill noti-icon-badge">3</span> </a>
+                <div class="dropdown-menu dropdown-menu-right dropdown-menu-animated dropdown-menu-lg">
+                  <!-- item-->
+                  <div class="dropdown-item noti-title"> <span class="badge badge-danger float-right">84</span>
+                    <h5>Notification</h5>
+                  </div>
+                  <div class="slimscroll" style="max-height: 230px;">
+
+                    <!-- item-->
+                    <a href="#" class="dropdown-item notify-item">
+                      <div class="notify-icon"><img src="#" alt="user-img"
+                          class="img-fluid rounded-circle" /> </div>
+                      <p class="notify-details"><b>Charles M. Jones</b><span class="text-muted">Dummy text of the
+                          printing and typesetting industry.</span></p>
+                    </a>
+
+                    <!-- item-->
+                    <a href="#" class="dropdown-item notify-item">
+                      <div class="notify-icon"><img src="#" alt="user-img"
+                          class="img-fluid rounded-circle" /> </div>
+                      <p class="notify-details"><b>Thomas J. Mimms</b><span class="text-muted">Dummy text of the
+                          printing and typesetting industry.</span></p>
+                    </a>
+
+                    <!-- item-->
+                    <a href="#" class="dropdown-item notify-item">
+                      <div class="notify-icon">
+                      {# <img src="assets/admin/images/users/user-4.jpg" alt="user-img"
+                          class="img-fluid rounded-circle" />  #}
+                          
+                          </div>
+                      <p class="notify-details">Luis M. Konrad<span class="text-muted">Dummy text of the printing and
+                          typesetting industry.</span></p>
+                    </a>
+
+                    <!-- item-->
+                    <a href="#" class="dropdown-item notify-item">
+                      <div class="notify-icon">
+                      {# <img src="assets/admin/images/users/user-5.jpg" alt="user-img"
+                          class="img-fluid rounded-circle" />  #}
+                          
+                          </div>
+                      <p class="notify-details"><b>Kendall E. Walker</b><span class="text-muted">Dummy text of the
+                          printing and typesetting industry.</span></p>
+                    </a>
+                  </div>
+
+                  <!-- All-->
+                  <a href="javascript:void(0);" class="dropdown-item notify-all"> View All </a>
+                </div>
+              </li>
+              <li class="list-inline-item dropdown notification-list "> <a
+                  class="nav-link dropdown-toggle arrow-none waves-effect nav-user" data-toggle="dropdown" href="#"
+                  role="button" aria-haspopup="false" aria-expanded="false"> 
+                  {# <img
+                    src="assets/admin/images/users/user-1.jpg" alt="user" class="rounded-circle">  #}
+                    <i class="fa fa-user"></i>
+                    </a>
+                <div class="dropdown-menu dropdown-menu-right dropdown-menu-animated profile-dropdown "> <a
+                    class="dropdown-item" href="#"><i class="mdi mdi-account-circle m-r-5 text-muted"></i> Profile</a>
+                  <a class="dropdown-item" href="#"><span class="badge badge-success mt-1 float-right">5</span><i
+                      class="mdi mdi-settings m-r-5 text-muted"></i> Settings</a> <a class="dropdown-item" href="/logout"><i
+                      class="mdi mdi-logout m-r-5 text-muted"></i> Logout</a>
+                </div>
+              </li>
+            </ul>
+            <ul class="list-inline menu-left mb-0">
+              <li class="list-inline-item">
+                <button type="button" class="button-menu-mobile open-left waves-effect"> <i class="ion-navicon"></i>
+                </button>
+              </li>
+            </ul>
+            <div class="clearfix"></div>
+          </nav>
+        </div>
+
+        <!--  Modal content for the above example -->
+        <div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+          aria-hidden="true">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title mt-0" id="myLargeModalLabel">Messages</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span
+                    aria-hidden="true">&times;</span> </button>
+              </div>
+              <div class="modal-body">
+                <section class="section">
+                  <div class="container">
+                    <div class="row align-items-center">
+                      <div class="col-lg-4">
+                        <div
+                          class="section-title   d-lg-block ui-elements-bar card notification-wrapper dropdown-scroll insideme ma_minus">
+                          <form class="position-relative mt-4 mb-3">
+                            <input class="form-control" type="text" placeholder="Search...">
+                          </form>
+                          <div class="process-menu nav flex-column nav-pills  dropdown-scroll" id="v-pills-tab"
+                            role="tablist" aria-orientation="vertical"> <a
+                              class=" active text-dark notification-item d-block " id="v-pills-home-tab"
+                              data-bs-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home"
+                              aria-selected="true">
+                              <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0 me-3 top-bu"> <img src="assets/images/featured-job/img-01.png"
+                                    class=" img-fluid boxlogoicon avatar-xs" alt="user-pic"> </div>
+                                <div class="flex-grow-1">
+                                  <h6 class="mt-0 mb-1 fs-14">Google</h6>
+                                  <p class="mb-0 fs-12 text-mutedlogin">Take five, punch the tree, and come back in here
+                                    with a ......</p>
+                                </div>
+                              </div>
+                            </a> <a class=" text-dark notification-item d-block" id="v-pills-profile-tab"
+                              data-bs-toggle="pill" href="#v-pills-profile" role="tab" aria-controls="v-pills-profile"
+                              aria-selected="false" tabindex="-1">
+                              <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0 me-3 top-bu"> <img src="assets/images/featured-job/img-02.png"
+                                    class=" img-fluid boxlogoicon avatar-xs" alt="user-pic"> </div>
+                                <div class="flex-grow-1">
+                                  <h6 class="mt-0 mb-1 fs-14">Adobe</h6>
+                                  <p class="mb-0 fs-12 text-mutedlogin">Take five, punch the tree, and come back in here
+                                    with a ......</p>
+                                </div>
+                              </div>
+                            </a> <a class="text-dark notification-item d-block" id="v-pills-messages-tab"
+                              data-bs-toggle="pill" href="#v-pills-messages" role="tab" aria-controls="v-pills-messages"
+                              aria-selected="false" tabindex="-1">
+                              <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0 me-3 top-bu"> <img src="assets/images/featured-job/img-03.png"
+                                    class=" img-fluid boxlogoicon avatar-xs" alt="user-pic"> </div>
+                                <div class="flex-grow-1">
+                                  <h6 class="mt-0 mb-1 fs-14">Apple</h6>
+                                  <p class="mb-0 fs-12 text-mutedlogin">Take five, punch the tree, and come back in here
+                                    with a ......</p>
+                                </div>
+                              </div>
+                            </a> <a class="text-dark notification-item d-block" id="v-pills-messages-tab"
+                              data-bs-toggle="pill" href="#v-pills-02" role="tab" aria-controls="v-pills-messages"
+                              aria-selected="false" tabindex="-1">
+                              <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0 me-3 top-bu"> <img src="assets/images/featured-job/img-04.png"
+                                    class=" img-fluid boxlogoicon avatar-xs" alt="user-pic"> </div>
+                                <div class="flex-grow-1">
+                                  <h6 class="mt-0 mb-1 fs-14">Moj</h6>
+                                  <p class="mb-0 fs-12 text-mutedlogin">Take five, punch the tree, and come back in here
+                                    with a ......</p>
+                                </div>
+                              </div>
+                            </a> <a class="text-dark notification-item d-block" id="v-pills-messages-tab"
+                              data-bs-toggle="pill" href="#v-pills-03" role="tab" aria-controls="v-pills-messages"
+                              aria-selected="false" tabindex="-1">
+                              <div class="d-flex align-items-center">
+                                <div class="flex-shrink-0 me-3 top-bu"> <img src="assets/images/featured-job/img-05.png"
+                                    class=" img-fluid boxlogoicon avatar-xs" alt="user-pic"> </div>
+                                <div class="flex-grow-1">
+                                  <h6 class="mt-0 mb-1 fs-14">Behance</h6>
+                                  <p class="mb-0 fs-12 text-mutedlogin">Take five, punch the tree, and come back in here
+                                    with a ......</p>
+                                </div>
+                              </div>
+                            </a> </div>
+                        </div>
+                      </div>
+                      <!--end col-->
+
+                      <div class="col-lg-8">
+                        <div class="d-lg-block ui-elements-bar card">
+                          <div class="tab-content" id="v-pills-tabContent">
+                            <div class="tab-pane fade show active" id="v-pills-home" role="tabpanel"
+                              aria-labelledby="v-pills-home-tab">
+                              <div class="p-4 border-bottom">
+                                <div class="d-flex align-items-center">
+                                  <div class="flex-shrink-0 me-3 "> <img src="assets/images/featured-job/img-01.png"
+                                      class=" img-fluid boxlogoicon avatar-xs" alt="user-pic"> </div>
+                                  <div class="flex-grow-1">
+                                    <h6 class="mt-0 mb-1 fs-14">Job Applied - HR Executive</h6>
+                                    <p class="mb-0 fs-12 text-mutedlogin">Job applied on 9 May, 2023 | Google -
+                                      Capetown, SA</p>
+                                  </div>
+                                  <div class="flex-shrink-0  text-md-end">
+                                    <button type="button" class="btn btn-outline-primary">View job</button>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div class="bg-secondary-subtle text-secondary p-4 mt-3">
+
+                                <!-- start -->
+                                <div class="d-sm-flex align-items-top mt-4 ">
+                                  <div class="flex-shrink-0"> <img class="rounded-circle avatar-md img-thumbnail"
+                                      src="assets/images/profile.jpg" alt="img"> </div>
+                                  <div class="flex-grow-1 ms-sm-3"> <small class="float-end fs-12 text-muted"><i
+                                        class="uil uil-clock"></i> 20 min Ago</small> <a href="javascript:(0)"
+                                      class="primary-link">
+                                      <h6 class="fs-16 mt-sm-0 mt-3 mb-0">Noor Begam</h6>
+                                    </a>
+                                    <p class="text-muted fs-12 mb-0">Aug 10, 2021</p>
+                                    <p class="text-muted fst-italic mb-0  alert  bg-primary-subtle text-primary mt-3">"
+                                      There are many variations of passages of Lorem Ipsum available, but the majority
+                                      have suffered alteration in some form, by injected humour "</p>
+                                  </div>
+                                </div>
+                                <!-- end -->
+
+                                <!-- start -->
+                                <div class="d-sm-flex align-items-top mt-4 ">
+                                  <div class="flex-shrink-0"> <img class="rounded-circle avatar-md img-thumbnail"
+                                      src="assets/images/featured-job/img-01.png" alt="img"> </div>
+                                  <div class="flex-grow-1 ms-sm-3"> <small class="float-end fs-12 text-muted"><i
+                                        class="uil uil-clock"></i> 10 min Ago</small> <a href="javascript:(0)"
+                                      class="primary-link">
+                                      <h6 class="fs-16 mt-sm-0 mt-3 mb-0">Google</h6>
+                                    </a>
+                                    <p class="text-muted fs-12 mb-0">Aug 10, 2021</p>
+                                    <p class="text-muted fst-italic mb-0  alert bg-primary-subtle text-info mt-3">"
+                                      There are many variations of passages of Lorem Ipsum available, but the majority
+                                      have suffered alteration in some form, by injected humour "</p>
+                                  </div>
+                                </div>
+                                <!-- end -->
+
+                                <!-- start -->
+                                <div class="d-sm-flex align-items-top mt-4 ">
+                                  <div class="flex-shrink-0"> <img class="rounded-circle avatar-md img-thumbnail"
+                                      src="assets/images/profile.jpg" alt="img"> </div>
+                                  <div class="flex-grow-1 ms-sm-3"> <small class="float-end fs-12 text-muted"><i
+                                        class="uil uil-clock"></i> 20 min Ago</small> <a href="javascript:(0)"
+                                      class="primary-link">
+                                      <h6 class="fs-16 mt-sm-0 mt-3 mb-0">Noor Begam</h6>
+                                    </a>
+                                    <p class="text-muted fs-12 mb-0">Aug 10, 2021</p>
+                                    <p class="text-muted fst-italic mb-0  alert  bg-primary-subtle text-primary mt-3">"
+                                      There are many variations of passages of Lorem Ipsum available, but the majority
+                                      have suffered alteration in some form, by injected humour "</p>
+                                  </div>
+                                </div>
+                                <!-- end -->
+
+                              </div>
+                            </div>
+                            <div class="tab-pane fade" id="v-pills-profile" role="tabpanel"
+                              aria-labelledby="v-pills-profile-tab">
+                              <div class="p-4 border-bottom">
+                                <div class="d-flex align-items-center">
+                                  <div class="flex-shrink-0 me-3 "> <img src="assets/images/featured-job/img-02.png"
+                                      class=" img-fluid boxlogoicon avatar-xs" alt="user-pic"> </div>
+                                  <div class="flex-grow-1">
+                                    <h6 class="mt-0 mb-1 fs-14">Job Applied - HR Executive</h6>
+                                    <p class="mb-0 fs-12 text-mutedlogin">Job applied on 9 May, 2023 | Adobe- Capetown,
+                                      SA</p>
+                                  </div>
+                                  <div class="flex-shrink-0  text-md-end">
+                                    <button type="button" class="btn btn-outline-primary">View job</button>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div class="bg-secondary-subtle text-secondary p-4 mt-4">
+
+                                <!-- start -->
+                                <div class="d-sm-flex align-items-top mt-4 ">
+                                  <div class="flex-shrink-0"> <img class="rounded-circle avatar-md img-thumbnail"
+                                      src="assets/images/featured-job/img-02.png" alt="img"> </div>
+                                  <div class="flex-grow-1 ms-sm-3"> <small class="float-end fs-12 text-muted"><i
+                                        class="uil uil-clock"></i> 20 min Ago</small> <a href="javascript:(0)"
+                                      class="primary-link">
+                                      <h6 class="fs-16 mt-sm-0 mt-3 mb-0">Adobe</h6>
+                                    </a>
+                                    <p class="text-muted fs-12 mb-0">Aug 10, 2021</p>
+                                    <p class="text-muted fst-italic mb-0  alert  bg-primary-subtle text-primary mt-3">"
+                                      There are many variations of passages of Lorem Ipsum available, but the majority
+                                      have suffered alteration in some form, by injected humour "</p>
+                                  </div>
+                                </div>
+                                <!-- end -->
+
+                                <!-- start -->
+                                <div class="d-sm-flex align-items-top mt-4 ">
+                                  <div class="flex-shrink-0"> <img class="rounded-circle avatar-md img-thumbnail"
+                                      src="assets/images/profile.jpg" alt="img"> </div>
+                                  <div class="flex-grow-1 ms-sm-3"> <small class="float-end fs-12 text-muted"><i
+                                        class="uil uil-clock"></i> 10 min Ago</small> <a href="javascript:(0)"
+                                      class="primary-link">
+                                      <h6 class="fs-16 mt-sm-0 mt-3 mb-0">Noor Begam</h6>
+                                    </a>
+                                    <p class="text-muted fs-12 mb-0">Aug 10, 2021</p>
+                                    <p class="text-muted fst-italic mb-0  alert bg-primary-subtle text-info mt-3">"
+                                      There are many variations of passages of Lorem Ipsum available, but the majority
+                                      have suffered alteration in some form, by injected humour "</p>
+                                  </div>
+                                </div>
+                                <!-- end -->
+
+                                <!-- start -->
+                                <div class="d-sm-flex align-items-top mt-4 ">
+                                  <div class="flex-shrink-0"> <img class="rounded-circle avatar-md img-thumbnail"
+                                      src="assets/images/featured-job/img-02.png" alt="img"> </div>
+                                  <div class="flex-grow-1 ms-sm-3"> <small class="float-end fs-12 text-muted"><i
+                                        class="uil uil-clock"></i> 20 min Ago</small> <a href="javascript:(0)"
+                                      class="primary-link">
+                                      <h6 class="fs-16 mt-sm-0 mt-3 mb-0">Adobe</h6>
+                                    </a>
+                                    <p class="text-muted fs-12 mb-0">Aug 10, 2021</p>
+                                    <p class="text-muted fst-italic mb-0  alert  bg-primary-subtle text-primary mt-3">"
+                                      There are many variations of passages of Lorem Ipsum available, but the majority
+                                      have suffered alteration in some form, by injected humour "</p>
+                                  </div>
+                                </div>
+                                <!-- end -->
+
+                              </div>
+                            </div>
+                            <div class="tab-pane fade" id="v-pills-messages" role="tabpanel"
+                              aria-labelledby="v-pills-messages-tab">
+                              <div class="p-4 border-bottom">
+                                <div class="d-flex align-items-center">
+                                  <div class="flex-shrink-0 me-3 "> <img src="assets/images/featured-job/img-03.png"
+                                      class=" img-fluid boxlogoicon avatar-xs" alt="user-pic"> </div>
+                                  <div class="flex-grow-1">
+                                    <h6 class="mt-0 mb-1 fs-14">Job Applied - HR Executive</h6>
+                                    <p class="mb-0 fs-12 text-mutedlogin">Job applied on 9 May, 2023 | Apple - Capetown,
+                                      SA</p>
+                                  </div>
+                                  <div class="flex-shrink-0  text-md-end">
+                                    <button type="button" class="btn btn-outline-primary">View job</button>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div class="bg-secondary-subtle text-secondary p-4 mt-4">
+
+                                <!-- start -->
+                                <div class="d-sm-flex align-items-top mt-4 ">
+                                  <div class="flex-shrink-0"> <img class="rounded-circle avatar-md img-thumbnail"
+                                      src="assets/images/featured-job/img-03.png" alt="img"> </div>
+                                  <div class="flex-grow-1 ms-sm-3"> <small class="float-end fs-12 text-muted"><i
+                                        class="uil uil-clock"></i> 10minus</small> <a href="javascript:(0)"
+                                      class="primary-link">
+                                      <h6 class="fs-16 mt-sm-0 mt-3 mb-0">Apple</h6>
+                                    </a>
+                                    <p class="text-muted fs-12 mb-0">Aug 10, 2021</p>
+                                    <p class="text-muted fst-italic mb-0  alert  bg-primary-subtle text-primary mt-3">"
+                                      There are many variations of passages of Lorem Ipsum available, but the majority
+                                      have suffered alteration in some form, by injected humour "</p>
+                                  </div>
+                                </div>
+                                <!-- end -->
+
+                                <!-- start -->
+                                <div class="d-sm-flex align-items-top mt-4 ">
+                                  <div class="flex-shrink-0"> <img class="rounded-circle avatar-md img-thumbnail"
+                                      src="assets/images/profile.jpg" alt="img"> </div>
+                                  <div class="flex-grow-1 ms-sm-3"> <small class="float-end fs-12 text-muted"><i
+                                        class="uil uil-clock"></i> 10 min Ago</small> <a href="javascript:(0)"
+                                      class="primary-link">
+                                      <h6 class="fs-16 mt-sm-0 mt-3 mb-0">Noor Begam</h6>
+                                    </a>
+                                    <p class="text-muted fs-12 mb-0">Aug 10, 2021</p>
+                                    <p class="text-muted fst-italic mb-0  alert bg-primary-subtle text-info mt-3">"
+                                      There are many variations of passages of Lorem Ipsum available, but the majority
+                                      have suffered alteration in some form, by injected humour "</p>
+                                  </div>
+                                </div>
+                                <!-- end -->
+
+                                <!-- start -->
+                                <div class="d-sm-flex align-items-top mt-4 ">
+                                  <div class="flex-shrink-0"> <img class="rounded-circle avatar-md img-thumbnail"
+                                      src="assets/images/featured-job/img-03.png" alt="img"> </div>
+                                  <div class="flex-grow-1 ms-sm-3"> <small class="float-end fs-12 text-muted"><i
+                                        class="uil uil-clock"></i> 20 min Ago</small> <a href="javascript:(0)"
+                                      class="primary-link">
+                                      <h6 class="fs-16 mt-sm-0 mt-3 mb-0">Apple</h6>
+                                    </a>
+                                    <p class="text-muted fs-12 mb-0">Aug 10, 2021</p>
+                                    <p class="text-muted fst-italic mb-0  alert  bg-primary-subtle text-primary mt-3">"
+                                      There are many variations of passages of Lorem Ipsum available, but the majority
+                                      have suffered alteration in some form, by injected humour "</p>
+                                  </div>
+                                </div>
+                                <!-- end -->
+
+                              </div>
+                            </div>
+                            <div class="tab-pane fade" id="v-pills-02" role="tabpanel"
+                              aria-labelledby="v-pills-profile-tab">
+                              <div class="p-4 border-bottom">
+                                <div class="d-flex align-items-center">
+                                  <div class="flex-shrink-0 me-3 "> <img src="assets/images/featured-job/img-04.png"
+                                      class=" img-fluid boxlogoicon avatar-xs" alt="user-pic"> </div>
+                                  <div class="flex-grow-1">
+                                    <h6 class="mt-0 mb-1 fs-14">Job Applied - HR Executive</h6>
+                                    <p class="mb-0 fs-12 text-mutedlogin">Job applied on 9 May, 2023 |Moj - Capetown, SA
+                                    </p>
+                                  </div>
+                                  <div class="flex-shrink-0  text-md-end">
+                                    <button type="button" class="btn btn-outline-primary">View job</button>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="bg-secondary-subtle text-secondary p-4 mt-4">
+
+                                <!-- start -->
+                                <div class="d-sm-flex align-items-top mt-4 ">
+                                  <div class="flex-shrink-0"> <img class="rounded-circle avatar-md img-thumbnail"
+                                      src="assets/images/featured-job/img-04.png" alt="img"> </div>
+                                  <div class="flex-grow-1 ms-sm-3"> <small class="float-end fs-12 text-muted"><i
+                                        class="uil uil-clock"></i> 10minus</small> <a href="javascript:(0)"
+                                      class="primary-link">
+                                      <h6 class="fs-16 mt-sm-0 mt-3 mb-0">Moj</h6>
+                                    </a>
+                                    <p class="text-muted fs-12 mb-0">Aug 10, 2021</p>
+                                    <p class="text-muted fst-italic mb-0  alert  bg-primary-subtle text-primary mt-3">"
+                                      There are many variations of passages of Lorem Ipsum available, but the majority
+                                      have suffered alteration in some form, by injected humour "</p>
+                                  </div>
+                                </div>
+                                <!-- end -->
+                              </div>
+                            </div>
+                            <div class="tab-pane fade" id="v-pills-03" role="tabpanel"
+                              aria-labelledby="v-pills-profile-tab">
+                              <div class="p-4 border-bottom">
+                                <div class="d-flex align-items-center">
+                                  <div class="flex-shrink-0 me-3 "> <img src="assets/images/featured-job/img-05.png"
+                                      class=" img-fluid boxlogoicon avatar-xs" alt="user-pic"> </div>
+                                  <div class="flex-grow-1">
+                                    <h6 class="mt-0 mb-1 fs-14">Job Applied - HR Executive</h6>
+                                    <p class="mb-0 fs-12 text-mutedlogin">Job applied on 9 May, 2023 | Behance -
+                                      Capetown, SA</p>
+                                  </div>
+                                  <div class="flex-shrink-0  text-md-end">
+                                    <button type="button" class="btn btn-outline-primary">View job</button>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="bg-secondary-subtle text-secondary p-4 mt-4">
+
+                                <!-- start -->
+                                <div class="d-sm-flex align-items-top mt-4 ">
+                                  <div class="flex-shrink-0"> <img class="rounded-circle avatar-md img-thumbnail"
+                                      src="assets/images/featured-job/img-05.png" alt="img"> </div>
+                                  <div class="flex-grow-1 ms-sm-3"> <small class="float-end fs-12 text-muted"><i
+                                        class="uil uil-clock"></i> 10minus</small> <a href="javascript:(0)"
+                                      class="primary-link">
+                                      <h6 class="fs-16 mt-sm-0 mt-3 mb-0">Behance</h6>
+                                    </a>
+                                    <p class="text-muted fs-12 mb-0">Aug 10, 2021</p>
+                                    <p class="text-muted fst-italic mb-0  alert  bg-primary-subtle text-primary mt-3">"
+                                      There are many variations of passages of Lorem Ipsum available, but the majority
+                                      have suffered alteration in some form, by injected humour "</p>
+                                  </div>
+                                </div>
+                                <!-- end -->
+                              </div>
+                            </div>
+                          </div>
+                          <div class="mb-3 mt-4">
+                            <label for="meassageInput" class="form-label">Your Message</label>
+                            <textarea class="form-control" id="meassageInput" placeholder="Enter your message"
+                              name="comments" rows="3"></textarea>
+                          </div>
+                          <div class="text-end">
+                            <button type="submit" id="submit" name="submit" class="btn btn-primary"> Send Message <i
+                                class="uil uil-message ms-1"></i></button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!--end row-->
+                  </div>
+                  <!--end container-->
+                </section>
+              </div>
+            </div>
+            <!-- /.modal-content -->
+          </div>
+          <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->
+
+        <!--  Modal content for the above example -->
+        <div class="modal fade abs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+          aria-hidden="true">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title mt-0" id="myLargeModalLabel">Create a new job</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"> <span
+                    aria-hidden="true">&times;</span> </button>
+              </div>
+              <div class="modal-body">
+
+                <div class="">
+                  <div class="progress">
+                    <div class="progress-bar" role="progressbar" style="width: 85%;" aria-valuenow="25"
+                      aria-valuemin="0" aria-valuemax="100">85%</div>
+                  </div>
+                </div>
+
+                <form id="regForm" action="">
+
+                  <!-- One "tab" for each step in the form: -->
+                  <div class="tab">
+                    <h5 class="modal-title mt-2" id="myLargeModalLabel">How do you like to create the new one?</h5>
+                    <div class="button-items mt-3 mb-3">
+                      <button type="button" class="btn btn-outline-primary waves-effect waves-light"> <i
+                          class="mdi mdi-google-wallet"></i> Create from Scratch</button>
+                      <button type="button" class="btn btn-outline-primary waves-effect waves-light"> <i
+                          class="mdi mdi-flattr"></i> Use Previously created</button>
+                      <button type="button" class="btn btn-outline-primary waves-effect waves-light"><i
+                          class="mdi mdi-chart-arc"></i> Popular Templates</button>
+                    </div>
+                    <h5 class="modal-title mt-0  fs-18 mb-3" id="myLargeModalLabel">Popular Template</h5>
+                    <div>
+                      <div class="custom-control custom-checkbox mb-3">
+                        <input type="checkbox" class="custom-control-input" id="customCheck1"
+                          data-parsley-multiple="groups" data-parsley-mincheck="2">
+                        <label class="custom-control-label" for="customCheck1">UX Designer Senior Associate</label>
+                      </div>
+                      <hr>
+                      <div class="custom-control custom-checkbox mb-3">
+                        <input type="checkbox" class="custom-control-input" id="customCheck2"
+                          data-parsley-multiple="groups" data-parsley-mincheck="2">
+                        <label class="custom-control-label" for="customCheck2">Java Developer </label>
+                      </div>
+                      <hr>
+                      <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="customCheck3"
+                          data-parsley-multiple="groups" data-parsley-mincheck="2">
+                        <label class="custom-control-label" for="customCheck3">Data Analyst senior resources</label>
+                      </div>
+                      <hr>
+                    </div>
+                  </div>
+                  <div class="tab">
+                    <h5 class="modal-title mt-4  fs-18 mb-3" id="myLargeModalLabel">Basic Details</h5>
+                    <div class="container">
+                      <div class="row">
+                        <div class="col-lg-6">
+                          <label class="form-label">Job Title </label>
+                          <input name="name" id="name" type="text" class="form-control"
+                            placeholder="How the Job position is called?" required>
+                        </div>
+                        <div class="col-lg-6">
+                          <label class="form-label">Job Type</label>
+                          <input name="name" id="name" type="text" class="form-control"
+                            placeholder="What is Type of work for the job" required>
+                        </div>
+                      </div>
+                      <div class="row mt-4">
+                        <div class="col-lg-4">
+                          <label class="form-label">Job Category </label>
+                          <input name="name" id="name" type="text" class="form-control"
+                            placeholder="How is the Job categorized?" required>
+                        </div>
+                        <div class="col-lg-4">
+                          <label class="form-label">Number of positions</label>
+                          <select class="form-control">
+                            <option>No of Vacancies</option>
+                            <option>56 Month</option>
+                            <option>5 year</option>
+                          </select>
+                        </div>
+                        <div class="col-lg-4">
+                          <label class="form-label">Job Type</label>
+                          <br />
+                          <div class="custom-controlin custom-checkbox mb-3">
+                            <input type="checkbox" class="custom-control-input" id="customCheck4"
+                              data-parsley-multiple="groups" data-parsley-mincheck="2">
+                            <label class="custom-control-label" for="customCheck4"> &nbsp;Work From Office</label>
+                          </div>
+                          <div class="custom-controlin custom-checkbox mb-3"> &nbsp;
+                            <input type="checkbox" class="custom-control-input" id="customCheck5"
+                              data-parsley-multiple="groups" data-parsley-mincheck="2">
+                            <label class="custom-control-label" for="customCheck5"> &nbsp;Hybrid</label>
+                          </div>
+                          <div class="custom-controlin custom-checkbox mb-3"> &nbsp;
+                            <input type="checkbox" class="custom-control-input" id="customCheck6"
+                              data-parsley-multiple="groups" data-parsley-mincheck="2">
+                            <label class="custom-control-label" for="customCheck6"> &nbsp;Remote Job</label>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="row mt-4">
+                        <div class="col-lg-6">
+                          <label class="form-label">Job Title </label>
+                          <textarea class="form-control" id="meassageInput" placeholder="Enter your message"
+                            name="comments" rows="3"></textarea>
+                        </div>
+                        <div class="col-lg-6">
+                          <div class="mb-4">
+                            <label class="form-label" for="inputGroupFile01">Upload Resume</label>
+                            <input type="file" class="form-control" id="inputGroupFile01">
+                            <p class="mt-3">Supports Docx,PDF</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tab">
+                    <h5 class="modal-title mt-4  fs-18 mb-3" id="myLargeModalLabel">Salary</h5>
+                    <div class="row mt-4">
+                      <div class="col-lg-4">
+                        <label class="form-label">Maximum Pay</label>
+                        <input name="name" id="name" type="text" class="form-control" placeholder="Amount" required>
+                      </div>
+                      <div class="col-lg-4">
+                        <label class="form-label">Minimum Pay</label>
+                        <input name="name" id="name" type="text" class="form-control" placeholder="Amount" required>
+                      </div>
+                      <div class="col-lg-4">
+                        <label class="form-label">Mentioned amount is</label>
+                        <br />
+                        <div class="custom-controlin custom-checkbox mb-3">
+                          <input type="checkbox" class="custom-control-input" id="customCheck7"
+                            data-parsley-multiple="groups" data-parsley-mincheck="2">
+                          <label class="custom-control-label" for="customCheck7"> &nbsp;Monthly</label>
+                        </div>
+                        <div class="custom-controlin custom-checkbox mb-3"> &nbsp;
+                          <input type="checkbox" class="custom-control-input" id="customCheck8"
+                            data-parsley-multiple="groups" data-parsley-mincheck="2">
+                          <label class="custom-control-label" for="customCheck8"> &nbsp;Yearly</label>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="row mt-4">
+                      <div class="col-lg-4">
+                        <label class="form-label">Currency</label>
+                        <select class="form-control">
+                          <option>eg Dollar $</option>
+                          <option>56 </option>
+                          <option>589</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="row mt-4">
+                      <div class="col-lg-12">
+                        <h5 class="modal-title mt-0  fs-18 mb-3" id="myLargeModalLabel">Benefits</h5>
+                      </div>
+                      <div class="col-lg-6">
+                        <label class="form-label">Job Description</label>
+                        <select class="form-control">
+                          <option>How is the job described</option>
+                          <option>How is the job described </option>
+                          <option>How is the job described</option>
+                        </select>
+                      </div>
+                      <div class="col-lg-6">
+                        <label class="form-label">Selected Benefits</label>
+                        <br />
+                        <span class="badge bg-secondary m-2 p-2">Selection One</span> <span
+                          class="badge bg-secondary m-2 p-2">Selection TWo</span> <span
+                          class="badge bg-secondary m-2 p-2"> Selection Three</span>
+                      </div>
+                    </div>
+                    <div class="row mt-4">
+                      <div class="col-lg-12">
+                        <h5 class="modal-title mt-0  fs-18 mb-3" id="myLargeModalLabel">Location</h5>
+                      </div>
+                      <div class="col-lg-4">
+                        <label class="form-label">Address line</label>
+                        <input name="name" id="name" type="text" class="form-control"
+                          placeholder="How is the job described" required>
+                      </div>
+                      <div class="col-lg-4">
+                        <label class="form-label">City</label>
+                        <input name="name" id="name" type="text" class="form-control"
+                          placeholder="How is the job described" required>
+                      </div>
+                      <div class="col-lg-4">
+                        <label class="form-label">Country</label>
+                        <input name="name" id="name" type="text" class="form-control"
+                          placeholder="How is the job described" required>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tab">
+                    <h5 class="modal-title mt-0  fs-18 mb-3" id="myLargeModalLabel">Skill Set</h5>
+                    <div class="row mt-4">
+                      <div class="col-lg-12"> </div>
+                      <div class="col-lg-6">
+                        <label class="form-label">Job Description</label>
+                        <select class="form-control">
+                          <option>What are the skills needed?</option>
+                          <option>Option one</option>
+                          <option>Option Two</option>
+                        </select>
+                      </div>
+                      <div class="col-lg-6">
+                        <label class="form-label">Selected Skills</label>
+                        <br />
+                        <span class="badge bg-secondary m-2 p-2">Selection One</span> <span
+                          class="badge bg-secondary m-2 p-2">Selection TWo</span> <span
+                          class="badge bg-secondary m-2 p-2"> Selection Three</span>
+                      </div>
+                    </div>
+                    <div class="row mt-4">
+                      <div class="col-lg-6">
+                        <label class="form-label">Professional experience Requried</label>
+                        <select class="form-control">
+                          <option>Professional Experience</option>
+                          <option>Option one</option>
+                          <option>Option Two</option>
+                        </select>
+                      </div>
+                      <div class="col-lg-6">
+                        <label class="form-label">Selected Professional Experience </label>
+                        <br />
+                        <span class="badge bg-secondary m-2 p-2">Selection One</span> <span
+                          class="badge bg-secondary m-2 p-2">Selection TWo</span> <span
+                          class="badge bg-secondary m-2 p-2"> Selection Three</span>
+                      </div>
+                    </div>
+                    <h5 class="modal-title mt-4  fs-18 mb-3" id="myLargeModalLabel">Education</h5>
+                    <div class="row mt-4">
+                      <div class="col-lg-6">
+                        <label class="form-label">Education Required</label>
+                        <select class="form-control">
+                          <option>Professional Experience</option>
+                          <option>Option one</option>
+                          <option>Option Two</option>
+                        </select>
+                      </div>
+                      <div class="col-lg-6">
+                        <label class="form-label">Selected Professional Experience </label>
+                        <br />
+                        <span class="badge bg-secondary m-2 p-2">Selection One</span> <span
+                          class="badge bg-secondary m-2 p-2">Selection TWo</span> <span
+                          class="badge bg-secondary m-2 p-2"> Selection Three</span>
+                      </div>
+                    </div>
+                    <div class="row mt-4">
+                      <div class="col-lg-6">
+                        <label class="form-label">Certification Required</label>
+                        <select class="form-control">
+                          <option>Professional Experience</option>
+                          <option>Option one</option>
+                          <option>Option Two</option>
+                        </select>
+                      </div>
+                      <div class="col-lg-6">
+                        <label class="form-label">Selected Certification </label>
+                        <br />
+                        <span class="badge bg-secondary m-2 p-2">Selection One</span> <span
+                          class="badge bg-secondary m-2 p-2">Selection TWo</span> <span
+                          class="badge bg-secondary m-2 p-2"> Selection Three</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tab">
+                    <h5 class="modal-title mt-4  fs-18 mb-3" id="myLargeModalLabel">Other Details</h5>
+                    <div class="row mt-4">
+                      <div class="col-lg-12">
+                        <label class="form-label">Other Requirements</label>
+                        <textarea class="form-control" id="meassageInput" placeholder="Enter your message"
+                          name="comments" rows="3"></textarea>
+                      </div>
+                      <div class="col-lg-12 mt-4">
+                        <label class="form-label">Application Closing Dates</label>
+                        <input class="form-control" type="date" value="2011-08-19" id="example-date-input">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="tab">
+                    <h5 class="modal-title mt-4  fs-18 mb-3" id="myLargeModalLabel">Preview</h5>
+                    <h5 class="modal-title mt-0  fs-21 mb-3" id="myLargeModalLabel">UX Designer - Junior, Google</h5>
+                    <p class="text-muted fs-15"> Our people work differently depending on their jobs and needs. From
+                      hybrid working to flexible hours, we have plenty of options that help our people to thrive.</p>
+                    <p class="text-muted fs-15 mt-2"> Our people work differently depending on their jobs and needs.
+                      From hybrid working to flexible hours, we have plenty of options that help our people to thrive.
+                    </p>
+                  </div>
+                  <div class="tab">
+                    <div class="row mt-4">
+                      <div class="col-lg-2"> </div>
+                      <div class="col-lg-8 text-center">
+                        <div class="text-center mt-4"> <img src="assets/images/suc.gif" alt=""> </div>
+                        <h5 class="modal-title mt-4  fs-18 mb-3 text-center" id="myLargeModalLabel">Your Job was posted
+                          successfully</h5>
+                        <p class="text-muted fs-15 text-center"> Lorem ipsum dolor sit amet, consectetur adipiscing
+                          elit. Mauris volutpat tortor at facilisis pretium. Sed congue viverra lectus in tempor. Nunc
+                          vel congue risus. Proin sagittis dolor quis blandit posuere.</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div style="overflow:auto;" class="mt-5">
+                    <div style="float:right;">
+                      <button class="btn btn-primary btn-hover" type="button" id="prevBtn"
+                        onclick="nextPrev(-1)">Previous</button>
+                      <button class="btn btn-primary btn-hover" type="button" id="nextBtn"
+                        onclick="nextPrev(1)">Next</button>
+                    </div>
+                  </div>
+
+                  <!-- Circles which indicates the steps of the form: -->
+                  <div style="text-align:center;margin-top:40px;"> <span class="step"></span> <span class="step"></span>
+                    <span class="step"></span> <span class="step"></span> <span class="step"></span> <span
+                      class="step"></span>
+                  </div>
+                </form>
+
+              </div>
+            </div>
+            <!-- /.modal-content -->
+          </div>
+          <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->
+
+        <div class="page-content-wrapper ">
+          <div class="container-fluid">
+  {% block body %}
+            
+            {% endblock %}
+
+			          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+  <script src="{{ asset('assets/admin/js/common.js') }}"></script>
+  <script src="{{ asset('assets/admin/js/jquery.min.js') }}"></script>
+  <script src="{{ asset('assets/admin/js/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ asset('assets/admin/js/modernizr.min.js') }}"></script>
+  <script src="{{ asset('assets/admin/js/detect.js') }}"></script>
+  <script src="{{ asset('assets/admin/js/fastclick.js') }}"></script>
+  <script src="{{ asset('assets/admin/js/jquery.slimscroll.js') }}"></script>
+  <script src="{{ asset('assets/admin/js/jquery.blockUI.js') }}"></script>
+  <script src="{{ asset('assets/admin/js/waves.js') }}"></script>
+  <script src="{{ asset('assets/admin/js/jquery.nicescroll.js') }}"></script>
+  <script src="{{ asset('assets/admin/js/jquery.scrollTo.min.js') }}"></script>
+  <script src="{{ asset('assets/admin/plugins/skycons/skycons.min.js') }}"></script>
+  <script src="{{ asset('assets/admin/plugins/peity/jquery.peity.min.js') }}"></script>
+  <script src="{{ asset('assets/admin/plugins/morris/morris.min.js') }}"></script>
+  <script src="{{ asset('assets/admin/plugins/raphael/raphael-min.js') }}"></script>
+  <script src="{{ asset('assets/admin/pages/dashboard.js') }}"></script>
+  <script src="{{ asset('assets/admin/js/app.js') }}"></script>
+  <script src="{{ asset('assets/js/scripts.js') }}"></script>
+  <script src="{{ asset('assets/libs/typeahead.bundle.js') }}"></script>
+</body>
+
+</html>

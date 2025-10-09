@@ -1,0 +1,246 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Find Resumes/CVs
+{% endblock %}
+
+{% block body %}
+	<div class="container-fluid">
+
+
+		<div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+			<div class="card-body px-4 py-3">
+				<div class="row align-items-center">
+					<div class="col-9">
+						<h4 class="fw-semibold mb-8">
+							<i class="ti ti-users fs-8 "></i>
+							Find Resumes/CVs</h4>
+						<nav aria-label="breadcrumb">
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item">
+									<a class="text-muted text-decoration-none" href="#">Find Resumes/CVs</a>
+								</li>
+								<li class="breadcrumb-item" aria-current="page">Find Resumes/CVs List</li>
+							</ol>
+						</nav>
+					</div>
+					<div class="col-3">
+						<div class="text-center mb-n5">
+							<img src="{{ asset('assets/de/images/breadcrumb/ChatBc.png') }}" alt="modernize-img" class="img-fluid mb-n4">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="container">
+
+			<div class="row">
+				<div class="col-12"></div>
+				<div class="col-md-6"></div>
+				<div class="col-md-6">
+					<div class="form-group"></div>
+				</div>
+			</div>
+
+
+		</div>
+		<div class="collapsible-section mb-4">
+			<div class="accordion accordion-flush position-relative overflow-hidden" id="accordionFlushExample">
+				<div class="accordion-item mb-3 shadow-none border rounded-top">
+					<h2 class="accordion-header" id="flush-headingOne">
+						<button class="accordion-button collapsed fs-4 fw-semibold px-3 py-6 lh-base border-0 rounded-top" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+							Quick Search
+						</button>
+					</h2>
+					<div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+						<div class="accordion-body px-3 fw-normal">
+							<div class="row">
+								<div class="col-lg-7">
+									<div class="mb-4">
+										<label for="exampleInputfirstname" class="form-label">Job Title</label>
+										<select class="form-select" aria-label="Default select example">
+											<option selected="">Choose Job Title</option>
+											<option value="1">Accountent</option>
+											<option value="2">HRM Manager</option>
+										</select>
+									</div>
+								</div>
+								<div class="col-lg-4">
+									<div class="mb-4">
+										<label for="exampleInputphoneno3" class="form-label">Search By Uploaded Date</label>
+										<input type="date" class="form-control" id="exampleInputphoneno3">
+									</div>
+								</div>
+								<div class="col-lg-4">
+									<div class="mb-4">
+										<label for="exampleInputpincode" class="form-label">Search By Last Active</label>
+										<input type="date" class="form-control" id="exampleInputpincode" placeholder="120125">
+									</div>
+								</div>
+								<div class="col-lg-4">
+									<div class="mb-4">
+										<label for="exampleInputlandmark" class="form-label">Search By Notice Period</label>
+										<input type="date" class="form-control" id="exampleInputlandmark" placeholder="Nr. Wall Street">
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="accordion-item mb-3 shadow-none border">
+					<h2 class="accordion-header" id="flush-headingTwo">
+						<button class="accordion-button collapsed fs-4 fw-semibold px-3 py-6 lh-base border-0" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseTwo" aria-expanded="false" aria-controls="flush-collapseTwo">
+							Advanced Search
+						</button>
+					</h2>
+					<div id="flush-collapseTwo" class="accordion-collapse collapse" aria-labelledby="flush-headingTwo" data-bs-parent="#accordionFlushExample">
+						<div class="accordion-body px-3 fw-normal">
+							<h5 class="fs-4 fw-semibold mb-4">Job Basic Details</h5>
+							<div class="row">
+
+								<div class="col-lg-7">
+									<div class="mb-4">
+										<label for="exampleInputfirstname" class="form-label">Job Title</label>
+										<select class="form-select" aria-label="Default select example">
+											<option selected="">Choose Job Title</option>
+											<option value="1">Accountent</option>
+											<option value="2">HRM Manager</option>
+										</select>
+									</div>
+								</div>
+								<div class="col-lg-4">
+									<div class="mb-4">
+										<label for="exampleInputphoneno3" class="form-label">Years of experience</label>
+										<input type="text" class="form-control" id="exampleInputphoneno3">
+									</div>
+								</div>
+								<div class="col-lg-4">
+									<div class="mb-4">
+										<label for="exampleInputpincode" class="form-label">Location</label>
+										<input type="text" class="form-control" id="exampleInputpincode" placeholder="120125">
+									</div>
+								</div>
+								<div class="col-lg-4">
+									<div class="mb-4">
+										<label for="exampleInputlandmark" class="form-label">Preferred location</label>
+										<input type="text" class="form-control" id="exampleInputlandmark" placeholder="Nr. Wall Street">
+									</div>
+								</div>
+							</div>
+							<h5 class="fs-4 fw-semibold mb-4">Current Role</h5>
+							<div class="row">
+								<div class="col-lg-4">
+									<div class="mb-4">
+										<label for="exampleInputphoneno3" class="form-label">Current Company</label>
+										<input type="text" class="form-control" id="exampleInputphoneno3">
+									</div>
+								</div>
+								<div class="col-lg-4">
+									<div class="mb-4">
+										<label for="exampleInputphoneno3" class="form-label">Current CTC</label>
+										<input type="text" class="form-control" id="exampleInputphoneno3">
+									</div>
+								</div>
+								<div class="col-lg-4">
+									<div class="mb-4">
+										<label for="exampleInputphoneno3" class="form-label">Current Role</label>
+										<input type="text" class="form-control" id="exampleInputphoneno3">
+									</div>
+								</div>
+							</div>
+							<h5 class="fs-4 fw-semibold mb-4">Notice Period</h5>
+							<div class="row">
+								<div class="col-lg-4">
+									<div class="mb-4">
+										<label for="exampleInputphoneno3" class="form-label">Current Serving</label>
+										<select class="form-select" aria-label="Default select example">
+											<option selected="">Service Date</option>
+										</select>
+									</div>
+								</div>
+								<div class="col-lg-4">
+									<div class="mb-4">
+										<label for="exampleInputphoneno3" class="form-label">Last Date</label>
+										<input type="date" class="form-control" id="exampleInputphoneno3">
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div
+			class="datatables">
+			<!-- start File export -->
+			<div class="card">
+				<div
+					class="card-body">
+					{# <div class="mb-2">
+																																																																												<h4 class="card-title mb-0">File export</h4>
+																																																																												<img src="data:image/png;base64,iVBORwkhzAAQAAAABJRU5ErkJggg==" alt="Placeholder Image">
+																																																																											</div> #}
+
+					<div class="card card-body">
+						<div class="table-responsive">
+							<table class="table search-table align-middle text-nowrap">
+								<thead class="header-item">
+									<th>Name</th>
+									<th>Currently Company</th>
+									<th>Education</th>
+									<th>Action</th>
+								</thead>
+								<tbody>
+									<!-- start row -->
+									<tr class="search-items">
+
+										<td>
+											<div class="d-flex align-items-center">
+												<img src="{{ asset('assets/de/images/profile/user-2.jpg') }}" alt="avatar" class="rounded-circle" width="35"/>
+												<div class="ms-3">
+													<div class="user-meta-info">
+														<h6 class="user-name mb-0" data-name="Emma Adams">Emma Adams</h6>
+														<span class="user-work fs-3" data-occupation="Web Developer">Web Developer</span>
+														<div>
+															<span class="mb-1 badge rounded-pill text-bg-light">3+ Experience</span>
+															<span class="mb-1 badge rounded-pill text-bg-light">Chennai</span>
+															<span class="mb-1 badge rounded-pill text-bg-light">Notice Period: 90 Days</span>
+														</div>
+
+													</div>
+												</div>
+											</div>
+										</td>
+										<td>
+											<span class="usr-email-addr" data-email="adams@mail.com">Extreme Media PVt. Ltd</span>
+										</td>
+										<td>
+											<span class="usr-location" data-location="Boston, USA">Education Details</span>
+										</td>
+										<td>
+											<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+												<div class="btn-group me-2 mb-2" role="group" aria-label="First group">
+													<button type="button" class="btn btn-warning">
+														<i class="ti ti-heart fs-4"></i>
+														Shortlist
+													</button>
+													<button type="button" class="btn btn-primary">
+														Schedule Interview
+													</button>
+													
+												</div>
+											</div>
+										</td>
+									</tr>
+									<!-- end row -->
+
+
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- end File export -->
+	</div>
+</div>{% endblock %}

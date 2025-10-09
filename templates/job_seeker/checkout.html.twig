@@ -1,0 +1,374 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+	Checkout & Payment
+{% endblock %}
+{% block body %}
+	<style>
+		.min-height-200 {
+			min-height: 200px;
+		}
+		.sss {
+			height: 79vh;
+		}
+
+
+		.product_image {
+			width: 100%;
+			height: 100%;
+			object-fit: fill;
+		}
+
+		.text-muted {
+			font-size: 10px;
+		}
+
+		.textmuted {
+			color: #6c757d;
+			font-size: 13px;
+		}
+
+		.fs-14 {
+			font-size: 14px;
+		}
+
+		.btn.btn-primary {
+			width: 100%;
+			height: 55px;
+			border-radius: 0;
+			padding: 13px 0;
+			background-color: black;
+			border: none;
+			font-weight: 600;
+		}
+
+		.btn.btn-primary:hover .fas {
+			transform: translateX(10px);
+			transition: transform 0.5s ease
+		}
+
+
+		.fw-900 {
+			font-weight: 900;
+		}
+
+		::placeholder {
+			font-size: 12px;
+		}
+
+		.ps-30 {
+			padding-left: 30px;
+		}
+
+		.h4 {
+			font-family: 'Work Sans', sans-serif !important;
+			font-weight: 800 !important;
+		}
+
+		.textmuted,
+		h5,
+		.text-muted {
+			font-family: 'Poppins', sans-serif;
+		}
+		.btn-outline-primary:hover {
+			background-color: #edebff !important;
+		}
+		.btn-outline-primary .open > .dropdown-toggle.btn-primary,
+		.btn-outline-primary.active,
+		.btn-outline-primary.focus,
+		.btn-outline-primary:active,
+		.btn-outline-primary:focus,
+		.btn-outline-primary:hover,
+		.btn-outline-primary:not(:disabled):not(.disabled):active,
+		.btn-outline-primary:not(:disabled):not(.disabled):active:focus {
+			color: #fff !important;
+			background: #edebff !important;
+			-webkit-box-shadow: 0 0 0 0.15rem rgb(var(--bs-primary-rgb), 50%);
+			box-shadow: 0 0 0 0.15rem rgb(var(--bs-primary-rgb), 50%);
+		}
+	</style>
+
+	<div class="page-content">
+		<section class="bg-homelogin" id="home">
+			<div class="container">
+				<div class="row align-items-center">
+					<div class="col-lg-12">
+						<div class="mb-2 pb-1 me-lg-6 text-center">
+							<h1 class="display-5 fw-semibold mb-3 mt-3 fs-22">Checkout
+							</h1>
+							{# <p class="lead text-muted mb-0 pc-da">You can use this platform to interact with employers</p> #}
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		{% set tax = ((package.cost * 5) / 100) | round(2) %}
+		{% set final = (package.cost + tax) | round(2) %}
+
+		<div class="container-fluid">
+			<div class="row m-0  justify-content-center">
+				<div class="col-lg-4 pb-5 ">
+					<div class="card">
+						<div class="card-header">
+    {% if package.name == 'Psychometric Service' %}
+        <h5 class="fs-6 fw-bold">Psychometric Test: What Job Should I Do?</h5>
+        <p>
+            You will discover your ideal career path with this personality report.
+            This assessment evaluates your cognitive skills and personality traits to
+            help identify the work environment where you are most likely to thrive.
+            Get personalized insights and make informed career decisions.
+        </p>
+    {% elseif package.class == 'psychometric_2' %}
+        <h5 class="fs-6 fw-bold">What Course Should I Choose?</h5>
+        <p>
+            You're one step away from finding the university course that truly fits you.
+            This personality report dives into your cognitive style, motivations, and
+            learning preferences to help pinpoint the academic path where you're most
+            likely to thrive. With personalized insights tailored to your strengths and
+            goals, you’ll be equipped to make confident, informed decisions about your
+            studies and future success.
+        </p>
+    {% else %}
+        <h5 class="fs-5 fw-semibold">REMINDER!</h5>
+        <p class="text-danger">
+            Remember to personalize it with your details, such as your name, contact
+            information, education, work experience, and achievements. Avoid using
+            this generic resume.
+        </p>
+    {% endif %}
+</div>
+
+						<div class="card-body">
+							<div class="row">
+								{% if package.category != "subscription" %}
+
+
+									<div class="col-12">
+										<img class="product_image" src="{{ path('profile_serve_employer_image', {'filename': package.thumbnail, 'type': 'product' }) }}" alt="">
+									</div>
+								{% endif %}
+								<div class="col-12">
+									{% if package.name != 'Psychometric Service' %}
+										<div class=" mt-4 mb-2">
+											<p class="h4 m-0">
+												<span class="pe-1">{{package.name}}</span>
+											</p>
+											<P>{{package.description}}</P>
+										</div>
+									{% endif %}
+									<div class="d-flex justify-content-between mb-2">
+										<p class="textmuted">Qty</p>
+										<p class="fs-14 fw-bold">1</p>
+									</div>
+									<div class="d-flex justify-content-between mb-2">
+										<p class="textmuted">Subtotal</p>
+										<p class="fs-14 fw-bold">
+											<span class="fas fa-dollar-sign pe-1"></span>${{package.cost|number_format(2, '.', ',')}}</p>
+									</div>
+									{# <div class="d-flex justify-content-between mb-2">
+										<p class="textmuted">Shipping</p>
+										<p class="fs-14 fw-bold">Free</p>
+									</div> #}
+									<div class="d-flex justify-content-between mb-2">
+										<p class="textmuted">Sales Tax 5%</p>
+										<p class="fs-14 fw-bold">
+											<span class="fas fa-dollar-sign px-1"></span>${{tax|number_format(2, '.', ',')}}</p>
+									</div>
+
+									<div class="d-flex justify-content-between mb-3">
+										<p class="textmuted fw-bold">Order Total</p>
+										<div class="d-flex align-text-top ">
+											<span class="fas fa-dollar-sign mt-1 pe-1 fs-14 "></span>
+											<span class="h4">${{final}}</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="col-lg-8 p-0">
+					<div class="">
+						<div class="card">
+							<div class="card-header">
+								<h5 class="fs-5 fw-semibold ">Please select the payment method you want to use to complete the purchase.</h5>
+							</div>
+							<div class="card-body">
+								<div class="row nav-tabs row" role="tablist">
+									<div class="col-lg-4 ">
+										<div class="nav-item" role="presentation">
+											<a
+												class="d-flex btn-outline-primary btn  align-items-center" href="{{ path('app_jobseeker_checkout_package', {'package': package.id}) }}">
+												{# <a class="d-flex btn-outline-primary btn  align-items-center" > #}
+												<span>
+													<i class="ti ti-gradienter fs-7"></i>
+												</span>
+												<span>
+													<img src="{{ asset('assets/images/stripe.png') }}" alt="zaad" width="200px" class="image-fluid"/>
+												</span>
+											</a>
+										</div>
+									</div>
+									<div class="col-lg-4 ">
+										<div class="nav-item ml-2 mr-2" role="presentation">
+											<a class=" btn-outline-primary btn d-flex  align-items-center" data-bs-toggle="tab" href="#edahabTab" role="tab" aria-selected="true">
+												<span>
+													<i class="ti ti-gradienter fs-7"></i>
+												</span>
+												<span>
+													<img src="{{ asset('assets/images/edahab.png') }}" alt="Zaad" width="130px" class="image-fluid"/>
+												</span>
+											</a>
+										</div>
+									</div>
+									<div class="col-lg-4 ">
+										<div class="nav-item ml-2 mr-2" role="presentation">
+											<a class=" btn-outline-primary btn d-flex  align-items-center" data-bs-toggle="tab" href="#home2" role="tab" aria-selected="true">
+												<span>
+													<i class="ti ti-gradienter fs-7"></i>
+												</span>
+												<span>
+													<img src="{{ asset('assets/images/waafi.png') }}" alt="Zaad" width="200px" class="image-fluid"/>
+												</span>
+											</a>
+										</div>
+									</div>
+
+									<ul class="nav nav-tabs button-group" role="tablist"></ul>
+
+									<div class="tab-content" data-controller="zaad">
+										<div class="tab-pane" id="home2" role="tabpanel">
+
+
+											<tr>
+												<td class="mt-4" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding-top: 10px;">
+													<p class="mt-4" style="font-size: 16px; font-weight: 400; line-height: 24px; color: #777777;">
+														Please complete the payment by filling in all the required fields carefully. Ensure that you enter the name and phone number associated with the EVC Plus, ZAAD, and Sahal Mobile Services you are using to successfully finalize the transaction.
+
+
+													</p>
+												</td>
+											</tr>
+											<div class="row justify-content-center mb-4 radio-group">
+    <div class="col-12 col-md-6">
+        <div class="radio selected mx-auto" data-value="dk">
+            <img class="img-fluid fit-image" src="{{ asset('assets/images/dd_services.jpg') }}" alt="Service">
+        </div>
+    </div>
+</div>
+
+
+											<div class="mb-4 m-3">
+												<label class="form-label" for="example-email"></label>
+												<p class="help fw-bold" stylel="font-size: 0.8em;">Please type below your EVC PLUS, Zaad or Sahal Number with the Area Code ( ex 60x xxx xxx, 61x xxx xxx, 63x xx xxxx, 68x xx xxxx)</p>
+												<div class="input-group">
+													<button type="button" class="text-black font-weight-bold btn bg-secondary-subtle text-secondary ">+252</button>
+													<input type="text" placeholder="Phone Number" required data-zaad-target="phone" class="form-control form-control-lg" aria-label="Text input with segmented dropdown button">
+												</div>
+											</div>
+											<div class="mb-3">
+												<div class="form-check">
+													<label for="termsInput" class="form-label  fs-13">Agree Terms</label>
+													<input class="form-check-input" data-checkbox="zaadPayment" type="checkbox" id="termsInput">
+												</div>
+
+												<label class="ms-2 fs-15" for="SMS">By clicking Agree terms, you agree to the
+													<a target="__blank" class="text-primary text-decoration-underline" href="{{ path("app_home_terms") }}">Terms and Conditions</a>
+													,
+													<a target="__blank" class="text-primary text-decoration-underline" href="{{ path("app_home_privacy") }}">Privacy Policy</a>
+													&amp;
+													<a target="__blank" class="text-primary text-decoration-underline" href="{{ path("app_home_refundPolicy") }}">Refund Policy</a>
+
+													of Métier  metier-quest.com
+												</label>
+
+											</div>
+											<div class="row  mt-3">
+												<div class="col-6">
+													<button data-type="jobseeker" data-status="zaadPayment" data-can="{{package.id}}" data-action="click->zaad#checkout" class="btn btn-primary mt-2">Make Payment<span class="fas fa-dollar-sign px-1"></span>${{final| number_format(2, '.', ',')}}
+													</button>
+
+												</div>
+												<div class="col-12">
+													<span class="fw-bold d-block text-dark mt-2" style="font-style: italic;">Please make sure the phone you are sending the payment from to be nearby in order to enter your PIN number to complete the transaction.</span>
+												</div>
+											</div>
+
+
+										</div>
+										<div class="tab-pane" id="edahabTab" role="tabpanel">
+											<div class="row ">
+												<div class="col-12 col-lg-6  col-md-6 mb-4 m-3">
+													<tr>
+														<td class="mt-4" align="left" style="font-family: Open Sans, Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 24px; padding-top: 10px;">
+															<p class="mt-4" style="font-size: 16px; font-weight: 400; line-height: 24px; color: #777777;">
+																Please complete the payment by filling in all the required fields carefully. Ensure that you enter the name and phone number associated with the eDahab Services you are using to successfully finalize the transaction.
+
+
+															</p>
+														</td>
+													</tr>
+												</div>
+											</div>
+											<div class="row ">
+												<div class="col-12 col-lg-6  col-md-6 mb-4 m-3">
+													<label class="form-label" for="example-email"></label>
+													<p class="help fw-bold" stylel="font-size: 0.8em;">Please type below your Edahab Number with the Area Code ( ex 62x xxx xxx, 65x xxx xxx, 66X XXX XXX)</p>
+													<div class="input-group">
+														<button type="button" class="text-black font-weight-bold btn bg-secondary-subtle text-secondary ">+252</button>
+														<input type="text" placeholder="Phone Number E.g 65xxxxxx" required data-zaad-target="edahab" class="form-control form-control-lg" aria-label="Text input with segmented dropdown button">
+													</div>
+												</div>
+
+											</div>
+											<div class="row ">
+												<div class="col-12 col-lg-6  col-md-6 mb-4 m-3">
+													<div class="form-check">
+														<label for="termsInput" class="form-label  fs-13">Agree Terms</label>
+														<input class="form-check-input" data-checkbox="edahabPayment" type="checkbox" id="termsInputEdahab">
+													</div>
+
+													<label class="ms-2 fs-15" for="SMS">By clicking Agree terms, you agree to the
+														<a target="__blank" class="text-primary text-decoration-underline" href="{{ path("app_home_terms") }}">Terms and Conditions</a>
+														,
+														<a target="__blank" class="text-primary text-decoration-underline" href="{{ path("app_home_privacy") }}">Privacy Policy</a>
+														&amp;
+														<a target="__blank" class="text-primary text-decoration-underline" href="{{ path("app_home_refundPolicy") }}">Refund Policy</a>
+
+														of Métier  metier-quest.com
+													</label>
+
+												</div>
+											</div>
+											<div class="row  mt-3">
+												<div class="col-12 col-lg-6  col-md-6 mb-4 m-3">
+													<button data-type="jobseeker" data-status="edahabPayment" data-can="{{package.id}}" data-action="click->zaad#checkout_edahab" class="btn btn-primary mt-2">Make Payment<span class="fas fa-dollar-sign px-1"></span>${{final| number_format(2, '.', ',')}}
+													</button>
+												</div>
+
+											</div>
+											<div class="row  mt-3">
+
+												<div class="col-12 col-lg-6  col-md-6 mb-4 m-3">
+													<span class="fw-bold d-block text-dark mt-2" style="font-style: italic;">Please make sure the phone you are sending the payment from to be nearby in order to enter your PIN number to complete the transaction.</span>
+												</div>
+											</div>
+
+
+										</div>
+
+
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+	</div>
+	<div class="my-5"></div>
+	{% include 'home/_footer.html.twig' %}
+{% endblock %}

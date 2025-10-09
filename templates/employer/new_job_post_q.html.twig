@@ -1,0 +1,73 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Job Questionnaire!
+{% endblock %}
+
+{% block body %}
+	<div class="container-fluid">
+
+
+		<div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+			<div class="card-body px-4 py-3">
+				<div class="row align-items-center">
+					<div class="col-9">
+						<h4 class="fw-semibold mb-8">Questionnaire</h4>
+						<nav aria-label="breadcrumb">
+							<ol class="breadcrumb">
+								<li class="breadcrumb-item">
+									<a class="text-muted text-decoration-none" href="#">Jobs</a>
+								</li>
+								<li class="breadcrumb-item" aria-current="page">Questionnaire</li>
+							</ol>
+						</nav>
+					</div>
+					<div class="col-3">
+						<div class="text-center mb-n5">
+							<img src="{{ asset('assets/de/images/breadcrumb/ChatBc.png') }}" alt="modernize-img" class="img-fluid mb-n4">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="containerss">
+
+			<div class="row">
+				<div class="col-12"></div>
+				<div class="col-md-6"></div>
+				<div class="col-md-6">
+					<div class="form-group"></div>
+				</div>
+			</div>
+
+
+		</div>
+		<div class="card">
+			<div class="card-header text-bg-primary">
+				<h5 class="mb-0 text-white">Questionnaire for JOBID: {{job.id}} Job Title: {{job.title}} </h5>
+			</div>
+			<form class="form-horizontal">
+				<div class="form-body">
+					<div class="card-body">
+						<div class="row justify-content-center">
+							<div class="col-lg-12">
+								{{ component('JobForm', {
+										        form: form,
+										        job: job
+										    }) }}
+							</div>
+						</div>
+					</div>
+					<div class="card-body">
+						<div class="row">
+							<div class="col-md-6">
+								<div class="row">
+								</div>
+							</div>
+							<div class="col-md-6"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

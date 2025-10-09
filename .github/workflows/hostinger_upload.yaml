@@ -1,0 +1,22 @@
+name: 🚀 Deploy on push production
+
+on: 
+  push:
+    branches:    
+      - master 
+    
+jobs:
+  web-deploy:
+    name: 🎉 Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📂 Deploy to server via ssh
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.host }}
+          username: ${{ secrets.hostinger_username }}
+          password: ${{ secrets.hostinger_password }}
+          port: ${{ secrets.port }}
+          script: "cd domains/systesa.net/public_html/metier && sh deploy.sh"
+# added again the commen

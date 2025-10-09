@@ -1,0 +1,107 @@
+{% extends 'base.html.twig' %}
+{% block title %}
+Purchase Reciept
+{% endblock %}
+{% block body %}
+<style>
+	.min-height-200 {
+		min-height: 200px;
+	}
+</style>
+
+<div class="page-content">
+	<section class="bg-homelogin" id="home">
+		<div class="container">
+			<div class="row align-items-center">
+				<div class="col-lg-12">
+					<div class="mb-2 pb-1 me-lg-6 text-center">
+						<h1 class="display-5 fw-semibold mb-3 mt-3 fs-22">Purchase Receipt</h1>
+						{# <p class="lead text-muted mb-0 pc-da">You can use this platform to interact with employers
+						</p> #}
+						{% if order.plan.type == "jobseeker" and order.plan.class == "branding" %}
+						<p class="lead text-muted mb-0 pc-da fs-5">Thank you for your payment.<br> Please check your
+							email to follow the
+							instructions and provide a summary of your requirements. This will help us tailor a CV,
+							cover
+							letter, and LinkedIn profile specifically for you
+						</p>
+						{% endif %}
+						{% if order.plan.type == "jobseeker" and order.plan.class == "psychometric" %}
+						<p class="lead text-muted mb-0 pc-da fs-5">Thank you for purchasing the psychometric test!<br>
+							Please click on the link
+							below or check your email to complete the questionnaire. Make sure to register with the same
+							email
+							as your Métier Quest account. Your customized report will be emailed to you within 24-72
+							hours after
+							completion. <br><br>
+							Link: <a style="font-weight: bold; font-size: 33px;" class="fw-bold  fs-33" target="__blank" href="{{ path("app_job_seeker_psychometric_test", {'order': order.id }) }}">Click here to take test</a> 
+
+						</p>
+						{% endif %}
+						{% if order.plan.type == "jobseeker" and order.plan.class == "psychometric_2" %}
+						<p class="lead text-muted mb-0 pc-da fs-5">Thank you for purchasing the psychometric test!<br>
+							Please click on the link
+							below or check your email to complete the questionnaire. Make sure to register with the same
+							email
+							as your Métier Quest account. <span class="text-primary bold">Download your customized report automatically from current open window.</span><br>
+							Link: <a style="font-weight: bold; font-size: 33px;" class="fw-bold  fs-33" target="__blank" href="{{ path("app_job_seeker_psychometric_finding_your_course", {'order': order.id }) }}">Click here to take test</a> 
+
+						</p>
+						{% endif %}
+						{% if order.plan.type == "jobseeker" and order.plan.class == "tailored" %}
+						<p class="lead text-muted mb-0 pc-da fs-5">Thank you for your payment.<br> Please check your
+							email for instructions on
+							how we can best draft your customized CV/resume for you
+						</p>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<div class="card">
+		<div class="card-body">
+			<section class="payment-method text-center body current" id="steps-uid-0-p-2" role="tabpanel"
+				aria-labelledby="steps-uid-0-h-2" aria-hidden="false" style="">
+				<h5 class="fw-semibold fs-5">Thank you for your purchase!</h5>
+
+				{# {{ order.plan.class}} #}
+				<h6 class="fw-semibold text-primary mb-7">Your order id:
+					MQ-{{order.id}}</h6>
+				<img src="{{ asset('assets/images/payment_s.gif') }}" alt="matdash-img" class="img-fluid mb-4"
+					width="350">
+				<div class="row">
+					<div class="col d-flex justify-content-center align-items-center">
+						<div class="text-center">
+							<p class="mb-0 fs-3">If you have questions about this order
+								<br>don't hesitate to contact us.
+							</p>
+
+
+
+
+							<div class="d-sm-flex align-items-center justify-content-between my-4">
+								<a href="/" class="btn btn-success d-block mb-2 mb-sm-0"><i
+										class="fa fa-arrow-left"></i> Back to home</a>
+								{% if order.plan.type == "jobseeker" and order.plan.class == "file" or order.plan.class
+								== "cover" or order.plan.class == "resume2" or order.plan.class == "resume" %}
+								<a target="__blank"
+									href="{{ path('jobseeker_download_file', {'filename': order.plan.file,'type': "product" }) }}"
+									class="btn btn-primary d-block"><i class="fa fa-download"></i> Download Template</a>
+								{% endif %}
+
+
+
+								<a target="__blank" href="{{ path('app_home_receipt', {'order': order.orderuid}) }}"
+									class="btn btn-primary d-block"><i class="fa fa-file"></i> Download Receipt</a>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</section>
+			
+		</div>
+	</div>
+</div>
+{% endblock %}
