@@ -1160,6 +1160,13 @@ public function scholarshipApplication(
         $form->remove('institute');
         $form->remove('course');
     }
+    if ($type == 't' || $type == 'h') {
+        $form->remove('literacy_level');
+        $form->remove('numeracy_level');
+        $form->remove('recent_education');
+        $form->remove('literacy_numeracy_qualification');
+       
+    }
 
     // Set default status (Applied)
     $appliedStatus = $em->getRepository(KaabaApplicationStatus::class)->find(1);

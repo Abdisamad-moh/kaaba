@@ -773,1092 +773,474 @@
 {% include 'home/_footer.html.twig' %}
 <!-- end footer -->
 
-	 <script>
-	// File upload functionality
-	document.addEventListener('DOMContentLoaded', function() {
-	    // Initialize all file drop areas
-	    const fileDropAreas = document.querySelectorAll('.file-drop-area');
-	    
-	    fileDropAreas.forEach(area => {
-	        const fileInput = area.querySelector('.file-input');
-	        const fileList = area.querySelector('.file-list');
-	        
-	        // Click to open file dialog
-	        area.addEventListener('click', function(e) {
-	            if (e.target.tagName !== 'BUTTON' && e.target.tagName !== 'SPAN') {
-	                fileInput.click();
-	            }
-	        });
-	        
-	        // Handle file selection
-	        fileInput.addEventListener('change', function(e) {
-	            handleFiles(this.files, fileList, fileInput);
-	        });
-	        
-	        // Drag and drop functionality
-	        area.addEventListener('dragover', function(e) {
-	            e.preventDefault();
-	            area.classList.add('dragover');
-	        });
-	        
-	        area.addEventListener('dragleave', function(e) {
-	            e.preventDefault();
-	            area.classList.remove('dragover');
-	        });
-	        
-	        area.addEventListener('drop', function(e) {
-	            e.preventDefault();
-	            area.classList.remove('dragover');
-	            handleFiles(e.dataTransfer.files, fileList, fileInput);
-	        });
-	    });
-	});
-	
-	function handleFiles(files, fileList, fileInput) {
-	    for (let i = 0; i < files.length; i++) {
-	        const file = files[i];
-	        addFileToList(file, fileList, fileInput);
-	    }
-	}
-	
-	function addFileToList(file, fileList, fileInput) {
-	    const fileItem = document.createElement('div');
-	    fileItem.className = 'file-item d-flex justify-content-between align-items-center';
-	    fileItem.innerHTML = `
-	        <span class="file-name">${file.name}</span>
-	        <span class="file-remove" onclick="removeFile(this)">×</span>
-	    `;
-	    fileList.appendChild(fileItem);
-	    
-	    // Store file data (you might want to handle this differently for actual upload)
-	    if (!fileInput.dataset.files) {
-	        fileInput.dataset.files = JSON.stringify([]);
-	    }
-	    const currentFiles = JSON.parse(fileInput.dataset.files);
-	    currentFiles.push(file.name);
-	    fileInput.dataset.files = JSON.stringify(currentFiles);
-	}
-	
-	function removeFile(element) {
-	    const fileItem = element.parentElement;
-	    const fileList = fileItem.parentElement;
-	    const fileInput = fileList.parentElement.querySelector('.file-input');
-	    
-	    // Remove from stored files
-	    const fileName = fileItem.querySelector('.file-name').textContent;
-	    let currentFiles = JSON.parse(fileInput.dataset.files || '[]');
-	    currentFiles = currentFiles.filter(name => name !== fileName);
-	    fileInput.dataset.files = JSON.stringify(currentFiles);
-	    
-	    fileItem.remove();
-	}
-	
-	// Enhanced file validation functions
-	function validateFileAttachments() {
-	    const fileFields = [
-	        'identity_attachment',
-	        'certificate_attachment', 
-	        'willingness_declaration_attachment',
-	        'needs_statement_attachment',
-	        'other_documents_attachment'
-	    ];
-	    
-	    let hasAtLeastOneFile = false;
-	    const emptyFileAreas = [];
-	    
-	    fileFields.forEach(fieldName => {
-	        const fileInput = document.querySelector(`[name="kaaba_application_form[${fieldName}]"]`);
-	        const fileArea = document.querySelector(`[data-field-name="${fieldName}"]`);
-	        
-	        if (fileInput && fileArea) {
-	            const fileList = fileArea.querySelector('.file-list');
-	            const hasFiles = fileList && fileList.children.length > 0;
-	            
-	            if (hasFiles) {
-	                hasAtLeastOneFile = true;
-	                // Remove error styling if files are present
-	                fileArea.classList.remove('file-area-error');
-	                const existingError = fileArea.querySelector('.file-error-message');
-	                if (existingError) {
-	                    existingError.remove();
-	                }
-	            } else {
-	                emptyFileAreas.push(fileArea);
-	            }
-	        }
-	    });
-	    
-	    // If no files found, show errors on all file areas
-	    if (!hasAtLeastOneFile && emptyFileAreas.length > 0) {
-	        emptyFileAreas.forEach(area => {
-	            area.classList.add('file-area-error');
-	            
-	            // Add error message if not already present
-	            if (!area.querySelector('.file-error-message')) {
-	                const errorDiv = document.createElement('div');
-	                errorDiv.className = 'file-error-message text-danger mt-2';
-	                errorDiv.innerHTML = '<i class="fa fa-exclamation-circle me-1"></i>At least one document is required';
-	                area.appendChild(errorDiv);
-	            }
-	        });
-	        
-	        return false;
-	    }
-	    
-	    return true;
-	}
-	// Function to update file area validation state
-	function updateFileAreaValidation(fileArea) {
-	    const fileList = fileArea.querySelector('.file-list');
-	    const hasFiles = fileList && fileList.children.length > 0;
-	    
-	    if (hasFiles) {
-	        fileArea.classList.remove('file-area-error');
-	        fileArea.classList.add('file-area-valid');
-	        
-	        const existingError = fileArea.querySelector('.file-error-message');
-	        if (existingError) {
-	            existingError.remove();
-	        }
-	    } else {
-	        fileArea.classList.remove('file-area-valid');
-	    }
-	}
-	
-	// Enhanced file handling functions
-	function handleFiles(files, fileList, fileInput) {
-	    for (let i = 0; i < files.length; i++) {
-	        const file = files[i];
-	        addFileToList(file, fileList, fileInput);
-	    }
-	    
-	    // Update validation state
-	    const fileArea = fileList.closest('.file-drop-area');
-	    updateFileAreaValidation(fileArea);
-	}
-	
-	function addFileToList(file, fileList, fileInput) {
-	    const fileItem = document.createElement('div');
-	    fileItem.className = 'file-item d-flex justify-content-between align-items-center';
-	    fileItem.innerHTML = `
-	        <span class="file-name">${file.name}</span>
-	        <span class="file-remove" onclick="removeFile(this)">×</span>
-	    `;
-	    fileList.appendChild(fileItem);
-	    
-	    // Update validation state
-	    const fileArea = fileList.closest('.file-drop-area');
-	    updateFileAreaValidation(fileArea);
-	}
-	
-	function removeFile(element) {
-	    const fileItem = element.parentElement;
-	    const fileList = fileItem.parentElement;
-	    const fileArea = fileList.closest('.file-drop-area');
-	    
-	    fileItem.remove();
-	    
-	    // Update validation state
-	    updateFileAreaValidation(fileArea);
-	}
-// Update the switchTab function to handle programmatic tab switching
-function switchTab(tabName) {
-    if (tabName === 'step2') {
-        // Validate Step 1 before proceeding - use the feedback version for user feedback
-        if (!validateStep1WithFeedback()) {
-            return false;
-        }
-    }
-    
-    const tab = new bootstrap.Tab(document.querySelector(`a[href="#${tabName}"]`));
-    tab.show();
-
-    // If switching to step 2, validate files to show current state
-    if (tabName === 'step2') {
-        setTimeout(() => {
-            validateFileAttachments();
-        }, 100);
-    }
-}
-	
-// Enhanced validation function for Step 1
-function validateStep1() {
-    let isValid = true;
-
-    // Clear previous error messages and styling
-    clearValidationErrors();
-
-    // Validate Full Name
-    const fullName = document.getElementById('{{ form.full_name.vars.id }}');
-    if (!fullName.value.trim()) {
-        isValid = false;
-    }
-    
-    // Validate Gender
-    const gender = document.getElementById('{{ form.gender.vars.id }}');
-    if (!gender.value) {
-        isValid = false;
-    }
-    
-    // Validate Phone
-    const phone = document.getElementById('{{ form.phone.vars.id }}');
-    if (!phone.value.trim()) {
-        isValid = false;
-    }
-    
-    // Validate Nationality
-    const nationality = document.getElementById('{{ form.nationality.vars.id }}');
-    if (!nationality.value) {
-        isValid = false;
-    }
-    
-    // Validate Date of Birth
-    const dateOfBirth = document.getElementById('{{ form.date_of_birth.vars.id }}');
-    if (!dateOfBirth.value) {
-        isValid = false;
-    }
-    
-    // Validate Region
-    const region = document.getElementById('{{ form.region.vars.id }}');
-    if (!region.value) {
-        isValid = false;
-    }
-    
-    // Validate Town
-    const town = document.getElementById('{{ form.town.vars.id }}');
-    if (!town.value.trim()) {
-        isValid = false;
-    }
-    
-    // Validate Disability
-    const disability = document.getElementById('{{ form.disability.vars.id }}');
-    if (!disability.value) {
-        isValid = false;
-    }
-
-    // Validate Disability Explanation (if disability is "Yes")
-    const disabilityExplanation = document.getElementById('{{ form.disability_explanation.vars.id }}');
-    if (disability.value === 'Yes' && !disabilityExplanation.value.trim()) {
-        // Make sure the explanation field is visible
-        const explanationDiv = document.getElementById('disabilityExplanation');
-        explanationDiv.style.display = 'block';
-        isValid = false;
-    }
-    
- 
-    // Only validate secondary region if it exists (scholarship type is not 'l')
-    const secondaryRegion = document.getElementById('secondary_region');
-    if (secondaryRegion && !secondaryRegion.value) {
-        isValid = false;
-    }
-
-    // Validate Identity Attachment (at least one file)
-    const identityAttachment = document.querySelector('[data-field-name="identity_attachment"]');
-    const identityFileList = identityAttachment ? identityAttachment.querySelector('.file-list') : null;
-    const hasIdentityFiles = identityFileList && identityFileList.children.length > 0;
-    
-    if (!hasIdentityFiles) {
-        isValid = false;
-    }
-    
-    // Update Next Step button state
-    updateNextStepButton(isValid);
-    // Update tab accessibility
-    updateTabAccessibility(isValid);
-
-    
-    return isValid;
-}
-
-// Function to validate and show errors only when user tries to proceed
-function validateStep1WithFeedback() {
-    let isValid = true;
-
-    // Clear previous error messages and styling
-    clearValidationErrors();
-
-    // Validate Full Name
-    const fullName = document.getElementById('{{ form.full_name.vars.id }}');
-    if (!fullName.value.trim()) {
-        showValidationError(fullName, 'Please enter your full name');
-        isValid = false;
-    }
-    
-    // Validate Gender
-    const gender = document.getElementById('{{ form.gender.vars.id }}');
-    if (!gender.value) {
-        showValidationError(gender, 'Please select your gender');
-        isValid = false;
-    }
-    
-    // Validate Phone
-    const phone = document.getElementById('{{ form.phone.vars.id }}');
-    if (!phone.value.trim()) {
-        showValidationError(phone, 'Please enter your phone number');
-        isValid = false;
-    }
-    
-    // Validate Nationality
-    const nationality = document.getElementById('{{ form.nationality.vars.id }}');
-    if (!nationality.value) {
-        showValidationError(nationality, 'Please select your nationality');
-        isValid = false;
-    }
-    
-    // Validate Date of Birth
-    const dateOfBirth = document.getElementById('{{ form.date_of_birth.vars.id }}');
-    if (!dateOfBirth.value) {
-        showValidationError(dateOfBirth, 'Please enter your date of birth');
-        isValid = false;
-    }
-    
-    // Validate Region
-    const region = document.getElementById('{{ form.region.vars.id }}');
-    if (!region.value) {
-        showValidationError(region, 'Please select your region');
-        isValid = false;
-    }
-    
-    // Validate Town
-    const town = document.getElementById('{{ form.town.vars.id }}');
-    if (!town.value.trim()) {
-        showValidationError(town, 'Please enter your town');
-        isValid = false;
-    }
-    
-    // Validate Disability
-    const disability = document.getElementById('{{ form.disability.vars.id }}');
-    if (!disability.value) {
-        showValidationError(disability, 'Please select an option for disability information');
-        isValid = false;
-    }
-
-    // Validate Disability Explanation (if disability is "Yes")
-    const disabilityExplanation = document.getElementById('{{ form.disability_explanation.vars.id }}');
-    if (disability.value === 'Yes' && !disabilityExplanation.value.trim()) {
-        // Make sure the explanation field is visible
-        const explanationDiv = document.getElementById('disabilityExplanation');
-        explanationDiv.style.display = 'block';
-        showValidationError(disabilityExplanation, 'Please provide an explanation for your disability');
-        isValid = false;
-    }
-    
-  
-    // Only validate secondary region if it exists (scholarship type is not 'l')
-    const secondaryRegion = document.getElementById('secondary_region');
-    if (secondaryRegion && !secondaryRegion.value) {
-        showValidationError(secondaryRegion, 'Please select your secondary school region');
-        isValid = false;
-    }
-
-    // Validate Identity Attachment (at least one file)
-    const identityAttachment = document.querySelector('[data-field-name="identity_attachment"]');
-    const identityFileList = identityAttachment ? identityAttachment.querySelector('.file-list') : null;
-    const hasIdentityFiles = identityFileList && identityFileList.children.length > 0;
-    
-    if (!hasIdentityFiles) {
-        // Show error on identity attachment area
-        identityAttachment.classList.add('file-area-error');
-        if (!identityAttachment.querySelector('.file-error-message')) {
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'file-error-message text-danger mt-2';
-            errorDiv.innerHTML = '<i class="fa fa-exclamation-circle me-1"></i>Identity attachment is required';
-            identityAttachment.appendChild(errorDiv);
-        }
-        isValid = false;
-    } else {
-        // Remove error if files are present
-        identityAttachment.classList.remove('file-area-error');
-        const existingError = identityAttachment.querySelector('.file-error-message');
-        if (existingError) {
-            existingError.remove();
-        }
-    }
-
-    // If validation fails, scroll to first error and show alert
-    if (!isValid) {
-        const firstError = document.querySelector('.is-invalid, .file-area-error');
-        if (firstError) {
-            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-        
-        showAlertMessage('Please complete all required fields and upload identity attachment before proceeding.', 'danger');
-    }
-    
-    return isValid;
-}
-
-
-
-// Enhanced real-time validation for fields
-function setupRealTimeValidation() {
-    const requiredFields = [
-        '{{ form.full_name.vars.id }}',
-        '{{ form.phone.vars.id }}',
-        '{{ form.town.vars.id }}',
-        '{{ form.gender.vars.id }}',
-        '{{ form.nationality.vars.id }}',
-        '{{ form.date_of_birth.vars.id }}',
-        '{{ form.region.vars.id }}',
-        '{{ form.disability.vars.id }}',
-    ];
-    
-    // Add secondary_region only if it exists
-    const secondaryRegionField = document.getElementById('secondary_region');
-    if (secondaryRegionField) {
-        requiredFields.push('secondary_region');
-    }
-    
-    requiredFields.forEach(fieldId => {
-        const field = document.getElementById(fieldId);
-        if (field) {
-            field.addEventListener('blur', function() {
-                validateStep1(); // Silent validation - just update button state
-            });
-            
-            field.addEventListener('change', function() {
-                validateStep1(); // Silent validation - just update button state
-            });
-            
-            field.addEventListener('input', function() {
-                validateStep1(); // Silent validation - just update button state
-            });
-        }
-    });
-
-
-    // Also validate when files are added/removed
-    const fileAreas = document.querySelectorAll('.file-drop-area');
-    fileAreas.forEach(area => {
-        const fileList = area.querySelector('.file-list');
-        if (fileList) {
-            // Use MutationObserver to detect file list changes
-            const observer = new MutationObserver(function() {
-                validateStep1(); // Silent validation - just update button state
-            });
-            
-            observer.observe(fileList, {
-                childList: true,
-                subtree: true
-            });
-        }
-    });
-}
-	// Function to update Next Step button state
-	function updateNextStepButton(isValid) {
-	    const nextStepButton = document.querySelector('button[onclick="switchTab(\'step2\')"]');
-	    if (nextStepButton) {
-	        if (isValid) {
-	            nextStepButton.disabled = false;
-	            nextStepButton.classList.remove('btn-disabled');
-	            nextStepButton.classList.add('btn-dark-gray');
-	        } else {
-	            nextStepButton.disabled = true;
-	            nextStepButton.classList.add('btn-disabled');
-	            nextStepButton.classList.remove('btn-dark-gray');
-	        }
-	    }
-	}
-	
-	
-	// Function to validate and show errors only when user tries to proceed
-	function validateStep1WithFeedback() {
-	    let isValid = true;
-	
-	    // Clear previous error messages and styling
-	    clearValidationErrors();
-	
-	    // Validate Full Name
-	    const fullName = document.getElementById('{{ form.full_name.vars.id }}');
-	    if (!fullName.value.trim()) {
-	        showValidationError(fullName, 'Please enter your full name');
-	        isValid = false;
-	    }
-	    
-	    // Validate Gender
-	    const gender = document.getElementById('{{ form.gender.vars.id }}');
-	    if (!gender.value) {
-	        showValidationError(gender, 'Please select your gender');
-	        isValid = false;
-	    }
-	    
-	    // Validate Phone
-	    const phone = document.getElementById('{{ form.phone.vars.id }}');
-	    if (!phone.value.trim()) {
-	        showValidationError(phone, 'Please enter your phone number');
-	        isValid = false;
-	    }
-	    
-	    // Validate Nationality
-	    const nationality = document.getElementById('{{ form.nationality.vars.id }}');
-	    if (!nationality.value) {
-	        showValidationError(nationality, 'Please select your nationality');
-	        isValid = false;
-	    }
-	    
-	    // Validate Date of Birth
-	    const dateOfBirth = document.getElementById('{{ form.date_of_birth.vars.id }}');
-	    if (!dateOfBirth.value) {
-	        showValidationError(dateOfBirth, 'Please enter your date of birth');
-	        isValid = false;
-	    }
-	    
-	    // Validate Region
-	    const region = document.getElementById('{{ form.region.vars.id }}');
-	    if (!region.value) {
-	        showValidationError(region, 'Please select your region');
-	        isValid = false;
-	    }
-	    
-	    // Validate Town
-	    const town = document.getElementById('{{ form.town.vars.id }}');
-	    if (!town.value.trim()) {
-	        showValidationError(town, 'Please enter your town');
-	        isValid = false;
-	    }
-	    
-	    // Validate Disability
-	    const disability = document.getElementById('{{ form.disability.vars.id }}');
-	    if (!disability.value) {
-	        showValidationError(disability, 'Please select an option for disability information');
-	        isValid = false;
-	    }
-	
-	    // Validate Disability Explanation (if disability is "Yes")
-	    const disabilityExplanation = document.getElementById('{{ form.disability_explanation.vars.id }}');
-	    if (disability.value === 'Yes' && !disabilityExplanation.value.trim()) {
-	        // Make sure the explanation field is visible
-	        const explanationDiv = document.getElementById('disabilityExplanation');
-	        explanationDiv.style.display = 'block';
-	        showValidationError(disabilityExplanation, 'Please provide an explanation for your disability');
-	        isValid = false;
-	    }
-	    
-	  
-	    
-	    // Validate Secondary Region
-	
-	
-	    // Validate Identity Attachment (at least one file)
-	    const identityAttachment = document.querySelector('[data-field-name="identity_attachment"]');
-	    const identityFileList = identityAttachment ? identityAttachment.querySelector('.file-list') : null;
-	    const hasIdentityFiles = identityFileList && identityFileList.children.length > 0;
-	    
-	    if (!hasIdentityFiles) {
-	        // Show error on identity attachment area
-	        identityAttachment.classList.add('file-area-error');
-	        if (!identityAttachment.querySelector('.file-error-message')) {
-	            const errorDiv = document.createElement('div');
-	            errorDiv.className = 'file-error-message text-danger mt-2';
-	            errorDiv.innerHTML = '<i class="fa fa-exclamation-circle me-1"></i>Identity attachment is required';
-	            identityAttachment.appendChild(errorDiv);
-	        }
-	        isValid = false;
-	    } else {
-	        // Remove error if files are present
-	        identityAttachment.classList.remove('file-area-error');
-	        const existingError = identityAttachment.querySelector('.file-error-message');
-	        if (existingError) {
-	            existingError.remove();
-	        }
-	    }
-	
-	    // If validation fails, scroll to first error and show alert
-	    if (!isValid) {
-	        const firstError = document.querySelector('.is-invalid, .file-area-error');
-	        if (firstError) {
-	            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-	        }
-	        
-	        showAlertMessage('Please complete all required fields and upload identity attachment before proceeding.', 'danger');
-	    }
-	    
-	    return isValid;
-	}
-	
-	// Enhanced real-time validation for fields
-function setupRealTimeValidation() {
-    const requiredFields = [
-        '{{ form.full_name.vars.id }}',
-        '{{ form.phone.vars.id }}',
-        '{{ form.town.vars.id }}',
-        '{{ form.gender.vars.id }}',
-        '{{ form.nationality.vars.id }}',
-        '{{ form.date_of_birth.vars.id }}',
-        '{{ form.region.vars.id }}',
-        '{{ form.disability.vars.id }}',
-    ];
-    
-    // Add secondary_region only if type is not 'l'
-    {% if type != 'l' %}
-    requiredFields.push('{{ form.secondary_region.vars.id }}');
-    {% endif %}
-    
-    requiredFields.forEach(fieldId => {
-        const field = document.getElementById(fieldId);
-        if (field) {
-            field.addEventListener('blur', function() {
-                validateStep1(); // Silent validation - just update button state
-            });
-            
-            field.addEventListener('change', function() {
-                validateStep1(); // Silent validation - just update button state
-            });
-            
-            field.addEventListener('input', function() {
-                validateStep1(); // Silent validation - just update button state
-            });
-        }
-    });
-
-	
-	    // Also validate when files are added/removed
-    const fileAreas = document.querySelectorAll('.file-drop-area');
-    fileAreas.forEach(area => {
-        const fileList = area.querySelector('.file-list');
-        if (fileList) {
-            // Use MutationObserver to detect file list changes
-            const observer = new MutationObserver(function() {
-                validateStep1(); // Silent validation - just update button state
-            });
-            
-            observer.observe(fileList, {
-                childList: true,
-                subtree: true
-            });
-        }
-    });
-	}
-	
-	// Enhanced tab switching function with validation
-function switchTab(tabName) {
-    if (tabName === 'step2') {
-        // Validate Step 1 before proceeding - use the feedback version for user feedback
-        if (!validateStep1WithFeedback()) {
-            return false;
-        }
-    }
-    
-    const tab = new bootstrap.Tab(document.querySelector(`a[href="#${tabName}"]`));
-    tab.show();
-
-    // If switching to step 2, validate files to show current state
-    if (tabName === 'step2') {
-        setTimeout(() => {
-            validateFileAttachments();
-        }, 100);
-    }
-}
-	// Function to show validation error
-	function showValidationError(field, message) {
-	    // Add Bootstrap invalid class
-	    field.classList.add('is-invalid');
-	    
-	    // Create or update error message
-	    let errorElement = field.parentNode.querySelector('.invalid-feedback');
-	    if (!errorElement) {
-	        errorElement = document.createElement('div');
-	        errorElement.className = 'invalid-feedback';
-	        field.parentNode.appendChild(errorElement);
-	    }
-	    errorElement.textContent = message;
-	    
-	    // Add red border styling
-	    field.style.borderColor = '#dc3545';
-	}
-	
-	// Function to clear validation errors
-	function clearValidationErrors() {
-	    // Remove invalid classes and error messages
-	    const invalidFields = document.querySelectorAll('.is-invalid');
-	    invalidFields.forEach(field => {
-	        field.classList.remove('is-invalid');
-	        field.style.borderColor = '';
-	        
-	        const errorElement = field.parentNode.querySelector('.invalid-feedback');
-	        if (errorElement) {
-	            errorElement.remove();
-	        }
-	    });
-	    
-	    // Remove alert messages
-	    const alert = document.querySelector('.validation-alert');
-	    if (alert) {
-	        alert.remove();
-	    }
-	}
-	
-	// Function to show alert message
-	function showAlertMessage(message, type = 'danger') {
-	    // Remove existing alert
-	    const existingAlert = document.querySelector('.validation-alert');
-	    if (existingAlert) {
-	        existingAlert.remove();
-	    }
-	    
-	    // Create alert
-	    const alertDiv = document.createElement('div');
-	    alertDiv.className = `alert alert-${type} validation-alert mt-3`;
-	    alertDiv.innerHTML = `
-	        <div class="d-flex align-items-center">
-	            <i class="fa fa-exclamation-circle me-2"></i>
-	            <span>${message}</span>
-	        </div>
-	    `;
-	    
-	    // Insert after the tab navigation
-	    const tabContent = document.querySelector('.tab-content');
-	    if (tabContent) {
-	        tabContent.parentNode.insertBefore(alertDiv, tabContent);
-	    }
-	}
-	
-	// Function to toggle disability explanation field
-	function toggleDisabilityExplanation(selectElement) {
-	    const explanationDiv = document.getElementById('disabilityExplanation');
-	    const explanationField = document.getElementById('{{ form.disability_explanation.vars.id }}');
-	    
-	    if (selectElement.value === 'Yes') {
-	        explanationDiv.style.display = 'block';
-	        explanationField.setAttribute('required', 'required');
-	        // Remove any inline display:none style
-	        explanationField.style.display = 'block';
-	    } else {
-	        explanationDiv.style.display = 'none';
-	        explanationField.removeAttribute('required');
-	        explanationField.value = '';
-	    }
-	}
-function loadDistricts(regionId) {
-    console.log('loadDistricts called with regionId:', regionId);
-    
-    // Get the district select element using the correct Symfony-generated ID
-    const districtSelect = document.getElementById('{{ form.district.vars.id }}');
-    
-    if (!districtSelect) {
-        console.error('District select element not found');
-        return;
-    }
-
-    if (!regionId || regionId === '') {
-        districtSelect.innerHTML = '<option value="">Select District</option>';
-        districtSelect.disabled = true;
-        return;
-    }
-
-    // Show loading state
-    districtSelect.innerHTML = '<option value="">Loading districts...</option>';
-    districtSelect.disabled = true;
-
-    // Construct the URL properly - use the current path and add query parameters
-    const currentPath = window.location.pathname;
-    const apiUrl = `${currentPath}?action=get_districts&region_id=${regionId}`;
-    
-    console.log('Making request to:', apiUrl);
-
-    fetch(apiUrl, {
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json'
-        }
-    })
-    .then(response => {
-        console.log('Response status:', response.status);
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(districts => {
-        console.log('Received districts:', districts);
-        
-        districtSelect.innerHTML = '<option value="">Select District</option>';
-        districtSelect.disabled = false;
-        
-        if (districts && districts.length > 0) {
-            districts.forEach(district => {
-                const option = document.createElement('option');
-                option.value = district.id;
-                option.textContent = district.name;
-                districtSelect.appendChild(option);
-            });
-            console.log(`Loaded ${districts.length} districts`);
-        } else {
-            console.log('No districts found for this region');
-            districtSelect.innerHTML = '<option value="">No districts available</option>';
-        }
-    })
-    .catch(error => {
-        console.error('Error loading districts:', error);
-        districtSelect.innerHTML = '<option value="">Error loading districts</option>';
-        districtSelect.disabled = false;
-    });
-}	
-	// Enhanced real-time validation for fields
-	function setupRealTimeValidation() {
-	    const requiredFields = [
-	        '{{ form.full_name.vars.id }}',
-	        '{{ form.phone.vars.id }}',
-	        '{{ form.town.vars.id }}',
-	        '{{ form.gender.vars.id }}',
-	        '{{ form.nationality.vars.id }}',
-	        '{{ form.date_of_birth.vars.id }}',
-	        '{{ form.region.vars.id }}',
-	        '{{ form.disability.vars.id }}',
-	    ];
-	    
-	    requiredFields.forEach(fieldId => {
-	        const field = document.getElementById(fieldId);
-	        if (field) {
-	            field.addEventListener('blur', function() {
-	                validateStep1(); // Silent validation - just update button state
-	            });
-	            
-	            field.addEventListener('change', function() {
-	                validateStep1(); // Silent validation - just update button state
-	            });
-	            
-	            field.addEventListener('input', function() {
-	                validateStep1(); // Silent validation - just update button state
-	            });
-	        }
-	    });
-	
-	    // Also validate when files are added/removed
-	    const fileAreas = document.querySelectorAll('.file-drop-area');
-	    fileAreas.forEach(area => {
-	        const fileList = area.querySelector('.file-list');
-	        if (fileList) {
-	            // Use MutationObserver to detect file list changes
-	            const observer = new MutationObserver(function() {
-	                validateStep1(); // Silent validation - just update button state
-	            });
-	            
-	            observer.observe(fileList, {
-	                childList: true,
-	                subtree: true
-	            });
-	        }
-	    });
-	}
-	// Enhanced form submission validation
-function validateFormSubmission() {
-    // First validate step 1
-    if (!validateStep1WithFeedback()) {
-        switchTab('step1');
-        showAlertMessage('Please complete all required fields before submitting your application.', 'danger');
-        return false;
-    }
-    
-    // Then validate file attachments
-    if (!validateFileAttachments()) {
-        switchTab('step2');
-        showAlertMessage('Please upload at least one supporting document before submitting your application.', 'danger');
-        
-        // Scroll to first file area with error
-        const firstErrorArea = document.querySelector('.file-area-error');
-        if (firstErrorArea) {
-            firstErrorArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-        return false;
-    }
-    
-    return true;
-}
-
-	// Function to update tab accessibility
-function updateTabAccessibility(isValid) {
-    const step2Tab = document.getElementById('step2-tab');
-    const step2TabLink = step2Tab.querySelector('a');
-    
-    if (isValid) {
-        // Enable the tab
-        step2TabLink.classList.remove('disabled-tab');
-        step2TabLink.style.pointerEvents = 'auto';
-        step2TabLink.style.opacity = '1';
-        step2TabLink.style.cursor = 'pointer';
-        step2TabLink.removeAttribute('tabindex');
-    } else {
-        // Disable the tab
-        step2TabLink.classList.add('disabled-tab');
-        step2TabLink.style.pointerEvents = 'none';
-        step2TabLink.style.opacity = '0.6';
-        step2TabLink.style.cursor = 'not-allowed';
-        step2TabLink.setAttribute('tabindex', '-1');
-    }
-}
-
-// Function to prevent tab switching via click
-function setupTabProtection() {
-    const step2Tab = document.getElementById('step2-tab');
-    const step2TabLink = step2Tab.querySelector('a');
-    
-    step2TabLink.addEventListener('click', function(e) {
-        if (this.classList.contains('disabled-tab')) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // Show validation message
-            showAlertMessage('Please complete all required fields in Step 1 before accessing Supporting Documents.', 'warning');
-            
-            // Scroll to first error if any
-            const firstError = document.querySelector('.is-invalid, .file-area-error');
-            if (firstError) {
-                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+	  <script>
+        // Application Form Manager
+        class ApplicationFormManager {
+            constructor() {
+                this.init();
             }
-            return false;
-        }
-    });
-}
-	
-	
-	
-// Initialize when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    // Clear any existing validation messages on page load
-    clearValidationErrors();
-    
-    // Get the region select element using the correct Symfony-generated ID
-    const regionSelect = document.getElementById('{{ form.region.vars.id }}');
-    
-    if (!regionSelect) {
-        return;
-    }
-    
-    // Get the district select element
-    const districtSelect = document.getElementById('{{ form.district.vars.id }}');
-    
-    // If a region is already selected, load its districts
-    if (regionSelect && regionSelect.value) {
-        loadDistricts(regionSelect.value);
-    } else {
-        console.log('No region pre-selected');
-        // Disable district select initially
-        if (districtSelect) {
-            districtSelect.innerHTML = '<option value="">Select region first</option>';
-            districtSelect.disabled = true;
-        }
-    }
-    
-    // Add event listener for region changes
-    regionSelect.addEventListener('change', function() {
-        loadDistricts(this.value);
-    });
-    
-    // Setup real-time validation
-    setupRealTimeValidation();
-    
-    // Setup tab protection
-    setupTabProtection();
 
-    // Run initial validation to set button state (silent - no messages)
-    validateStep1();
+            init() {
+                this.setupFileUpload();
+                this.setupRealTimeValidation();
+                this.setupTabProtection();
+                this.setupLanguageSwitcher();
+                this.initializeFormState();
+            }
 
-    // Initialize file area validation state
-    const fileAreas = document.querySelectorAll('.file-drop-area');
-    fileAreas.forEach(area => {
-        updateFileAreaValidation(area);
-    });
-
-    // Initialize disability explanation toggle
-    const disabilitySelect = document.getElementById('{{ form.disability.vars.id }}');
-    if (disabilitySelect) {
-        // Set initial state
-        toggleDisabilityExplanation(disabilitySelect);
-        
-        // Add event listener for changes
-        disabilitySelect.addEventListener('change', function() {
-            toggleDisabilityExplanation(this);
-            validateStep1(); // Silent validation - just update button state
-        });
-    }
-});
-
-	</script>
-
-
-		 <script src="{{ asset('assets/js/jquery.js') }}"></script>
-		 <script src="{{ asset('assets/js/vendors.min.js') }}"></script>
-		 <script src="{{ asset('assets/js/main.js') }}"></script>
-		 <script>
-		
-	function submitApplication() {
-    var form = document.getElementById('register_form');
-    
-    // Run our custom validation first
-    if (!validateFormSubmission()) {
-        return false;
-    }
-    
-    // If validation passes, submit the form only once
-    if (form.reportValidity()) {
-        // Disable the submit button to prevent double submission
-        const submitBtn = document.getElementById('submitBtn');
-        if (submitBtn) {
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = 'Submitting...';
-        }
-        
-        // Submit the form
-        form.submit();
-    }
-}
-				</script>
-
-		 {# <script src="https://www.google.com/recaptcha/api.js" async defer></script> #}
-
-         <script>
-// Language switching functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const languageButtons = document.querySelectorAll('.language-btn');
-    
-    languageButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const lang = this.getAttribute('data-lang');
-            
-            fetch(`/change-language/${lang}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Update active button
-                    languageButtons.forEach(btn => btn.classList.remove('active'));
-                    this.classList.add('active');
+            // File Upload Management
+            setupFileUpload() {
+                const fileDropAreas = document.querySelectorAll('.file-drop-area');
+                
+                fileDropAreas.forEach(area => {
+                    const fileInput = area.querySelector('.file-input');
+                    const fileList = area.querySelector('.file-list');
                     
-                    // Reload the page to apply translations
-                    location.reload();
+                    // Click to open file dialog
+                    area.addEventListener('click', (e) => {
+                        if (!e.target.closest('button') && !e.target.closest('.file-remove')) {
+                            fileInput.click();
+                        }
+                    });
+                    
+                    // Handle file selection
+                    fileInput.addEventListener('change', (e) => {
+                        this.handleFiles(e.target.files, fileList, fileInput);
+                    });
+                    
+                    // Drag and drop functionality
+                    area.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        area.classList.add('dragover');
+                    });
+                    
+                    area.addEventListener('dragleave', (e) => {
+                        e.preventDefault();
+                        area.classList.remove('dragover');
+                    });
+                    
+                    area.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        area.classList.remove('dragover');
+                        this.handleFiles(e.dataTransfer.files, fileList, fileInput);
+                    });
+                });
+            }
+
+            handleFiles(files, fileList, fileInput) {
+                for (let file of files) {
+                    this.addFileToList(file, fileList, fileInput);
                 }
-            })
-            .catch(error => {
-                console.error('Error changing language:', error);
-            });
+            }
+
+            addFileToList(file, fileList, fileInput) {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <span class="file-name">${file.name}</span>
+                    <span class="file-remove" onclick="appFormManager.removeFile(this)">×</span>
+                `;
+                fileList.appendChild(fileItem);
+                
+                this.updateFileAreaValidation(fileList.closest('.file-drop-area'));
+                this.validateStep1();
+            }
+
+            removeFile(element) {
+                const fileItem = element.parentElement;
+                const fileArea = fileItem.closest('.file-drop-area');
+                fileItem.remove();
+                this.updateFileAreaValidation(fileArea);
+                this.validateStep1();
+            }
+
+            updateFileAreaValidation(fileArea) {
+                const fileList = fileArea.querySelector('.file-list');
+                const hasFiles = fileList && fileList.children.length > 0;
+                
+                fileArea.classList.toggle('file-area-error', !hasFiles);
+                fileArea.classList.toggle('file-area-valid', hasFiles);
+                
+                const existingError = fileArea.querySelector('.file-error-message');
+                if (existingError && hasFiles) {
+                    existingError.remove();
+                }
+            }
+
+            // Validation Management
+            setupRealTimeValidation() {
+                const requiredFields = [
+                    '{{ form.full_name.vars.id }}',
+                    '{{ form.phone.vars.id }}',
+                    '{{ form.town.vars.id }}',
+                    '{{ form.gender.vars.id }}',
+                    '{{ form.nationality.vars.id }}',
+                    '{{ form.date_of_birth.vars.id }}',
+                    '{{ form.region.vars.id }}',
+                    '{{ form.disability.vars.id }}',
+                ];
+
+                {% if type != 'l' %}
+                requiredFields.push('{{ form.secondary_region.vars.id }}');
+                {% endif %}
+
+                requiredFields.forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (field) {
+                        ['blur', 'change', 'input'].forEach(event => {
+                            field.addEventListener(event, () => this.validateStep1());
+                        });
+                    }
+                });
+
+                // Monitor file changes
+                const fileLists = document.querySelectorAll('.file-list');
+                fileLists.forEach(list => {
+                    const observer = new MutationObserver(() => this.validateStep1());
+                    observer.observe(list, { childList: true });
+                });
+            }
+
+            validateStep1() {
+                const requiredFields = {
+                    '{{ form.full_name.vars.id }}': 'Full name is required',
+                    '{{ form.gender.vars.id }}': 'Gender is required',
+                    '{{ form.phone.vars.id }}': 'Phone number is required',
+                    '{{ form.nationality.vars.id }}': 'Nationality is required',
+                    '{{ form.date_of_birth.vars.id }}': 'Date of birth is required',
+                    '{{ form.region.vars.id }}': 'Region is required',
+                    '{{ form.town.vars.id }}': 'Town is required',
+                    '{{ form.disability.vars.id }}': 'Disability information is required'
+                };
+
+                {% if type != 'l' %}
+                requiredFields['{{ form.secondary_region.vars.id }}'] = 'Secondary school region is required';
+                {% endif %}
+
+                let isValid = true;
+
+                // Clear previous errors
+                this.clearValidationErrors();
+
+                // Validate fields
+                for (const [fieldId, message] of Object.entries(requiredFields)) {
+                    const field = document.getElementById(fieldId);
+                    if (field && !field.value.trim()) {
+                        isValid = false;
+                    }
+                }
+
+                // Validate disability explanation
+                const disabilityField = document.getElementById('{{ form.disability.vars.id }}');
+                const disabilityExplanation = document.getElementById('{{ form.disability_explanation.vars.id }}');
+                if (disabilityField && disabilityField.value === 'Yes' && 
+                    disabilityExplanation && !disabilityExplanation.value.trim()) {
+                    isValid = false;
+                }
+
+                // Validate identity attachment
+                const identityArea = document.querySelector('[data-field-name="identity_attachment"]');
+                const hasIdentityFiles = identityArea && 
+                    identityArea.querySelector('.file-list') && 
+                    identityArea.querySelector('.file-list').children.length > 0;
+                
+                if (!hasIdentityFiles) {
+                    isValid = false;
+                }
+
+                this.updateNextStepButton(isValid);
+                this.updateTabAccessibility(isValid);
+
+                return isValid;
+            }
+
+            validateStep1WithFeedback() {
+                if (!this.validateStep1()) {
+                    this.showAlertMessage('Please complete all required fields before proceeding.', 'danger');
+                    const firstError = document.querySelector('.is-invalid, .file-area-error');
+                    if (firstError) {
+                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                    return false;
+                }
+                return true;
+            }
+
+            validateFileAttachments() {
+                const fileFields = [
+                    'identity_attachment',
+                    'certificate_attachment', 
+                    'willingness_declaration_attachment',
+                    'needs_statement_attachment',
+                    'other_documents_attachment'
+                ];
+                
+                let hasAtLeastOneFile = false;
+                
+                fileFields.forEach(fieldName => {
+                    const fileArea = document.querySelector(`[data-field-name="${fieldName}"]`);
+                    if (fileArea) {
+                        const fileList = fileArea.querySelector('.file-list');
+                        const hasFiles = fileList && fileList.children.length > 0;
+                        
+                        if (hasFiles) {
+                            hasAtLeastOneFile = true;
+                            fileArea.classList.remove('file-area-error');
+                        } else {
+                            fileArea.classList.add('file-area-error');
+                        }
+                    }
+                });
+                
+                if (!hasAtLeastOneFile) {
+                    this.showAlertMessage('Please upload at least one supporting document.', 'danger');
+                    return false;
+                }
+                
+                return true;
+            }
+
+            // UI Management
+            updateNextStepButton(isValid) {
+                const nextStepButton = document.getElementById('nextStepButton');
+                if (nextStepButton) {
+                    nextStepButton.disabled = !isValid;
+                    nextStepButton.classList.toggle('btn-disabled', !isValid);
+                }
+            }
+
+            updateTabAccessibility(isValid) {
+                const step2Tab = document.getElementById('step2-tab');
+                if (step2Tab) {
+                    step2Tab.classList.toggle('disabled-tab', !isValid);
+                    step2Tab.style.pointerEvents = isValid ? 'auto' : 'none';
+                    step2Tab.style.opacity = isValid ? '1' : '0.6';
+                }
+            }
+
+            setupTabProtection() {
+                const step2Tab = document.getElementById('step2-tab');
+                if (step2Tab) {
+                    step2Tab.addEventListener('click', (e) => {
+                        if (step2Tab.classList.contains('disabled-tab')) {
+                            e.preventDefault();
+                            this.showAlertMessage('Please complete all required fields in Step 1 first.', 'warning');
+                        }
+                    });
+                }
+            }
+
+            // Form Operations
+            switchTab(tabName) {
+                if (tabName === 'step2' && !this.validateStep1WithFeedback()) {
+                    return false;
+                }
+                
+                const tab = new bootstrap.Tab(document.querySelector(`a[href="#${tabName}"]`));
+                tab.show();
+
+                if (tabName === 'step2') {
+                    setTimeout(() => this.validateFileAttachments(), 100);
+                }
+            }
+
+            submitApplication() {
+                if (!this.validateStep1WithFeedback() || !this.validateFileAttachments()) {
+                    return false;
+                }
+                
+                const form = document.getElementById('register_form');
+                const submitBtn = document.getElementById('submitBtn');
+                
+                if (form.reportValidity()) {
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = 'Submitting... <i class="fa-solid fa-spinner fa-spin ms-2"></i>';
+                    }
+                    form.submit();
+                }
+            }
+
+            // Utility Methods
+            clearValidationErrors() {
+                document.querySelectorAll('.is-invalid').forEach(field => {
+                    field.classList.remove('is-invalid');
+                });
+                
+                const alert = document.querySelector('.validation-alert');
+                if (alert) {
+                    alert.remove();
+                }
+            }
+
+            showAlertMessage(message, type = 'danger') {
+                const existingAlert = document.querySelector('.validation-alert');
+                if (existingAlert) {
+                    existingAlert.remove();
+                }
+                
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type} validation-alert mt-3 alert-modern`;
+                alertDiv.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <i class="fa fa-exclamation-circle me-2"></i>
+                        <span>${message}</span>
+                    </div>
+                `;
+                
+                const tabContent = document.querySelector('.tab-content');
+                if (tabContent) {
+                    tabContent.parentNode.insertBefore(alertDiv, tabContent);
+                }
+            }
+
+            // Language Switcher
+            setupLanguageSwitcher() {
+                document.querySelectorAll('.language-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const lang = e.target.getAttribute('data-lang');
+                        fetch(`/change-language/${lang}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    document.querySelectorAll('.language-btn').forEach(b => b.classList.remove('active'));
+                                    e.target.classList.add('active');
+                                    location.reload();
+                                }
+                            })
+                            .catch(error => console.error('Error changing language:', error));
+                    });
+                });
+            }
+
+            // Initialization
+            initializeFormState() {
+                this.clearValidationErrors();
+                this.initializeRegionDistrict();
+                this.initializeDisabilityToggle();
+                this.validateStep1();
+
+                // Initialize file area validation state
+                document.querySelectorAll('.file-drop-area').forEach(area => {
+                    this.updateFileAreaValidation(area);
+                });
+            }
+
+            initializeRegionDistrict() {
+                const regionSelect = document.getElementById('{{ form.region.vars.id }}');
+                const districtSelect = document.getElementById('{{ form.district.vars.id }}');
+                
+                if (regionSelect && regionSelect.value) {
+                    this.loadDistricts(regionSelect.value);
+                } else if (districtSelect) {
+                    districtSelect.innerHTML = '<option value="">Select region first</option>';
+                    districtSelect.disabled = true;
+                }
+
+                if (regionSelect) {
+                    regionSelect.addEventListener('change', (e) => {
+                        this.loadDistricts(e.target.value);
+                    });
+                }
+            }
+
+            initializeDisabilityToggle() {
+                const disabilitySelect = document.getElementById('{{ form.disability.vars.id }}');
+                if (disabilitySelect) {
+                    this.toggleDisabilityExplanation(disabilitySelect);
+                    disabilitySelect.addEventListener('change', (e) => {
+                        this.toggleDisabilityExplanation(e.target);
+                        this.validateStep1();
+                    });
+                }
+            }
+
+            toggleDisabilityExplanation(selectElement) {
+                const explanationDiv = document.getElementById('disabilityExplanation');
+                const explanationField = document.getElementById('{{ form.disability_explanation.vars.id }}');
+                
+                if (selectElement.value === 'Yes') {
+                    explanationDiv.style.display = 'block';
+                    explanationField.setAttribute('required', 'required');
+                } else {
+                    explanationDiv.style.display = 'none';
+                    explanationField.removeAttribute('required');
+                    explanationField.value = '';
+                }
+            }
+
+            // API Calls
+            loadDistricts(regionId) {
+                const districtSelect = document.getElementById('{{ form.district.vars.id }}');
+                if (!districtSelect) return;
+
+                if (!regionId) {
+                    districtSelect.innerHTML = '<option value="">Select District</option>';
+                    districtSelect.disabled = true;
+                    return;
+                }
+
+                districtSelect.innerHTML = '<option value="">Loading districts...</option>';
+                districtSelect.disabled = true;
+
+                const currentPath = window.location.pathname;
+                const apiUrl = `${currentPath}?action=get_districts&region_id=${regionId}`;
+
+                fetch(apiUrl, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                })
+                .then(districts => {
+                    districtSelect.innerHTML = '<option value="">Select District</option>';
+                    districtSelect.disabled = false;
+                    
+                    if (districts && districts.length > 0) {
+                        districts.forEach(district => {
+                            const option = document.createElement('option');
+                            option.value = district.id;
+                            option.textContent = district.name;
+                            districtSelect.appendChild(option);
+                        });
+                    } else {
+                        districtSelect.innerHTML = '<option value="">No districts available</option>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading districts:', error);
+                    districtSelect.innerHTML = '<option value="">Error loading districts</option>';
+                    districtSelect.disabled = false;
+                });
+            }
+        }
+
+        // Global functions for inline event handlers
+        function toggleDisabilityExplanation(select) {
+            appFormManager.toggleDisabilityExplanation(select);
+        }
+
+        function switchTab(tabName) {
+            appFormManager.switchTab(tabName);
+        }
+
+        function submitApplication() {
+            appFormManager.submitApplication();
+        }
+
+        // Initialize application when DOM is loaded
+        let appFormManager;
+        document.addEventListener('DOMContentLoaded', function() {
+            appFormManager = new ApplicationFormManager();
         });
-    });
-});
+    </script>
 
-// Existing functions for your form
-function toggleDisabilityExplanation(select) {
-    const explanationDiv = document.getElementById('disabilityExplanation');
-    if (select.value === 'Yes') {
-        explanationDiv.style.display = 'block';
-    } else {
-        explanationDiv.style.display = 'none';
-    }
-}
-
-function switchTab(tabName) {
-    const tab = new bootstrap.Tab(document.querySelector(`[href="#${tabName}"]`));
-    tab.show();
-}
-
-function validateFormSubmission() {
-    // Your existing validation logic
-    document.getElementById('register_form').submit();
-}
-</script>
+    <script src="{{ asset('assets/js/jquery.js') }}"></script>
+    <script src="{{ asset('assets/js/vendors.min.js') }}"></script>
+    <script src="{{ asset('assets/js/main.js') }}"></script>
 	</body>
 </html>
