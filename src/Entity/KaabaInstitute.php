@@ -35,6 +35,12 @@ class KaabaInstitute
     #[ORM\OneToMany(targetEntity: KaabaCourse::class, mappedBy: 'institute')]
     private Collection $kaabaCourses;
 
+
+ #[ORM\ManyToOne(inversedBy: 'institutes')]
+    #[ORM\JoinColumn(nullable: true)] // Institute MUST belong to a scholarship
+    private ?KaabaScholarship $scholarship = null;
+
+
     public function __construct()
     {
         $this->kaabaApplications = new ArrayCollection();
@@ -126,6 +132,19 @@ class KaabaInstitute
                 $kaabaCourse->setInstitute(null);
             }
         }
+
+        return $this;
+    }
+
+
+  public function getScholarship(): ?KaabaScholarship
+    {
+        return $this->scholarship;
+    }
+
+    public function setScholarship(?KaabaScholarship $scholarship): static
+    {
+        $this->scholarship = $scholarship;
 
         return $this;
     }

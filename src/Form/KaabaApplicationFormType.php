@@ -50,6 +50,9 @@ class KaabaApplicationFormType extends AbstractType
             'mimeTypesMessage' => 'Please upload a valid document (PDF, JPG, PNG, DOC, DOCX).',
         ];
 
+ // Get filtered institutes from options
+        $institutes = $options['institutes'] ?? [];
+
         $builder
             ->add('full_name', TextType::class, [
                 'label' => $this->translator->trans('full_name'),
@@ -131,15 +134,15 @@ class KaabaApplicationFormType extends AbstractType
                     new NotBlank(['message' => 'Please select an option for disability information.'])
                 ]
             ])
-            ->add('disability_explanation', TextareaType::class, [
-                'label' => $this->translator->trans('disability_explanation'),
-                'required' => false,
-                'attr' => [
-                    'class' => 'form-control border border-dark rounded-0',
-                    'placeholder' => $this->translator->trans('disability_explanation_placeholder'),
-                    'rows' => 4,
-                ]
-            ])
+            // ->add('disability_explanation', TextareaType::class, [
+            //     'label' => $this->translator->trans('disability_explanation'),
+            //     'required' => false,
+            //     'attr' => [
+            //         'class' => 'form-control border border-dark rounded-0',
+            //         'placeholder' => $this->translator->trans('disability_explanation_placeholder'),
+            //         'rows' => 4,
+            //     ]
+            // ])
             ->add('identity_type', EntityType::class, [
                 'class' => KaabaIdentityType::class,
                 'choice_label' => 'name',
@@ -337,7 +340,9 @@ class KaabaApplicationFormType extends AbstractType
                 'class' => KaabaInstitute::class,
                 'choice_label' => 'name',
                 'label' => $this->translator->trans('institute'),
-                'required' => false, // Changed to false
+                'required' => false,
+                'placeholder' => $this->translator->trans('institute'),
+                'choices' => $institutes, // Use filtered institutes
                 'attr' => [
                     'class' => 'form-select'
                 ]
@@ -421,6 +426,7 @@ class KaabaApplicationFormType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => KaabaApplication::class,
+ 'institutes' => [], // Add institutes as an option
         ]);
     }
 }

@@ -1135,8 +1135,13 @@ public function scholarshipApplication(
     $application = new KaabaApplication();
     $application->setScholarship($scholarship);
     
-    // Create form
-    $form = $this->createForm(KaabaApplicationFormType::class, $application);
+    // Get institutes that belong to this scholarship
+    $scholarshipInstitutes = $scholarship->getInstitutes();
+
+    // Create form with filtered institutes
+    $form = $this->createForm(KaabaApplicationFormType::class, $application, [
+        'institutes' => $scholarshipInstitutes // Pass filtered institutes to form
+    ]);
     
     // Get scholarship type
     $type = $scholarship->getType();
@@ -1165,7 +1170,6 @@ public function scholarshipApplication(
         $form->remove('numeracy_level');
         $form->remove('recent_education');
         $form->remove('literacy_numeracy_qualification');
-       
     }
 
     // Set default status (Applied)
@@ -1174,26 +1178,52 @@ public function scholarshipApplication(
         $application->setStatus($appliedStatus);
     }
 
-    // Handle AJAX request for districts
-    if ($request->isXmlHttpRequest() && $request->query->get('action') === 'get_districts') {
-        $regionId = $request->query->get('region_id');
-        $region = $regionRepository->find($regionId);
+    // Handle AJAX requests
+    if ($request->isXmlHttpRequest()) {
+        $action = $request->query->get('action');
+        
+        if ($action === 'get_districts') {
+            $regionId = $request->query->get('region_id');
+            $region = $regionRepository->find($regionId);
 
-        if (!$region) {
-            return new JsonResponse([]);
+            if (!$region) {
+                return new JsonResponse([]);
+            }
+
+            $districts = $districtRepository->findBy(['region' => $region]);
+            $districtArray = [];
+
+            foreach ($districts as $district) {
+                $districtArray[] = [
+                    'id' => $district->getId(),
+                    'name' => $district->getName()
+                ];
+            }
+
+            return new JsonResponse($districtArray);
         }
+        
+        // Handle AJAX request for courses by institute
+        if ($action === 'get_courses') {
+            $instituteId = $request->query->get('institute_id');
+            $institute = $instituteRepository->find($instituteId);
 
-        $districts = $districtRepository->findBy(['region' => $region]);
-        $districtArray = [];
+            if (!$institute) {
+                return new JsonResponse([]);
+            }
 
-        foreach ($districts as $district) {
-            $districtArray[] = [
-                'id' => $district->getId(),
-                'name' => $district->getName()
-            ];
+            $courses = $courseRepository->findBy(['institute' => $institute]);
+            $courseArray = [];
+
+            foreach ($courses as $course) {
+                $courseArray[] = [
+                    'id' => $course->getId(),
+                    'name' => $course->getName()
+                ];
+            }
+
+            return new JsonResponse($courseArray);
         }
-
-        return new JsonResponse($districtArray);
     }
 
     $form->handleRequest($request);
@@ -1210,49 +1240,49 @@ public function scholarshipApplication(
             ];
 
             foreach ($fileFields as $field) {
-        if ($form->has($field)) {
+                if ($form->has($field)) {
+                    $file = $form->get($field)->getData();
+                    
+                    if ($file) {
+                        // Validate file type and size
+                        $allowedMimeTypes = [
+                            'application/pdf',
+                            'image/jpeg',
+                            'image/png',
+                            'image/jpg',
+                            'application/msword',
+                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                        ];
+                        
+                        $fileMimeType = $file->getMimeType();
+                        
+                        if (!in_array($fileMimeType, $allowedMimeTypes)) {
+                            $this->addFlash('error', 'Invalid file type for ' . $field . '. Allowed types: PDF, JPG, PNG, DOC, DOCX.');
+                            return $this->redirectToRoute('app_scholarship_application', ['uuid' => $uuid]);
+                        }
+                        
+                        if ($file->getSize() > 20 * 1024 * 1024) { // 20MB limit
+                            $this->addFlash('error', 'File too large for ' . $field . '. Maximum size is 20MB.');
+                            return $this->redirectToRoute('app_scholarship_application', ['uuid' => $uuid]);
+                        }
 
-                $file = $form->get($field)->getData();
-                
-                if ($file) {
-                    // Validate file type and size
-                    $allowedMimeTypes = [
-                        'application/pdf',
-                        'image/jpeg',
-                        'image/png',
-                        'image/jpg',
-                        'application/msword',
-                        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-                    ];
-                    
-                    $fileMimeType = $file->getMimeType();
-                    
-                    if (!in_array($fileMimeType, $allowedMimeTypes)) {
-                        $this->addFlash('error', 'Invalid file type for ' . $field . '. Allowed types: PDF, JPG, PNG, DOC, DOCX.');
-                        return $this->redirectToRoute('app_scholarship_application', ['uuid' => $uuid]);
+                        // Generate unique filename
+                        $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+                        $safeFilename = transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $originalFilename);
+                        $newFilename = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
+
+                        // Move file to uploads directory
+                        $file->move(
+                            $this->getParameter('application_attachments'),
+                            $newFilename
+                        );
+
+                        // Set filename in entity
+                        $setter = 'set' . str_replace('_', '', ucwords($field, '_'));
+                        $application->$setter($newFilename);
                     }
-                    
-                    if ($file->getSize() > 20 * 1024 * 1024) { // 20MB limit
-                        $this->addFlash('error', 'File too large for ' . $field . '. Maximum size is 20MB.');
-                        return $this->redirectToRoute('app_scholarship_application', ['uuid' => $uuid]);
-                    }
-
-                    // Generate unique filename
-                    $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-                    $safeFilename = transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $originalFilename);
-                    $newFilename = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
-
-                    // Move file to uploads directory
-                    $file->move(
-                        $this->getParameter('application_attachments'),
-                        $newFilename
-                    );
-
-                    // Set filename in entity
-                    $setter = 'set' . str_replace('_', '', ucwords($field, '_'));
-                    $application->$setter($newFilename);
-                }
-            } }
+                } 
+            }
 
             $em->persist($application);
             $em->flush();
@@ -1261,9 +1291,7 @@ public function scholarshipApplication(
             return $this->redirectToRoute('app_home');
 
         } catch (\Exception $e) {
-            // $this->addFlash('error', 'An error occurred while uploading files. Please try again.');
-    $this->addFlash('error', 'An error occurred: ' . $e->getMessage());
-
+            $this->addFlash('error', 'An error occurred: ' . $e->getMessage());
         }
     }
 
@@ -1271,7 +1299,7 @@ public function scholarshipApplication(
     $regions = $regionRepository->findAll();
     $genders = $genderRepository->findAll();
     $nationalities = $nationalityRepository->findAll();
-    $institutes = $instituteRepository->findAll();
+    $institutes = $scholarshipInstitutes; // Use the filtered institutes
     $qualifications = $qualificationRepository->findAll();
     $courses = $courseRepository->findAll();
     $identityTypes = $identityTypeRepository->findAll();

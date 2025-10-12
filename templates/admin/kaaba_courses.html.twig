@@ -46,6 +46,28 @@
                 <div class="card-body">
                     {{ form_start(form) }}
                     <div class="row">
+                        <!-- Institute Selection -->
+                        <div class="col-md-8 mb-3">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3 col-form-label">
+                                    {{ form_label(form.institute) }}
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="col-md-9">
+                                    {{ form_widget(form.institute, { 
+                                        'attr': { 
+                                            'class': 'form-select',
+                                        } 
+                                    }) }}
+                                    {{ form_errors(form.institute) }}
+                                    <small class="form-text text-muted">
+                                        Select the institute that offers this course
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Course Name -->
                         <div class="col-md-8 mb-3">
                             <div class="form-group row">
                                 <label class="form-label text-end col-md-3 col-form-label">
@@ -112,7 +134,9 @@
                         <tr>
                             <th width="50">#</th>
                             <th width="120">UUID</th>
+                            <th>Institute</th>
                             <th>Course Name</th>
+                            <th width="150">Used By Applications</th>
                             <th width="200" class="text-center">Actions</th>
                         </tr>
                     </thead>
@@ -126,8 +150,35 @@
                                     </small>
                                 </td>
                                 <td>
+                                    {% if course.institute %}
+                                        <span class="badge bg-info" title="{{ course.institute.name }}">
+                                            <i class="ti ti-school me-1"></i>
+                                            {{ course.institute.name|length > 30 ? course.institute.name|slice(0, 30) ~ '...' : course.institute.name }}
+                                        </span>
+                                        {% if course.institute.scholarship %}
+                                            <br>
+                                            <small class="text-muted" title="{{ course.institute.scholarship.title }}">
+                                                <i class="ti ti-award me-1"></i>
+                                                {{ course.institute.scholarship.title|length > 25 ? course.institute.scholarship.title|slice(0, 25) ~ '...' : course.institute.scholarship.title }}
+                                            </small>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="badge bg-secondary">
+                                            <i class="ti ti-school-off me-1"></i>
+                                            No Institute
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
                                     <strong>{{ course.name }}</strong>
                                 </td>
+                               <td>
+    {% set applicationsCount = course.kaabaApplications|length %}
+    <span class="badge {% if applicationsCount > 0 %}bg-warning{% else %}bg-success{% endif %}">
+        <i class="ti ti-{{ applicationsCount > 0 ? 'users' : 'user-off' }} me-1"></i>
+        {{ applicationsCount }} application(s)
+    </span>
+</td>
                                 <td>
                                     <div class="btn-group btn-group-sm" role="group">
                                         <a href="{{ path('app_admin_kaaba_courses', { edit: course.uuid }) }}" 
@@ -135,12 +186,21 @@
                                            title="Edit course">
                                             <i class="ti ti-edit me-1"></i> Edit
                                         </a>
-                                        <a href="{{ path('app_admin_kaaba_courses', { delete: course.uuid }) }}" 
-                                           class="btn btn-danger" 
-                                           onclick="return confirm('Are you sure you want to delete \"{{ course.name }}\"? This action cannot be undone.')"
-                                           title="Delete course">
-                                            <i class="ti ti-trash me-1"></i> Delete
-                                        </a>
+                                 {% if course.kaabaApplications|length == 0 %}
+    <a href="{{ path('app_admin_kaaba_courses', { delete: course.uuid }) }}" 
+       class="btn btn-danger" 
+       onclick="return confirm('Are you sure you want to delete \"{{ course.name }}\"? This action cannot be undone.')"
+       title="Delete course">
+        <i class="ti ti-trash me-1"></i> Delete
+    </a>
+{% else %}
+    <button class="btn btn-secondary" 
+            title="Cannot delete - this course has {{ course.kaabaApplications|length }} application(s). Reassign or delete those applications first."
+            data-bs-toggle="tooltip"
+            disabled>
+        <i class="ti ti-trash-off me-1"></i> Delete
+    </button>
+{% endif %}
                                     </div>
                                 </td>
                             </tr>

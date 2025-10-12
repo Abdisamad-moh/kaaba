@@ -46,6 +46,28 @@
                 <div class="card-body">
                     {{ form_start(form) }}
                     <div class="row">
+                        <!-- Scholarship Selection -->
+                        <div class="col-md-8 mb-3">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3 col-form-label">
+                                    {{ form_label(form.scholarship) }}
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="col-md-9">
+                                    {{ form_widget(form.scholarship, { 
+                                        'attr': { 
+                                            'class': 'form-select',
+                                        } 
+                                    }) }}
+                                    {{ form_errors(form.scholarship) }}
+                                    <small class="form-text text-muted">
+                                        Select the scholarship this institute belongs to
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Institute Name -->
                         <div class="col-md-8 mb-3">
                             <div class="form-group row">
                                 <label class="form-label text-end col-md-3 col-form-label">
@@ -113,6 +135,7 @@
                             <th width="50">#</th>
                             <th width="120">UUID</th>
                             <th>Institute Name</th>
+                            <th>Scholarship</th>
                             <th width="150">Used By Applications</th>
                             <th width="200" class="text-center">Actions</th>
                         </tr>
@@ -128,6 +151,19 @@
                                 </td>
                                 <td>
                                     <strong>{{ institute.name }}</strong>
+                                </td>
+                                <td>
+                                    {% if institute.scholarship %}
+                                        <span class="badge bg-info" title="{{ institute.scholarship.title }}">
+                                            <i class="ti ti-award me-1"></i>
+                                            {{ institute.scholarship.title|length > 30 ? institute.scholarship.title|slice(0, 30) ~ '...' : institute.scholarship.title }}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">
+                                            <i class="ti ti-award-off me-1"></i>
+                                            No Scholarship
+                                        </span>
+                                    {% endif %}
                                 </td>
                                 <td>
                                     {% set applicationsCount = institute.kaabaApplications|length %}

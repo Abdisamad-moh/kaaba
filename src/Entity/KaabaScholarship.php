@@ -49,10 +49,18 @@ class KaabaScholarship
     private ?string $type = null;
 
 
+  /**
+     * @var Collection<int, KaabaInstitute>
+     */
+    #[ORM\OneToMany(targetEntity: KaabaInstitute::class, mappedBy: 'scholarship')]
+    private Collection $institutes;
+
     public function __construct()
     {
          $this->uuid = Uuid::v4();
          $this->kaabaApplications = new ArrayCollection();
+        $this->institutes = new ArrayCollection();
+
     }
 
 
@@ -192,5 +200,36 @@ class KaabaScholarship
     public function isLiteracyNumeracyScholarship(): bool
     {
         return $this->type === 'Literacy & Numeracy Scholarship';
+    }
+
+
+  /**
+     * @return Collection<int, KaabaInstitute>
+     */
+    public function getInstitutes(): Collection
+    {
+        return $this->institutes;
+    }
+
+    public function addInstitute(KaabaInstitute $institute): static
+    {
+        if (!$this->institutes->contains($institute)) {
+            $this->institutes->add($institute);
+            $institute->setScholarship($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInstitute(KaabaInstitute $institute): static
+    {
+        if ($this->institutes->removeElement($institute)) {
+            // set the owning side to null (unless already changed)
+            if ($institute->getScholarship() === $this) {
+                $institute->setScholarship(null);
+            }
+        }
+
+        return $this;
     }
 }

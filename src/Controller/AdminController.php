@@ -2669,86 +2669,115 @@ public function index(
         ]);
     }
 
-    #[Route('/kaaba-institutes', name: 'app_admin_kaaba_institutes')]
-    public function kaabaInstitutes(
-        Request $request,
-        KaabaInstituteRepository $kaabaInstituteRepository,
-        EntityManagerInterface $em,
-    ): Response {
-        // Fetch all institutes for the table
-        $institutes = $kaabaInstituteRepository->findAll();
+ #[Route('/kaaba-institutes', name: 'app_admin_kaaba_institutes')]
+public function kaabaInstitutes(
+    Request $request,
+    KaabaInstituteRepository $kaabaInstituteRepository,
+    KaabaScholarshipRepository $kaabaScholarshipRepository,
+    EntityManagerInterface $em,
+): Response {
+    // Fetch all institutes for the table
+    $institutes = $kaabaInstituteRepository->findAll();
 
-        // Check if editing or creating a new institute
-        $editUuid = $request->query->get('edit');
-        $showForm = $editUuid || $request->query->get('create');
+    // Fetch active scholarships for the dropdown
+    $activeScholarships = $kaabaScholarshipRepository->findBy(['status' => true]);
 
-        $institute = new KaabaInstitute();
-        if ($editUuid) {
-            $institute = $kaabaInstituteRepository->findOneBy(['uuid' => $editUuid]);
-            if (!$institute) {
-                throw $this->createNotFoundException('Institute not found.');
-            }
+    // Check if editing or creating a new institute
+    $editUuid = $request->query->get('edit');
+    $showForm = $editUuid || $request->query->get('create');
+
+    $institute = new KaabaInstitute();
+    if ($editUuid) {
+        $institute = $kaabaInstituteRepository->findOneBy(['uuid' => $editUuid]);
+        if (!$institute) {
+            throw $this->createNotFoundException('Institute not found.');
         }
+    }
 
-        // Create the form using FormBuilder
-        $form = $this->createFormBuilder($institute)
-            ->add('name', TextType::class, [
-                'label' => 'Institute Name',
-                'attr' => [
-                    'class' => 'form-control',
-                    'placeholder' => 'Enter institute name'
-                ],
-                'constraints' => [
-                    new NotBlank(['message' => 'Institute name is required.']),
-                    new Length([
-                        'max' => 255,
-                        'maxMessage' => 'Institute name cannot be longer than 255 characters.'
-                    ])
-                ]
-            ])
-            ->getForm();
+    // Create the form using FormBuilder
+    $form = $this->createFormBuilder($institute)
+        ->add('scholarship', EntityType::class, [
+            'class' => KaabaScholarship::class,
+            'choice_label' => 'title',
+            'label' => 'Scholarship',
+            'placeholder' => 'Select a scholarship',
+            'choices' => $activeScholarships,
+            'attr' => [
+                'class' => 'form-select'
+            ],
+            'constraints' => [
+                new NotBlank(['message' => 'Please select a scholarship.'])
+            ]
+        ])
+        ->add('name', TextType::class, [
+            'label' => 'Institute Name',
+            'attr' => [
+                'class' => 'form-control',
+                'placeholder' => 'Enter institute name'
+            ],
+            'constraints' => [
+                new NotBlank(['message' => 'Institute name is required.']),
+                new Length([
+                    'max' => 255,
+                    'maxMessage' => 'Institute name cannot be longer than 255 characters.'
+                ])
+            ]
+        ])
+        ->getForm();
 
-        $form->handleRequest($request);
+    $form->handleRequest($request);
 
-        // Handle form submission
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em->persist($institute);
-            $em->flush();
+    // Handle form submission
+    if ($form->isSubmitted() && $form->isValid()) {
+        $em->persist($institute);
+        $em->flush();
 
-            $this->addFlash('success', $editUuid ? 'Institute updated successfully.' : 'Institute created successfully.');
+        $this->addFlash('success', $editUuid ? 'Institute updated successfully.' : 'Institute created successfully.');
+        return $this->redirectToRoute('app_admin_kaaba_institutes');
+    }
+
+    // Handle delete request
+  // Handle delete request
+$deleteUuid = $request->query->get('delete');
+if ($deleteUuid) {
+    $instituteToDelete = $kaabaInstituteRepository->findOneBy(['uuid' => $deleteUuid]);
+    if ($instituteToDelete) {
+        // Check if there are any applications using this institute
+        $applicationsCount = $instituteToDelete->getKaabaApplications()->count();
+        
+        // NEW: Check if there are any courses using this institute
+        $coursesCount = $instituteToDelete->getKaabaCourses()->count();
+
+        if ($applicationsCount > 0) {
+            $this->addFlash('error', "Cannot delete this institute. It is being used by $applicationsCount application(s).");
+            return $this->redirectToRoute('app_admin_kaaba_institutes');
+        }
+        
+        // NEW: Check for courses
+        if ($coursesCount > 0) {
+            $this->addFlash('error', "Cannot delete this institute. It has $coursesCount course(s) associated with it. Please delete or reassign the courses first.");
             return $this->redirectToRoute('app_admin_kaaba_institutes');
         }
 
-        // Handle delete request
-        $deleteUuid = $request->query->get('delete');
-        if ($deleteUuid) {
-            $instituteToDelete = $kaabaInstituteRepository->findOneBy(['uuid' => $deleteUuid]);
-            if ($instituteToDelete) {
-                // Check if there are any applications using this institute
-                $applicationsCount = $instituteToDelete->getKaabaApplications()->count();
+        $em->remove($instituteToDelete);
+        $em->flush();
 
-                if ($applicationsCount > 0) {
-                    $this->addFlash('error', "Cannot delete this institute. It is being used by $applicationsCount application(s).");
-                    return $this->redirectToRoute('app_admin_kaaba_institutes');
-                }
-
-                $em->remove($instituteToDelete);
-                $em->flush();
-
-                $this->addFlash('success', 'Institute deleted successfully.');
-                return $this->redirectToRoute('app_admin_kaaba_institutes');
-            } else {
-                $this->addFlash('error', 'Institute not found.');
-            }
-        }
-
-        return $this->render('admin/kaaba_institutes.html.twig', [
-            'institutes' => $institutes,
-            'form' => $form->createView(),
-            'editUuid' => $editUuid,
-            'showForm' => $showForm,
-        ]);
+        $this->addFlash('success', 'Institute deleted successfully.');
+        return $this->redirectToRoute('app_admin_kaaba_institutes');
+    } else {
+        $this->addFlash('error', 'Institute not found.');
     }
+}
+
+
+    return $this->render('admin/kaaba_institutes.html.twig', [
+        'institutes' => $institutes,
+        'activeScholarships' => $activeScholarships,
+        'form' => $form->createView(),
+        'editUuid' => $editUuid,
+        'showForm' => $showForm,
+    ]);
+}
 
     #[Route('/kaaba-regions', name: 'app_admin_kaaba_regions')]
     public function kaabaRegions(
@@ -3057,14 +3086,18 @@ public function index(
         ]);
     }
 
-    #[Route('/kaaba-courses', name: 'app_admin_kaaba_courses')]
+#[Route('/kaaba-courses', name: 'app_admin_kaaba_courses')]
 public function kaabaCourses(
     Request $request,
     KaabaCourseRepository $kaabaCourseRepository,
+    KaabaInstituteRepository $kaabaInstituteRepository,
     EntityManagerInterface $em,
 ): Response {
     // Fetch all courses for the table
     $courses = $kaabaCourseRepository->findAll();
+
+    // Fetch all institutes for the dropdown
+    $institutes = $kaabaInstituteRepository->findAll();
 
     // Check if editing or creating a new course
     $editUuid = $request->query->get('edit');
@@ -3080,6 +3113,19 @@ public function kaabaCourses(
 
     // Create the form using FormBuilder
     $form = $this->createFormBuilder($course)
+        ->add('institute', EntityType::class, [
+            'class' => KaabaInstitute::class,
+            'choice_label' => 'name',
+            'label' => 'Institute',
+            'placeholder' => 'Select an institute',
+            'choices' => $institutes,
+            'attr' => [
+                'class' => 'form-select'
+            ],
+            'constraints' => [
+                new NotBlank(['message' => 'Please select an institute.'])
+            ]
+        ])
         ->add('name', TextType::class, [
             'label' => 'Course Name',
             'attr' => [
@@ -3107,23 +3153,35 @@ public function kaabaCourses(
         return $this->redirectToRoute('app_admin_kaaba_courses');
     }
 
-    // Handle delete request
+    // Handle delete request - IMPROVED VERSION
     $deleteUuid = $request->query->get('delete');
     if ($deleteUuid) {
         $courseToDelete = $kaabaCourseRepository->findOneBy(['uuid' => $deleteUuid]);
         if ($courseToDelete) {
-            $em->remove($courseToDelete);
-            $em->flush();
+            // More robust check for applications
+            $applicationsCount = $courseToDelete->getKaabaKaabaApplications()->count();
+            
+            if ($applicationsCount > 0) {
+                $this->addFlash('error', "Cannot delete course \"{$courseToDelete->getName()}\". It is being used by $applicationsCount application(s). Please reassign or delete those applications first.");
+                return $this->redirectToRoute('app_admin_kaaba_courses');
+            }
 
-            $this->addFlash('success', 'Course deleted successfully.');
+            try {
+                $em->remove($courseToDelete);
+                $em->flush();
+                $this->addFlash('success', 'Course deleted successfully.');
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Cannot delete course. It is still being referenced by other records.');
+            }
+            
             return $this->redirectToRoute('app_admin_kaaba_courses');
         } else {
             $this->addFlash('error', 'Course not found.');
         }
     }
-
     return $this->render('admin/kaaba_courses.html.twig', [
         'courses' => $courses,
+        'institutes' => $institutes,
         'form' => $form->createView(),
         'editUuid' => $editUuid,
         'showForm' => $showForm,

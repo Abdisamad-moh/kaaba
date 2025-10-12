@@ -26,10 +26,10 @@ class KaabaCourse
     private ?string $name = null;
 
     /**
-     * @var Collection<int, KaabaKaabaApplication>
+     * @var Collection<int, KaabaApplication >
      */
-    #[ORM\OneToMany(targetEntity: KaabaKaabaApplication::class, mappedBy: 'course')]
-    private Collection $kaabaKaabaApplications;
+    #[ORM\OneToMany(targetEntity: KaabaApplication ::class, mappedBy: 'course')]
+    private Collection $kaabaApplications;
 
     #[ORM\ManyToOne(inversedBy: 'kaabaCourses')]
     private ?KaabaInstitute $institute = null;
@@ -39,7 +39,7 @@ class KaabaCourse
      public function __construct()
     {
          $this->uuid = Uuid::v4();
-         $this->kaabaKaabaApplications = new ArrayCollection();
+         $this->kaabaApplications = new ArrayCollection();
     }
 
 
@@ -73,29 +73,29 @@ class KaabaCourse
     }
 
     /**
-     * @return Collection<int, KaabaKaabaApplication>
+     * @return Collection<int, KaabaApplication >
      */
-    public function getKaabaKaabaApplications(): Collection
+    public function getkaabaApplications(): Collection
     {
-        return $this->kaabaKaabaApplications;
+        return $this->kaabaApplications;
     }
 
-    public function addKaabaKaabaApplication(KaabaKaabaApplication $kaabaKaabaApplication): static
+    public function addKaabaApplication (KaabaApplication  $KaabaApplication ): static
     {
-        if (!$this->kaabaKaabaApplications->contains($kaabaKaabaApplication)) {
-            $this->kaabaKaabaApplications->add($kaabaKaabaApplication);
-            $kaabaKaabaApplication->setCourse($this);
+        if (!$this->kaabaApplications->contains($KaabaApplication )) {
+            $this->kaabaApplications->add($KaabaApplication );
+            $KaabaApplication ->setCourse($this);
         }
 
         return $this;
     }
 
-    public function removeKaabaKaabaApplication(KaabaKaabaApplication $kaabaKaabaApplication): static
+    public function removeKaabaApplication (KaabaApplication  $KaabaApplication ): static
     {
-        if ($this->kaabaKaabaApplications->removeElement($kaabaKaabaApplication)) {
+        if ($this->kaabaApplications->removeElement($KaabaApplication )) {
             // set the owning side to null (unless already changed)
-            if ($kaabaKaabaApplication->getCourse() === $this) {
-                $kaabaKaabaApplication->setCourse(null);
+            if ($KaabaApplication ->getCourse() === $this) {
+                $KaabaApplication ->setCourse(null);
             }
         }
 
