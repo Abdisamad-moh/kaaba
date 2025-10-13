@@ -1119,23 +1119,29 @@
             });
         }
 
-        initializeRegionDistrict() {
-            const regionSelect = document.getElementById('{{ form.region.vars.id }}');
-            const districtSelect = document.getElementById('{{ form.district.vars.id }}');
-            
-            if (regionSelect && regionSelect.value) {
-                this.loadDistricts(regionSelect.value);
-            } else if (districtSelect) {
-                districtSelect.innerHTML = '<option value="">Select region first</option>';
-                districtSelect.disabled = true;
-            }
-
-            if (regionSelect) {
-                regionSelect.addEventListener('change', (e) => {
-                    this.loadDistricts(e.target.value);
-                });
-            }
+      initializeRegionDistrict() {
+    const regionSelect = document.getElementById('{{ form.region.vars.id }}');
+    const districtSelect = document.getElementById('{{ form.district.vars.id }}');
+    
+    if (regionSelect && regionSelect.value) {
+        this.loadDistricts(regionSelect.value);
+    } else if (districtSelect) {
+        districtSelect.innerHTML = '<option value="">Select region first</option>';
+        districtSelect.disabled = true;
+        
+        // If there's only one region in the dropdown, automatically select it and load districts
+        if (regionSelect && regionSelect.options.length === 2) { // 2 because of placeholder + one region
+            regionSelect.selectedIndex = 1;
+            this.loadDistricts(regionSelect.value);
         }
+    }
+
+    if (regionSelect) {
+        regionSelect.addEventListener('change', (e) => {
+            this.loadDistricts(e.target.value);
+        });
+    }
+}
 
     initializeInstituteCourseDynamics() {
     // Only initialize for non-literacy scholarships

@@ -50,7 +50,8 @@ class KaabaApplicationFormType extends AbstractType
             'mimeTypesMessage' => 'Please upload a valid document (PDF, JPG, PNG, DOC, DOCX).',
         ];
 
- // Get filtered institutes from options
+// Get filtered regions and institutes from options
+        $regions = $options['regions'] ?? [];
         $institutes = $options['institutes'] ?? [];
 
         $builder
@@ -298,6 +299,7 @@ class KaabaApplicationFormType extends AbstractType
                 'choice_label' => 'name',
                 'label' => $this->translator->trans('region'),
                 'required' => true,
+'choices' => $regions, 
                 'attr' => [
                     'class' => 'form-select'
                 ],
@@ -427,6 +429,7 @@ class KaabaApplicationFormType extends AbstractType
         $resolver->setDefaults([
             'data_class' => KaabaApplication::class,
  'institutes' => [], // Add institutes as an option
+    'regions' => [], // Add regions as an option
         ]);
     }
 }

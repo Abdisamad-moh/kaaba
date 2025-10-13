@@ -1122,6 +1122,7 @@ public function scholarshipApplication(
     // Find scholarship by UUID
     $scholarship = $scholarshipRepository->findOneBy(['uuid' => $uuid]);
 
+  
     if (!$scholarship) {
         throw $this->createNotFoundException('Scholarship not found.');
     }
@@ -1132,6 +1133,20 @@ public function scholarshipApplication(
         return $this->redirectToRoute('app_scholarships_list');
     }
 
+    // Get scholarship type
+    $type = $scholarship->getType();
+
+    // Filter regions based on scholarship type
+    if ($type == 't') {
+        // For Literacy scholarships, only show Maroodi Jeex and Togdheer
+        $regions = $regionRepository->findBy([
+            'name' => ['Maroodi Jeex', 'Togdheer']
+        ]);
+    } else {
+        // For other scholarship types, show all regions
+        $regions = $regionRepository->findAll();
+    }
+
     $application = new KaabaApplication();
     $application->setScholarship($scholarship);
     
@@ -1140,6 +1155,7 @@ public function scholarshipApplication(
 
     // Create form with filtered institutes
     $form = $this->createForm(KaabaApplicationFormType::class, $application, [
+ 'regions' => $regions, // Pass filtered regions to form
         'institutes' => $scholarshipInstitutes // Pass filtered institutes to form
     ]);
     
