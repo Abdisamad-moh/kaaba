@@ -112,7 +112,7 @@ use Symfony\UX\Chartjs\Model\Chart;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Symfony\Component\Form\FormInterface;
 
-#[Route('/employer')]
+#[Route('/account')]
 class EmployerController extends AbstractController
 {
     private UrlGeneratorInterface $generator;
@@ -1942,169 +1942,169 @@ class EmployerController extends AbstractController
         ]);
     }
 
-    #[Route('/settings', name: 'app_employer_settings')]
-    public function settings(
-        FileUploader $fileUploader,
-        MetierPackagesRepository $packages,
-        UserPasswordHasherInterface $passwordHasher,
-        Request $request,
-        EntityManagerInterface $em,
-        UserRepository $users,
-        EmployerDetailsRepository $employerDetails,
-    ): Response {
-        $user = $this->getUser();
-        $currentUser = $users->find($this->getUser());
-        $form = $this->createForm(ChangePasswordType::class);
-        $form->handleRequest($request);
+    // #[Route('/settings', name: 'app_employer_settings')]
+    // public function settings(
+    //     FileUploader $fileUploader,
+    //     MetierPackagesRepository $packages,
+    //     UserPasswordHasherInterface $passwordHasher,
+    //     Request $request,
+    //     EntityManagerInterface $em,
+    //     UserRepository $users,
+    //     EmployerDetailsRepository $employerDetails,
+    // ): Response {
+    //     $user = $this->getUser();
+    //     $currentUser = $users->find($this->getUser());
+    //     $form = $this->createForm(ChangePasswordType::class);
+    //     $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $oldPassword = $form->get('oldPassword')->getData();
-            $newPassword = $form->get('newPassword')->getData();
+    //     if ($form->isSubmitted() && $form->isValid()) {
+    //         $oldPassword = $form->get('oldPassword')->getData();
+    //         $newPassword = $form->get('newPassword')->getData();
 
-            if (!$passwordHasher->isPasswordValid($currentUser, $oldPassword)) {
-                sweetalert()->error("Old password is incorrect.");
-                // return $this->redirectToRoute('user_change_password');
-            }
+    //         if (!$passwordHasher->isPasswordValid($currentUser, $oldPassword)) {
+    //             sweetalert()->error("Old password is incorrect.");
+    //             // return $this->redirectToRoute('user_change_password');
+    //         }
 
-            if ($oldPassword === $newPassword) {
-                sweetalert()->error("New password cannot be the same as the old password.");
-                // return $this->redirectToRoute('user_change_password');
-            }
+    //         if ($oldPassword === $newPassword) {
+    //             sweetalert()->error("New password cannot be the same as the old password.");
+    //             // return $this->redirectToRoute('user_change_password');
+    //         }
 
-            $encodedPassword = $passwordHasher->hashPassword($currentUser, $newPassword);
-            $currentUser = $em->getRepository(User::class)->find($this->getUser());
-            $currentUser->setPassword($encodedPassword);
-            $em->persist($user);
-            $em->flush();
+    //         $encodedPassword = $passwordHasher->hashPassword($currentUser, $newPassword);
+    //         $currentUser = $em->getRepository(User::class)->find($this->getUser());
+    //         $currentUser->setPassword($encodedPassword);
+    //         $em->persist($user);
+    //         $em->flush();
 
-            // $this->addFlash('success', 'Password changed successfully.');
-            // Logout the user and redirect to login page
-            return $this->redirectToRoute('app_logout');
-        }
+    //         // $this->addFlash('success', 'Password changed successfully.');
+    //         // Logout the user and redirect to login page
+    //         return $this->redirectToRoute('app_logout');
+    //     }
 
-        $logoForm = $this->createFormBuilder()->add('logo', FileType::class, [
-            'label' => 'Exam Image (JPG, JPEG, PNG, Webp file)',
-            'mapped' => false,
-            'required' => true,
-            'constraints' => [
-                new File([
-                    'maxSize' => '1024k',
-                    'mimeTypes' => [
-                        'image/jpeg',
-                        'image/png',
-                        'image/jpg',
-                        'image/webp',
-                    ],
-                    'mimeTypesMessage' => 'Please upload a valid image file (JPG, JPEG, PNG, WEBP).',
-                ]),
-            ],
-        ])->getForm();
-        $logoForm->handleRequest($request);
-        if ($logoForm->isSubmitted() && $logoForm->isValid()) {
-            $imageFile = $logoForm->get('logo')->getData();
+    //     $logoForm = $this->createFormBuilder()->add('logo', FileType::class, [
+    //         'label' => 'Exam Image (JPG, JPEG, PNG, Webp file)',
+    //         'mapped' => false,
+    //         'required' => true,
+    //         'constraints' => [
+    //             new File([
+    //                 'maxSize' => '1024k',
+    //                 'mimeTypes' => [
+    //                     'image/jpeg',
+    //                     'image/png',
+    //                     'image/jpg',
+    //                     'image/webp',
+    //                 ],
+    //                 'mimeTypesMessage' => 'Please upload a valid image file (JPG, JPEG, PNG, WEBP).',
+    //             ]),
+    //         ],
+    //     ])->getForm();
+    //     $logoForm->handleRequest($request);
+    //     if ($logoForm->isSubmitted() && $logoForm->isValid()) {
+    //         $imageFile = $logoForm->get('logo')->getData();
 
-            if ($imageFile) {
-                try {
-                    $employerDetails = $employerDetails->findOneBy(['employer' => $this->getUser()]);
-                    if ($employerDetails) {
-                        $existingImage = $employerDetails->getLogo();
-                        if ($existingImage) {
-                            // Remove the existing image
-                            $existingImagePath = $fileUploader->getTargetDirectory() . '/' . $existingImage;
-                            if (file_exists($existingImagePath)) {
-                                unlink($existingImagePath);
-                            }
-                        }
-                        $fileName = $fileUploader->uploadImage($imageFile, $this->getParameter('employer_profile_images_directory'));
+    //         if ($imageFile) {
+    //             try {
+    //                 $employerDetails = $employerDetails->findOneBy(['employer' => $this->getUser()]);
+    //                 if ($employerDetails) {
+    //                     $existingImage = $employerDetails->getLogo();
+    //                     if ($existingImage) {
+    //                         // Remove the existing image
+    //                         $existingImagePath = $fileUploader->getTargetDirectory() . '/' . $existingImage;
+    //                         if (file_exists($existingImagePath)) {
+    //                             unlink($existingImagePath);
+    //                         }
+    //                     }
+    //                     $fileName = $fileUploader->uploadImage($imageFile, $this->getParameter('employer_profile_images_directory'));
 
-                        $employerDetails->setLogo($fileName);
-                        $em->persist($employerDetails);
-                    } else {
-                        $new_employer_details = new EmployerDetails();
-                        $new_employer_details->setEmployer($this->getUser());
+    //                     $employerDetails->setLogo($fileName);
+    //                     $em->persist($employerDetails);
+    //                 } else {
+    //                     $new_employer_details = new EmployerDetails();
+    //                     $new_employer_details->setEmployer($this->getUser());
 
-                        $fileName = $fileUploader->uploadImage($imageFile, $this->getParameter('employer_profile_images_directory'));
+    //                     $fileName = $fileUploader->uploadImage($imageFile, $this->getParameter('employer_profile_images_directory'));
 
-                        $new_employer_details->setLogo($fileName);
-                        $em->persist($new_employer_details);
-                    }
-                    $em->flush();
-                } catch (\Exception $e) {
-                    $this->addFlash('error', $e->getMessage());
-                    // return $this->redirectToRoute('exam_upload');
-                }
-            }
-        } else if ($logoForm->isSubmitted() && !$logoForm->isValid()) {
-            $errors = $logoForm->getErrors(true, true);
-            $errors_list = [];
-            foreach ($errors as $error) {
-                array_push($errors_list, $error->getMessage());
-            }
-            $message = implode(", ", $errors_list);
-            sweetalert()->error($message);
-            return $this->redirectToRoute('app_employer_company_settings');
-        }
+    //                     $new_employer_details->setLogo($fileName);
+    //                     $em->persist($new_employer_details);
+    //                 }
+    //                 $em->flush();
+    //             } catch (\Exception $e) {
+    //                 $this->addFlash('error', $e->getMessage());
+    //                 // return $this->redirectToRoute('exam_upload');
+    //             }
+    //         }
+    //     } else if ($logoForm->isSubmitted() && !$logoForm->isValid()) {
+    //         $errors = $logoForm->getErrors(true, true);
+    //         $errors_list = [];
+    //         foreach ($errors as $error) {
+    //             array_push($errors_list, $error->getMessage());
+    //         }
+    //         $message = implode(", ", $errors_list);
+    //         sweetalert()->error($message);
+    //         return $this->redirectToRoute('app_employer_company_settings');
+    //     }
 
-        $userDetails = $currentUser->getEmployerDetails();
-        if (!$userDetails) {
-            $userDetails = new EmployerDetails();
-            $userDetails->setEmployer($currentUser);
-        }
-        $detailsForm = $this->createForm(EmployerDetailsFormType::class, $userDetails)
-            ->add('name', TextType::class, [
-                'mapped' => false,
-                'required' => true,
-                'data' => $currentUser->getName(),
-                'attr' => [
-                    'class' => 'form-control',
-                ],
-                'label' => 'Company Name',
-            ]);
+    //     $userDetails = $currentUser->getEmployerDetails();
+    //     if (!$userDetails) {
+    //         $userDetails = new EmployerDetails();
+    //         $userDetails->setEmployer($currentUser);
+    //     }
+    //     $detailsForm = $this->createForm(EmployerDetailsFormType::class, $userDetails)
+    //         ->add('name', TextType::class, [
+    //             'mapped' => false,
+    //             'required' => true,
+    //             'data' => $currentUser->getName(),
+    //             'attr' => [
+    //                 'class' => 'form-control',
+    //             ],
+    //             'label' => 'Company Name',
+    //         ]);
 
-        $detailsForm->handleRequest($request);
+    //     $detailsForm->handleRequest($request);
 
-        if ($detailsForm->isSubmitted() && $detailsForm->isValid()) {
-            $em->persist($userDetails);
-            $currentUser->setName($detailsForm->get('name')->getData());
-            $em->persist($currentUser);
-            $em->flush();
-        }
+    //     if ($detailsForm->isSubmitted() && $detailsForm->isValid()) {
+    //         $em->persist($userDetails);
+    //         $currentUser->setName($detailsForm->get('name')->getData());
+    //         $em->persist($currentUser);
+    //         $em->flush();
+    //     }
 
-        // deactivation / activation form
-        $statusForm = $this->createFormBuilder($currentUser)
-            ->add('status', ChoiceType::class, [
-                'required' => true,
-                'choices' => [
-                    'Status' => null,
-                    'Active' => true,
-                    'Disabled' => false,
-                ],
+    //     // deactivation / activation form
+    //     $statusForm = $this->createFormBuilder($currentUser)
+    //         ->add('status', ChoiceType::class, [
+    //             'required' => true,
+    //             'choices' => [
+    //                 'Status' => null,
+    //                 'Active' => true,
+    //                 'Disabled' => false,
+    //             ],
 
-                'attr' => ['class' => 'form-control'],
-            ])->getForm();
-        $statusForm->handleRequest($request);
-        if ($statusForm->isSubmitted() && $statusForm->isValid()) {
-            $currentUser->setStatus($statusForm->get('status')->getData());
-            $em->persist($currentUser);
-            $em->flush();
-            sweetalert()->success("Updated account successfully");
-        }
+    //             'attr' => ['class' => 'form-control'],
+    //         ])->getForm();
+    //     $statusForm->handleRequest($request);
+    //     if ($statusForm->isSubmitted() && $statusForm->isValid()) {
+    //         $currentUser->setStatus($statusForm->get('status')->getData());
+    //         $em->persist($currentUser);
+    //         $em->flush();
+    //         sweetalert()->success("Updated account successfully");
+    //     }
 
-        $activePlan = $this->getActiveOrder($this->getUser());
+    //     $activePlan = $this->getActiveOrder($this->getUser());
 
-        $services = $packages->findBy(['status' => true, 'type' => "employer", "category" => "service"]);
+    //     $services = $packages->findBy(['status' => true, 'type' => "employer", "category" => "service"]);
 
-        return $this->render('employer/settings.html.twig', [
-            'backages' => $packages->findBy(['status' => true, 'type' => "employer", "category" => "subscription"]),
-            'activeplan' => $activePlan,
-            'employer' => $this->getUser(),
-            'form' => $form,
-            'logoForm' => $logoForm,
-            'userDetails' => $detailsForm,
-            'statusForm' => $statusForm,
-            'services' => $services,
-        ]);
-    }
+    //     return $this->render('employer/settings.html.twig', [
+    //         'backages' => $packages->findBy(['status' => true, 'type' => "employer", "category" => "subscription"]),
+    //         'activeplan' => $activePlan,
+    //         'employer' => $this->getUser(),
+    //         'form' => $form,
+    //         'logoForm' => $logoForm,
+    //         'userDetails' => $detailsForm,
+    //         'statusForm' => $statusForm,
+    //         'services' => $services,
+    //     ]);
+    // }
     #[Route('/settingsBillingH', name: 'app_employer_settings_billing_history')]
     public function settingsBillingH(
         FileUploader $fileUploader,
@@ -2401,7 +2401,7 @@ class EmployerController extends AbstractController
             'services' => $services,
         ]);
     }
-    #[Route('/accountSettings', name: 'app_employer_account_settings')]
+    #[Route('/settings', name: 'app_employer_account_settings')]
     public function accountSettings(
         FileUploader $fileUploader,
         MetierPackagesRepository $packages,
