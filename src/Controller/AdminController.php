@@ -30,6 +30,7 @@ use App\Entity\MetierContacts;
 use App\Form\JobFormTypeShort;
 use App\Entity\EmployerDetails;
 use App\Entity\JobseekerDetails;
+use App\Entity\KaabaApplication;
 use App\Entity\KaabaScholarship;
 use App\Entity\MetierAppSetting;
 use App\Entity\MetierEmailTemps;
@@ -3409,13 +3410,37 @@ public function updateApplicationStatus(
         }
 
         $statusName = $statusMap[$statusAction];
-        $status = $statusRepository->findOneBy(['name' => $statusName]);
+      $status = $statusRepository->findOneBy(['name' => $statusName]);
+// If not found, try case-insensitive
+if (!$status) {
+    $allStatuses = $statusRepository->findAll();
+    foreach ($allStatuses as $s) {
+        if (strtolower($s->getName()) === strtolower($statusName)) {
+            $status = $s;
+            break;
+        }
+    }
+}
 
         if (!$status) {
             return $this->json([
                 'success' => false,
                 'message' => 'Status not found.'
             ], 404);
+        }
+
+        // Set status dates
+        $now = new \DateTime();
+        switch ($statusAction) {
+            case 'shortlisted':
+                $application->setShortlistedDate($now);
+                break;
+            case 'accepted':
+                $application->setAcceptedDate($now);
+                break;
+            case 'rejected':
+                $application->setRejectedDate($now);
+                break;
         }
 
         // Update application status
@@ -3448,6 +3473,199 @@ public function updateApplicationStatus(
     }
 }
 
+
+#[Route('/kaaba-applications/revert-status/{id}', name: 'app_admin_kaaba_application_revert_status', methods: ['POST'])]
+public function revertApplicationStatus(
+    KaabaApplication $application,
+    Request $request,
+    KaabaApplicationStatusRepository $statusRepository,
+    EntityManagerInterface $entityManager
+): JsonResponse {
+    $csrfToken = $request->request->get('_token') ?? $request->headers->get('X-CSRF-Token');
+
+    // Validate CSRF token
+    if (!$this->isCsrfTokenValid('revert_application_status', $csrfToken)) {
+        return $this->json([
+            'success' => false,
+            'message' => 'Invalid CSRF token.'
+        ], 400);
+    }
+
+    try {
+        $currentStatus = $application->getStatus();
+        
+        if (!$currentStatus) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Application has no current status.'
+            ], 400);
+        }
+
+        $currentStatusName = $currentStatus->getName();
+
+        // Define allowed reverts with case-insensitive matching
+        $allowedReverts = [
+            'accepted' => 'applied', // or 'shortlisted' depending on your flow
+            'shortlisted' => 'applied'
+        ];
+
+        // Normalize the current status name to lowercase for comparison
+        $normalizedCurrentStatus = strtolower($currentStatusName);
+
+        if (!isset($allowedReverts[$normalizedCurrentStatus])) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Cannot revert from current status: ' . $currentStatusName . '. Allowed reverts: from accepted or shortlisted to applied.'
+            ], 400);
+        }
+
+        $targetStatusName = $allowedReverts[$normalizedCurrentStatus];
+        
+        // Find the target status - try both exact match and case-insensitive
+        $newStatus = $statusRepository->findOneBy(['name' => $targetStatusName]);
+        
+        // If not found with exact case, try case-insensitive search
+        if (!$newStatus) {
+            $allStatuses = $statusRepository->findAll();
+            foreach ($allStatuses as $status) {
+                if (strtolower($status->getName()) === $targetStatusName) {
+                    $newStatus = $status;
+                    break;
+                }
+            }
+        }
+
+        if (!$newStatus) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Target status not found: ' . $targetStatusName
+            ], 404);
+        }
+
+        // Clear status dates when reverting
+        switch ($normalizedCurrentStatus) {
+            case 'accepted':
+                $application->setAcceptedDate(null);
+                break;
+            case 'shortlisted':
+                $application->setShortlistedDate(null);
+                break;
+        }
+
+        // Update application status
+        $application->setStatus($newStatus);
+        $entityManager->flush();
+
+        $newStatusDisplayName = $newStatus->getName();
+        
+        // Generate new status badge HTML
+        $newStatusBadge = sprintf(
+            '<span class="badge %s">%s</span>',
+            match(strtolower($newStatusDisplayName)) {
+                'accepted' => 'bg-success',
+                'rejected' => 'bg-danger',
+                'shortlisted' => 'bg-info',
+                'applied' => 'bg-primary',
+                default => 'bg-secondary'
+            },
+            $newStatusDisplayName
+        );
+
+        return $this->json([
+            'success' => true,
+            'message' => "Application status reverted to {$newStatusDisplayName} successfully.",
+            'newStatusBadge' => $newStatusBadge,
+            'newStatus' => $newStatusDisplayName
+        ]);
+
+    } catch (\Exception $e) {
+        return $this->json([
+            'success' => false,
+            'message' => 'Error reverting application status: ' . $e->getMessage()
+        ], 500);
+    }
+}
+
+#[Route('/kaaba-applications/revert-rejected/{id}', name: 'app_admin_kaaba_application_revert_rejected', methods: ['POST'])]
+public function revertRejectedApplication(
+    KaabaApplication $application,
+    Request $request,
+    KaabaApplicationStatusRepository $statusRepository,
+    EntityManagerInterface $entityManager
+): JsonResponse {
+    $csrfToken = $request->request->get('_token') ?? $request->headers->get('X-CSRF-Token');
+
+    // Validate CSRF token
+    if (!$this->isCsrfTokenValid('revert_rejected_application', $csrfToken)) {
+        return $this->json([
+            'success' => false,
+            'message' => 'Invalid CSRF token.'
+        ], 400);
+    }
+
+    try {
+        $currentStatus = $application->getStatus();
+        
+        if (!$currentStatus) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Application has no current status.'
+            ], 400);
+        }
+
+        $currentStatusName = $currentStatus->getName();
+
+        // Only allow reverting from Rejected status (case-insensitive)
+        if (strtolower($currentStatusName) !== 'rejected') {
+            return $this->json([
+                'success' => false,
+                'message' => 'This action is only allowed for rejected applications. Current status: ' . $currentStatusName
+            ], 400);
+        }
+
+        // Find applied status - try both exact match and case-insensitive
+        $appliedStatus = $statusRepository->findOneBy(['name' => 'applied']);
+        
+        // If not found with exact case, try case-insensitive search
+        if (!$appliedStatus) {
+            $allStatuses = $statusRepository->findAll();
+            foreach ($allStatuses as $status) {
+                if (strtolower($status->getName()) === 'applied') {
+                    $appliedStatus = $status;
+                    break;
+                }
+            }
+        }
+        
+        if (!$appliedStatus) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Applied status not found.'
+            ], 404);
+        }
+
+        // Clear rejected date and set to applied
+        $application->setRejectedDate(null);
+        $application->setStatus($appliedStatus);
+        $entityManager->flush();
+
+        // Generate new status badge HTML
+        $newStatusBadge = '<span class="badge bg-primary">Applied</span>';
+
+        return $this->json([
+            'success' => true,
+            'message' => "Application status reverted to Applied successfully.",
+            'newStatusBadge' => $newStatusBadge,
+            'newStatus' => 'Applied'
+        ]);
+
+    } catch (\Exception $e) {
+        return $this->json([
+            'success' => false,
+            'message' => 'Error reverting rejected application: ' . $e->getMessage()
+        ], 500);
+    }
+}
 
 #[Route('/admin/kaaba-application/{uuid}', name: 'app_admin_kaaba_application_view')]
 public function kaabaApplicationView(

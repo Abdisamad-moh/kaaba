@@ -18,9 +18,7 @@
                     <span class="badge bg-primary">Total: {{ total_count }}</span>
                 </div>
                 <div class="col-3">
-                    <div class="text-center">
-                        <img src="{{ asset('assets/images/application.png') }}" alt="modernize-img" class="iconn img-fluid mb-n4">
-                    </div>
+                    
                 </div>
             </div>
         </div>
@@ -48,6 +46,7 @@
                                         <th>Gender</th>
                                         <th>Application Date</th>
                                         <th>Status</th>
+                                        <th>Status Dates</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -113,10 +112,10 @@
                                             <td id="status-{{ application.id }}">
                                                 {% if application.status %}
                                                     <span class="badge 
-                                                        {% if application.status.name == 'applied' or application.status.name == 'applied' %}bg-primary
-                                                        {% elseif application.status.name == 'rejected' %}bg-danger
-                                                        {% elseif application.status.name == 'applied' or application.status.name == 'applied' %}bg-info text-white
-                                                        {% elseif application.status.name == 'shortlisted' %}bg-secondary
+                                                        {% if application.status.name == 'applied' or application.status.name == 'Applied' %}bg-primary
+                                                        {% elseif application.status.name == 'rejected' or application.status.name == 'Rejected' %}bg-danger
+                                                        {% elseif application.status.name == 'shortlisted' or application.status.name == 'Shortlisted' %}bg-info text-white
+                                                        {% elseif application.status.name == 'accepted' or application.status.name == 'Accepted' %}bg-success
                                                         {% elseif application.status.name == 'Under Review' %}bg-primary
                                                         {% else %}bg-secondary{% endif %}">
                                                         {{ application.status.name }}
@@ -124,6 +123,19 @@
                                                 {% else %}
                                                     <span class="badge bg-warning text-dark">Pending</span>
                                                 {% endif %}
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">
+                                                    {% if application.shortlisteddate %}
+                                                        <div>Shortlisted: {{ application.shortlisteddate|date('d-m-Y') }}</div>
+                                                    {% endif %}
+                                                    {% if application.accepteddate %}
+                                                        <div>Accepted: {{ application.accepteddate|date('d-m-Y') }}</div>
+                                                    {% endif %}
+                                                    {% if application.rejecteddate %}
+                                                        <div>Rejected: {{ application.rejecteddate|date('d-m-Y') }}</div>
+                                                    {% endif %}
+                                                </small>
                                             </td>
                                             <td>
                                                 <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
@@ -196,13 +208,37 @@
     </div>
 {% endif %}
 
+{# Revert Status Button - Show for Accepted and Shortlisted statuses #}
+{% if statusName in ['accepted', 'shortlisted'] %}
+    <button type="button" 
+            class="btn btn-warning btn-sm revert-status"
+            data-application-id="{{ application.id }}"
+            data-applicant-name="{{ application.fullname }}"
+            title="Revert to previous status">
+        <i class="ti ti-arrow-back-up fs-4"></i>
+        Revert
+    </button>
+{% endif %}
+
+{# Revert Rejected Button - Show only for Rejected status #}
+{% if statusName == 'rejected' %}
+    <button type="button" 
+            class="btn btn-info btn-sm revert-rejected"
+            data-application-id="{{ application.id }}"
+            data-applicant-name="{{ application.fullname }}"
+            title="Revert rejected application to applied">
+        <i class="ti ti-arrow-back-up fs-4"></i>
+        Revert to Applied
+    </button>
+{% endif %}
+
                                                     </div>
                                                 </div>
                                             </td>
                                         </tr>
                                     {% else %}
                                         <tr>
-                                            <td colspan="13" class="text-center py-4">
+                                            <td colspan="14" class="text-center py-4">
                                                 <div class="alert alert-info mb-0">
                                                     <i class="ti ti-info-circle me-2"></i>
                                                     No scholarship applications found.
@@ -232,7 +268,6 @@
 </div>
 
 <style>
-
 .bg-danger{
 background-color:red !important;
 } 
@@ -377,6 +412,158 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
+
+// Revert Status functionality
+document.querySelectorAll('.revert-status').forEach(button => {
+    button.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        const applicationId = this.getAttribute('data-application-id');
+        const applicantName = this.getAttribute('data-applicant-name');
+        
+        // Show SweetAlert confirmation
+        Swal.fire({
+            title: 'Revert Status',
+            html: `Are you sure you want to revert the status for <strong>${applicantName}</strong> to the previous status?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#ffc107',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, revert status!',
+            cancelButtonText: 'Cancel',
+            showLoaderOnConfirm: true,
+            preConfirm: () => {
+                const formData = new URLSearchParams();
+                formData.append('_token', '{{ csrf_token("revert_application_status") }}');
+                
+                return fetch(`/admin/kaaba-applications/revert-status/${applicationId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        // Get the error message from the response
+                        return response.json().then(errorData => {
+                            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Update status badge
+                        const statusBadge = document.getElementById(`status-${applicationId}`);
+                        if (statusBadge) {
+                            statusBadge.innerHTML = data.newStatusBadge;
+                        }
+                        
+                        return data;
+                    } else {
+                        throw new Error(data.message || 'Failed to revert status');
+                    }
+                })
+                .catch(error => {
+                    Swal.showValidationMessage(
+                        `Request failed: ${error.message}`
+                    );
+                });
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed && result.value) {
+                Swal.fire({
+                    title: 'Success!',
+                    text: result.value.message,
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    // Reload the page to reflect changes
+                    window.location.reload();
+                });
+            }
+        });
+    });
+});
+
+// Revert Rejected functionality
+document.querySelectorAll('.revert-rejected').forEach(button => {
+    button.addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        const applicationId = this.getAttribute('data-application-id');
+        const applicantName = this.getAttribute('data-applicant-name');
+        
+        // Show SweetAlert confirmation
+        Swal.fire({
+            title: 'Revert Rejected Application',
+            html: `Are you sure you want to revert the rejected application for <strong>${applicantName}</strong> back to Applied status?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#17a2b8',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Yes, revert to applied!',
+            cancelButtonText: 'Cancel',
+            showLoaderOnConfirm: true,
+            preConfirm: () => {
+                const formData = new URLSearchParams();
+                formData.append('_token', '{{ csrf_token("revert_rejected_application") }}');
+                
+                return fetch(`/admin/kaaba-applications/revert-rejected/${applicationId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        // Get the error message from the response
+                        return response.json().then(errorData => {
+                            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Update status badge
+                        const statusBadge = document.getElementById(`status-${applicationId}`);
+                        if (statusBadge) {
+                            statusBadge.innerHTML = data.newStatusBadge;
+                        }
+                        
+                        return data;
+                    } else {
+                        throw new Error(data.message || 'Failed to revert rejected application');
+                    }
+                })
+                .catch(error => {
+                    Swal.showValidationMessage(
+                        `Request failed: ${error.message}`
+                    );
+                });
+            },
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then((result) => {
+            if (result.isConfirmed && result.value) {
+                Swal.fire({
+                    title: 'Success!',
+                    text: result.value.message,
+                    icon: 'success',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    // Reload the page to reflect changes
+                    window.location.reload();
+                });
+            }
+        });
+    });
+});
 });
 </script>
 {% endblock %}

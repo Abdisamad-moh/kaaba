@@ -147,11 +147,26 @@ class KaabaApplication
     private ?string $literacy_numeracy_qualification = null;
 
 
+ #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $applied_date = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $shortlisted_date = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $accepted_date = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $rejected_date = null;
+
+
     public function __construct()
     {
-        $this->created_at = new \DateTime();        // current date & time
-        $this->application_date = new \DateTime();  // current date only, time is ignored in DB
+        $this->created_at = new \DateTime();        
+        $this->application_date = new \DateTime();  
         $this->uuid = Uuid::v4();
+        $this->applied_date = new \DateTime(); 
+
     }
 
     public function getId(): ?int
@@ -646,6 +661,55 @@ class KaabaApplication
     public function setLiteracyNumeracyQualification(?string $literacy_numeracy_qualification): static
     {
         $this->literacy_numeracy_qualification = $literacy_numeracy_qualification;
+
+        return $this;
+    }
+
+
+   public function getAppliedDate(): ?\DateTimeInterface
+    {
+        return $this->applied_date;
+    }
+
+    public function setAppliedDate(?\DateTimeInterface $applied_date): static
+    {
+        $this->applied_date = $applied_date;
+
+        return $this;
+    }
+
+    public function getShortlistedDate(): ?\DateTimeInterface
+    {
+        return $this->shortlisted_date;
+    }
+
+    public function setShortlistedDate(?\DateTimeInterface $shortlisted_date): static
+    {
+        $this->shortlisted_date = $shortlisted_date;
+
+        return $this;
+    }
+
+    public function getAcceptedDate(): ?\DateTimeInterface
+    {
+        return $this->accepted_date;
+    }
+
+    public function setAcceptedDate(?\DateTimeInterface $accepted_date): static
+    {
+        $this->accepted_date = $accepted_date;
+
+        return $this;
+    }
+
+    public function getRejectedDate(): ?\DateTimeInterface
+    {
+        return $this->rejected_date;
+    }
+
+    public function setRejectedDate(?\DateTimeInterface $rejected_date): static
+    {
+        $this->rejected_date = $rejected_date;
 
         return $this;
     }
