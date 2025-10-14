@@ -35,18 +35,12 @@
                             <table id="file_export" class="table w-100 table-striped table-bordered display text-nowrap" width="100%" data-controller="general">
                                 <thead>
                                     <tr>
-                                        <th>Applicant Name</th>
-                                        <th>Phone</th>
-                                        <th>Email</th>
-                                        <th>Scholarship</th>
-                                        <th>Region</th>
-                                        <th>District</th>
-                                        <th>Institute</th>
-                                        <th>Qualification</th>
-                                        <th>Gender</th>
+                                        <th>Applicant Details</th>
+                                        <th>Scholarship & Course</th>
+                                        <th>Region & District</th>
+                                        <th>Institue & Highest Qualifications</th>
                                         <th>Application Date</th>
                                         <th>Status</th>
-                                        <th>Status Dates</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
@@ -54,61 +48,71 @@
                                     {% for application in applications %}
                                         <tr id="application-{{ application.id }}">
                                             <td>
-                                                <strong>{{ application.fullname }}</strong>
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <strong>{{ application.fullname }}</strong>
+                                                    {% if application.gender %}
+                                                        <span class="badge bg-dark ms-2">{{ application.gender.name }}</span>
+                                                    {% endif %}
+                                                </div>
                                                 {% if application.dateofbirth %}
-                                                    <br><small class="text-muted">DOB: {{ application.dateofbirth|date('d-m-Y') }}</small>
+                                                    <div class="text-muted small">DOB: {{ application.dateofbirth|date('d-m-Y') }}</div>
                                                 {% endif %}
+                                                <div class="text-primary small mt-1">
+                                                    <i class="ti ti-phone"></i> {{ application.phone }}
+                                                </div>
+                                          
                                             </td>
-                                            <td>{{ application.phone }}</td>
-                                            <td>{{ application.email ?? 'N/A' }}</td>
                                             <td>
                                                 {% if application.scholarship %}
-                                                    <span class="badge bg-purple" title="{{ application.scholarship.title }}">
+                                                    <div class="fw-bold text-purple">
                                                         {{ application.scholarship.title|length > 30 ? application.scholarship.title|slice(0, 30) ~ '...' : application.scholarship.title }}
-                                                    </span>
+                                                    </div>
                                                     {% if not application.scholarship.status %}
-                                                        <br><small class="text-danger">(Inactive)</small>
+                                                        <small class="text-danger">(Inactive)</small>
                                                     {% endif %}
                                                 {% else %}
-                                                    <span class="badge bg-secondary">N/A</span>
+                                                    <span class="text-muted">N/A</span>
+                                                {% endif %}
+                                                {% if application.course %}
+                                                    <div class="text-info small mt-1">
+                                                        <i class="ti ti-book"></i> {{ application.course.name }}
+                                                    </div>
                                                 {% endif %}
                                             </td>
                                             <td>
                                                 {% if application.region %}
-                                                    <span class="badge bg-info">{{ application.region.name }}</span>
+                                                    <div class="fw-medium text-dark">{{ application.region.name }}</div>
                                                 {% else %}
-                                                    <span class="badge bg-secondary">N/A</span>
+                                                    <span class="text-muted">N/A</span>
                                                 {% endif %}
-                                            </td>
-                                            <td>
                                                 {% if application.district %}
-                                                    <span class="badge bg-light text-dark">{{ application.district.name }}</span>
-                                                {% else %}
-                                                    <span class="badge bg-secondary">N/A</span>
+                                                    <div class="text-muted small">{{ application.district.name }}</div>
                                                 {% endif %}
                                             </td>
                                             <td>
                                                 {% if application.institute %}
-                                                    <span class="badge bg-primary">{{ application.institute.name }}</span>
+                                                    <div class="fw-medium text-primary">{{ application.institute.name }}</div>
                                                 {% else %}
-                                                    <span class="badge bg-secondary">N/A</span>
+                                                    <span class="text-muted">N/A</span>
                                                 {% endif %}
-                                            </td>
-                                            <td>
                                                 {% if application.highestqualification %}
-                                                    <span class="badge bg-warning text-dark">{{ application.highestqualification.name }}</span>
-                                                {% else %}
-                                                    <span class="badge bg-secondary">N/A</span>
+                                                    <div class="text-warning small">{{ application.highestqualification.name }}</div>
                                                 {% endif %}
                                             </td>
                                             <td>
-                                                {% if application.gender %}
-                                                    <span class="badge bg-success">{{ application.gender.name }}</span>
-                                                {% else %}
-                                                    <span class="badge bg-secondary">N/A</span>
-                                                {% endif %}
+                                                {{ application.applicationdate|date('d-m-Y') }}
+                                                <div class="text-muted small">
+                                                    {% if application.shortlisteddate %}
+                                                        <div>Shortlisted: {{ application.shortlisteddate|date('d-m-Y') }}</div>
+                                                    {% endif %}
+                                                    {% if application.accepteddate %}
+                                                        <div>Accepted: {{ application.accepteddate|date('d-m-Y') }}</div>
+                                                    {% endif %}
+                                                    {% if application.rejecteddate %}
+                                                        <div>Rejected: {{ application.rejecteddate|date('d-m-Y') }}</div>
+                                                    {% endif %}
+                                                </div>
                                             </td>
-                                            <td>{{ application.applicationdate|date('d-m-Y') }}</td>
                                             <td id="status-{{ application.id }}">
                                                 {% if application.status %}
                                                     <span class="badge 
@@ -123,19 +127,6 @@
                                                 {% else %}
                                                     <span class="badge bg-warning text-dark">Pending</span>
                                                 {% endif %}
-                                            </td>
-                                            <td>
-                                                <small class="text-muted">
-                                                    {% if application.shortlisteddate %}
-                                                        <div>Shortlisted: {{ application.shortlisteddate|date('d-m-Y') }}</div>
-                                                    {% endif %}
-                                                    {% if application.accepteddate %}
-                                                        <div>Accepted: {{ application.accepteddate|date('d-m-Y') }}</div>
-                                                    {% endif %}
-                                                    {% if application.rejecteddate %}
-                                                        <div>Rejected: {{ application.rejecteddate|date('d-m-Y') }}</div>
-                                                    {% endif %}
-                                                </small>
                                             </td>
                                             <td>
                                                 <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
@@ -205,9 +196,6 @@
                 </li>
             {% endif %}
         </ul>
-
-
-
     </div>
 {% endif %}
 
@@ -236,7 +224,6 @@
 {% endif %}
 
     <button class="btn text-white btn-sm" style="background: gray;"
-      
        data-action="click->general#operations" data-type="get logs" data-item="{{ application.uuid }}" data-url="{{ path('app_admin_kaaba_application_logs', {'uuid': application.uuid}) }}" data-utility-modal-param="fullModal">
         <i class="ti ti-history me-2"></i> View Logs
     </button>
@@ -247,7 +234,7 @@
                                         </tr>
                                     {% else %}
                                         <tr>
-                                            <td colspan="14" class="text-center py-4">
+                                            <td colspan="7" class="text-center py-4">
                                                 <div class="alert alert-info mb-0">
                                                     <i class="ti ti-info-circle me-2"></i>
                                                     No scholarship applications found.
@@ -303,6 +290,9 @@ font-size:20px;
 .bg-purple {
     background-color: #6f42c1 !important;
 }
+.text-purple {
+    color: #6f42c1 !important;
+}
 
 .btn-loading {
     position: relative;
@@ -331,6 +321,12 @@ font-size:20px;
 .table-responsive .dropdown-menu {
     position: absolute;
     z-index: 1060;
+}
+
+/* Improve table readability */
+.table td {
+    vertical-align: top;
+    padding: 12px 8px;
 }
 </style>
 {% endblock %}

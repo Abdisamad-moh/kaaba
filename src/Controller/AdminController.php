@@ -3212,12 +3212,13 @@ public function kaabaApplications(
     $genders = $genderRepository->findAll();
     $scholarships = $scholarshipRepository->findAll();
 
-    $searchForm = $this->createFormBuilder(null)
+  $searchForm = $this->createFormBuilder(null)
         ->add('status', EntityType::class, [
             'class' => KaabaApplicationStatus::class,
             'choice_label' => 'name',
             'required' => false,
             'mapped' => false,
+            'label' => 'Status',
             'attr' => [
                 'class' => 'form-control',
                 'col_class' => 'col-md-3',
@@ -3229,6 +3230,7 @@ public function kaabaApplications(
             'choice_label' => 'title',
             'required' => false,
             'mapped' => false,
+            'label' => 'Scholarship',
             'attr' => [
                 'class' => 'form-control',
                 'col_class' => 'col-md-3',
@@ -3239,6 +3241,7 @@ public function kaabaApplications(
             'required' => false,
             'mapped' => false,
             'widget' => 'single_text',
+            'label' => 'From Date',
             'attr' => [
                 'class' => 'form-control',
                 'col_class' => 'col-md-3',
@@ -3249,6 +3252,7 @@ public function kaabaApplications(
             'required' => false,
             'mapped' => false,
             'widget' => 'single_text',
+            'label' => 'To Date',
             'attr' => [
                 'class' => 'form-control',
                 'col_class' => 'col-md-3',
@@ -3258,6 +3262,7 @@ public function kaabaApplications(
         ->add('phone', TextType::class, [
             'required' => false,
             'mapped' => false,
+            'label' => 'Phone Number',
             'attr' => [
                 'class' => 'form-control',
                 'col_class' => 'col-md-3',
@@ -3269,6 +3274,7 @@ public function kaabaApplications(
             'choice_label' => 'name',
             'required' => false,
             'mapped' => false,
+            'label' => 'Region',
             'attr' => [
                 'class' => 'form-control',
                 'col_class' => 'col-md-3',
@@ -3280,6 +3286,7 @@ public function kaabaApplications(
             'choice_label' => 'name',
             'required' => false,
             'mapped' => false,
+            'label' => 'District',
             'attr' => [
                 'class' => 'form-control',
                 'col_class' => 'col-md-3',
@@ -3291,6 +3298,7 @@ public function kaabaApplications(
             'choice_label' => 'name',
             'required' => false,
             'mapped' => false,
+            'label' => 'Qualification',
             'attr' => [
                 'class' => 'form-control',
                 'col_class' => 'col-md-3',
@@ -3302,6 +3310,7 @@ public function kaabaApplications(
             'choice_label' => 'name',
             'required' => false,
             'mapped' => false,
+            'label' => 'Gender',
             'attr' => [
                 'class' => 'form-control',
                 'col_class' => 'col-md-3',
