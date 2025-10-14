@@ -12,19 +12,19 @@
         "type": "js"
     },
     "\/assets\/@symfony\/ux-autocomplete\/controller.js": {
-        "path": "\/assets\/@symfony\/ux-autocomplete\/controller-dd1b31bd819824edecb124585c6bdb56.js",
+        "path": "\/assets\/@symfony\/ux-autocomplete\/controller-e32293e0cc8575fe75e244c5a68fd241.js",
         "type": "js"
     },
     "\/assets\/@symfony\/ux-chartjs\/controller.js": {
-        "path": "\/assets\/@symfony\/ux-chartjs\/controller-ca19c6fa17c0c7a61a47fa5cd49a8137.js",
+        "path": "\/assets\/@symfony\/ux-chartjs\/controller-2b631fe9f6962343d71ebbe25f0594ec.js",
         "type": "js"
     },
     "\/assets\/@symfony\/ux-live-component\/live_controller.js": {
-        "path": "\/assets\/@symfony\/ux-live-component\/live_controller-b4fdb1f53d5a5f813f85327cceb706b8.js",
+        "path": "\/assets\/@symfony\/ux-live-component\/live_controller-64f51caa9e8bfee28249a576457f914f.js",
         "type": "js"
     },
     "\/assets\/@symfony\/ux-live-component\/live.min.css": {
-        "path": "\/assets\/@symfony\/ux-live-component\/live.min-5108f988fb2a3dbb292d6feebc9db7e8.css",
+        "path": "\/assets\/@symfony\/ux-live-component\/live.min-64907418e2da12691d8fa3c70a509e08.css",
         "type": "css"
     },
     "\/assets\/controllers\/recommended-candidates-controller.js": {
@@ -156,7 +156,7 @@
         "type": "js"
     },
     "@symfony\/stimulus-bundle": {
-        "path": "\/assets\/@symfony\/stimulus-bundle\/loader-870999a02e9fc147c034d522826ea70d.js",
+        "path": "\/assets\/@symfony\/stimulus-bundle\/loader-5751ad1ee2975e725a94d8121d153d17.js",
         "type": "js"
     },
     "@hotwired\/turbo": {
@@ -164,7 +164,7 @@
         "type": "js"
     },
     "@symfony\/ux-live-component": {
-        "path": "\/assets\/@symfony\/ux-live-component\/live_controller-b4fdb1f53d5a5f813f85327cceb706b8.js",
+        "path": "\/assets\/@symfony\/ux-live-component\/live_controller-64f51caa9e8bfee28249a576457f914f.js",
         "type": "js"
     },
     "bootstrap": {
@@ -238,5 +238,9 @@
     "ckeditor5-build-classic": {
         "path": "\/assets\/vendor\/ckeditor5-build-classic\/ckeditor5-build-classic.index-73a732f94d4d669243e671449e6f48ad.js",
         "type": "js"
+    },
+    "tom-select\/dist\/css\/tom-select.bootstrap4.css": {
+        "path": "\/assets\/vendor\/tom-select\/dist\/css\/tom-select.bootstrap4-fa019d9f7e879f3a22bd232c75173c1f.css",
+        "type": "css"
     }
 }

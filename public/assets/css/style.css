@@ -19665,10 +19665,8 @@ background-color: #212320 !important;
 
 
 .fl-wrapper {
-    pointer-events: none; /* wrapper won't block clicks */
-}
-
-.flasher, /* the actual notifications */
-.fl-notification {
-    pointer-events: auto; /* allow interaction with the notification */
+    z-index: 99999 !important;
+    position: fixed !important;
+    top: 20px !important;
+    right: 20px !important;
 }

@@ -1255,50 +1255,60 @@ public function scholarshipApplication(
                
             ];
 
-            foreach ($fileFields as $field) {
-                if ($form->has($field)) {
-                    $file = $form->get($field)->getData();
-                    
-                    if ($file) {
-                        // Validate file type and size
-                        $allowedMimeTypes = [
-                            'application/pdf',
-                            'image/jpeg',
-                            'image/png',
-                            'image/jpg',
-                            'application/msword',
-                            'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-                        ];
-                        
-                        $fileMimeType = $file->getMimeType();
-                        
-                        if (!in_array($fileMimeType, $allowedMimeTypes)) {
-                            $this->addFlash('error', 'Invalid file type for ' . $field . '. Allowed types: PDF, JPG, PNG, DOC, DOCX.');
-                            return $this->redirectToRoute('app_scholarship_application', ['uuid' => $uuid]);
-                        }
-                        
-                        if ($file->getSize() > 20 * 1024 * 1024) { // 20MB limit
-                            $this->addFlash('error', 'File too large for ' . $field . '. Maximum size is 20MB.');
-                            return $this->redirectToRoute('app_scholarship_application', ['uuid' => $uuid]);
-                        }
-
-                        // Generate unique filename
-                        $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-                        $safeFilename = transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $originalFilename);
-                        $newFilename = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
-
-                        // Move file to uploads directory
-                        $file->move(
-                            $this->getParameter('application_attachments'),
-                            $newFilename
-                        );
-
-                        // Set filename in entity
-                        $setter = 'set' . str_replace('_', '', ucwords($field, '_'));
-                        $application->$setter($newFilename);
-                    }
-                } 
+         foreach ($fileFields as $field) {
+    if ($form->has($field)) {
+        $file = $form->get($field)->getData();
+        
+        if ($file) {
+            // Validate file type and size
+            $allowedMimeTypes = [
+                'application/pdf',
+                'image/jpeg',
+                'image/png',
+                'image/jpg',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+            ];
+            
+            $fileMimeType = $file->getMimeType();
+            
+            if (!in_array($fileMimeType, $allowedMimeTypes)) {
+                $this->addFlash('error', 'Invalid file type for ' . $field . '. Allowed types: PDF, JPG, PNG, DOC, DOCX.');
+                return $this->redirectToRoute('app_scholarship_application', ['uuid' => $uuid]);
             }
+            
+            if ($file->getSize() > 20 * 1024 * 1024) { // 20MB limit
+                $this->addFlash('error', 'File too large for ' . $field . '. Maximum size is 20MB.');
+                return $this->redirectToRoute('app_scholarship_application', ['uuid' => $uuid]);
+            }
+
+            // Generate unique filename with fallback for transliterator
+            $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            
+            // Use transliterator if available, otherwise use simple sanitization
+            if (function_exists('transliterator_transliterate')) {
+                $safeFilename = transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $originalFilename);
+            } else {
+                // Fallback sanitization
+                $safeFilename = preg_replace('/[^A-Za-z0-9_-]/', '', $originalFilename);
+                $safeFilename = strtolower($safeFilename);
+            }
+            
+            $newFilename = $safeFilename.'-'.uniqid().'.'.$file->guessExtension();
+
+            // Move file to uploads directory
+            $file->move(
+                $this->getParameter('application_attachments'),
+                $newFilename
+            );
+
+            // Set filename in entity
+            $setter = 'set' . str_replace('_', '', ucwords($field, '_'));
+            $application->$setter($newFilename);
+        }
+    } 
+}
+
 
             $em->persist($application);
 

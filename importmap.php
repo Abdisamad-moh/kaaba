@@ -86,4 +86,8 @@ return [
     'ckeditor5-build-classic' => [
         'version' => '1.0.0',
     ],
+    'tom-select/dist/css/tom-select.bootstrap4.css' => [
+        'version' => '2.4.3',
+        'type' => 'css',
+    ],
 ];
