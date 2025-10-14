@@ -35,21 +35,24 @@ class TranslationService
                 'add_files' => 'Add Files',
                 'drag_files_here' => 'Drag files here or click to browse',
                 'select_option' => 'Select an option',
-                'select_district' => 'Select District',
+                'district_placeholder' => 'Select District',
                 'optional' => 'optional',
 
                 // Personal Information Fields
                 'full_name' => 'Full Name',
                 'full_name_placeholder' => 'Enter your full name',
                 'gender' => 'Gender',
+                'gender_placeholder' => 'Select Gender',
                 'phone' => 'Phone Number',
                 'phone_placeholder' => 'Enter your phone number',
                 'email' => 'Email Address',
                 'email_placeholder' => 'Enter your email address',
                 'nationality' => 'Nationality',
+                'nationality_placeholder' => 'List of Countries',
                 'date_of_birth' => 'Date of Birth',
                 'date_placeholder' => 'mm/dd/yyyy',
                 'region' => 'Region',
+                'region_placeholder' => 'Select Region',
                 'district' => 'District',
                 'town' => 'Town',
                 'town_placeholder' => 'Enter your town',
@@ -95,6 +98,7 @@ class TranslationService
                 'enrollment_school' => 'Enrollment - School Selection',
                 'enrollment_course' => 'Enrollment - Course Selection',
                 'institute' => 'Institute',
+                'institute_placeholder' => 'Select Institute',
 
                 // Secondary Education
                 'secondary_school_education' => 'Secondary School Education',
@@ -109,6 +113,7 @@ class TranslationService
                 // Higher Education
                 'higher_education' => 'Higher Education Qualification',
                 'highest_qualification' => 'Highest Qualification',
+                'highest_qualification_placeholder' => 'Select Your Highest Qualification',
                 'highest_qualification_detail' => 'Highest Qualification Details',
                 'highest_qualification_detail_placeholder' => 'Enter qualification details',
 
@@ -133,6 +138,16 @@ class TranslationService
                 'needs_statement' => 'Needs Statement Attachment',
                 'other_documents' => 'Other Documents Attachment',
 
+
+//Declaration Section
+                'declaration' => 'Declaration',
+                'declaration_text' => 'I hereby affirm that all information provided in this application form is true, accurate, andcomplete to the best of my knowledge. I further express my earnest commitment to fullyengage with the learning opportunity offered through this scholarship. Due to financialconstraints, I have been unable to pursue studies at other institutions, and I amtherefore sincerely motivated to benefit from this program.',
+              
+
+// Acknowledgment Section
+                'acknowledgement_agreement' => 'Acknowledgement and Agreement',
+                'i_confirm_read_agree' => 'I confirm that I have read and agree to the terms and conditions stated above.',
+
                 // Choices
                 'yes' => 'Yes',
                 'no' => 'No',
@@ -154,7 +169,6 @@ class TranslationService
                 'add_files' => 'Ku Dar Faylalka',
                 'drag_files_here' => 'Jiid faylalka halkan ama guji si aad u raadiso',
                 'select_option' => 'Xulo Ikhtiyaar',
-                'select_district' => 'Xulo Degmo',
                 'optional' => 'ikhtiyaari',
 
                 // Personal Information Fields
@@ -170,10 +184,13 @@ class TranslationService
                 'date_placeholder' => 'dd/bb/ssss',
                 'region' => 'Gobolka',
                 'district' => 'Degmada',
-                'town' => 'Magaalada',
-                'town_placeholder' => 'Geli magaaladaada',
                 'village' => 'Tuulada',
                 'village_placeholder' => 'Geli tuuladaada',
+                'gender_placeholder' => 'Dooro Jinsiga',
+                'region_placeholder' => 'Dooro Gobolka',
+                'district_placeholder' => 'Dooro Degmada',
+                'nationality_placeholder' => 'Dooro wadankaga',
+                'date' => 'Taariikhda',
 
                 // Literacy & Numeracy Section
                 'literacy_numeracy_section' => 'Heerka Aqoonta Akhriska Qorista & Heerka Xisaabta',
@@ -216,6 +233,7 @@ class TranslationService
                 // Higher Education
                 'higher_education' => 'Aqoonta Ugu Sarreysa',
                 'highest_qualification' => 'Aqoon Ugu Sarreysa',
+                'highest_qualification_placeholder' => 'Dooro Aqoontada Ugu Sarreysa',
                 'highest_qualification_detail' => 'Faahfaahinta Aqoonta Ugu Sarreysa',
                 'highest_qualification_detail_placeholder' => 'Geli faahfaahinta aqoonta ugu sarreysa',
 
@@ -236,9 +254,15 @@ class TranslationService
 
                 // Supporting Documents
                 'certificates_attachment' => 'Dukumiintiga Shahaadadyada',
-                'willingness_declaration' => 'Dukumiintiga Caddaynta Raalli Ka Ah',
-                'needs_statement' => 'Dukumiintiga Caddaynta Baahida',
-                'other_documents' => 'Dukumiintiyada Kale',
+
+//Declaration Section
+                'declaration' => 'Bayaanka',
+                'declaration_text' => 'Waxaan si daacad ah u caddeynayaa in dhammaan macluumaadka aan ku bixiyayfoomkan codsiga uu yahay mid sax ah, dhammaystiran, oo run ah sida ugu wanaagsanee aan u ogahay. Waxaan sidoo kale muujinayaa go’aankeyga dhabta ah ee ah inaan sibuuxda uga faa’iideysto fursadda waxbarasho ee deeqdan waxbarasho. Xaaladahadhaqaale awgood, ma aanan awoodin inaan wax ka barto hay’adaha kale, sidaasdarteed waxaan si dhab ah u daneynayaa inaan ka faa’iideysto barnaamijkan.',
+              
+
+// Acknowledgment Section
+                'acknowledgement_agreement' => 'Caddeyn iyo Oggolaansho',
+                'i_confirm_read_agree' => 'Waxaan caddeynayaa in aan akhriyey oo aan oggolahay shuruudaha iyo xaaladahakor ku xusan.',
 
                 // Choices
                 'yes' => 'Haa',

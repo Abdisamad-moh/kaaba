@@ -405,7 +405,6 @@
                                     </div>
 
                                     <!-- Region -->
-                                    <!-- Region -->
 <div class="col-md-6">
     {{ form_label(form.region, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
     {{ form_widget(form.region, {'attr': {'class': 'form-select border border-dark rounded-0', 'id': 'region-select'}}) }}
@@ -419,12 +418,7 @@
                                         {{ form_errors(form.district) }}
                                     </div>
 
-                                    <!-- Town -->
-                                    <div class="col-md-6">
-                                        {{ form_label(form.town, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                                        {{ form_widget(form.town, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
-                                        {{ form_errors(form.town) }}
-                                    </div>
+                                   
 
                                     <!-- Village -->
                                     <div class="col-md-6">
@@ -570,11 +564,7 @@
 
         <div class="mt-3">
             <div class="row g-3">
-                <div class="col-md-6">
-                    {{ form_label(form.secondary_region, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                    {{ form_widget(form.secondary_region, {'attr': {'class': 'form-select border border-dark rounded-0'}}) }}
-                    {{ form_errors(form.secondary_region) }}
-                </div>
+            
                 <div class="col-md-6">
                     {{ form_label(form.secondary_school, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
                     {{ form_widget(form.secondary_school, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
@@ -692,75 +682,80 @@
                     </div>
                     <!-- End Step 1 -->
 
-                    <!-- Step 2: Supporting Documents -->
-                    <div class="tab-pane fade in" id="step2">
-                        <div class="row justify-content-center">
-                            <div class="col-lg-10">
-                                <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3" style="background-color:#1b5e20; font-size:14px;">
-                                    {{ 'supporting_documents'|trans }}
-                                </h6>
+                  <!-- Step 2: Supporting Documents -->
+<div class="tab-pane fade in" id="step2">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3" style="background-color:#1b5e20; font-size:14px;">
+                {{ 'supporting_documents'|trans }}
+            </h6>
 
-                                <div class="mt-3" style="font-size:14px;">
-                                    <!-- Certificates Attachment -->
-                                    <div class="mb-4">
-                                        <label class="form-label fw-600 text-dark-gray">{{ 'certificates_attachment'|trans }}</label>
-                                        <div class="file-drop-area border border-dark rounded-0 p-4 text-center bg-light" id="certificatesArea" data-field-name="certificate_attachment">
-                                            {{ form_widget(form.certificate_attachment, {'attr': {'class': 'hidden-file-input file-input', 'data-area': 'certificatesArea'}}) }}
-                                            <button type="button" class="btn btn-sm btn-dark-gray mb-2" onclick="document.getElementById('{{ form.certificate_attachment.vars.id }}').click()">{{ 'add_files'|trans }}</button>
-                                            <div class="text-muted" style="font-size:13px;">{{ 'drag_files_here'|trans }}</div>
-                                            <div class="file-list mt-2" id="certificatesList"></div>
-                                        </div>
-                                        {{ form_errors(form.certificate_attachment) }}
-                                    </div>
+            <div class="mt-3" style="font-size:14px;">
+                <!-- Certificates Attachment -->
+                <div class="mb-4">
+                    <label class="form-label fw-600 text-dark-gray">{{ 'certificates_attachment'|trans }}</label>
+                    <div class="file-drop-area border border-dark rounded-0 p-4 text-center bg-light" id="certificatesArea" data-field-name="certificate_attachment">
+                        {{ form_widget(form.certificate_attachment, {'attr': {'class': 'hidden-file-input file-input', 'data-area': 'certificatesArea'}}) }}
+                        <button type="button" class="btn btn-sm btn-dark-gray mb-2" onclick="document.getElementById('{{ form.certificate_attachment.vars.id }}').click()">{{ 'add_files'|trans }}</button>
+                        <div class="text-muted" style="font-size:13px;">{{ 'drag_files_here'|trans }}</div>
+                        <div class="file-list mt-2" id="certificatesList"></div>
+                    </div>
+                    {{ form_errors(form.certificate_attachment) }}
+                </div>
 
-                                    <!-- Willingness Declaration Attachment -->
-                                    <div class="mb-4">
-                                        <label class="form-label fw-600 text-dark-gray">{{ 'willingness_declaration'|trans }}</label>
-                                        <div class="file-drop-area border border-dark rounded-0 p-4 text-center bg-light" id="willingnessArea" data-field-name="willingness_declaration_attachment">
-                                            {{ form_widget(form.willingness_declaration_attachment, {'attr': {'class': 'hidden-file-input file-input', 'data-area': 'willingnessArea'}}) }}
-                                            <button type="button" class="btn btn-sm btn-dark-gray mb-2" onclick="document.getElementById('{{ form.willingness_declaration_attachment.vars.id }}').click()">{{ 'add_files'|trans }}</button>
-                                            <div class="text-muted" style="font-size:13px;">{{ 'drag_files_here'|trans }}</div>
-                                            <div class="file-list mt-2" id="willingnessList"></div>
-                                        </div>
-                                        {{ form_errors(form.willingness_declaration_attachment) }}
-                                    </div>
+                <!-- Declaration Section -->
+                <div class="mb-4">
+                    <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3 mt-4" style="background-color:#1b5e20; font-size:14px;">
+                        {{ 'declaration'|trans }}
+                    </h6>
+                    
+                    <div class="border border-dark rounded-0 p-4 mt-3 bg-light">
+                        <!-- Declaration Text -->
+                        <div class="mb-4">
+                            <p class="mb-3"><strong>{{ 'declaration'|trans }}</strong></p>
+                            <p class="mb-2" style="font-size: 14px; line-height: 1.5;">
+                                {{ 'declaration_text'|trans }}
+                            </p>
+                        </div>
 
-                                    <!-- Needs Statement Attachment -->
-                                    <div class="mb-4">
-                                        <label class="form-label fw-600 text-dark-gray">{{ 'needs_statement'|trans }}</label>
-                                        <div class="file-drop-area border border-dark rounded-0 p-4 text-center bg-light" id="needsArea" data-field-name="needs_statement_attachment">
-                                            {{ form_widget(form.needs_statement_attachment, {'attr': {'class': 'hidden-file-input file-input', 'data-area': 'needsArea'}}) }}
-                                            <button type="button" class="btn btn-sm btn-dark-gray mb-2" onclick="document.getElementById('{{ form.needs_statement_attachment.vars.id }}').click()">{{ 'add_files'|trans }}</button>
-                                            <div class="text-muted" style="font-size:13px;">{{ 'drag_files_here'|trans }}</div>
-                                            <div class="file-list mt-2" id="needsList"></div>
-                                        </div>
-                                        {{ form_errors(form.needs_statement_attachment) }}
-                                    </div>
+                        <!-- Acknowledgement and Agreement -->
+                        <div class="mb-4">
+                            <p class="mb-3"><strong>{{ 'acknowledgement_agreement'|trans }}</strong></p>
+                            
+                            <!-- Checkbox -->
+                            <div class="form-check mb-3">
+                                <input class="form-check-input" type="checkbox" id="declarationAgreement" style="width: 18px; height: 18px;">
+                                <label class="form-check-label fw-600 text-dark-gray ms-2" for="declarationAgreement" style="font-size: 14px;">
+                                    {{ 'i_confirm_read_agree'|trans }}
+                                </label>
+                            </div>
 
-                                    <!-- Other Documents Attachment -->
-                                    <div class="mb-4">
-                                        <label class="form-label fw-600 text-dark-gray">{{ 'other_documents'|trans }}</label>
-                                        <div class="file-drop-area border border-dark rounded-0 p-4 text-center bg-light" id="otherArea" data-field-name="other_documents_attachment">
-                                            {{ form_widget(form.other_documents_attachment, {'attr': {'class': 'hidden-file-input file-input', 'data-area': 'otherArea'}}) }}
-                                            <button type="button" class="btn btn-sm btn-dark-gray mb-2" onclick="document.getElementById('{{ form.other_documents_attachment.vars.id }}').click()">{{ 'add_files'|trans }}</button>
-                                            <div class="text-muted" style="font-size:13px;">{{ 'drag_files_here'|trans }}</div>
-                                            <div class="file-list mt-2" id="otherList"></div>
-                                        </div>
-                                        {{ form_errors(form.other_documents_attachment) }}
-                                    </div>
-
-                                    <!-- Action Buttons -->
-                                    <div class="d-flex justify-content-between mt-4">
-                                        <button type="button" class="btn btn-outline-dark-gray btn-round-edge px-4" onclick="switchTab('step1')">{{ 'previous'|trans }}</button>
-                                        <div>
-<button type="button" onclick="submitApplication()" class="btn btn-outline-dark-gray btn-round-edge px-5" id="submitBtn">{{ 'submit_application'|trans }}</button>
-                                        </div>
-                                    </div>
+                            <!-- Full Name Field -->
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-600 text-dark-gray mb-2">{{ 'full_name'|trans }}</label>
+                                    <input type="text" class="form-control border border-dark rounded-0" id="declarationFullName" readonly style="background-color: #f8f9fa;">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-600 text-dark-gray mb-2">{{ 'date'|trans }}</label>
+                                    <input type="text" class="form-control border border-dark rounded-0" id="declarationDate" readonly style="background-color: #f8f9fa;">
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- End Step 2 -->
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex justify-content-between mt-4">
+                    <button type="button" class="btn btn-outline-dark-gray btn-round-edge px-4" onclick="switchTab('step1')">{{ 'previous'|trans }}</button>
+                    <div>
+                        <button type="button" onclick="submitApplication()" class="btn btn-outline-dark-gray btn-round-edge px-5" id="submitBtn" disabled>{{ 'submit_application'|trans }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
                 </div>
                 {{ form_end(form) }}
             </div>
@@ -788,6 +783,20 @@
             this.setupLanguageSwitcher();
             this.initializeFormState();
         }
+
+
+forcePlaceholderSelection() {
+    const regionSelect = document.getElementById('{{ form.region.vars.id }}');
+    if (regionSelect) {
+        // Wait a brief moment for the DOM to be fully ready
+        setTimeout(() => {
+            if (regionSelect.selectedIndex !== 0) {
+                regionSelect.selectedIndex = 0;
+            }
+        }, 100);
+    }
+}
+
 
         // File Upload Management
         setupFileUpload() {
@@ -873,7 +882,6 @@
             const requiredFields = [
                 '{{ form.full_name.vars.id }}',
                 '{{ form.phone.vars.id }}',
-                '{{ form.town.vars.id }}',
                 '{{ form.gender.vars.id }}',
                 '{{ form.nationality.vars.id }}',
                 '{{ form.date_of_birth.vars.id }}',
@@ -881,9 +889,7 @@
                 '{{ form.disability.vars.id }}',
             ];
 
-            {% if type != 'l' %}
-            requiredFields.push('{{ form.secondary_region.vars.id }}');
-            {% endif %}
+          
 
             requiredFields.forEach(fieldId => {
                 const field = document.getElementById(fieldId);
@@ -910,13 +916,10 @@
                 '{{ form.nationality.vars.id }}': 'Nationality is required',
                 '{{ form.date_of_birth.vars.id }}': 'Date of birth is required',
                 '{{ form.region.vars.id }}': 'Region is required',
-                '{{ form.town.vars.id }}': 'Town is required',
                 '{{ form.disability.vars.id }}': 'Disability information is required'
             };
 
-            {% if type != 'l' %}
-            requiredFields['{{ form.secondary_region.vars.id }}'] = 'Secondary school region is required';
-            {% endif %}
+           
 
             let isValid = true;
 
@@ -959,39 +962,78 @@
             return true;
         }
 
-        validateFileAttachments() {
-            const fileFields = [
-                'identity_attachment',
-                'certificate_attachment', 
-                'willingness_declaration_attachment',
-                'needs_statement_attachment',
-                'other_documents_attachment'
-            ];
-            
-            let hasAtLeastOneFile = false;
-            
-            fileFields.forEach(fieldName => {
-                const fileArea = document.querySelector(`[data-field-name="${fieldName}"]`);
-                if (fileArea) {
-                    const fileList = fileArea.querySelector('.file-list');
-                    const hasFiles = fileList && fileList.children.length > 0;
-                    
-                    if (hasFiles) {
-                        hasAtLeastOneFile = true;
-                        fileArea.classList.remove('file-area-error');
-                    } else {
-                        fileArea.classList.add('file-area-error');
-                    }
-                }
-            });
-            
-            if (!hasAtLeastOneFile) {
-                this.showAlertMessage('Please upload at least one supporting document.', 'danger');
-                return false;
-            }
-            
-            return true;
+       validateFileAttachments() {
+    const certificatesArea = document.querySelector('[data-field-name="certificate_attachment"]');
+    let hasCertificateFiles = false;
+    
+    if (certificatesArea) {
+        const fileList = certificatesArea.querySelector('.file-list');
+        hasCertificateFiles = fileList && fileList.children.length > 0;
+        
+        if (!hasCertificateFiles) {
+            certificatesArea.classList.add('file-area-error');
+        } else {
+            certificatesArea.classList.remove('file-area-error');
         }
+    }
+    
+    if (!hasCertificateFiles) {
+        this.showAlertMessage('Please upload at least one certificate document.', 'danger');
+        return false;
+    }
+    
+    return true;
+}
+
+
+setupDeclarationSection() {
+    this.initializeDeclarationFields();
+    this.setupDeclarationValidation();
+}
+
+initializeDeclarationFields() {
+    // Set today's date
+    const today = new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    document.getElementById('declarationDate').value = today;
+
+    // Auto-fill name from step 1
+    const fullNameField = document.getElementById('{{ form.full_name.vars.id }}');
+    if (fullNameField) {
+        // Set initial value
+        document.getElementById('declarationFullName').value = fullNameField.value;
+        
+        // Update on changes
+        fullNameField.addEventListener('input', () => {
+            document.getElementById('declarationFullName').value = fullNameField.value;
+        });
+    }
+}
+
+setupDeclarationValidation() {
+    const agreementCheckbox = document.getElementById('declarationAgreement');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    if (agreementCheckbox && submitBtn) {
+        agreementCheckbox.addEventListener('change', () => {
+            this.updateSubmitButtonState();
+        });
+    }
+}
+
+updateSubmitButtonState() {
+    const agreementCheckbox = document.getElementById('declarationAgreement');
+    const submitBtn = document.getElementById('submitBtn');
+    
+    if (agreementCheckbox && submitBtn) {
+        const isAgreed = agreementCheckbox.checked;
+        submitBtn.disabled = !isAgreed;
+        submitBtn.classList.toggle('btn-disabled', !isAgreed);
+    }
+}
 
         // UI Management
         updateNextStepButton(isValid) {
@@ -1111,7 +1153,9 @@
             this.clearValidationErrors();
             this.initializeRegionDistrict();
             this.initializeInstituteCourseDynamics();
+  this.setupDeclarationSection(); 
             this.validateStep1();
+this.forcePlaceholderSelection();
 
             // Initialize file area validation state
             document.querySelectorAll('.file-drop-area').forEach(area => {

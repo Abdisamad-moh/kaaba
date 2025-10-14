@@ -1251,10 +1251,8 @@ public function scholarshipApplication(
             // Handle file uploads
             $fileFields = [
                 'identity_attachment',
-                'certificate_attachment',
-                'willingness_declaration_attachment',
-                'needs_statement_attachment',
-                'other_documents_attachment'
+                'certificate_attachment'
+               
             ];
 
             foreach ($fileFields as $field) {

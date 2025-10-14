@@ -78,17 +78,17 @@ class KaabaApplicationFormType extends AbstractType
                     new NotBlank(['message' => 'Date of birth is required.'])
                 ]
             ])
-            ->add('town', TextType::class, [
-                'label' => $this->translator->trans('town'),
-                'required' => true,
-                'attr' => [
-                    'class' => 'form-control',
-                    'placeholder' => $this->translator->trans('town_placeholder')
-                ],
-                'constraints' => [
-                    new NotBlank(['message' => 'Town is required.'])
-                ]
-            ])
+            // ->add('town', TextType::class, [
+            //     'label' => $this->translator->trans('town'),
+            //     'required' => true,
+            //     'attr' => [
+            //         'class' => 'form-control',
+            //         'placeholder' => $this->translator->trans('town_placeholder')
+            //     ],
+            //     'constraints' => [
+            //         new NotBlank(['message' => 'Town is required.'])
+            //     ]
+            // ])
             ->add('village', TextType::class, [
                 'label' => $this->translator->trans('village'),
                 'required' => false,
@@ -258,50 +258,19 @@ class KaabaApplicationFormType extends AbstractType
                     'data-area' => 'certificatesArea'
                 ]
             ])
-            ->add('willingness_declaration_attachment', FileType::class, [
-                'label' => $this->translator->trans('willingness_declaration'),
-                'required' => false,
-                'mapped' => true,
-                'constraints' => [
-                    new File($fileConstraints)
-                ],
-                'attr' => [
-                    'class' => 'hidden-file-input file-input',
-                    'data-area' => 'willingnessArea'
-                ]
-            ])
-            ->add('needs_statement_attachment', FileType::class, [
-                'label' => $this->translator->trans('needs_statement'),
-                'required' => false,
-                'mapped' => true,
-                'constraints' => [
-                    new File($fileConstraints)
-                ],
-                'attr' => [
-                    'class' => 'hidden-file-input file-input',
-                    'data-area' => 'needsArea'
-                ]
-            ])
-            ->add('other_documents_attachment', FileType::class, [
-                'label' => $this->translator->trans('other_documents'),
-                'required' => false,
-                'mapped' => true,
-                'constraints' => [
-                    new File($fileConstraints)
-                ],
-                'attr' => [
-                    'class' => 'hidden-file-input file-input',
-                    'data-area' => 'otherArea'
-                ]
-            ])
+          
             ->add('region', EntityType::class, [
                 'class' => KaabaRegion::class,
                 'choice_label' => 'name',
                 'label' => $this->translator->trans('region'),
                 'required' => true,
-'choices' => $regions, 
+// 'choices' => $regions, 
+ 'placeholder' => $this->translator->trans('region_placeholder')
+,
                 'attr' => [
                     'class' => 'form-select'
+
+
                 ],
                 'constraints' => [
                     new NotBlank(['message' => 'Region is required.'])
@@ -312,9 +281,10 @@ class KaabaApplicationFormType extends AbstractType
                 'choice_label' => 'name',
                 'label' => $this->translator->trans('gender'),
                 'required' => true,
+ 'placeholder' => $this->translator->trans('gender_placeholder')
+,
                 'attr' => [
-                    'class' => 'form-select'
-                ],
+                    'class' => 'form-select'                ],
                 'constraints' => [
                     new NotBlank(['message' => 'Gender is required.'])
                 ]
@@ -324,7 +294,7 @@ class KaabaApplicationFormType extends AbstractType
                 'choice_label' => 'name',
                 'label' => $this->translator->trans('district'),
                 'required' => false,
-                'placeholder' => $this->translator->trans('select_district'),
+                'placeholder' => $this->translator->trans('district_placeholder'),
                 'attr' => [
                     'class' => 'form-select'
                 ]
@@ -334,9 +304,10 @@ class KaabaApplicationFormType extends AbstractType
                 'choice_label' => 'name',
                 'label' => $this->translator->trans('nationality'),
                 'required' => false,
+ 'placeholder' => $this->translator->trans('nationality_placeholder')
+,
                 'attr' => [
-                    'class' => 'form-select'
-                ]
+                    'class' => 'form-select'                ]
             ])
             ->add('institute', EntityType::class, [
                 'class' => KaabaInstitute::class,
@@ -349,18 +320,19 @@ class KaabaApplicationFormType extends AbstractType
                     'class' => 'form-select'
                 ]
             ])
-            ->add('secondary_region', EntityType::class, [
-                'class' => KaabaRegion::class,
-                'choice_label' => 'name',
-                'label' => $this->translator->trans('secondary_region'),
-                'required' => false, // Changed to false
-                'attr' => [
-                    'class' => 'form-select'
-                ]
-            ])
+            // ->add('secondary_region', EntityType::class, [
+            //     'class' => KaabaRegion::class,
+            //     'choice_label' => 'name',
+            //     'label' => $this->translator->trans('secondary_region'),
+            //     'required' => false, // Changed to false
+            //     'attr' => [
+            //         'class' => 'form-select'
+            //     ]
+            // ])
             ->add('highest_qualification', EntityType::class, [
                 'class' => KaabaQualification::class,
                 'choice_label' => 'name',
+                'placeholder' => $this->translator->trans('highest_qualification_placeholder'),
                 'label' => $this->translator->trans('highest_qualification'),
                 'required' => false,
                 'attr' => [
