@@ -1,0 +1,100 @@
+{# templates/admin/kaaba_application/_logs.html.twig #}
+<div class="row">
+    <div class="col-12">
+        <div class="logs-container">
+            {% for log in application.logs %}
+                {# Determine card color based on action type #}
+                {% set card_class = '' %}
+                {% if 'status_change' in log.action %}
+                    {# Extract the status from the log note instead of using current application status #}
+                    {% if 'to: Accepted' in log.note or 'to \'Accepted\'' in log.note %}
+                        {% set card_class = 'border-success' %}
+                    {% elseif 'to: Shortlisted' in log.note or 'to \'Shortlisted\'' in log.note %}
+                        {% set card_class = 'border-info' %}
+                    {% elseif 'to: Rejected' in log.note or 'to \'Rejected\'' in log.note %}
+                        {% set card_class = 'border-danger' %}
+                    {% elseif 'to: Applied' in log.note or 'to \'Applied\'' in log.note %}
+                        {% set card_class = 'border-primary' %}
+                    {% else %}
+                        {% set card_class = 'border-secondary' %}
+                    {% endif %}
+                {% elseif 'revert' in log.action %}
+                    {% set card_class = 'border-warning' %}
+                {% elseif 'created' in log.action %}
+                    {% set card_class = 'border-secondary' %}
+                {% else %}
+                    {% set card_class = 'border-secondary' %}
+                {% endif %}
+
+                <div class="card mb-2 {{ card_class }}">
+                    <div class="card-header py-2 px-3 d-flex justify-content-between align-items-center bg-light">
+                        <div class="d-flex align-items-center">
+                            <div class="me-2">
+                                <i class="fas 
+                                    {% if 'status_change' in log.action %}fa-exchange-alt
+                                    {% elseif 'revert' in log.action %}fa-undo
+                                    {% else %}fa-user-circle{% endif %} 
+                                    fa-lg text-muted"></i>
+                            </div>
+                            <div>
+                                <h6 class="mb-0 fw-bold small">
+                                    {{ log.user ? (log.user.employee.name ?? log.user.email) : 'System' }}
+                                </h6>
+                                <small class="text-muted">
+                                    {{ log.user ? (log.user.roles|first|replace({'ROLE_': ''})|title) : 'Applicant' }}
+                                    • {{ log.created_at|date('M j, Y g:i a') }}
+                                </small>
+                            </div>
+                        </div>
+                        <span class="badge bg-{{ 
+                            'status_change' in log.action ? 'primary' : 
+                            'revert' in log.action ? 'warning' : 
+                            'created' in log.action ? 'secondary' : 'secondary' 
+                        }} small">
+                            {{ log.action|replace({'_': ' '})|title }}
+                        </span>
+                    </div>
+                    <div class="card-body py-2 px-3">
+                        <div class="d-flex align-items-start">
+                            <i class="fas fa-comment-alt text-muted mt-1 me-2"></i>
+                            <div>
+                                <p class="mb-0 small">{{ log.note }}</p>
+                                {% if 'status_change' in log.action %}
+                                    {# Extract and display the NEW status from the log note #}
+                                    {% if 'to: Accepted' in log.note or 'to \'Accepted\'' in log.note %}
+                                        <span class="badge bg-success mt-2 small">Accepted</span>
+                                    {% elseif 'to: Shortlisted' in log.note or 'to \'Shortlisted\'' in log.note %}
+                                        <span class="badge bg-info mt-2 small">Shortlisted</span>
+                                    {% elseif 'to: Rejected' in log.note or 'to \'Rejected\'' in log.note %}
+                                        <span class="badge bg-danger mt-2 small">Rejected</span>
+                                    {% elseif 'to: Applied' in log.note or 'to \'Applied\'' in log.note %}
+                                        <span class="badge bg-primary mt-2 small">Applied</span>
+                                    {% endif %}
+                                {% elseif 'revert' in log.action %}
+                                    {# For revert logs, show the target status #}
+                                    {% if 'to \'Applied\'' in log.note %}
+                                        <span class="badge bg-primary mt-2 small">Applied</span>
+                                    {% elseif 'to \'Shortlisted\'' in log.note %}
+                                        <span class="badge bg-info mt-2 small">Shortlisted</span>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-info mb-0">No logs found for this application</div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .logs-container {
+        max-height: 500px;
+        overflow-y: auto;
+    }
+    .card {
+        border-left-width: 4px;
+    }
+</style>

@@ -14,6 +14,7 @@
     "\/assets\/controllers\/employer_controller.js",
     "\/assets\/controllers\/jobseeker-education-controller.js",
     "\/assets\/controllers\/test_controller.js",
+    "\/assets\/controllers\/general_controller.js",
     "\/assets\/controllers\/sync-select-controller.js",
     "\/assets\/controllers\/career-autocomplete-controller.js",
     "\/assets\/controllers\/recommended-candidates-controller.js",

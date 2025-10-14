@@ -40,7 +40,9 @@ use App\Entity\InterviewQuestions;
 use App\Entity\KaabaQualification;
 use App\Form\CustomerAutoComplete;
 use App\Repository\UserRepository;
+use App\Service\ApplicationLogger;
 use App\Entity\EmployerJobQuestion;
+use App\Entity\KaabaApplicationLog;
 use App\Form\EmailTemplateFormType;
 use App\Form\SettingsBasicInfoType;
 use Symfony\UX\Chartjs\Model\Chart;
@@ -3357,13 +3359,41 @@ public function kaabaApplications(
 }
 
 
+#[Route('/logs/{uuid}', name: 'app_admin_kaaba_application_logs', methods: ['GET', 'POST'])]
+public function viewLogs(
+    KaabaApplication $application,
+    Request $request,
+    EntityManagerInterface $em
+): Response {
+    // Get logs with user data
+    $logs = $em->createQueryBuilder()
+        ->select('l', 'u')
+        ->from(KaabaApplicationLog::class, 'l')
+        ->leftJoin('l.user', 'u')
+        ->where('l.application = :application')
+        ->setParameter('application', $application)
+        ->orderBy('l.created_at', 'DESC')
+        ->getQuery()
+        ->getResult();
+
+    $template = $request->isXmlHttpRequest()
+        ? 'admin/_logs.html.twig'
+        : 'admin/_logs.html.twig';
+
+    return $this->render($template, [
+        'application' => $application,
+        'logs' => $logs
+    ]);
+}
+
 
 #[Route('/kaaba-applications/update-status', name: 'app_admin_kaaba_application_update_status', methods: ['POST'])]
 public function updateApplicationStatus(
     Request $request,
     KaabaApplicationRepository $applicationRepository,
     KaabaApplicationStatusRepository $statusRepository,
-    EntityManagerInterface $entityManager
+    EntityManagerInterface $entityManager,
+    ApplicationLogger $applicationLogger
 ): JsonResponse {
     $data = json_decode($request->getContent(), true);
     $applicationId = $data['applicationId'] ?? null;
@@ -3395,6 +3425,9 @@ public function updateApplicationStatus(
             ], 404);
         }
 
+        // Get the old status for logging BEFORE changing it
+        $oldStatus = $application->getStatus() ? $application->getStatus()->getName() : 'None';
+
         // Map status actions to status names
         $statusMap = [
             'shortlisted' => 'Shortlisted',
@@ -3410,17 +3443,18 @@ public function updateApplicationStatus(
         }
 
         $statusName = $statusMap[$statusAction];
-      $status = $statusRepository->findOneBy(['name' => $statusName]);
-// If not found, try case-insensitive
-if (!$status) {
-    $allStatuses = $statusRepository->findAll();
-    foreach ($allStatuses as $s) {
-        if (strtolower($s->getName()) === strtolower($statusName)) {
-            $status = $s;
-            break;
+        $status = $statusRepository->findOneBy(['name' => $statusName]);
+        
+        // If not found, try case-insensitive
+        if (!$status) {
+            $allStatuses = $statusRepository->findAll();
+            foreach ($allStatuses as $s) {
+                if (strtolower($s->getName()) === strtolower($statusName)) {
+                    $status = $s;
+                    break;
+                }
+            }
         }
-    }
-}
 
         if (!$status) {
             return $this->json([
@@ -3445,6 +3479,16 @@ if (!$status) {
 
         // Update application status
         $application->setStatus($status);
+        
+          // ✅ FIX: Use the generic log() method instead of logStatusChange()
+        $applicationLogger->log(
+            $application,
+            'status_change', // This will trigger the status_change case in your switch statement
+            sprintf("Status changed from '%s' to '%s' via admin panel", $oldStatus, $statusName),
+            $this->getUser() // current admin user
+        );
+
+
         $entityManager->flush();
 
         // Generate new status badge HTML
@@ -3453,7 +3497,7 @@ if (!$status) {
             match($statusName) {
                 'Accepted' => 'bg-success',
                 'Rejected' => 'bg-danger',
-                'Shortlisted' => 'bg-info',
+                'Shortlisted' => 'bg-info text-white',
                 default => 'bg-secondary'
             },
             $statusName
@@ -3473,13 +3517,13 @@ if (!$status) {
     }
 }
 
-
 #[Route('/kaaba-applications/revert-status/{id}', name: 'app_admin_kaaba_application_revert_status', methods: ['POST'])]
 public function revertApplicationStatus(
     KaabaApplication $application,
     Request $request,
     KaabaApplicationStatusRepository $statusRepository,
-    EntityManagerInterface $entityManager
+    EntityManagerInterface $entityManager,
+    ApplicationLogger $applicationLogger // Add this
 ): JsonResponse {
     $csrfToken = $request->request->get('_token') ?? $request->headers->get('X-CSRF-Token');
 
@@ -3554,6 +3598,19 @@ public function revertApplicationStatus(
 
         // Update application status
         $application->setStatus($newStatus);
+        
+        // ✅ ADD LOGGING HERE
+        $applicationLogger->log(
+            $application,
+            'revert',
+            sprintf(
+                "Status reverted from '%s' to '%s'", 
+                $currentStatusName, 
+                $newStatus->getName()
+            ),
+            $this->getUser() // current admin user
+        );
+
         $entityManager->flush();
 
         $newStatusDisplayName = $newStatus->getName();
@@ -3591,7 +3648,8 @@ public function revertRejectedApplication(
     KaabaApplication $application,
     Request $request,
     KaabaApplicationStatusRepository $statusRepository,
-    EntityManagerInterface $entityManager
+    EntityManagerInterface $entityManager,
+    ApplicationLogger $applicationLogger // Add this
 ): JsonResponse {
     $csrfToken = $request->request->get('_token') ?? $request->headers->get('X-CSRF-Token');
 
@@ -3647,6 +3705,18 @@ public function revertRejectedApplication(
         // Clear rejected date and set to applied
         $application->setRejectedDate(null);
         $application->setStatus($appliedStatus);
+        
+        // ✅ ADD LOGGING HERE
+        $applicationLogger->log(
+            $application,
+            'revert',
+            sprintf(
+                "Rejected application reverted to '%s' status", 
+                $appliedStatus->getName()
+            ),
+            $this->getUser() // current admin user
+        );
+
         $entityManager->flush();
 
         // Generate new status badge HTML
@@ -3666,6 +3736,7 @@ public function revertRejectedApplication(
         ], 500);
     }
 }
+
 
 #[Route('/admin/kaaba-application/{uuid}', name: 'app_admin_kaaba_application_view')]
 public function kaabaApplicationView(

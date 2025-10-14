@@ -1,5 +1,5 @@
 {
-    "@symfony\/stimulus-bundle\/controllers.js": "\/assets\/@symfony\/stimulus-bundle\/controllers-916470ac07b8f9363247fb0e27420761.js",
+    "@symfony\/stimulus-bundle\/controllers.js": "\/assets\/@symfony\/stimulus-bundle\/controllers-a00b55d3867a4f4d0b2b2a0165de8c02.js",
     "@symfony\/stimulus-bundle\/loader.js": "\/assets\/@symfony\/stimulus-bundle\/loader-870999a02e9fc147c034d522826ea70d.js",
     "@symfony\/ux-autocomplete\/controller.js": "\/assets\/@symfony\/ux-autocomplete\/controller-dd1b31bd819824edecb124585c6bdb56.js",
     "@symfony\/ux-chartjs\/controller.js": "\/assets\/@symfony\/ux-chartjs\/controller-ca19c6fa17c0c7a61a47fa5cd49a8137.js",
@@ -415,6 +415,7 @@
     "controllers\/contact-form-controller.js": "\/assets\/controllers\/contact-form-controller-2582490376d3893271b0f65f63a8cce1.js",
     "controllers\/copy-clipboard-controller.js": "\/assets\/controllers\/copy-clipboard-controller-43d7efa6e1fbc72dd85a467851b27009.js",
     "controllers\/employer_controller.js": "\/assets\/controllers\/employer_controller-8d822172fb6fc82662b8b91129148979.js",
+    "controllers\/general_controller.js": "\/assets\/controllers\/general_controller-c8ed49658de0d6c40d171d6ff4947925.js",
     "controllers\/home-controller.js": "\/assets\/controllers\/home-controller-a5e8835804c5c1a95fb33138d657fdb8.js",
     "controllers\/interview-result-controller.js": "\/assets\/controllers\/interview-result-controller-217bb00b8d9ac2740e2bf3f9ad3a6ba1.js",
     "controllers\/job-application-controller.js": "\/assets\/controllers\/job-application-controller-8fbed9bef0cab4cdcc403b8d9ef1f4ce.js",

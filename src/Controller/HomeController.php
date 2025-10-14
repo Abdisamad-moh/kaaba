@@ -24,6 +24,7 @@ use App\Entity\KaabaApplication;
 use App\Entity\JobSeekerSavedJob;
 use App\Entity\MetierJobCategory;
 use App\Entity\MetierJobIndustry;
+use App\Service\ApplicationLogger;
 use App\Service\RecaptchaValidator;
 use App\Service\TranslationService;
 use Flasher\Prime\FlasherInterface;
@@ -1114,7 +1115,8 @@ public function scholarshipApplication(
     KaabaCourseRepository $courseRepository,
     EntityManagerInterface $em,
     KaabaIdentityTypeRepository $identityTypeRepository,
-    TranslationService $translationService
+    TranslationService $translationService,
+  ApplicationLogger $applicationLogger,
 ): Response {
     $session = $this->requestStack->getSession();
     $currentLang = $session->get('app_language', 'en');
@@ -1301,6 +1303,15 @@ public function scholarshipApplication(
             }
 
             $em->persist($application);
+
+    
+            // ✅ LOG APPLICATION CREATION
+            $applicationLogger->log(
+                $application,
+                'applied',
+                null, // No additional note needed
+                null  // No user since applicant is submitting
+            );
             $em->flush();
 
             $this->addFlash('success', 'Your application has been submitted successfully!');

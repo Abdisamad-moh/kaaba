@@ -8,7 +8,7 @@
         "type": "js"
     },
     "\/assets\/@symfony\/stimulus-bundle\/controllers.js": {
-        "path": "\/assets\/@symfony\/stimulus-bundle\/controllers-916470ac07b8f9363247fb0e27420761.js",
+        "path": "\/assets\/@symfony\/stimulus-bundle\/controllers-a00b55d3867a4f4d0b2b2a0165de8c02.js",
         "type": "js"
     },
     "\/assets\/@symfony\/ux-autocomplete\/controller.js": {
@@ -37,6 +37,10 @@
     },
     "\/assets\/controllers\/test_controller.js": {
         "path": "\/assets\/controllers\/test_controller-a2bf4261509e4d4cf7ef40a9551a0b34.js",
+        "type": "js"
+    },
+    "\/assets\/controllers\/general_controller.js": {
+        "path": "\/assets\/controllers\/general_controller-c8ed49658de0d6c40d171d6ff4947925.js",
         "type": "js"
     },
     "\/assets\/controllers\/sync-select-controller.js": {

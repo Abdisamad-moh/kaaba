@@ -5,7 +5,9 @@ namespace App\Entity;
 use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Uid\Uuid;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\Collection;
 use App\Repository\KaabaApplicationRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 
 #[ORM\Entity(repositoryClass: KaabaApplicationRepository::class)]
 class KaabaApplication
@@ -160,12 +162,17 @@ class KaabaApplication
     private ?\DateTimeInterface $rejected_date = null;
 
 
+#[ORM\OneToMany(mappedBy: 'application', targetEntity: KaabaApplicationLog::class, cascade: ['persist'])]
+private Collection $logs;
+
     public function __construct()
     {
         $this->created_at = new \DateTime();        
         $this->application_date = new \DateTime();  
         $this->uuid = Uuid::v4();
         $this->applied_date = new \DateTime(); 
+    $this->logs = new ArrayCollection();
+
 
     }
 
@@ -713,5 +720,33 @@ class KaabaApplication
 
         return $this;
     }
+
+// Add these methods:
+public function getLogs(): Collection
+{
+    return $this->logs;
+}
+
+public function addLog(KaabaApplicationLog $log): static
+{
+    if (!$this->logs->contains($log)) {
+        $this->logs->add($log);
+        $log->setApplication($this);
+    }
+
+    return $this;
+}
+
+public function removeLog(KaabaApplicationLog $log): static
+{
+    if ($this->logs->removeElement($log)) {
+        // set the owning side to null (unless already changed)
+        if ($log->getApplication() === $this) {
+            $log->setApplication(null);
+        }
+    }
+
+    return $this;
+}
 
 }
