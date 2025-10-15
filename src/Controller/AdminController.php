@@ -3162,7 +3162,7 @@ public function kaabaCourses(
         $courseToDelete = $kaabaCourseRepository->findOneBy(['uuid' => $deleteUuid]);
         if ($courseToDelete) {
             // More robust check for applications
-            $applicationsCount = $courseToDelete->getKaabaKaabaApplications()->count();
+            $applicationsCount = $courseToDelete->getKaabaApplications()->count();
             
             if ($applicationsCount > 0) {
                 $this->addFlash('error', "Cannot delete course \"{$courseToDelete->getName()}\". It is being used by $applicationsCount application(s). Please reassign or delete those applications first.");

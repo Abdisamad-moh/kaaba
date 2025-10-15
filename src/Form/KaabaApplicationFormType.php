@@ -190,14 +190,14 @@ class KaabaApplicationFormType extends AbstractType
                     'placeholder' => $this->translator->trans('secondary_grade_placeholder')
                 ]
             ])
-            ->add('highest_qualification_detail', TextType::class, [
-                'label' => $this->translator->trans('highest_qualification_detail'),
-                'required' => false, // Changed to false
-                'attr' => [
-                    'class' => 'form-control',
-                    'placeholder' => $this->translator->trans('highest_qualification_detail_placeholder')
-                ]
-            ])
+            // ->add('highest_qualification_detail', TextType::class, [
+            //     'label' => $this->translator->trans('highest_qualification_detail'),
+            //     'required' => false, // Changed to false
+            //     'attr' => [
+            //         'class' => 'form-control',
+            //         'placeholder' => $this->translator->trans('highest_qualification_detail_placeholder')
+            //     ]
+            // ])
             ->add('institution_name', TextType::class, [
                 'label' => $this->translator->trans('institution_name'),
                 'required' => false, // Changed to false
@@ -329,16 +329,16 @@ class KaabaApplicationFormType extends AbstractType
             //         'class' => 'form-select'
             //     ]
             // ])
-            ->add('highest_qualification', EntityType::class, [
-                'class' => KaabaQualification::class,
-                'choice_label' => 'name',
-                'placeholder' => $this->translator->trans('highest_qualification_placeholder'),
-                'label' => $this->translator->trans('highest_qualification'),
-                'required' => false,
-                'attr' => [
-                    'class' => 'form-select'
-                ]
-            ])
+            // ->add('highest_qualification', EntityType::class, [
+            //     'class' => KaabaQualification::class,
+            //     'choice_label' => 'name',
+            //     'placeholder' => $this->translator->trans('highest_qualification_placeholder'),
+            //     'label' => $this->translator->trans('highest_qualification'),
+            //     'required' => false,
+            //     'attr' => [
+            //         'class' => 'form-select'
+            //     ]
+            // ])
             ->add('course', EntityType::class, [
                 'class' => KaabaCourse::class,
                 'choice_label' => 'name',

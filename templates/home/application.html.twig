@@ -585,31 +585,6 @@
     </div>
 </div>
 {% endif %}
-<!-- Higher Education Qualification Section -->
-{% if type != 'l' %}
-<div class="row justify-content-center mt-4">
-    <div class="col-12">
-        <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3" style="background-color:#1b5e20; font-size:14px;">
-            {{ 'higher_education'|trans }}
-        </h6>
-
-        <div class="mt-3">
-            <div class="row g-3">
-                <div class="col-md-6">
-                    {{ form_label(form.highest_qualification, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                    {{ form_widget(form.highest_qualification, {'attr': {'class': 'form-select border border-dark rounded-0'}}) }}
-                    {{ form_errors(form.highest_qualification) }}
-                </div>
-                <div class="col-md-6">
-                    {{ form_label(form.highest_qualification_detail, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                    {{ form_widget(form.highest_qualification_detail, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
-                    {{ form_errors(form.highest_qualification_detail) }}
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
 
                                       <!-- Last Education Training Institution Section -->
 {% if type != 'l' %}
