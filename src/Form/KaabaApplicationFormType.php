@@ -260,22 +260,19 @@ class KaabaApplicationFormType extends AbstractType
             ])
           
             ->add('region', EntityType::class, [
-                'class' => KaabaRegion::class,
-                'choice_label' => 'name',
-                'label' => $this->translator->trans('region'),
-                'required' => true,
-// 'choices' => $regions, 
- 'placeholder' => $this->translator->trans('region_placeholder')
-,
-                'attr' => [
-                    'class' => 'form-select'
-
-
-                ],
-                'constraints' => [
-                    new NotBlank(['message' => 'Region is required.'])
-                ]
-            ])
+    'class' => KaabaRegion::class,
+    'choice_label' => 'name',
+    'label' => $this->translator->trans('region'),
+    'required' => true,
+    'choices' => $regions, // ✅ uses filtered regions
+    'placeholder' => $this->translator->trans('region_placeholder'),
+    'attr' => [
+        'class' => 'form-select'
+    ],
+    'constraints' => [
+        new NotBlank(['message' => 'Region is required.'])
+    ]
+])
             ->add('gender', EntityType::class, [
                 'class' => KaabaGender::class,
                 'choice_label' => 'name',
