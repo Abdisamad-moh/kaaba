@@ -1,1327 +1,1508 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8">
-		<title>
-			{% block title %}Rajo Kaaba Project
-			{% endblock %}
-		</title>
-		<meta name="robots" content="index, follow">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-		<link rel="icon" href="{{ asset('assets/images/logo.png') }}"> {% block stylesheets %}{% endblock %}
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {% block title %}Rajo Kaaba Project
+        {% endblock %}
+    </title>
+    <meta name="robots" content="index, follow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-		<link rel="preconnect" href="https://fonts.googleapis.com">
-		<link
-		rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="icon" href="{{ asset('assets/images/logo.png') }}"> {% block stylesheets %}{% endblock %}
 
-		<!-- CSS Links -->
-		<link href="{{ asset('assets/css/vendors.min.css') }}" rel="stylesheet" type="text/css"/>
-		<link href="{{ asset('assets/css/icon.min.css') }}" rel="stylesheet" type="text/css"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
 
-		<link href="{{ asset('assets/css/style.css') }}" rel="stylesheet" type="text/css"/>
+    <!-- CSS Links -->
+    <link href="{{ asset('assets/css/vendors.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('assets/css/icon.min.css') }}" rel="stylesheet" type="text/css" />
 
-		<link href="{{ asset('assets/css/responsive.css') }}" rel="stylesheet" type="text/css"/>
+    <link href="{{ asset('assets/css/style.css') }}" rel="stylesheet" type="text/css" />
 
-
-		<style>
-			.file-drop-area {
-				transition: all 0.3s ease;
-				cursor: pointer;
-				min-height: 120px;
-				display: flex;
-				flex-direction: column;
-				justify-content: center;
-				border: 2px dashed #dee2e6;
-			}
-
-			.file-drop-area:hover {
-				background-color: #f8f9fa !important;
-				border-color: #1b5e20 !important;
-			}
-
-			.bg-light-green {
-				background-color: #e8f5e8 !important;
-			}
-
-			.file-item {
-				font-size: 17px;
-				background-color: #386026;
-				border-radius: 4px;
-				margin-bottom: 5px;
-				padding: 8px 12px;
-				border: 1px solid #dee2e6;
-				color: #fff;
-			}
-
-			.file-name {
-				overflow: hidden;
-				text-overflow: ellipsis;
-				white-space: nowrap;
-				font-size: 16px;
-			}
-
-			.file-drop-area.dragover {
-				background-color: #e8f5e8 !important;
-				border: 2px dashed #1b5e20 !important;
-			}
-
-			.file-drop-area {
-				text-align: center;
-				align-items: center;
-			}
-
-			.file-remove {
-				color: #ff0019;
-				cursor: pointer;
-				margin-left: 8px;
-				font-size: 35px;
-			}
-
-			.file-remove:hover {
-				color: #831b1b;
-
-			}
-
-			/* inner dot when checked */
-			.form-check-input[type="radio"]:checked::before {
-				content: "";
-				position: absolute;
-				top: 50%;
-				left: 50%;
-				width: 0.5em;
-				height: 0.5em;
-				background-color: #1b5e20; /* your theme green */
-				border-radius: 50%;
-				transform: translate(-50%, -50%);
-			}
-
-			/* Validation Styles */
-			.is-invalid {
-				border-color: #dc3545 !important;
-			}
-
-			.invalid-feedback {
-				display: block;
-				width: 100%;
-				margin-top: 0.25rem;
-				font-size: 0.875em;
-				color: #dc3545;
-			}
-
-			.validation-alert {
-				border-radius: 4px;
-				animation: fadeIn 0.3s ease-in;
-			}
-
-			@keyframes fadeIn {
-				from {
-					opacity: 0;
-				}
-				to {
-					opacity: 1;
-				}
-			}
-
-			/* Make required field labels more obvious */
-			.form-label.fw-600.text-dark-gray:after {
-				content: " *";
-				color: #dc3545;
-			}
-
-			.hidden-file-input {
-				display: none;
-			}
+    <link href="{{ asset('assets/css/responsive.css') }}" rel="stylesheet" type="text/css" />
 
 
-			/* File Validation Styles */
-			.file-area-error {
-				border: 2px dashed #dc3545 !important;
-				background-color: #f8d7da !important;
-			}
+    <style>
+        .file-drop-area {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            border: 2px dashed #dee2e6;
+        }
 
-			.file-area-valid {
-				border: 2px dashed #198754 !important;
-				background-color: #d1e7dd !important;
-			}
+        .file-drop-area:hover {
+            background-color: #f8f9fa !important;
+            border-color: #1b5e20 !important;
+        }
 
-			.file-error-message {
-				font-size: 12px;
-				font-weight: 500;
-			}
+        .bg-light-green {
+            background-color: #e8f5e8 !important;
+        }
 
-			.file-success-message {
-				font-size: 12px;
-				font-weight: 500;
-				color: #198754;
-			}
+        .file-item {
+            font-size: 17px;
+            background-color: #386026;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            padding: 8px 12px;
+            border: 1px solid #dee2e6;
+            color: #fff;
+        }
 
-			/* Enhanced file item styles for validation states */
-			.file-drop-area.file-area-error:hover {
-				background-color: #f8d7da !important;
-				border-color: #dc3545 !important;
-			}
+        .file-name {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 16px;
+        }
 
-			.file-drop-area.file-area-valid:hover {
-				background-color: #d1e7dd !important;
-				border-color: #198754 !important;
-			}
+        .file-drop-area.dragover {
+            background-color: #e8f5e8 !important;
+            border: 2px dashed #1b5e20 !important;
+        }
 
-			/* Pulse animation for error areas */
-			@keyframes pulseError {
-				0% {
-					border-color: #dc3545;
-				}
-				50% {
-					border-color: #ff6b6b;
-				}
-				100% {
-					border-color: #dc3545;
-				}
-			}
+        .file-drop-area {
+            text-align: center;
+            align-items: center;
+        }
 
-			.file-area-error {
-				animation: pulseError 2s ease-in-out;
-			}
+        .file-remove {
+            color: #ff0019;
+            cursor: pointer;
+            margin-left: 8px;
+            font-size: 35px;
+        }
+
+        .file-remove:hover {
+            color: #831b1b;
+
+        }
+
+        /* inner dot when checked */
+        .form-check-input[type="radio"]:checked::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0.5em;
+            height: 0.5em;
+            background-color: #1b5e20;
+            /* your theme green */
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Validation Styles */
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+
+        .invalid-feedback {
+            display: block;
+            width: 100%;
+            margin-top: 0.25rem;
+            font-size: 0.875em;
+            color: #dc3545;
+        }
+
+        .validation-alert {
+            border-radius: 4px;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Make required field labels more obvious */
+        .form-label.fw-600.text-dark-gray:after {
+            content: " *";
+            color: #dc3545;
+        }
+
+        .hidden-file-input {
+            display: none;
+        }
 
 
-			.bg-theme {
-				background: #222222 !important;
-			}
-			.page-layout {
-				margin-top: 100px !important;
-			}
+        /* File Validation Styles */
+        .file-area-error {
+            border: 2px dashed #dc3545 !important;
+            background-color: #f8d7da !important;
+        }
 
-			.btn.btn-dark-gray:hover,
-			.btn.btn-dark-gray:active {
-				background: #121212 !important;
-				color: #ffffff;
-			}
+        .file-area-valid {
+            border: 2px dashed #198754 !important;
+            background-color: #d1e7dd !important;
+        }
+
+        .file-error-message {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .file-success-message {
+            font-size: 12px;
+            font-weight: 500;
+            color: #198754;
+        }
+
+        /* Enhanced file item styles for validation states */
+        .file-drop-area.file-area-error:hover {
+            background-color: #f8d7da !important;
+            border-color: #dc3545 !important;
+        }
+
+        .file-drop-area.file-area-valid:hover {
+            background-color: #d1e7dd !important;
+            border-color: #198754 !important;
+        }
+
+        /* Pulse animation for error areas */
+        @keyframes pulseError {
+            0% {
+                border-color: #dc3545;
+            }
+
+            50% {
+                border-color: #ff6b6b;
+            }
+
+            100% {
+                border-color: #dc3545;
+            }
+        }
+
+        .file-area-error {
+            animation: pulseError 2s ease-in-out;
+        }
 
 
-			/* Disabled button styles */
-			.btn-disabled {
-				background-color: #6c757d !important;
-				border-color: #6c757d !important;
-				color: #fff !important;
-				cursor: not-allowed !important;
-				opacity: 0.65 !important;
-			}
+        .bg-theme {
+            background: #222222 !important;
+        }
 
-			.btn-disabled:hover {
-				background-color: #6c757d !important;
-				border-color: #6c757d !important;
-				color: #fff !important;
-			}
+        .page-layout {
+            margin-top: 100px !important;
+        }
 
+        .btn.btn-dark-gray:hover,
+        .btn.btn-dark-gray:active {
+            background: #121212 !important;
+            color: #ffffff;
+        }
 
 
-/* Disabled tab styles */
-.disabled-tab {
-    pointer-events: none !important;
-    opacity: 0.6 !important;
-    cursor: not-allowed !important;
-    color: #6c757d !important;
-}
+        /* Disabled button styles */
+        .btn-disabled {
+            background-color: #6c757d !important;
+            border-color: #6c757d !important;
+            color: #fff !important;
+            cursor: not-allowed !important;
+            opacity: 0.65 !important;
+        }
 
-.nav-link.disabled-tab:hover {
-    background-color: transparent !important;
-    border-color: #dee2e6 !important;
-}
+        .btn-disabled:hover {
+            background-color: #6c757d !important;
+            border-color: #6c757d !important;
+            color: #fff !important;
+        }
 
-/* Tooltip for disabled tab */
-.disabled-tab[title] {
-    position: relative;
-}
 
-.disabled-tab[title]:hover::after {
-    content: attr(title);
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #333;
-    color: white;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 12px;
-    white-space: nowrap;
-    z-index: 1000;
-}
-		</style>
-	</head>
 
-	<body data-mobile-nav-style="full-screen-menu" data-mobile-nav-bg-color="">
-		<!-- start header -->
-		<!-- start header -->
-			<header>
-			<!-- start navigation -->
-				<nav class="navbar navbar-expand-lg header-transparent bg-theme header-reverse" data-header-hover="light"> <div class="container-fluid">
-					<div class="col-auto col-lg-2 me-lg-0 me-auto">
-						<a class="navbar-brand" href="#">
-							<img src="{{ asset('assets/images/hero-logo.png') }} " data-at2x="{{ asset('assets/images/hero-logo.png') }}" alt="" class="default-logo">
-							<img src="{{ asset('assets/images/hero-logo.png') }}" data-at2x="{{ asset('assets/images/hero-logo.png') }}" alt="" class="alt-logo">
-							<img src="{{ asset('assets/images/hero-logo.png') }}" data-at2x="{{ asset('assets/images/hero-logo.png') }}" alt="" class="mobile-logo">
-						</a>
-					</div>
-					<div class="col-auto menu-order position-static ms-auto">
-						<button class="navbar-toggler float-start" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-							<span class="navbar-toggler-line"></span>
-							<span class="navbar-toggler-line"></span>
-							<span class="navbar-toggler-line"></span>
-							<span class="navbar-toggler-line"></span>
-						</button>
-						<div class="collapse navbar-collapse justify-content-end" id="navbarNav">
-    <a href="{% if lang == 'so' %}{{ path('app_home', {'_locale': 'so'}) }}{% else %}{{ path('app_home', {'_locale': 'en'}) }}{% endif %}" class="btn btn-extra-large btn-rounded with-rounded btn-gray d-table d-lg-inline-block lg-mb-15px">
-        <span class="bg-dark text-white">
-            <i class="fa-solid fa-arrow-left"></i>
-        </span>
-        {{ trans.trans('back_to_home') }}
-    </a>
-</div>
-					</div>
-				</div>
-			</nav>
-			<!-- end navigation -->
-		</header>
-		<!-- end header -->
-		<!-- end header -->
+        /* Disabled tab styles */
+        .disabled-tab {
+            pointer-events: none !important;
+            opacity: 0.6 !important;
+            cursor: not-allowed !important;
+            color: #6c757d !important;
+        }
 
-		<!-- start banner -->
-			<section class="position-relative">
-    <div class="container">
-        <!-- Language Switcher -->
-        <div class="row mb-3">
-            <div class="col-12 text-end">
-                <div class="btn-group">
-                    <button type="button" class="btn btn-sm btn-outline-dark-gray language-btn {% if app.session.get('app_language', 'en') == 'en' %}active{% endif %}" data-lang="en">English</button>
-                    <button type="button" class="btn btn-sm btn-outline-dark-gray language-btn {% if app.session.get('app_language', 'en') == 'so' %}active{% endif %}" data-lang="so">Somali</button>
+        .nav-link.disabled-tab:hover {
+            background-color: transparent !important;
+            border-color: #dee2e6 !important;
+        }
+
+        /* Tooltip for disabled tab */
+        .disabled-tab[title] {
+            position: relative;
+        }
+
+        .disabled-tab[title]:hover::after {
+            content: attr(title);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+        }
+    </style>
+</head>
+
+<body data-mobile-nav-style="full-screen-menu" data-mobile-nav-bg-color="">
+    <!-- start header -->
+    <!-- start header -->
+    <header>
+        <!-- start navigation -->
+        <nav class="navbar navbar-expand-lg header-transparent bg-theme header-reverse" data-header-hover="light">
+            <div class="container-fluid">
+                <div class="col-auto col-lg-2 me-lg-0 me-auto">
+                    <a class="navbar-brand" href="#">
+                        <img src="{{ asset('assets/images/hero-logo.png') }} "
+                            data-at2x="{{ asset('assets/images/hero-logo.png') }}" alt="" class="default-logo">
+                        <img src="{{ asset('assets/images/hero-logo.png') }}"
+                            data-at2x="{{ asset('assets/images/hero-logo.png') }}" alt="" class="alt-logo">
+                        <img src="{{ asset('assets/images/hero-logo.png') }}"
+                            data-at2x="{{ asset('assets/images/hero-logo.png') }}" alt="" class="mobile-logo">
+                    </a>
+                </div>
+                <div class="col-auto menu-order position-static ms-auto">
+                    <button class="navbar-toggler float-start" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false"
+                        aria-label="Toggle navigation">
+                        <span class="navbar-toggler-line"></span>
+                        <span class="navbar-toggler-line"></span>
+                        <span class="navbar-toggler-line"></span>
+                        <span class="navbar-toggler-line"></span>
+                    </button>
+                    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                        <a href="{% if lang == 'so' %}{{ path('app_home', {'_locale': 'so'}) }}{% else %}{{ path('app_home', {'_locale': 'en'}) }}{% endif %}"
+                            class="btn btn-extra-large btn-rounded with-rounded btn-gray d-table d-lg-inline-block lg-mb-15px">
+                            <span class="bg-dark text-white">
+                                <i class="fa-solid fa-arrow-left"></i>
+                            </span>
+                            {{ trans.trans('back_to_home') }}
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
+        </nav>
+        <!-- end navigation -->
+    </header>
+    <!-- end header -->
+    <!-- end header -->
 
-<!-- Header row -->
-<div class="row">
-    <div class="col-12">
-        <h6 class="fw-700 text-white text-uppercase mb-0 py-3 px-4" style="background-color:#1b5e20; font-size:14px;">
-            {{ 'application_form'|trans }} -
-            {% if lang == 'so' %}
-                {{ scholarship.sotitle ?? scholarship.title }}
-            {% else %}
-                {{ scholarship.title }}
-            {% endif %}
-        </h6>
-    </div>
-</div>
-
-<!-- Scholarship Info -->
-<div class="row mt-3">
-    <div class="col-12">
-        <div class="alert alert-info">
-            <h6 class="fw-600 mb-2">{{ 'scholarship_information'|trans }}</h6>
-            <p class="mb-1">
-                <strong>{{ 'description'|trans }}:</strong>
-                {% if lang == 'so' %}
-                    {{ scholarship.socontent ?? scholarship.content }}
-                {% else %}
-                    {{ scholarship.content }}
-                {% endif %}
-            </p>
-            <p class="mb-0">
-                <strong>{{ 'closing_date'|trans }}:</strong>
-                {{ scholarship.closingDate|date('F d, Y') }}
-            </p>
-        </div>
-    </div>
-</div>
-       <!-- Tab Navigation -->
-<div class="row mt-4">
-    <div class="col tab-style-06">
-        <ul class="nav nav-tabs alt-font justify-content-center border-0 text-center text-uppercase alt-font fw-500 mb-5">
-            <li class="nav-item bg-white border-color-extra-medium-gray">
-                <a class="nav-link active fw-500" data-bs-toggle="tab" href="#step1">{{ 'personal_information'|trans }}</a>
-                <span class="tab-bg-active bg-dark-gray"></span>
-            </li>
-          <li class="nav-item bg-white border-color-extra-medium-gray">
-    <a class="nav-link fw-500 disabled-tab" id="step2-tab" data-bs-toggle="tab" href="#step2" 
-       title="Complete Step 1 first" style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
-        {{ 'supporting_documents'|trans }}
-    </a>
-    <span class="tab-bg-active bg-dark-gray"></span>
-</li>
-        </ul>
-
-                <div class="tab-content">
-                    <!-- Step 1: Personal Information -->
-                    <div class="tab-pane fade in active show" id="step1">
-                        {{ form_start(form, {'attr': {'class': 'contact-form-style-03', 'id': 'register_form', 'enctype': 'multipart/form-data'}}) }}
-                        <div class="row justify-content-center">
-                            <div class="col-lg-10">
-  <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3" style="background-color:#1b5e20; font-size:14px;">
-                                            {{ 'personal_information'|trans }}
-                                        </h6>
-                                <div class="row g-4">
-                                    <!-- Full Name -->
-
-                                    <div class="col-md-6">
-                                        {{ form_label(form.full_name, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                                        {{ form_widget(form.full_name, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
-                                        {{ form_errors(form.full_name) }}
-                                    </div>
-
-                                    <!-- Gender -->
-                                    <div class="col-md-6">
-                                        {{ form_label(form.gender, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                                        {{ form_widget(form.gender, {'attr': {'class': 'form-select border border-dark rounded-0'}}) }}
-                                        {{ form_errors(form.gender) }}
-                                    </div>
-
-                                    <!-- Phone -->
-                                    <div class="col-md-6">
-                                        {{ form_label(form.phone, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                                        {{ form_widget(form.phone, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
-                                        {{ form_errors(form.phone) }}
-                                    </div>
-
-                                    <!-- Email -->
-                                    <div class="col-md-6">
-                                        {{ form_label(form.email, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                                        {{ form_widget(form.email, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
-                                        {{ form_errors(form.email) }}
-                                    </div>
-
-                                    <!-- Nationality -->
-                                    <div class="col-md-6">
-                                        {{ form_label(form.nationality, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                                        {{ form_widget(form.nationality, {'attr': {'class': 'form-select border border-dark rounded-0'}}) }}
-                                        {{ form_errors(form.nationality) }}
-                                    </div>
-
-                                    <!-- Date of Birth -->
-                                    <div class="col-md-6">
-                                        {{ form_label(form.date_of_birth, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                                        {{ form_widget(form.date_of_birth, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
-                                        {{ form_errors(form.date_of_birth) }}
-                                    </div>
-
-                                    <!-- Region -->
-<div class="col-md-6">
-    {{ form_label(form.region, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-    {{ form_widget(form.region, {'attr': {'class': 'form-select border border-dark rounded-0', 'id': 'region-select'}}) }}
-    {{ form_errors(form.region) }}
-</div>
-
-                                    <!-- District (Dynamic) -->
-                                    <div class="col-md-6">
-                                        {{ form_label(form.district, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                                        {{ form_widget(form.district, {'attr': {'class': 'form-select border border-dark rounded-0', 'id': 'district-select'}}) }}
-                                        {{ form_errors(form.district) }}
-                                    </div>
-
-                                   
-
-                                    <!-- Village -->
-                                    <div class="col-md-6">
-                                        {{ form_label(form.village, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                                        {{ form_widget(form.village, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
-                                        {{ form_errors(form.village) }}
-                                    </div>
-                                </div>
-
-     
-
-                                <!-- Disability Disclosure Section -->
-                                <div class="row justify-content-center mt-4">
-                                    <div class="col-12">
-                                        <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3" style="background-color:#1b5e20; font-size:14px;">
-                                            {{ 'disability_disclosure'|trans }}
-                                        </h6>
-
-                                        <div class="mt-3" style="font-size:14px;">
-                                            {{ form_label(form.disability, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                                            {{ form_widget(form.disability, {'attr': {'class': 'form-select border border-dark rounded-0', 'onchange': 'toggleDisabilityExplanation(this)'}}) }}
-                                            {{ form_errors(form.disability) }}
-                                        </div>
-                                        <!-- Disability Explanation (Conditional) -->
-                                        {# <div id="disabilityExplanation" style="display: none;">
-                                            <div class="mb-3">
-                                                {{ form_label(form.disability_explanation, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                                                {{ form_widget(form.disability_explanation, {'attr': {'class': 'form-control border border-dark rounded-0', 'rows': 3}}) }}
-                                                {{ form_errors(form.disability_explanation) }}
-                                            </div>
-                                        </div> #}
-
-                                        <!-- Personal Identification Verification -->
-                                        <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3 mt-4" style="background-color:#1b5e20; font-size:14px;">
-                                            {{ 'personal_identification'|trans }}
-                                        </h6>
-
-                                        <div class="mt-3">
-                                            <div class="mb-3">
-                                                {{ form_label(form.identity_type, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                                                {{ form_widget(form.identity_type, {'attr': {'class': 'form-select border border-dark rounded-0'}}) }}
-                                                {{ form_errors(form.identity_type) }}
-                                            </div>
-
-                                            <div class="mb-3">
-                                                <label class="form-label fw-600 text-dark-gray">{{ 'identity_attachment'|trans }}</label>
-                                                <div class="file-drop-area border border-dark rounded-0 p-3 text-center bg-light" id="identityArea" data-field-name="identity_attachment">
-                                                    {{ form_widget(form.identity_attachment, {'attr': {'class': 'hidden-file-input file-input', 'data-area': 'identityArea'}}) }}
-                                                    <button type="button" class="btn btn-sm btn-dark-gray mb-2" onclick="document.getElementById('{{ form.identity_attachment.vars.id }}').click()">{{ 'add_files'|trans }}</button>
-                                                    <div class="text-muted" style="font-size:13px;">{{ 'drag_files_here'|trans }}</div>
-                                                    <div class="file-list mt-2" id="identityList"></div>
-                                                </div>
-                                                {{ form_errors(form.identity_attachment) }}
-                                            </div>
-                                        </div>
-                                            {% if type != 'l' %}
-                                        <!-- Enrollment School Selection -->
-                                        <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3 mt-4" style="background-color:#1b5e20; font-size:14px;">
-                                            {{ 'enrollment_school'|trans }}
-                                        </h6>
-
-                                        <div class="mt-3">
-                                            {{ form_label(form.institute, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                                            {{ form_widget(form.institute, {'attr': {'class': 'form-select border border-dark rounded-0'}}) }}
-                                            {{ form_errors(form.institute) }}
-                                        </div>
-{% endif %}
-                                            {% if type != 'l' %}
-
-                                        <!-- Enrollment Course Selection -->
-                                        <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3 mt-4" style="background-color:#1b5e20; font-size:14px;">
-                                            {{ 'enrollment_course'|trans }}
-                                        </h6>
-
-                                        <div class="mt-3">
-                                            {{ form_label(form.course, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                                            {{ form_widget(form.course, {'attr': {'class': 'form-select border border-dark rounded-0'}}) }}
-                                            {{ form_errors(form.course) }}
-                                        </div>
-{% endif %}
-
-
- {% if type != 'h' and type != 't' %}
-<!-- NEW FIELDS: Literacy and Numeracy Section -->
-<div class="row justify-content-center mt-4">
-    <div class="col-12">
-        <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3" style="background-color:#1b5e20; font-size:14px;">
-            {{ 'literacy_numeracy_section'|trans }}
-        </h6>
-
-        <div class="mt-3">
-            <div class="row g-3">
-                <div class="col-md-6">
-                    {{ form_label(form.literacy_level, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                    {{ form_widget(form.literacy_level, {'attr': {'class': 'form-select border border-dark rounded-0'}}) }}
-                    {{ form_errors(form.literacy_level) }}
+    <!-- start banner -->
+    <section class="position-relative">
+        <div class="container">
+            <!-- Language Switcher -->
+            <div class="row mb-3">
+                <div class="col-12 text-end">
+                    <div class="btn-group">
+                        <button type="button"
+                            class="btn btn-sm btn-outline-dark-gray language-btn {% if app.session.get('app_language', 'en') == 'en' %}active{% endif %}"
+                            data-lang="en">English</button>
+                        <button type="button"
+                            class="btn btn-sm btn-outline-dark-gray language-btn {% if app.session.get('app_language', 'en') == 'so' %}active{% endif %}"
+                            data-lang="so">Somali</button>
+                    </div>
                 </div>
-                <div class="col-md-6">
-                    {{ form_label(form.numeracy_level, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                    {{ form_widget(form.numeracy_level, {'attr': {'class': 'form-select border border-dark rounded-0'}}) }}
-                    {{ form_errors(form.numeracy_level) }}
-                </div>
+            </div>
+
+            <!-- Header row -->
+            <div class="row">
                 <div class="col-12">
-                    {{ form_label(form.literacy_numeracy_qualification, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                    {{ form_widget(form.literacy_numeracy_qualification, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
-                    {{ form_errors(form.literacy_numeracy_qualification) }}
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
-
-{% if type != 'h' and type != 't' %}
-<!-- NEW SECTION: Education Background -->
-<div class="row justify-content-center mt-4">
-    <div class="col-12">
-        <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3" style="background-color:#1b5e20; font-size:14px;">
-            {{ 'Educational Background'|trans }}
-        </h6>
-
-        <div class="mt-3">
-            <div class="row g-3">
-                <div class="col-12">
-                    {{ form_label(form.recent_education, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                    {{ form_widget(form.recent_education, {'attr': {'class': 'form-control border border-dark rounded-0', 'rows': 3}}) }}
-                    {{ form_errors(form.recent_education) }}
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
-
-
-<!-- Secondary School Education Section -->
-{% if type != 'l' %}
-<div class="row justify-content-center mt-4">
-    <div class="col-12">
-        <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3" style="background-color:#1b5e20; font-size:14px;">
-            {{ 'secondary_school_education'|trans }}
-        </h6>
-
-        <div class="mt-3">
-            <div class="row g-3">
-            
-                <div class="col-md-6">
-                    {{ form_label(form.secondary_school, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                    {{ form_widget(form.secondary_school, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
-                    {{ form_errors(form.secondary_school) }}
-                </div>
-                <div class="col-md-6">
-                    {{ form_label(form.secondary_graduation_year, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                    {{ form_widget(form.secondary_graduation_year, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
-                    {{ form_errors(form.secondary_graduation_year) }}
-                </div>
-                <div class="col-md-6">
-                    {{ form_label(form.secondary_grade, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                    {{ form_widget(form.secondary_grade, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
-                    {{ form_errors(form.secondary_grade) }}
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
-
-                                      <!-- Last Education Training Institution Section -->
-{% if type != 'l' %}
-<div class="row justify-content-center mt-4">
-    <div class="col-12">
-        <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3" style="background-color:#1b5e20; font-size:14px;">
-            {{ 'last_education'|trans }}
-        </h6>
-
-        <div class="mt-3">
-            <div class="border rounded-2 p-3 bg-light">
-                <div class="row g-4">
-                    <!-- Institution/Plan Name -->
-                    <div class="col-md-6">
-                        {{ form_label(form.institution_name, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                        {{ form_widget(form.institution_name, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
-                        {{ form_errors(form.institution_name) }}
-                    </div>
-
-                    <!-- Location -->
-                    <div class="col-md-6">
-                        {{ form_label(form.location, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                        {{ form_widget(form.location, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
-                        {{ form_errors(form.location) }}
-                    </div>
-
-                    <!-- Start Year -->
-                    <div class="col-md-6">
-                        {{ form_label(form.start_year, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                        {{ form_widget(form.start_year, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
-                        {{ form_errors(form.start_year) }}
-                    </div>
-
-                    <!-- End Year -->
-                    <div class="col-md-6">
-                        {{ form_label(form.end_year, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                        {{ form_widget(form.end_year, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
-                        {{ form_errors(form.end_year) }}
-                    </div>
-
-                    <!-- Qualification -->
-                    <div class="col-md-6">
-                        {{ form_label(form.qualification, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                        {{ form_widget(form.qualification, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
-                        {{ form_errors(form.qualification) }}
-                    </div>
-
-                    <!-- Minimum Grade/GPA -->
-                    <div class="col-md-6">
-                        {{ form_label(form.minimum_grade, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                        {{ form_widget(form.minimum_grade, {'attr': {'class': 'form-control border border-dark rounded-0'}}) }}
-                        {{ form_errors(form.minimum_grade) }}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-{% endif %}
-
-
-                                        <div class="col-12 text-end mt-4">
-                                            <button type="button" class="btn btn-dark-gray btn-round-edge px-5" onclick="switchTab('step2')" id="nextStepButton">{{ 'next_step'|trans }}</button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                    <!-- End Step 1 -->
-
-                  <!-- Step 2: Supporting Documents -->
-<div class="tab-pane fade in" id="step2">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3" style="background-color:#1b5e20; font-size:14px;">
-                {{ 'supporting_documents'|trans }}
-            </h6>
-
-            <div class="mt-3" style="font-size:14px;">
-                <!-- Certificates Attachment -->
-                <div class="mb-4">
-                    <label class="form-label fw-600 text-dark-gray">{{ 'certificates_attachment'|trans }}</label>
-                    <div class="file-drop-area border border-dark rounded-0 p-4 text-center bg-light" id="certificatesArea" data-field-name="certificate_attachment">
-                        {{ form_widget(form.certificate_attachment, {'attr': {'class': 'hidden-file-input file-input', 'data-area': 'certificatesArea'}}) }}
-                        <button type="button" class="btn btn-sm btn-dark-gray mb-2" onclick="document.getElementById('{{ form.certificate_attachment.vars.id }}').click()">{{ 'add_files'|trans }}</button>
-                        <div class="text-muted" style="font-size:13px;">{{ 'drag_files_here'|trans }}</div>
-                        <div class="file-list mt-2" id="certificatesList"></div>
-                    </div>
-                    {{ form_errors(form.certificate_attachment) }}
-                </div>
-
-                <!-- Declaration Section -->
-                <div class="mb-4">
-                    <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3 mt-4" style="background-color:#1b5e20; font-size:14px;">
-                        {{ 'declaration'|trans }}
+                    <h6 class="fw-700 text-white text-uppercase mb-0 py-3 px-4"
+                        style="background-color:#1b5e20; font-size:14px;">
+                        {{ 'application_form'|trans }} -
+                        {% if lang == 'so' %}
+                        {{ scholarship.sotitle ?? scholarship.title }}
+                        {% else %}
+                        {{ scholarship.title }}
+                        {% endif %}
                     </h6>
-                    
-                    <div class="border border-dark rounded-0 p-4 mt-3 bg-light">
-                        <!-- Declaration Text -->
-                        <div class="mb-4">
-                            <p class="mb-3"><strong>{{ 'declaration'|trans }}</strong></p>
-                            <p class="mb-2" style="font-size: 14px; line-height: 1.5;">
-                                {{ 'declaration_text'|trans }}
-                            </p>
-                        </div>
+                </div>
+            </div>
 
-                        <!-- Acknowledgement and Agreement -->
-                        <div class="mb-4">
-                            <p class="mb-3"><strong>{{ 'acknowledgement_agreement'|trans }}</strong></p>
-                            
-                            <!-- Checkbox -->
-                            <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" id="declarationAgreement" style="width: 18px; height: 18px;">
-                                <label class="form-check-label fw-600 text-dark-gray ms-2" for="declarationAgreement" style="font-size: 14px;">
-                                    {{ 'i_confirm_read_agree'|trans }}
-                                </label>
-                            </div>
+            <!-- Scholarship Info -->
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <h6 class="fw-600 mb-2">{{ 'scholarship_information'|trans }}</h6>
+                        <p class="mb-1">
+                            <strong>{{ 'description'|trans }}:</strong>
+                            {% if lang == 'so' %}
+                            {{ scholarship.socontent ?? scholarship.content }}
+                            {% else %}
+                            {{ scholarship.content }}
+                            {% endif %}
+                        </p>
+                        <p class="mb-0">
+                            <strong>{{ 'closing_date'|trans }}:</strong>
+                            {{ scholarship.closingDate|date('F d, Y') }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- Tab Navigation -->
+            <div class="row mt-4">
+                <div class="col tab-style-06">
+                    <ul
+                        class="nav nav-tabs alt-font justify-content-center border-0 text-center text-uppercase alt-font fw-500 mb-5">
+                        <li class="nav-item bg-white border-color-extra-medium-gray">
+                            <a class="nav-link active fw-500" data-bs-toggle="tab" href="#step1">{{
+                                'personal_information'|trans }}</a>
+                            <span class="tab-bg-active bg-dark-gray"></span>
+                        </li>
+                        <li class="nav-item bg-white border-color-extra-medium-gray">
+                            <a class="nav-link fw-500 disabled-tab" id="step2-tab" data-bs-toggle="tab" href="#step2"
+                                title="Complete Step 1 first"
+                                style="pointer-events: none; opacity: 0.6; cursor: not-allowed;">
+                                {{ 'supporting_documents'|trans }}
+                            </a>
+                            <span class="tab-bg-active bg-dark-gray"></span>
+                        </li>
+                    </ul>
 
-                            <!-- Full Name Field -->
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label fw-600 text-dark-gray mb-2">{{ 'full_name'|trans }}</label>
-                                    <input type="text" class="form-control border border-dark rounded-0" id="declarationFullName" readonly style="background-color: #f8f9fa;">
+                    <div class="tab-content">
+                        <!-- Step 1: Personal Information -->
+                        <div class="tab-pane fade in active show" id="step1">
+                            {{ form_start(form, {'attr': {'class': 'contact-form-style-03', 'id': 'register_form',
+                            'enctype': 'multipart/form-data'}}) }}
+                            <div class="row justify-content-center">
+                                <div class="col-lg-10">
+                                    <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3"
+                                        style="background-color:#1b5e20; font-size:14px;">
+                                        {{ 'personal_information'|trans }}
+                                    </h6>
+                                    <div class="row g-4">
+                                        <!-- Full Name -->
+
+                                        <div class="col-md-6">
+                                            {{ form_label(form.full_name, null, {'label_attr': {'class': 'form-label
+                                            fw-600 text-dark-gray'}}) }}
+                                            {{ form_widget(form.full_name, {'attr': {'class': 'form-control border
+                                            border-dark rounded-0'}}) }}
+                                            {{ form_errors(form.full_name) }}
+                                        </div>
+
+                                        <!-- Gender -->
+                                        <div class="col-md-6">
+                                            {{ form_label(form.gender, null, {'label_attr': {'class': 'form-label fw-600
+                                            text-dark-gray'}}) }}
+                                            {{ form_widget(form.gender, {'attr': {'class': 'form-select border
+                                            border-dark rounded-0'}}) }}
+                                            {{ form_errors(form.gender) }}
+                                        </div>
+
+                                        <!-- Phone -->
+                                        <div class="col-md-6">
+                                            {{ form_label(form.phone, null, {'label_attr': {'class': 'form-label fw-600
+                                            text-dark-gray'}}) }}
+                                            {{ form_widget(form.phone, {'attr': {'class': 'form-control border
+                                            border-dark rounded-0'}}) }}
+                                            {{ form_errors(form.phone) }}
+                                        </div>
+
+                                        <!-- Email -->
+                                        <div class="col-md-6">
+                                            {{ form_label(form.email, null, {'label_attr': {'class': 'form-label fw-600
+                                            text-dark-gray'}}) }}
+                                            {{ form_widget(form.email, {'attr': {'class': 'form-control border
+                                            border-dark rounded-0'}}) }}
+                                            {{ form_errors(form.email) }}
+                                        </div>
+
+                                        <!-- Nationality -->
+                                        <div class="col-md-6">
+                                            {{ form_label(form.nationality, null, {'label_attr': {'class': 'form-label
+                                            fw-600 text-dark-gray'}}) }}
+                                            {{ form_widget(form.nationality, {'attr': {'class': 'form-select border
+                                            border-dark rounded-0'}}) }}
+                                            {{ form_errors(form.nationality) }}
+                                        </div>
+
+                                        <!-- Date of Birth -->
+                                        <div class="col-md-6">
+                                            {{ form_label(form.date_of_birth, null, {'label_attr': {'class': 'form-label
+                                            fw-600 text-dark-gray'}}) }}
+                                            {{ form_widget(form.date_of_birth, {'attr': {'class': 'form-control border
+                                            border-dark rounded-0'}}) }}
+                                            {{ form_errors(form.date_of_birth) }}
+                                        </div>
+
+                                        <!-- Region -->
+                                        <div class="col-md-6">
+                                            {{ form_label(form.region, null, {'label_attr': {'class': 'form-label fw-600
+                                            text-dark-gray'}}) }}
+                                            {{ form_widget(form.region, {'attr': {'class': 'form-select border
+                                            border-dark rounded-0', 'id': 'region-select'}}) }}
+                                            {{ form_errors(form.region) }}
+                                        </div>
+
+                                        <!-- District (Dynamic) -->
+                                        <div class="col-md-6">
+                                            {{ form_label(form.district, null, {'label_attr': {'class': 'form-label
+                                            fw-600 text-dark-gray'}}) }}
+                                            {{ form_widget(form.district, {'attr': {'class': 'form-select border
+                                            border-dark rounded-0', 'id': 'district-select'}}) }}
+                                            {{ form_errors(form.district) }}
+                                        </div>
+
+
+
+                                        <!-- Village -->
+                                        <div class="col-md-6">
+                                            {{ form_label(form.village, null, {'label_attr': {'class': 'form-label
+                                            fw-600 text-dark-gray'}}) }}
+                                            {{ form_widget(form.village, {'attr': {'class': 'form-control border
+                                            border-dark rounded-0'}}) }}
+                                            {{ form_errors(form.village) }}
+                                        </div>
+                                    </div>
+
+
+
+                                    <!-- Disability Disclosure Section -->
+                                    <div class="row justify-content-center mt-4">
+                                        <div class="col-12">
+                                            <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3"
+                                                style="background-color:#1b5e20; font-size:14px;">
+                                                {{ 'disability_disclosure'|trans }}
+                                            </h6>
+
+                                            <div class="mt-3" style="font-size:14px;">
+                                                {{ form_label(form.disability, null, {'label_attr': {'class':
+                                                'form-label fw-600 text-dark-gray'}}) }}
+                                                {{ form_widget(form.disability, {'attr': {'class': 'form-select border
+                                                border-dark rounded-0', 'onchange':
+                                                'toggleDisabilityExplanation(this)'}}) }}
+                                                {{ form_errors(form.disability) }}
+                                            </div>
+                                            <!-- Disability Explanation (Conditional) -->
+                                            <div id="disabilityExplanation" style="display: none;">
+                                                <div class="mb-3">
+                                                    {{ form_label(form.disability_explanation, null, {'label_attr':
+                                                    {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                                                    {{ form_widget(form.disability_explanation, {'attr': {'class':
+                                                    'form-control border border-dark rounded-0', 'rows': 3}}) }}
+                                                    {{ form_errors(form.disability_explanation) }}
+                                                </div>
+                                            </div>
+
+                                            <!-- Personal Identification Verification -->
+                                            <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3 mt-4"
+                                                style="background-color:#1b5e20; font-size:14px;">
+                                                {{ 'personal_identification'|trans }}
+                                            </h6>
+
+                                            <div class="mt-3">
+                                                <div class="mb-3">
+                                                    {{ form_label(form.identity_type, null, {'label_attr': {'class':
+                                                    'form-label fw-600 text-dark-gray'}}) }}
+                                                    {{ form_widget(form.identity_type, {'attr': {'class': 'form-select
+                                                    border border-dark rounded-0'}}) }}
+                                                    {{ form_errors(form.identity_type) }}
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-600 text-dark-gray">{{
+                                                        'identity_attachment'|trans }}</label>
+                                                    <div class="file-drop-area border border-dark rounded-0 p-3 text-center bg-light"
+                                                        id="identityArea" data-field-name="identity_attachment">
+                                                        {{ form_widget(form.identity_attachment, {'attr': {'class':
+                                                        'hidden-file-input file-input', 'data-area': 'identityArea'}})
+                                                        }}
+                                                        <button type="button" class="btn btn-sm btn-dark-gray mb-2"
+                                                            onclick="document.getElementById('{{ form.identity_attachment.vars.id }}').click()">{{
+                                                            'add_files'|trans }}</button>
+                                                        <div class="text-muted" style="font-size:13px;">{{
+                                                            'drag_files_here'|trans }}</div>
+                                                        <div class="file-list mt-2" id="identityList"></div>
+                                                    </div>
+                                                    {{ form_errors(form.identity_attachment) }}
+                                                </div>
+                                            </div>
+                                            {% if type != 'l' %}
+                                            <!-- Enrollment School Selection -->
+                                            <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3 mt-4"
+                                                style="background-color:#1b5e20; font-size:14px;">
+                                                {{ 'enrollment_school'|trans }}
+                                            </h6>
+
+                                            <div class="mt-3">
+                                                {{ form_label(form.institute, null, {'label_attr': {'class': 'form-label
+                                                fw-600 text-dark-gray'}}) }}
+                                                {{ form_widget(form.institute, {'attr': {'class': 'form-select border
+                                                border-dark rounded-0'}}) }}
+                                                {{ form_errors(form.institute) }}
+                                            </div>
+                                            {% endif %}
+                                            {% if type != 'l' %}
+
+                                            <!-- Enrollment Course Selection -->
+                                            <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3 mt-4"
+                                                style="background-color:#1b5e20; font-size:14px;">
+                                                {{ 'enrollment_course'|trans }}
+                                            </h6>
+
+                                            <div class="mt-3">
+                                                {{ form_label(form.course, null, {'label_attr': {'class': 'form-label
+                                                fw-600 text-dark-gray'}}) }}
+                                                {{ form_widget(form.course, {'attr': {'class': 'form-select border
+                                                border-dark rounded-0'}}) }}
+                                                {{ form_errors(form.course) }}
+                                            </div>
+                                            {% endif %}
+
+
+                                            {% if type != 'h' and type != 't' %}
+                                            <!-- NEW FIELDS: Literacy and Numeracy Section -->
+                                            <div class="row justify-content-center mt-4">
+                                                <div class="col-12">
+                                                    <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3"
+                                                        style="background-color:#1b5e20; font-size:14px;">
+                                                        {{ 'literacy_numeracy_section'|trans }}
+                                                    </h6>
+
+                                                    <div class="mt-3">
+                                                        <div class="row g-3">
+                                                            <div class="col-md-6">
+                                                                {{ form_label(form.literacy_level, null, {'label_attr':
+                                                                {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                                                                {{ form_widget(form.literacy_level, {'attr': {'class':
+                                                                'form-select border border-dark rounded-0'}}) }}
+                                                                {{ form_errors(form.literacy_level) }}
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                {{ form_label(form.numeracy_level, null, {'label_attr':
+                                                                {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                                                                {{ form_widget(form.numeracy_level, {'attr': {'class':
+                                                                'form-select border border-dark rounded-0'}}) }}
+                                                                {{ form_errors(form.numeracy_level) }}
+                                                            </div>
+                                                            <div class="col-12">
+                                                                {{ form_label(form.literacy_numeracy_qualification,
+                                                                null, {'label_attr': {'class': 'form-label fw-600
+                                                                text-dark-gray'}}) }}
+                                                                {{ form_widget(form.literacy_numeracy_qualification,
+                                                                {'attr': {'class': 'form-control border border-dark
+                                                                rounded-0'}}) }}
+                                                                {{ form_errors(form.literacy_numeracy_qualification) }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+
+                                            {% if type != 'h' and type != 't' %}
+                                            <!-- NEW SECTION: Education Background -->
+                                            <div class="row justify-content-center mt-4">
+                                                <div class="col-12">
+                                                    <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3"
+                                                        style="background-color:#1b5e20; font-size:14px;">
+                                                        {{ 'Educational Background'|trans }}
+                                                    </h6>
+
+                                                    <div class="mt-3">
+                                                        <div class="row g-3">
+                                                            <div class="col-12">
+                                                                {{ form_label(form.recent_education, null,
+                                                                {'label_attr': {'class': 'form-label fw-600
+                                                                text-dark-gray'}}) }}
+                                                                {{ form_widget(form.recent_education, {'attr': {'class':
+                                                                'form-control border border-dark rounded-0', 'rows':
+                                                                3}}) }}
+                                                                {{ form_errors(form.recent_education) }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+
+
+                                            <!-- Secondary School Education Section -->
+                                            {% if type != 'l' %}
+                                            <div class="row justify-content-center mt-4">
+                                                <div class="col-12">
+                                                    <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3"
+                                                        style="background-color:#1b5e20; font-size:14px;">
+                                                        {{ 'secondary_school_education'|trans }}
+                                                    </h6>
+
+                                                    <div class="mt-3">
+                                                        <div class="row g-3">
+
+                                                            <div class="col-md-6">
+                                                                {{ form_label(form.secondary_school, null,
+                                                                {'label_attr': {'class': 'form-label fw-600
+                                                                text-dark-gray'}}) }}
+                                                                {{ form_widget(form.secondary_school, {'attr': {'class':
+                                                                'form-control border border-dark rounded-0'}}) }}
+                                                                {{ form_errors(form.secondary_school) }}
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                {{ form_label(form.secondary_graduation_year, null,
+                                                                {'label_attr': {'class': 'form-label fw-600
+                                                                text-dark-gray'}}) }}
+                                                                {{ form_widget(form.secondary_graduation_year, {'attr':
+                                                                {'class': 'form-control border border-dark rounded-0'}})
+                                                                }}
+                                                                {{ form_errors(form.secondary_graduation_year) }}
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                {{ form_label(form.secondary_grade, null, {'label_attr':
+                                                                {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                                                                {{ form_widget(form.secondary_grade, {'attr': {'class':
+                                                                'form-control border border-dark rounded-0'}}) }}
+                                                                {{ form_errors(form.secondary_grade) }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+
+                                            <!-- Last Education Training Institution Section -->
+                                            {% if type != 'l' %}
+                                            <div class="row justify-content-center mt-4">
+                                                <div class="col-12">
+                                                    <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3"
+                                                        style="background-color:#1b5e20; font-size:14px;">
+                                                        {{ 'last_education'|trans }}
+                                                    </h6>
+
+                                                    <div class="mt-3">
+                                                        <div class="border rounded-2 p-3 bg-light">
+                                                            <div class="row g-4">
+                                                                <!-- Institution/Plan Name -->
+                                                                <div class="col-md-6">
+                                                                    {{ form_label(form.institution_name, null,
+                                                                    {'label_attr': {'class': 'form-label fw-600
+                                                                    text-dark-gray'}}) }}
+                                                                    {{ form_widget(form.institution_name, {'attr':
+                                                                    {'class': 'form-control border border-dark
+                                                                    rounded-0'}}) }}
+                                                                    {{ form_errors(form.institution_name) }}
+                                                                </div>
+
+                                                                <!-- Location -->
+                                                                <div class="col-md-6">
+                                                                    {{ form_label(form.location, null, {'label_attr':
+                                                                    {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                                                                    {{ form_widget(form.location, {'attr': {'class':
+                                                                    'form-control border border-dark rounded-0'}}) }}
+                                                                    {{ form_errors(form.location) }}
+                                                                </div>
+
+                                                                <!-- Start Year -->
+                                                                <div class="col-md-6">
+                                                                    {{ form_label(form.start_year, null, {'label_attr':
+                                                                    {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                                                                    {{ form_widget(form.start_year, {'attr': {'class':
+                                                                    'form-control border border-dark rounded-0'}}) }}
+                                                                    {{ form_errors(form.start_year) }}
+                                                                </div>
+
+                                                                <!-- End Year -->
+                                                                <div class="col-md-6">
+                                                                    {{ form_label(form.end_year, null, {'label_attr':
+                                                                    {'class': 'form-label fw-600 text-dark-gray'}}) }}
+                                                                    {{ form_widget(form.end_year, {'attr': {'class':
+                                                                    'form-control border border-dark rounded-0'}}) }}
+                                                                    {{ form_errors(form.end_year) }}
+                                                                </div>
+
+                                                                <!-- Qualification -->
+                                                                <div class="col-md-6">
+                                                                    {{ form_label(form.qualification, null,
+                                                                    {'label_attr': {'class': 'form-label fw-600
+                                                                    text-dark-gray'}}) }}
+                                                                    {{ form_widget(form.qualification, {'attr':
+                                                                    {'class': 'form-control border border-dark
+                                                                    rounded-0'}}) }}
+                                                                    {{ form_errors(form.qualification) }}
+                                                                </div>
+
+                                                                <!-- Minimum Grade/GPA -->
+                                                                <div class="col-md-6">
+                                                                    {{ form_label(form.minimum_grade, null,
+                                                                    {'label_attr': {'class': 'form-label fw-600
+                                                                    text-dark-gray'}}) }}
+                                                                    {{ form_widget(form.minimum_grade, {'attr':
+                                                                    {'class': 'form-control border border-dark
+                                                                    rounded-0'}}) }}
+                                                                    {{ form_errors(form.minimum_grade) }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endif %}
+
+
+                                            <div class="col-12 text-end mt-4">
+                                                <button type="button" class="btn btn-dark-gray btn-round-edge px-5"
+                                                    onclick="switchTab('step2')" id="nextStepButton">{{
+                                                    'next_step'|trans }}</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
-                                <div class="col-md-6">
-                                    <label class="form-label fw-600 text-dark-gray mb-2">{{ 'date'|trans }}</label>
-                                    <input type="text" class="form-control border border-dark rounded-0" id="declarationDate" readonly style="background-color: #f8f9fa;">
+                            </div>
+                        </div>
+                        <!-- End Step 1 -->
+
+                        <!-- Step 2: Supporting Documents -->
+                        <div class="tab-pane fade in" id="step2">
+                            <div class="row justify-content-center">
+                                <div class="col-lg-10">
+                                    <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3"
+                                        style="background-color:#1b5e20; font-size:14px;">
+                                        {{ 'supporting_documents'|trans }}
+                                    </h6>
+
+                                    <div class="mt-3" style="font-size:14px;">
+                                        <!-- Certificates Attachment -->
+                                        <div class="mb-4">
+                                            <label class="form-label fw-600 text-dark-gray">{{
+                                                'certificates_attachment'|trans }}</label>
+                                            <div class="file-drop-area border border-dark rounded-0 p-4 text-center bg-light"
+                                                id="certificatesArea" data-field-name="certificate_attachment">
+                                                {{ form_widget(form.certificate_attachment, {'attr': {'class':
+                                                'hidden-file-input file-input', 'data-area': 'certificatesArea'}}) }}
+                                                <button type="button" class="btn btn-sm btn-dark-gray mb-2"
+                                                    onclick="document.getElementById('{{ form.certificate_attachment.vars.id }}').click()">{{
+                                                    'add_files'|trans }}</button>
+                                                <div class="text-muted" style="font-size:13px;">{{
+                                                    'drag_files_here'|trans }}</div>
+                                                <div class="file-list mt-2" id="certificatesList"></div>
+                                            </div>
+                                            {{ form_errors(form.certificate_attachment) }}
+                                        </div>
+
+                                        <!-- Declaration Section -->
+                                        <div class="mb-4">
+                                            <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3 mt-4"
+                                                style="background-color:#1b5e20; font-size:14px;">
+                                                {{ 'declaration'|trans }}
+                                            </h6>
+
+                                            <div class="border border-dark rounded-0 p-4 mt-3 bg-light">
+                                                <!-- Declaration Text -->
+                                                <div class="mb-4">
+                                                    <p class="mb-3"><strong>{{ 'declaration'|trans }}</strong></p>
+                                                    <p class="mb-2" style="font-size: 14px; line-height: 1.5;">
+                                                        {{ 'declaration_text'|trans }}
+                                                    </p>
+                                                </div>
+
+                                                <!-- Acknowledgement and Agreement -->
+                                                <div class="mb-4">
+                                                    <p class="mb-3"><strong>{{ 'acknowledgement_agreement'|trans
+                                                            }}</strong></p>
+
+                                                    <!-- Checkbox -->
+                                                    <div class="form-check mb-3">
+                                                        <input class="form-check-input" type="checkbox"
+                                                            id="declarationAgreement"
+                                                            style="width: 18px; height: 18px;">
+                                                        <label class="form-check-label fw-600 text-dark-gray ms-2"
+                                                            for="declarationAgreement" style="font-size: 14px;">
+                                                            {{ 'i_confirm_read_agree'|trans }}
+                                                        </label>
+                                                    </div>
+
+                                                    <!-- Full Name Field -->
+                                                    <div class="row mb-3">
+                                                        <div class="col-md-6">
+                                                            <label class="form-label fw-600 text-dark-gray mb-2">{{
+                                                                'full_name'|trans }}</label>
+                                                            <input type="text"
+                                                                class="form-control border border-dark rounded-0"
+                                                                id="declarationFullName" readonly
+                                                                style="background-color: #f8f9fa;">
+                                                        </div>
+                                                        <div class="col-md-6">
+                                                            <label class="form-label fw-600 text-dark-gray mb-2">{{
+                                                                'date'|trans }}</label>
+                                                            <input type="text"
+                                                                class="form-control border border-dark rounded-0"
+                                                                id="declarationDate" readonly
+                                                                style="background-color: #f8f9fa;">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Action Buttons -->
+                                        <div class="d-flex justify-content-between mt-4">
+                                            <button type="button" class="btn btn-outline-dark-gray btn-round-edge px-4"
+                                                onclick="switchTab('step1')">{{ 'previous'|trans }}</button>
+                                            <div>
+                                                <button type="button" onclick="submitApplication()"
+                                                    class="btn btn-outline-dark-gray btn-round-edge px-5" id="submitBtn"
+                                                    disabled>{{ 'submit_application'|trans }}</button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="d-flex justify-content-between mt-4">
-                    <button type="button" class="btn btn-outline-dark-gray btn-round-edge px-4" onclick="switchTab('step1')">{{ 'previous'|trans }}</button>
-                    <div>
-                        <button type="button" onclick="submitApplication()" class="btn btn-outline-dark-gray btn-round-edge px-5" id="submitBtn" disabled>{{ 'submit_application'|trans }}</button>
-                    </div>
+                    {{ form_end(form) }}
                 </div>
             </div>
         </div>
-    </div>
-</div>
-                </div>
-                {{ form_end(form) }}
-            </div>
-        </div>
-    </div>
-</section>
+    </section>
 
 
 
-<!-- start footer -->
-{% include 'home/_footer.html.twig' %}
-<!-- end footer -->
+    <!-- start footer -->
+    {% include 'home/_footer.html.twig' %}
+    <!-- end footer -->
 
-	<script>
-    // Application Form Manager
-    class ApplicationFormManager {
-        constructor() {
-            this.init();
-        }
-
-        init() {
-            this.setupFileUpload();
-            this.setupRealTimeValidation();
-            this.setupTabProtection();
-            this.setupLanguageSwitcher();
-            this.initializeFormState();
-        }
-
-
-forcePlaceholderSelection() {
-    const regionSelect = document.getElementById('{{ form.region.vars.id }}');
-    if (regionSelect) {
-        // Wait a brief moment for the DOM to be fully ready
-        setTimeout(() => {
-            if (regionSelect.selectedIndex !== 0) {
-                regionSelect.selectedIndex = 0;
+    <script>
+        // Application Form Manager
+        class ApplicationFormManager {
+            constructor() {
+                this.init();
             }
-        }, 100);
-    }
-}
 
-
-        // File Upload Management
-        setupFileUpload() {
-            const fileDropAreas = document.querySelectorAll('.file-drop-area');
-            
-            fileDropAreas.forEach(area => {
-                const fileInput = area.querySelector('.file-input');
-                const fileList = area.querySelector('.file-list');
-                
-                // Click to open file dialog
-                area.addEventListener('click', (e) => {
-                    if (!e.target.closest('button') && !e.target.closest('.file-remove')) {
-                        fileInput.click();
-                    }
-                });
-                
-                // Handle file selection
-                fileInput.addEventListener('change', (e) => {
-                    this.handleFiles(e.target.files, fileList, fileInput);
-                });
-                
-                // Drag and drop functionality
-                area.addEventListener('dragover', (e) => {
-                    e.preventDefault();
-                    area.classList.add('dragover');
-                });
-                
-                area.addEventListener('dragleave', (e) => {
-                    e.preventDefault();
-                    area.classList.remove('dragover');
-                });
-                
-                area.addEventListener('drop', (e) => {
-                    e.preventDefault();
-                    area.classList.remove('dragover');
-                    this.handleFiles(e.dataTransfer.files, fileList, fileInput);
-                });
-            });
-        }
-
-        handleFiles(files, fileList, fileInput) {
-            for (let file of files) {
-                this.addFileToList(file, fileList, fileInput);
+            init() {
+                this.setupFileUpload();
+                this.setupRealTimeValidation();
+                this.setupTabProtection();
+                this.setupLanguageSwitcher();
+                this.initializeFormState();
             }
-        }
 
-        addFileToList(file, fileList, fileInput) {
-            const fileItem = document.createElement('div');
-            fileItem.className = 'file-item';
-            fileItem.innerHTML = `
+
+            forcePlaceholderSelection() {
+                const regionSelect = document.getElementById('{{ form.region.vars.id }}');
+                if (regionSelect) {
+                    // Wait a brief moment for the DOM to be fully ready
+                    setTimeout(() => {
+                        if (regionSelect.selectedIndex !== 0) {
+                            regionSelect.selectedIndex = 0;
+                        }
+                    }, 100);
+                }
+            }
+
+
+            // File Upload Management
+            setupFileUpload() {
+                const fileDropAreas = document.querySelectorAll('.file-drop-area');
+
+                fileDropAreas.forEach(area => {
+                    const fileInput = area.querySelector('.file-input');
+                    const fileList = area.querySelector('.file-list');
+
+                    // Click to open file dialog
+                    area.addEventListener('click', (e) => {
+                        if (!e.target.closest('button') && !e.target.closest('.file-remove')) {
+                            fileInput.click();
+                        }
+                    });
+
+                    // Handle file selection
+                    fileInput.addEventListener('change', (e) => {
+                        this.handleFiles(e.target.files, fileList, fileInput);
+                    });
+
+                    // Drag and drop functionality
+                    area.addEventListener('dragover', (e) => {
+                        e.preventDefault();
+                        area.classList.add('dragover');
+                    });
+
+                    area.addEventListener('dragleave', (e) => {
+                        e.preventDefault();
+                        area.classList.remove('dragover');
+                    });
+
+                    area.addEventListener('drop', (e) => {
+                        e.preventDefault();
+                        area.classList.remove('dragover');
+                        this.handleFiles(e.dataTransfer.files, fileList, fileInput);
+                    });
+                });
+            }
+
+            handleFiles(files, fileList, fileInput) {
+                for (let file of files) {
+                    this.addFileToList(file, fileList, fileInput);
+                }
+            }
+
+            addFileToList(file, fileList, fileInput) {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
                 <span class="file-name">${file.name}</span>
                 <span class="file-remove" onclick="appFormManager.removeFile(this)">×</span>
             `;
-            fileList.appendChild(fileItem);
-            
-            this.updateFileAreaValidation(fileList.closest('.file-drop-area'));
-            this.validateStep1();
-        }
+                fileList.appendChild(fileItem);
 
-        removeFile(element) {
-            const fileItem = element.parentElement;
-            const fileArea = fileItem.closest('.file-drop-area');
-            fileItem.remove();
-            this.updateFileAreaValidation(fileArea);
-            this.validateStep1();
-        }
-
-        updateFileAreaValidation(fileArea) {
-            const fileList = fileArea.querySelector('.file-list');
-            const hasFiles = fileList && fileList.children.length > 0;
-            
-            fileArea.classList.toggle('file-area-error', !hasFiles);
-            fileArea.classList.toggle('file-area-valid', hasFiles);
-            
-            const existingError = fileArea.querySelector('.file-error-message');
-            if (existingError && hasFiles) {
-                existingError.remove();
+                this.updateFileAreaValidation(fileList.closest('.file-drop-area'));
+                this.validateStep1();
             }
-        }
 
-        // Validation Management
-        setupRealTimeValidation() {
-            const requiredFields = [
-                '{{ form.full_name.vars.id }}',
-                '{{ form.phone.vars.id }}',
-                '{{ form.gender.vars.id }}',
-                '{{ form.nationality.vars.id }}',
-                '{{ form.date_of_birth.vars.id }}',
-                '{{ form.region.vars.id }}',
-                '{{ form.disability.vars.id }}',
-            ];
+            removeFile(element) {
+                const fileItem = element.parentElement;
+                const fileArea = fileItem.closest('.file-drop-area');
+                fileItem.remove();
+                this.updateFileAreaValidation(fileArea);
+                this.validateStep1();
+            }
 
-          
+            updateFileAreaValidation(fileArea) {
+                const fileList = fileArea.querySelector('.file-list');
+                const hasFiles = fileList && fileList.children.length > 0;
 
-            requiredFields.forEach(fieldId => {
-                const field = document.getElementById(fieldId);
-                if (field) {
-                    ['blur', 'change', 'input'].forEach(event => {
-                        field.addEventListener(event, () => this.validateStep1());
-                    });
-                }
-            });
+                fileArea.classList.toggle('file-area-error', !hasFiles);
+                fileArea.classList.toggle('file-area-valid', hasFiles);
 
-            // Monitor file changes
-            const fileLists = document.querySelectorAll('.file-list');
-            fileLists.forEach(list => {
-                const observer = new MutationObserver(() => this.validateStep1());
-                observer.observe(list, { childList: true });
-            });
-        }
-
-        validateStep1() {
-            const requiredFields = {
-                '{{ form.full_name.vars.id }}': 'Full name is required',
-                '{{ form.gender.vars.id }}': 'Gender is required',
-                '{{ form.phone.vars.id }}': 'Phone number is required',
-                '{{ form.nationality.vars.id }}': 'Nationality is required',
-                '{{ form.date_of_birth.vars.id }}': 'Date of birth is required',
-                '{{ form.region.vars.id }}': 'Region is required',
-                '{{ form.disability.vars.id }}': 'Disability information is required'
-            };
-
-           
-
-            let isValid = true;
-
-            // Clear previous errors
-            this.clearValidationErrors();
-
-            // Validate fields
-            for (const [fieldId, message] of Object.entries(requiredFields)) {
-                const field = document.getElementById(fieldId);
-                if (field && !field.value.trim()) {
-                    isValid = false;
+                const existingError = fileArea.querySelector('.file-error-message');
+                if (existingError && hasFiles) {
+                    existingError.remove();
                 }
             }
 
-            // Validate identity attachment
-            const identityArea = document.querySelector('[data-field-name="identity_attachment"]');
-            const hasIdentityFiles = identityArea && 
-                identityArea.querySelector('.file-list') && 
-                identityArea.querySelector('.file-list').children.length > 0;
-            
-            if (!hasIdentityFiles) {
-                isValid = false;
-            }
-
-            this.updateNextStepButton(isValid);
-            this.updateTabAccessibility(isValid);
-
-            return isValid;
-        }
-
-        validateStep1WithFeedback() {
-            if (!this.validateStep1()) {
-                this.showAlertMessage('Please complete all required fields before proceeding.', 'danger');
-                const firstError = document.querySelector('.is-invalid, .file-area-error');
-                if (firstError) {
-                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-                return false;
-            }
-            return true;
-        }
-
-       validateFileAttachments() {
-    const certificatesArea = document.querySelector('[data-field-name="certificate_attachment"]');
-    let hasCertificateFiles = false;
-    
-    if (certificatesArea) {
-        const fileList = certificatesArea.querySelector('.file-list');
-        hasCertificateFiles = fileList && fileList.children.length > 0;
-        
-        if (!hasCertificateFiles) {
-            certificatesArea.classList.add('file-area-error');
-        } else {
-            certificatesArea.classList.remove('file-area-error');
-        }
-    }
-    
-    if (!hasCertificateFiles) {
-        this.showAlertMessage('Please upload at least one certificate document.', 'danger');
-        return false;
-    }
-    
-    return true;
-}
+            // Validation Management
+            setupRealTimeValidation() {
+                const requiredFields = [
+                    '{{ form.full_name.vars.id }}',
+                    '{{ form.phone.vars.id }}',
+                    '{{ form.gender.vars.id }}',
+                    '{{ form.nationality.vars.id }}',
+                    '{{ form.date_of_birth.vars.id }}',
+                    '{{ form.region.vars.id }}',
+                    '{{ form.disability.vars.id }}',
+                ];
 
 
-setupDeclarationSection() {
-    this.initializeDeclarationFields();
-    this.setupDeclarationValidation();
-}
 
-initializeDeclarationFields() {
-    // Set today's date
-    const today = new Date().toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-    document.getElementById('declarationDate').value = today;
-
-    // Auto-fill name from step 1
-    const fullNameField = document.getElementById('{{ form.full_name.vars.id }}');
-    if (fullNameField) {
-        // Set initial value
-        document.getElementById('declarationFullName').value = fullNameField.value;
-        
-        // Update on changes
-        fullNameField.addEventListener('input', () => {
-            document.getElementById('declarationFullName').value = fullNameField.value;
-        });
-    }
-}
-
-setupDeclarationValidation() {
-    const agreementCheckbox = document.getElementById('declarationAgreement');
-    const submitBtn = document.getElementById('submitBtn');
-    
-    if (agreementCheckbox && submitBtn) {
-        agreementCheckbox.addEventListener('change', () => {
-            this.updateSubmitButtonState();
-        });
-    }
-}
-
-updateSubmitButtonState() {
-    const agreementCheckbox = document.getElementById('declarationAgreement');
-    const submitBtn = document.getElementById('submitBtn');
-    
-    if (agreementCheckbox && submitBtn) {
-        const isAgreed = agreementCheckbox.checked;
-        submitBtn.disabled = !isAgreed;
-        submitBtn.classList.toggle('btn-disabled', !isAgreed);
-    }
-}
-
-        // UI Management
-        updateNextStepButton(isValid) {
-            const nextStepButton = document.getElementById('nextStepButton');
-            if (nextStepButton) {
-                nextStepButton.disabled = !isValid;
-                nextStepButton.classList.toggle('btn-disabled', !isValid);
-            }
-        }
-
-        updateTabAccessibility(isValid) {
-            const step2Tab = document.getElementById('step2-tab');
-            if (step2Tab) {
-                step2Tab.classList.toggle('disabled-tab', !isValid);
-                step2Tab.style.pointerEvents = isValid ? 'auto' : 'none';
-                step2Tab.style.opacity = isValid ? '1' : '0.6';
-            }
-        }
-
-        setupTabProtection() {
-            const step2Tab = document.getElementById('step2-tab');
-            if (step2Tab) {
-                step2Tab.addEventListener('click', (e) => {
-                    if (step2Tab.classList.contains('disabled-tab')) {
-                        e.preventDefault();
-                        this.showAlertMessage('Please complete all required fields in Step 1 first.', 'warning');
+                requiredFields.forEach(fieldId => {
+                    const field = document.getElementById(fieldId);
+                    if (field) {
+                        ['blur', 'change', 'input'].forEach(event => {
+                            field.addEventListener(event, () => this.validateStep1());
+                        });
                     }
                 });
-            }
-        }
 
-        // Form Operations
-        switchTab(tabName) {
-            if (tabName === 'step2' && !this.validateStep1WithFeedback()) {
-                return false;
+                // Monitor file changes
+                const fileLists = document.querySelectorAll('.file-list');
+                fileLists.forEach(list => {
+                    const observer = new MutationObserver(() => this.validateStep1());
+                    observer.observe(list, { childList: true });
+                });
             }
-            
-            const tab = new bootstrap.Tab(document.querySelector(`a[href="#${tabName}"]`));
-            tab.show();
 
-            if (tabName === 'step2') {
-                setTimeout(() => this.validateFileAttachments(), 100);
-            }
-        }
+            validateStep1() {
+                const requiredFields = {
+                    '{{ form.full_name.vars.id }}': 'Full name is required',
+                    '{{ form.gender.vars.id }}': 'Gender is required',
+                    '{{ form.phone.vars.id }}': 'Phone number is required',
+                    '{{ form.nationality.vars.id }}': 'Nationality is required',
+                    '{{ form.date_of_birth.vars.id }}': 'Date of birth is required',
+                    '{{ form.region.vars.id }}': 'Region is required',
+                    '{{ form.disability.vars.id }}': 'Disability information is required'
+                };
 
-        submitApplication() {
-            if (!this.validateStep1WithFeedback() || !this.validateFileAttachments()) {
-                return false;
-            }
-            
-            const form = document.getElementById('register_form');
-            const submitBtn = document.getElementById('submitBtn');
-            
-            if (form.reportValidity()) {
-                if (submitBtn) {
-                    submitBtn.disabled = true;
-                    submitBtn.innerHTML = 'Submitting... <i class="fa-solid fa-spinner fa-spin ms-2"></i>';
+
+
+                let isValid = true;
+
+                // Clear previous errors
+                this.clearValidationErrors();
+
+                // Validate fields
+                for (const [fieldId, message] of Object.entries(requiredFields)) {
+                    const field = document.getElementById(fieldId);
+                    if (field && !field.value.trim()) {
+                        isValid = false;
+                    }
                 }
-                form.submit();
-            }
-        }
 
-        // Utility Methods
-        clearValidationErrors() {
-            document.querySelectorAll('.is-invalid').forEach(field => {
-                field.classList.remove('is-invalid');
-            });
-            
-            const alert = document.querySelector('.validation-alert');
-            if (alert) {
-                alert.remove();
-            }
-        }
+                // Validate identity attachment
+                const identityArea = document.querySelector('[data-field-name="identity_attachment"]');
+                const hasIdentityFiles = identityArea &&
+                    identityArea.querySelector('.file-list') &&
+                    identityArea.querySelector('.file-list').children.length > 0;
 
-        showAlertMessage(message, type = 'danger') {
-            const existingAlert = document.querySelector('.validation-alert');
-            if (existingAlert) {
-                existingAlert.remove();
+                if (!hasIdentityFiles) {
+                    isValid = false;
+                }
+
+                this.updateNextStepButton(isValid);
+                this.updateTabAccessibility(isValid);
+
+                return isValid;
             }
-            
-            const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type} validation-alert mt-3 alert-modern`;
-            alertDiv.innerHTML = `
+
+            validateStep1WithFeedback() {
+                if (!this.validateStep1()) {
+                    this.showAlertMessage('Please complete all required fields before proceeding.', 'danger');
+                    const firstError = document.querySelector('.is-invalid, .file-area-error');
+                    if (firstError) {
+                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                    return false;
+                }
+                return true;
+            }
+
+            validateFileAttachments() {
+                const certificatesArea = document.querySelector('[data-field-name="certificate_attachment"]');
+                let hasCertificateFiles = false;
+
+                if (certificatesArea) {
+                    const fileList = certificatesArea.querySelector('.file-list');
+                    hasCertificateFiles = fileList && fileList.children.length > 0;
+
+                    if (!hasCertificateFiles) {
+                        certificatesArea.classList.add('file-area-error');
+                    } else {
+                        certificatesArea.classList.remove('file-area-error');
+                    }
+                }
+
+                if (!hasCertificateFiles) {
+                    this.showAlertMessage('Please upload at least one certificate document.', 'danger');
+                    return false;
+                }
+
+                return true;
+            }
+
+
+            setupDeclarationSection() {
+                this.initializeDeclarationFields();
+                this.setupDeclarationValidation();
+            }
+
+            initializeDeclarationFields() {
+                // Set today's date
+                const today = new Date().toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                document.getElementById('declarationDate').value = today;
+
+                // Auto-fill name from step 1
+                const fullNameField = document.getElementById('{{ form.full_name.vars.id }}');
+                if (fullNameField) {
+                    // Set initial value
+                    document.getElementById('declarationFullName').value = fullNameField.value;
+
+                    // Update on changes
+                    fullNameField.addEventListener('input', () => {
+                        document.getElementById('declarationFullName').value = fullNameField.value;
+                    });
+                }
+            }
+
+            setupDeclarationValidation() {
+                const agreementCheckbox = document.getElementById('declarationAgreement');
+                const submitBtn = document.getElementById('submitBtn');
+
+                if (agreementCheckbox && submitBtn) {
+                    agreementCheckbox.addEventListener('change', () => {
+                        this.updateSubmitButtonState();
+                    });
+                }
+            }
+
+            updateSubmitButtonState() {
+                const agreementCheckbox = document.getElementById('declarationAgreement');
+                const submitBtn = document.getElementById('submitBtn');
+
+                if (agreementCheckbox && submitBtn) {
+                    const isAgreed = agreementCheckbox.checked;
+                    submitBtn.disabled = !isAgreed;
+                    submitBtn.classList.toggle('btn-disabled', !isAgreed);
+                }
+            }
+
+            // UI Management
+            updateNextStepButton(isValid) {
+                const nextStepButton = document.getElementById('nextStepButton');
+                if (nextStepButton) {
+                    nextStepButton.disabled = !isValid;
+                    nextStepButton.classList.toggle('btn-disabled', !isValid);
+                }
+            }
+
+            updateTabAccessibility(isValid) {
+                const step2Tab = document.getElementById('step2-tab');
+                if (step2Tab) {
+                    step2Tab.classList.toggle('disabled-tab', !isValid);
+                    step2Tab.style.pointerEvents = isValid ? 'auto' : 'none';
+                    step2Tab.style.opacity = isValid ? '1' : '0.6';
+                }
+            }
+
+            setupTabProtection() {
+                const step2Tab = document.getElementById('step2-tab');
+                if (step2Tab) {
+                    step2Tab.addEventListener('click', (e) => {
+                        if (step2Tab.classList.contains('disabled-tab')) {
+                            e.preventDefault();
+                            this.showAlertMessage('Please complete all required fields in Step 1 first.', 'warning');
+                        }
+                    });
+                }
+            }
+
+            // Form Operations
+            switchTab(tabName) {
+                if (tabName === 'step2' && !this.validateStep1WithFeedback()) {
+                    return false;
+                }
+
+                const tab = new bootstrap.Tab(document.querySelector(`a[href="#${tabName}"]`));
+                tab.show();
+
+                if (tabName === 'step2') {
+                    setTimeout(() => this.validateFileAttachments(), 100);
+                }
+            }
+
+            submitApplication() {
+                if (!this.validateStep1WithFeedback() || !this.validateFileAttachments()) {
+                    return false;
+                }
+
+                const form = document.getElementById('register_form');
+                const submitBtn = document.getElementById('submitBtn');
+
+                if (form.reportValidity()) {
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.innerHTML = 'Submitting... <i class="fa-solid fa-spinner fa-spin ms-2"></i>';
+                    }
+                    form.submit();
+                }
+            }
+
+            // Utility Methods
+            clearValidationErrors() {
+                document.querySelectorAll('.is-invalid').forEach(field => {
+                    field.classList.remove('is-invalid');
+                });
+
+                const alert = document.querySelector('.validation-alert');
+                if (alert) {
+                    alert.remove();
+                }
+            }
+
+            showAlertMessage(message, type = 'danger') {
+                const existingAlert = document.querySelector('.validation-alert');
+                if (existingAlert) {
+                    existingAlert.remove();
+                }
+
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type} validation-alert mt-3 alert-modern`;
+                alertDiv.innerHTML = `
                 <div class="d-flex align-items-center">
                     <i class="fa fa-exclamation-circle me-2"></i>
                     <span>${message}</span>
                 </div>
             `;
-            
-            const tabContent = document.querySelector('.tab-content');
-            if (tabContent) {
-                tabContent.parentNode.insertBefore(alertDiv, tabContent);
-            }
-        }
 
-        // Language Switcher
-        setupLanguageSwitcher() {
-            document.querySelectorAll('.language-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const lang = e.target.getAttribute('data-lang');
-                    fetch(`/change-language/${lang}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                document.querySelectorAll('.language-btn').forEach(b => b.classList.remove('active'));
-                                e.target.classList.add('active');
-                                location.reload();
-                            }
-                        })
-                        .catch(error => console.error('Error changing language:', error));
-                });
-            });
-        }
-
-        // Initialization
-        initializeFormState() {
-            this.clearValidationErrors();
-            this.initializeRegionDistrict();
-            this.initializeInstituteCourseDynamics();
-  this.setupDeclarationSection(); 
-            this.validateStep1();
-this.forcePlaceholderSelection();
-
-            // Initialize file area validation state
-            document.querySelectorAll('.file-drop-area').forEach(area => {
-                this.updateFileAreaValidation(area);
-            });
-        }
-
-      initializeRegionDistrict() {
-    const regionSelect = document.getElementById('{{ form.region.vars.id }}');
-    const districtSelect = document.getElementById('{{ form.district.vars.id }}');
-        const selectRegionFirstText = "{{ trans.trans('select_region_first')|e('js') }}";
-
-    if (regionSelect && regionSelect.value) {
-        this.loadDistricts(regionSelect.value);
-    } else if (districtSelect) {
-districtSelect.innerHTML = `<option value="">${selectRegionFirstText}</option>`;
-        districtSelect.disabled = true;
-        
-        // If there's only one region in the dropdown, automatically select it and load districts
-        if (regionSelect && regionSelect.options.length === 2) { // 2 because of placeholder + one region
-            regionSelect.selectedIndex = 1;
-            this.loadDistricts(regionSelect.value);
-        }
-    }
-
-    if (regionSelect) {
-        regionSelect.addEventListener('change', (e) => {
-            this.loadDistricts(e.target.value);
-        });
-    }
-}
-
-    initializeInstituteCourseDynamics() {
-    // Only initialize for non-literacy scholarships
-    {% if type != 'l' %}
-    const instituteSelect = document.getElementById('{{ form.institute.vars.id }}');
-    const courseSelect = document.getElementById('{{ form.course.vars.id }}');
-    
-    if (instituteSelect && courseSelect) {
-        instituteSelect.addEventListener('change', (e) => {
-            this.loadCourses(e.target.value);
-        });
-        
-        // Initialize courses based on selected institute
-        if (instituteSelect.value) {
-            this.loadCourses(instituteSelect.value);
-        } else {
-            this.resetCourseSelect();
-        }
-    }
-    {% endif %}
-}
-
-
-
-        // API Calls
-        loadDistricts(regionId) {
-            const districtSelect = document.getElementById('{{ form.district.vars.id }}');
-    const selectDistrictText = "{{ trans.trans('district_placeholder')|e('js') }}";
-
-            if (!districtSelect) return;
-
-            if (!regionId) {
-                districtSelect.innerHTML = '<option value="">${selectDistrictText}</option>';
-                districtSelect.disabled = true;
-                return;
-            }
-
-            districtSelect.innerHTML = '<option value="">Loading districts...</option>';
-            districtSelect.disabled = true;
-
-            const currentPath = window.location.pathname;
-            const apiUrl = `${currentPath}?action=get_districts&region_id=${regionId}`;
-
-            fetch(apiUrl, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json'
+                const tabContent = document.querySelector('.tab-content');
+                if (tabContent) {
+                    tabContent.parentNode.insertBefore(alertDiv, tabContent);
                 }
-            })
-            .then(response => {
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                return response.json();
-            })
-            .then(districts => {
-                districtSelect.innerHTML = `<option value="">${selectDistrictText}</option>`;
-                districtSelect.disabled = false;
-                
-                if (districts && districts.length > 0) {
-                    districts.forEach(district => {
-                        const option = document.createElement('option');
-                        option.value = district.id;
-                        option.textContent = district.name;
-                        districtSelect.appendChild(option);
+            }
+
+            // Language Switcher
+            setupLanguageSwitcher() {
+                document.querySelectorAll('.language-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const lang = e.target.getAttribute('data-lang');
+                        fetch(`/change-language/${lang}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    document.querySelectorAll('.language-btn').forEach(b => b.classList.remove('active'));
+                                    e.target.classList.add('active');
+                                    location.reload();
+                                }
+                            })
+                            .catch(error => console.error('Error changing language:', error));
                     });
-                } else {
-                    districtSelect.innerHTML = '<option value="">No districts available</option>';
+                });
+            }
+
+            // Initialization
+            initializeFormState() {
+                this.clearValidationErrors();
+                this.initializeRegionDistrict();
+                this.initializeInstituteCourseDynamics();
+                this.setupDeclarationSection();
+                this.validateStep1();
+                this.forcePlaceholderSelection();
+
+                // Initialize file area validation state
+                document.querySelectorAll('.file-drop-area').forEach(area => {
+                    this.updateFileAreaValidation(area);
+                });
+            }
+
+            initializeRegionDistrict() {
+                const regionSelect = document.getElementById('{{ form.region.vars.id }}');
+                const districtSelect = document.getElementById('{{ form.district.vars.id }}');
+                const selectRegionFirstText = "{{ trans.trans('select_region_first')|e('js') }}";
+
+                if (regionSelect && regionSelect.value) {
+                    this.loadDistricts(regionSelect.value);
+                } else if (districtSelect) {
+                    districtSelect.innerHTML = `<option value="">${selectRegionFirstText}</option>`;
+                    districtSelect.disabled = true;
+
+                    // If there's only one region in the dropdown, automatically select it and load districts
+                    if (regionSelect && regionSelect.options.length === 2) { // 2 because of placeholder + one region
+                        regionSelect.selectedIndex = 1;
+                        this.loadDistricts(regionSelect.value);
+                    }
                 }
-            })
-            .catch(error => {
-                console.error('Error loading districts:', error);
-                districtSelect.innerHTML = '<option value="">Error loading districts</option>';
-                districtSelect.disabled = false;
-            });
+
+                if (regionSelect) {
+                    regionSelect.addEventListener('change', (e) => {
+                        this.loadDistricts(e.target.value);
+                    });
+                }
+            }
+
+            initializeInstituteCourseDynamics() {
+                // Only initialize for non-literacy scholarships
+                {% if type != 'l' %}
+                const instituteSelect = document.getElementById('{{ form.institute.vars.id }}');
+                const courseSelect = document.getElementById('{{ form.course.vars.id }}');
+
+                if (instituteSelect && courseSelect) {
+                    instituteSelect.addEventListener('change', (e) => {
+                        this.loadCourses(e.target.value);
+                    });
+
+                    // Initialize courses based on selected institute
+                    if (instituteSelect.value) {
+                        this.loadCourses(instituteSelect.value);
+                    } else {
+                        this.resetCourseSelect();
+                    }
+                }
+                {% endif %}
+            }
+
+
+
+            // API Calls
+            loadDistricts(regionId) {
+                const districtSelect = document.getElementById('{{ form.district.vars.id }}');
+                const selectDistrictText = "{{ trans.trans('district_placeholder')|e('js') }}";
+
+                if (!districtSelect) return;
+
+                if (!regionId) {
+                    districtSelect.innerHTML = '<option value="">${selectDistrictText}</option>';
+                    districtSelect.disabled = true;
+                    return;
+                }
+
+                districtSelect.innerHTML = '<option value="">Loading districts...</option>';
+                districtSelect.disabled = true;
+
+                const currentPath = window.location.pathname;
+                const apiUrl = `${currentPath}?action=get_districts&region_id=${regionId}`;
+
+                fetch(apiUrl, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                        return response.json();
+                    })
+                    .then(districts => {
+                        districtSelect.innerHTML = `<option value="">${selectDistrictText}</option>`;
+                        districtSelect.disabled = false;
+
+                        if (districts && districts.length > 0) {
+                            districts.forEach(district => {
+                                const option = document.createElement('option');
+                                option.value = district.id;
+                                option.textContent = district.name;
+                                districtSelect.appendChild(option);
+                            });
+                        } else {
+                            districtSelect.innerHTML = '<option value="">No districts available</option>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading districts:', error);
+                        districtSelect.innerHTML = '<option value="">Error loading districts</option>';
+                        districtSelect.disabled = false;
+                    });
+            }
+
+            loadCourses(instituteId) {
+                // Only proceed for non-literacy scholarships
+                {% if type != 'l' %}
+                const courseSelect = document.getElementById('{{ form.course.vars.id }}');
+
+                if (!courseSelect) return;
+
+                if (!instituteId) {
+                    this.resetCourseSelect();
+                    return;
+                }
+
+                courseSelect.innerHTML = '<option value="">Loading courses...</option>';
+                courseSelect.disabled = true;
+
+                const currentPath = window.location.pathname;
+                const apiUrl = `${currentPath}?action=get_courses&institute_id=${instituteId}`;
+
+                fetch(apiUrl, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                    .then(response => {
+                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                        return response.json();
+                    })
+                    .then(courses => {
+                        if (!courseSelect) return;
+ const selectCourseText = "{{ trans.trans('course_placeholder')|e('js') }}"
+                        courseSelect.innerHTML = `<option value="">${selectCourseText}</option>`;
+                        courseSelect.disabled = false;
+
+                        if (courses && courses.length > 0) {
+                            courses.forEach(course => {
+                                const option = document.createElement('option');
+                                option.value = course.id;
+                                option.textContent = course.name;
+                                courseSelect.appendChild(option);
+                            });
+                        } else {
+                            courseSelect.innerHTML = '<option value="">No courses available</option>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading courses:', error);
+                        if (courseSelect) {
+                            courseSelect.innerHTML = '<option value="">Error loading courses</option>';
+                            courseSelect.disabled = false;
+                        }
+                    });
+                {% endif %}
+            }
+
+
+            resetCourseSelect() {
+                // Only proceed for non-literacy scholarships
+                {% if type != 'l' %}
+                const courseSelect = document.getElementById('{{ form.course.vars.id }}');
+                const selectInstitueText = "{{ trans.trans('select_institute_placeholder')|e('js') }}";
+
+                if (courseSelect) {
+                    courseSelect.innerHTML = `<option value="">${selectInstitueText}</option>`;
+                    courseSelect.disabled = true;
+                }
+                {% endif %}
+            }
+
         }
 
-    loadCourses(instituteId) {
-    // Only proceed for non-literacy scholarships
-    {% if type != 'l' %}
-    const courseSelect = document.getElementById('{{ form.course.vars.id }}');
-    
-    if (!courseSelect) return;
 
-    if (!instituteId) {
-        this.resetCourseSelect();
-        return;
-    }
 
-    courseSelect.innerHTML = '<option value="">Loading courses...</option>';
-    courseSelect.disabled = true;
-
-    const currentPath = window.location.pathname;
-    const apiUrl = `${currentPath}?action=get_courses&institute_id=${instituteId}`;
-
-    fetch(apiUrl, {
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json'
+        // Global functions for inline event handlers
+        function switchTab(tabName) {
+            appFormManager.switchTab(tabName);
         }
-    })
-    .then(response => {
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        return response.json();
-    })
-    .then(courses => {
-        if (!courseSelect) return;
+
+        function submitApplication() {
+            appFormManager.submitApplication();
+        }
+
+
+// Standalone disability toggle function
+function toggleDisabilityExplanation(selectElement) {
+    const explanationDiv = document.getElementById('disabilityExplanation');
+    if (explanationDiv) {
+        // Get the selected option text and value for debugging
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        const optionText = selectedOption.text.trim().toLowerCase();
+        const optionValue = selectElement.value.toLowerCase();
         
-        courseSelect.innerHTML = '<option value="">Select Course</option>';
-        courseSelect.disabled = false;
+        console.log('Disability selected - Text:', optionText, 'Value:', optionValue);
         
-        if (courses && courses.length > 0) {
-            courses.forEach(course => {
-                const option = document.createElement('option');
-                option.value = course.id;
-                option.textContent = course.name;
-                courseSelect.appendChild(option);
-            });
-        } else {
-            courseSelect.innerHTML = '<option value="">No courses available</option>';
+        // Show explanation field if "Yes" is selected (check both text and value in multiple languages)
+        const yesValues = ['yes', 'haa', '1', 'true', 'y', 'aye'];
+        const isDisabled = yesValues.includes(optionText) || yesValues.includes(optionValue);
+        
+        console.log('Show explanation:', isDisabled);
+        
+        // Toggle visibility
+        explanationDiv.style.display = isDisabled ? 'block' : 'none';
+        
+        // Make the explanation field required only if "Yes" is selected
+        const explanationField = document.getElementById('{{ form.disability_explanation.vars.id }}');
+        if (explanationField) {
+            explanationField.required = isDisabled;
+            
+            // Clear the field when hiding it
+            if (!isDisabled) {
+                explanationField.value = '';
+            }
         }
-    })
-    .catch(error => {
-        console.error('Error loading courses:', error);
-        if (courseSelect) {
-            courseSelect.innerHTML = '<option value="">Error loading courses</option>';
-            courseSelect.disabled = false;
-        }
-    });
-    {% endif %}
-}
-    resetCourseSelect() {
-    // Only proceed for non-literacy scholarships
-    {% if type != 'l' %}
-    const courseSelect = document.getElementById('{{ form.course.vars.id }}');
-    if (courseSelect) {
-        courseSelect.innerHTML = '<option value="">Select Institute first</option>';
-        courseSelect.disabled = true;
     }
-    {% endif %}
 }
 
-    }
 
-    // Global functions for inline event handlers
-    function switchTab(tabName) {
-        appFormManager.switchTab(tabName);
-    }
 
-    function submitApplication() {
-        appFormManager.submitApplication();
+// Initialize application when DOM is loaded
+        let appFormManager;
+        document.addEventListener('DOMContentLoaded', function () {
+            appFormManager = new ApplicationFormManager();
+ // Initialize disability field state
+    const disabilitySelect = document.getElementById('{{ form.disability.vars.id }}');
+    if (disabilitySelect) {
+        toggleDisabilityExplanation(disabilitySelect);
     }
+        });
 
-    // Initialize application when DOM is loaded
-    let appFormManager;
-    document.addEventListener('DOMContentLoaded', function() {
-        appFormManager = new ApplicationFormManager();
-    });
-</script>
+
+
+    </script>
 
     <script src="{{ asset('assets/js/jquery.js') }}"></script>
     <script src="{{ asset('assets/js/vendors.min.js') }}"></script>
     <script src="{{ asset('assets/js/main.js') }}"></script>
-	</body>
+</body>
+
 </html>

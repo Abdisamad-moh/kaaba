@@ -3,9 +3,19 @@
 {% block title %}Scholarship Applications Dashboard{% endblock %}
 
 {% block body %}
+<style>
+.card i{
+font-size: 35px !important;
+}
+.statistics-cards p, .statistics-cards h5 {
+font-size: 18px !important;
+}
+
+
+</style>
 <!-- Counter Carousel -->
 <!-- Statistics Cards with Tabler Icons -->
-<div class="row">
+<div class="row statistics-cards">
     <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 mb-4">
         <div class="card border-0 zoom-in bg-primary-subtle shadow-none h-100">
             <div class="card-body">
@@ -200,7 +210,7 @@
                                                 {% if application.status.name == 'accepted' %}bg-success-subtle text-success
                                                 {% elseif application.status.name == 'rejected' %}bg-danger-subtle text-danger
                                                 {% elseif application.status.name == 'shortlisted' %}bg-info-subtle text-info
-                                                {% elseif application.status.name == 'applied' %}bg-warning-subtle text-warning
+                                                {% elseif application.status.name == 'applied' %}bg-primary-subtle text-primary
                                                 {% else %}bg-secondary-subtle text-secondary{% endif %}">
                                                 {{ application.status.name|capitalize }}
                                             </span>

@@ -37,6 +37,9 @@ class TranslationService
                 'select_option' => 'Select an option',
                 'district_placeholder' => 'Select District',
                 'optional' => 'optional',
+                'select_institute_placeholder' => 'Select Institute first',
+                'course_placeholder' => 'Select Course',
+
 
                 // Personal Information Fields
                 'full_name' => 'Full Name',
@@ -158,6 +161,18 @@ class TranslationService
     'back_to_home' => 'Dib ugu Noqo Bogga Hore',
 'select_region_first' => 'Dooro gobolka marka hore',
 
+   // Literacy Level Choices (Somali)
+    'literacy_no_skills' => 'Ma haysano aqoon u ah akhriska ama qorista',
+    'literacy_limited' => 'Waxaan haystaa aqoon kooban oo ku saabsan akhriska iyo qorista',
+    'literacy_moderate' => 'Waxaan haystaa aqoon dhexdhexaad ah oo ku saabsan akhriska iyo qorista',
+    'literacy_proficient' => 'Waxaan ku fiicanahay akhriska iyo qorista',
+
+    // Numeracy Level Choices (Somali)
+    'numeracy_no_skills' => 'Ma haysano aqoon aasaasi ah oo ku saabsan xisaabta',
+    'numeracy_limited' => 'Waxaan haystaa aqoon kooban oo ku saabsan xisaabta',
+    'numeracy_moderate' => 'Waxaan haystaa aqoon dhexdhexaad ah oo ku saabsan xisaabta',
+    'numeracy_proficient' => 'Waxaan ku fiicanahay xisaabta',
+
                 // Application structure
                 'application_form' => 'Foomka Codsigashada',
                 'scholarship_information' => 'Macluumaadka Bixinta Deeqda',
@@ -221,6 +236,8 @@ class TranslationService
                 'enrollment_school' => 'Isku Qorista - Xulashada Dugsiyeenta',
                 'enrollment_course' => 'Isku Qorista - Xulashada Koorsada',
                 'institute' => 'Hay\'adda',
+                'course' => 'koorsada',
+                'course_placeholder' => 'Dooro koorsada',
 
                 // Secondary Education
                 'secondary_school_education' => 'Waxbarashada Dugsiyeenta Sare',
@@ -256,6 +273,7 @@ class TranslationService
 
                 // Supporting Documents
                 'certificates_attachment' => 'Dukumiintiga Shahaadadyada',
+                'select_institute_placeholder' => 'marka hore dooro Hayadda',
 
 //Declaration Section
                 'declaration' => 'Bayaanka',

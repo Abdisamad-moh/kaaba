@@ -135,15 +135,15 @@ class KaabaApplicationFormType extends AbstractType
                     new NotBlank(['message' => 'Please select an option for disability information.'])
                 ]
             ])
-            // ->add('disability_explanation', TextareaType::class, [
-            //     'label' => $this->translator->trans('disability_explanation'),
-            //     'required' => false,
-            //     'attr' => [
-            //         'class' => 'form-control border border-dark rounded-0',
-            //         'placeholder' => $this->translator->trans('disability_explanation_placeholder'),
-            //         'rows' => 4,
-            //     ]
-            // ])
+            ->add('disability_explanation', TextareaType::class, [
+                'label' => $this->translator->trans('disability_explanation'),
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control border border-dark rounded-0',
+                    'placeholder' => $this->translator->trans('disability_explanation_placeholder'),
+                    'rows' => 4,
+                ]
+            ])
             ->add('identity_type', EntityType::class, [
                 'class' => KaabaIdentityType::class,
                 'choice_label' => 'name',
@@ -348,34 +348,34 @@ class KaabaApplicationFormType extends AbstractType
                     'class' => 'form-select'
                 ]
             ])
-            ->add('literacy_level', ChoiceType::class, [
-                'label' => $this->translator->trans('literacy_level'),
-                'required' => false,
-                'choices' => [
-                    'I do not possess reading or writing skills' => 'I do not possess reading or writing skills',
-                    'I have limited proficiency in reading and writing' => 'I have limited proficiency in reading and writing',
-                    'I have moderate proficiency in reading and writing' => 'I have moderate proficiency in reading and writing',
-                    'I am proficient in reading and writing' => 'I am proficient in reading and writing',
-                ],
-                'placeholder' => $this->translator->trans('literacy_level_placeholder'),
-                'attr' => [
-                    'class' => 'form-control',
-                ]
-            ])
-            ->add('numeracy_level', ChoiceType::class, [
-                'label' => $this->translator->trans('numeracy_level'),
-                'required' => false,
-                'choices' => [
-                    'I do not possess basic numeracy skills' => 'I do not possess basic numeracy skills',
-                    'I have limited proficiency in numeracy' => 'I have limited proficiency in numeracy',
-                    'I have moderate proficiency in numeracy' => 'I have moderate proficiency in numeracy',
-                    'I am proficient in numeracy' => 'I am proficient in numeracy',
-                ],
-                'placeholder' => $this->translator->trans('numeracy_level_placeholder'),
-                'attr' => [
-                    'class' => 'form-control',
-                ]
-            ])
+           ->add('literacy_level', ChoiceType::class, [
+    'label' => $this->translator->trans('literacy_level'),
+    'required' => false,
+    'choices' => [
+        $this->translator->trans('literacy_no_skills') => $this->translator->trans('literacy_no_skills'),
+        $this->translator->trans('literacy_limited') => $this->translator->trans('literacy_limited'),
+        $this->translator->trans('literacy_moderate') => $this->translator->trans('literacy_moderate'),
+        $this->translator->trans('literacy_proficient') => $this->translator->trans('literacy_proficient'),
+    ],
+    'placeholder' => $this->translator->trans('literacy_level_placeholder'),
+    'attr' => [
+        'class' => 'form-control',
+    ]
+])
+->add('numeracy_level', ChoiceType::class, [
+    'label' => $this->translator->trans('numeracy_level'),
+    'required' => false,
+    'choices' => [
+        $this->translator->trans('numeracy_no_skills') => $this->translator->trans('numeracy_no_skills'),
+        $this->translator->trans('numeracy_limited') => $this->translator->trans('numeracy_limited'),
+        $this->translator->trans('numeracy_moderate') => $this->translator->trans('numeracy_moderate'),
+        $this->translator->trans('numeracy_proficient') => $this->translator->trans('numeracy_proficient'),
+    ],
+    'placeholder' => $this->translator->trans('numeracy_level_placeholder'),
+    'attr' => [
+        'class' => 'form-control',
+    ]
+])
             ->add('recent_education', TextareaType::class, [
                 'label' => $this->translator->trans('recent_education'),
                 'required' => false,
