@@ -1139,15 +1139,18 @@ public function scholarshipApplication(
     $type = $scholarship->getType();
 
     // Filter regions based on scholarship type
-    if ($type == 't') {
-        // For Literacy scholarships, only show Maroodi Jeex and Togdheer
-        $regions = $regionRepository->findBy([
-            'name' => ['Maroodi Jeex', 'Togdheer']
-        ]);
-    } else {
-        // For other scholarship types, show all regions
-        $regions = $regionRepository->findAll();
-    }
+   if ($type === 't') {
+    // For type 't', only show Maroodi Jeex and Togdheer
+    $regions = $regionRepository->createQueryBuilder('r')
+        ->where('r.name IN (:names)')
+        ->setParameter('names', ['Maroodi Jeex', 'Togdheer'])
+        ->orderBy('r.name', 'ASC')
+        ->getQuery()
+        ->getResult();
+} else {
+    $regions = $regionRepository->findAll();
+}
+
 
     $application = new KaabaApplication();
     $application->setScholarship($scholarship);
