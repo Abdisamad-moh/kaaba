@@ -1141,11 +1141,12 @@ this.forcePlaceholderSelection();
       initializeRegionDistrict() {
     const regionSelect = document.getElementById('{{ form.region.vars.id }}');
     const districtSelect = document.getElementById('{{ form.district.vars.id }}');
-    
+        const selectRegionFirstText = "{{ trans.trans('select_region_first')|e('js') }}";
+
     if (regionSelect && regionSelect.value) {
         this.loadDistricts(regionSelect.value);
     } else if (districtSelect) {
-        districtSelect.innerHTML = '<option value="">Select region first</option>';
+districtSelect.innerHTML = `<option value="">${selectRegionFirstText}</option>`;
         districtSelect.disabled = true;
         
         // If there's only one region in the dropdown, automatically select it and load districts
@@ -1188,10 +1189,12 @@ this.forcePlaceholderSelection();
         // API Calls
         loadDistricts(regionId) {
             const districtSelect = document.getElementById('{{ form.district.vars.id }}');
+    const selectDistrictText = "{{ trans.trans('district_placeholder')|e('js') }}";
+
             if (!districtSelect) return;
 
             if (!regionId) {
-                districtSelect.innerHTML = '<option value="">Select District</option>';
+                districtSelect.innerHTML = '<option value="">${selectDistrictText}</option>';
                 districtSelect.disabled = true;
                 return;
             }
@@ -1213,7 +1216,7 @@ this.forcePlaceholderSelection();
                 return response.json();
             })
             .then(districts => {
-                districtSelect.innerHTML = '<option value="">Select District</option>';
+                districtSelect.innerHTML = `<option value="">${selectDistrictText}</option>`;
                 districtSelect.disabled = false;
                 
                 if (districts && districts.length > 0) {

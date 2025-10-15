@@ -58,6 +58,7 @@ class TranslationService
                 'town_placeholder' => 'Enter your town',
                 'village' => 'Village',
                 'village_placeholder' => 'Enter your village',
+'select_region_first' => 'Select region first',
 
                // Literacy & Numeracy Section
 'literacy_numeracy_section' => 'Literacy & Numeracy Level',
@@ -155,6 +156,7 @@ class TranslationService
             ],
             'so' => [
     'back_to_home' => 'Dib ugu Noqo Bogga Hore',
+'select_region_first' => 'Dooro gobolka marka hore',
 
                 // Application structure
                 'application_form' => 'Foomka Codsigashada',
