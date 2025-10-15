@@ -137,7 +137,7 @@ class TranslationService
                 'minimum_grade_placeholder' => 'Enter minimum grade/GPA',
 
                 // Supporting Documents
-                'certificates_attachment' => 'Certificates Attachment',
+                'certificates_attachment' => 'Attach all your relevant educational training certificates',
                 'willingness_declaration' => 'Willingness Declaration Attachment',
                 'needs_statement' => 'Needs Statement Attachment',
                 'other_documents' => 'Other Documents Attachment',
@@ -272,7 +272,7 @@ class TranslationService
                 'minimum_grade_placeholder' => 'Geli darajada ugu yar/GPA',
 
                 // Supporting Documents
-                'certificates_attachment' => 'Dukumiintiga Shahaadadyada',
+                'certificates_attachment' => 'Ku lifaaq dhammaan shahaadooyinkaaga tababarka waxbarasho ee khuseeya',
                 'select_institute_placeholder' => 'marka hore dooro Hayadda',
 
 //Declaration Section

@@ -3747,7 +3747,7 @@ public function revertRejectedApplication(
 }
 
 
-#[Route('/admin/kaaba-application/{uuid}', name: 'app_admin_kaaba_application_view')]
+#[Route('/kaaba-application/{uuid}', name: 'app_admin_kaaba_application_view')]
 public function kaabaApplicationView(
     string $uuid,
     KaabaApplicationRepository $applicationRepository,

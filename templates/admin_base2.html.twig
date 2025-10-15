@@ -136,7 +136,10 @@
 							<!-- Dashboard -->
 							<!-- ---------------------------------- -->
 								{% if is_granted('ROLE_SUPER_ADMIN') %}
-									<li class="sidebar-item"> <a class="sidebar-link" href="{{path('app_admin')}}" id="get-url" aria-expanded="false">
+                                     <pre>
+										{{ dump(path('app_admin')) }}
+									 </pre>
+									<li class="sidebar-item"> <a class="sidebar-link" href="{{path('app_admin')}}"  aria-expanded="false">
 										<span>
 											<i class="ti ti-layout-grid"></i>
 										</span>

@@ -413,61 +413,10 @@
             </div>
         </div>
     </div>
-    <div class="col-md-6">
-        <div class="form-group row">
-            <label class="form-label text-end col-md-3">Willingness Declaration:</label>
-            <div class="col-md-9">
-                {% if application.willingnessdeclarationattachment %}
-                    <a href="{{ path('app_application_attachments', {'filename': application.willingnessdeclarationattachment}) }}" 
-                       target="_blank" 
-                       class="btn btn-warning btn-sm document-link">
-                        <i class="ti ti-file-description me-1"></i>
-                        View Declaration
-                    </a>
-                {% else %}
-                    <p class="text-muted">No willingness declaration</p>
-                {% endif %}
-            </div>
-        </div>
-    </div>
+ 
 </div>
 
-<div class="row">
-    <div class="col-md-6">
-        <div class="form-group row">
-            <label class="form-label text-end col-md-3">Needs Statement:</label>
-            <div class="col-md-9">
-                {% if application.needsstatementattachment %}
-                    <a href="{{ path('app_application_attachments', {'filename': application.needsstatementattachment}) }}" 
-                       target="_blank" 
-                       class="btn btn-success btn-sm document-link">
-                        <i class="ti ti-notes me-1"></i>
-                        View Needs Statement
-                    </a>
-                {% else %}
-                    <p class="text-muted">No needs statement</p>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="form-group row">
-            <label class="form-label text-end col-md-3">Other Documents:</label>
-            <div class="col-md-9">
-                {% if application.otherdocumentsattachment %}
-                    <a href="{{ path('app_application_attachments', {'filename': application.otherdocumentsattachment}) }}" 
-                       target="_blank" 
-                       class="btn btn-secondary btn-sm document-link">
-                        <i class="ti ti-files me-1"></i>
-                        View Other Documents
-                    </a>
-                {% else %}
-                    <p class="text-muted">No other documents</p>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
+
                 </div>
 
               <!-- Action Buttons -->
