@@ -22,9 +22,22 @@
         <div class="card border-0 zoom-in bg-warning-subtle shadow-none h-100">
             <div class="card-body">
                 <div class="text-center">
-                    <i class="ti ti-clock fs-1 text-warning mb-3"></i>
-                    <p class="fw-semibold fs-3 text-warning mb-1">Pending Review</p>
-                    <h5 class="fw-semibold text-warning mb-0">{{ pendingApplications }}</h5>
+                    <i class="ti ti-file-text fs-1 text-warning mb-3"></i>
+                    <p class="fw-semibold fs-3 text-warning mb-1">Applied</p>
+                    <h5 class="fw-semibold text-warning mb-0">{{ appliedApplications }}</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+ <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 mb-4">
+        <div class="card border-0 zoom-in bg-info-subtle shadow-none h-100">
+            <div class="card-body">
+                <div class="text-center">
+                    <i class="ti ti-star fs-1 text-info mb-3"></i>
+                    <p class="fw-semibold fs-3 text-info mb-1">Shortlisted</p>
+                    <h5 class="fw-semibold text-info mb-0">{{ shortlistedApplications }}</h5>
                 </div>
             </div>
         </div>
@@ -35,8 +48,8 @@
             <div class="card-body">
                 <div class="text-center">
                     <i class="ti ti-circle-check fs-1 text-success mb-3"></i>
-                    <p class="fw-semibold fs-3 text-success mb-1">Approved</p>
-                    <h5 class="fw-semibold text-success mb-0">{{ approvedApplications }}</h5>
+                    <p class="fw-semibold fs-3 text-success mb-1">Accepted</p>
+                    <h5 class="fw-semibold text-success mb-0">{{ acceptedApplications }}</h5>
                 </div>
             </div>
         </div>
@@ -54,17 +67,7 @@
         </div>
     </div>
 
-    <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 mb-4">
-        <div class="card border-0 zoom-in bg-info-subtle shadow-none h-100">
-            <div class="card-body">
-                <div class="text-center">
-                    <i class="ti ti-star fs-1 text-info mb-3"></i>
-                    <p class="fw-semibold fs-3 text-info mb-1">Shortlisted</p>
-                    <h5 class="fw-semibold text-info mb-0">{{ shortlistedApplications }}</h5>
-                </div>
-            </div>
-        </div>
-    </div>
+   
 
     <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 mb-4">
         <div class="card border-0 zoom-in bg-secondary-subtle shadow-none h-100">
@@ -191,15 +194,21 @@
                                             {{ application.scholarship.title|length > 20 ? application.scholarship.title|slice(0, 20) ~ '...' : application.scholarship.title }}
                                         </p>
                                     </td>
-                                    <td>
-                                        <span class="badge fw-semibold py-1 w-85 
-                                            {% if application.status.name == 'Approved' %}bg-success-subtle text-success
-                                            {% elseif application.status.name == 'Rejected' %}bg-danger-subtle text-danger
-                                            {% elseif application.status.name == 'Pending' %}bg-warning-subtle text-warning
-                                            {% elseif application.status.name == 'Shortlisted' %}bg-info-subtle text-info
-                                            {% else %}bg-secondary-subtle text-secondary{% endif %}">
-                                            {{ application.status.name ?? 'Pending' }}
-                                        </span>
+                                   <td>
+                                        {% if application.status %}
+                                            <span class="badge fw-semibold py-1 w-85 
+                                                {% if application.status.name == 'accepted' %}bg-success-subtle text-success
+                                                {% elseif application.status.name == 'rejected' %}bg-danger-subtle text-danger
+                                                {% elseif application.status.name == 'shortlisted' %}bg-info-subtle text-info
+                                                {% elseif application.status.name == 'applied' %}bg-warning-subtle text-warning
+                                                {% else %}bg-secondary-subtle text-secondary{% endif %}">
+                                                {{ application.status.name|capitalize }}
+                                            </span>
+                                        {% else %}
+                                            <span class="badge bg-secondary-subtle text-secondary fw-semibold py-1 w-85">
+                                                Applied
+                                            </span>
+                                        {% endif %}
                                     </td>
                                 </tr>
                             {% else %}

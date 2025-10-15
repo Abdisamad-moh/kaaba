@@ -148,10 +148,10 @@ public function index(
     $totalApplications = $applicationRepository->countTotalApplications();
     $lastYearApplications = $applicationRepository->countLastYearApplications();
     $pendingApplications = $applicationRepository->countApplicationsByStatus('Pending');
-    $approvedApplications = $applicationRepository->countApplicationsByStatus('Approved');
-    $rejectedApplications = $applicationRepository->countApplicationsByStatus('Rejected');
-    $shortlistedApplications = $applicationRepository->countApplicationsByStatus('Shortlisted');
-
+     $appliedApplications = $applicationRepository->countApplicationsByStatus('applied');
+    $acceptedApplications = $applicationRepository->countApplicationsByStatus('accepted');
+    $rejectedApplications = $applicationRepository->countApplicationsByStatus('rejected');
+    $shortlistedApplications = $applicationRepository->countApplicationsByStatus('shortlisted');
     // Get data for charts
     $applicationsByRegion = $applicationRepository->countApplicationsByRegion();
     $applicationsByDistrict = $applicationRepository->countApplicationsByDistrict();
@@ -344,8 +344,8 @@ public function index(
     return $this->render('admin/index.html.twig', [
         'totalApplications' => $totalApplications,
         'lastYearApplications' => $lastYearApplications,
-        'pendingApplications' => $pendingApplications,
-        'approvedApplications' => $approvedApplications,
+         'appliedApplications' => $appliedApplications, // Changed from pendingApplications
+        'acceptedApplications' => $acceptedApplications, // Changed from approvedApplications
         'rejectedApplications' => $rejectedApplications,
         'shortlistedApplications' => $shortlistedApplications,
         'recentApplications' => $recentApplications,
