@@ -137,7 +137,7 @@ class TranslationService
                 'minimum_grade_placeholder' => 'Enter minimum grade/GPA',
 
                 // Supporting Documents
-                'certificates_attachment' => 'Attach all your relevant educational training certificates',
+                'certificates_attachment' => 'Please attach all relevant certifcates and documentation pertaining to your education qualifications and Professional Training.',
                 'willingness_declaration' => 'Willingness Declaration Attachment',
                 'needs_statement' => 'Needs Statement Attachment',
                 'other_documents' => 'Other Documents Attachment',
