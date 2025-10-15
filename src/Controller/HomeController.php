@@ -1331,7 +1331,7 @@ public function scholarshipApplication(
     }
 
     // Fetch all entities for dropdowns
-    $regions = $regionRepository->findAll();
+   // $regions = $regionRepository->findAll();
     $genders = $genderRepository->findAll();
     $nationalities = $nationalityRepository->findAll();
     $institutes = $scholarshipInstitutes; // Use the filtered institutes
