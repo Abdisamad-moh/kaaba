@@ -51,6 +51,7 @@ security:
     access_control:
     - { path: ^/home, roles: PUBLIC_ACCESS }
     - { path: ^/auth, roles: PUBLIC_ACCESS }
+    - { path: ^/admin/kaaba-institutes, roles: [ROLE_SUPER_ADMIN] }
     - { path: ^/admin, roles: [ROLE_USER, ROLE_SUPER_ADMIN] }
 
     # Employer access control

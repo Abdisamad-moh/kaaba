@@ -164,6 +164,7 @@
                     </a>
                 </li>
             {% endif %}
+
 								<li class="sidebar-item">
 									<a class="sidebar-link" href="{{path('app_employer_account_settings')}}" aria-expanded="false">
 										<span>
@@ -198,7 +199,7 @@
                         <span class="hide-menu">Courses</span>
                     </a>
                 </li>
-              
+              {% if is_granted('ROLE_SUPER_ADMIN') %}
                 <li class="sidebar-item">
                     <a href="{{ path('app_admin_kaaba_institutes') }}" class="sidebar-link">
                         <div class="round-16 d-flex align-items-center justify-content-center">
@@ -207,6 +208,7 @@
                         <span class="hide-menu">Institutes</span>
                     </a>
                 </li>
+{% endif %}
             </ul>
         </li>
 

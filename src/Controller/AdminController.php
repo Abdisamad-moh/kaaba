@@ -3194,9 +3194,22 @@ public function kaabaCourses(
     KaabaCourseRepository $kaabaCourseRepository,
     KaabaInstituteRepository $kaabaInstituteRepository,
     EntityManagerInterface $em,
+
 ): Response {
     // Fetch all courses for the table
-    $courses = $kaabaCourseRepository->findAll();
+     if ($this->isGranted('ROLE_SUPER_ADMIN')) {
+        $courses = $kaabaCourseRepository->findAll();
+     }else{
+        $user = $this->getUser();
+        $instituteIds = $user->getKaabaInstitutes()->map(function($institute) {
+    return $institute->getId();
+})->toArray();
+
+$courses = $kaabaCourseRepository->findBy([
+    'institute' => $instituteIds
+]);
+     }
+  
 
     // Fetch all institutes for the dropdown
     $institutes = $kaabaInstituteRepository->findAll();
