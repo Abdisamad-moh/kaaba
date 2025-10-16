@@ -120,30 +120,45 @@ class KaabaApplicationFormType extends AbstractType
                 ]
             ])
             ->add('disability', ChoiceType::class, [
-                'label' => $this->translator->trans('disability_question'),
-                'required' => true,
-                'choices' => [
-                    $this->translator->trans('select_option') => '',
-                    $this->translator->trans('yes') => 'Yes',
-                    $this->translator->trans('no') => 'No',
-                    $this->translator->trans('prefer_not_to_say') => 'Prefer not to say'
-                ],
-                'attr' => [
-                    'class' => 'form-select'
-                ],
-                'constraints' => [
-                    new NotBlank(['message' => 'Please select an option for disability information.'])
-                ]
-            ])
-            ->add('disability_explanation', TextareaType::class, [
-                'label' => $this->translator->trans('disability_explanation'),
-                'required' => false,
-                'attr' => [
-                    'class' => 'form-control border border-dark rounded-0',
-                    'placeholder' => $this->translator->trans('disability_explanation_placeholder'),
-                    'rows' => 4,
-                ]
-            ])
+    'label' => $this->translator->trans('disability_question'),
+    'required' => true,
+    'choices' => [
+        $this->translator->trans('select_option') => '',
+        $this->translator->trans('yes') => 'Yes',
+        $this->translator->trans('no') => 'No',
+        $this->translator->trans('prefer_not_to_say') => 'Prefer not to say'
+    ],
+    'attr' => [
+        'class' => 'form-select'
+    ],
+    'constraints' => [
+        new NotBlank(['message' => 'Please select an option for disability information.'])
+    ]
+])
+->add('disability_type', ChoiceType::class, [
+    'label' => $this->translator->trans('disability_type'),
+    'required' => false,
+    'choices' => [
+        $this->translator->trans('select_disability_type') => '',
+        $this->translator->trans('blind') => 'Blind',
+        $this->translator->trans('physical') => 'Physical',
+        $this->translator->trans('deaf') => 'Deaf',
+        $this->translator->trans('learning_disability') => 'Learning Disability',
+        $this->translator->trans('other') => 'Other'
+    ],
+    'attr' => [
+        'class' => 'form-select border border-dark rounded-0'
+    ]
+])
+->add('disability_explanation', TextareaType::class, [
+    'label' => $this->translator->trans('disability_explanation'),
+    'required' => false,
+    'attr' => [
+        'class' => 'form-control border border-dark rounded-0',
+        'placeholder' => $this->translator->trans('disability_explanation_placeholder'),
+        'rows' => 4,
+    ]
+])
             ->add('identity_type', EntityType::class, [
                 'class' => KaabaIdentityType::class,
                 'choice_label' => 'name',

@@ -133,6 +133,9 @@ class KaabaApplication
     #[ORM\Column(type: Types::GUID)]
     private ?string $uuid = null;
 
+#[ORM\Column(length: 255, nullable: true)]
+private ?string $disability_type = null;
+
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $disability_explanation = null;
 
@@ -749,4 +752,16 @@ public function removeLog(KaabaApplicationLog $log): static
     return $this;
 }
 
+
+public function getDisabilityType(): ?string
+{
+    return $this->disability_type;
+}
+
+public function setDisabilityType(?string $disability_type): static
+{
+    $this->disability_type = $disability_type;
+
+    return $this;
+}
 }

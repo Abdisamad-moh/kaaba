@@ -473,29 +473,30 @@
                                     <!-- Disability Disclosure Section -->
                                     <div class="row justify-content-center mt-4">
                                         <div class="col-12">
-                                            <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3"
-                                                style="background-color:#1b5e20; font-size:14px;">
-                                                {{ 'disability_disclosure'|trans }}
-                                            </h6>
+                                                <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3"
+            style="background-color:#1b5e20; font-size:14px;">
+            {{ 'disability_disclosure'|trans }}
+        </h6>
 
-                                            <div class="mt-3" style="font-size:14px;">
-                                                {{ form_label(form.disability, null, {'label_attr': {'class':
-                                                'form-label fw-600 text-dark-gray'}}) }}
-                                                {{ form_widget(form.disability, {'attr': {'class': 'form-select border
-                                                border-dark rounded-0', 'onchange':
-                                                'toggleDisabilityExplanation(this)'}}) }}
-                                                {{ form_errors(form.disability) }}
-                                            </div>
-                                            <!-- Disability Explanation (Conditional) -->
-                                            <div id="disabilityExplanation" style="display: none;">
-                                                <div class="mb-3">
-                                                    {{ form_label(form.disability_explanation, null, {'label_attr':
-                                                    {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                                                    {{ form_widget(form.disability_explanation, {'attr': {'class':
-                                                    'form-control border border-dark rounded-0', 'rows': 3}}) }}
-                                                    {{ form_errors(form.disability_explanation) }}
-                                                </div>
-                                            </div>
+        <div class="mt-3" style="font-size:14px;">
+            {{ form_label(form.disability, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+            {{ form_widget(form.disability, {'attr': {'class': 'form-select border border-dark rounded-0', 'onchange': 'toggleDisabilityFields(this)'}}) }}
+            {{ form_errors(form.disability) }}
+        </div>
+
+        <!-- Disability Type (Conditional) -->
+        <div id="disabilityTypeSection" style="display: none;" class="mt-3">
+            {{ form_label(form.disability_type, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+            {{ form_widget(form.disability_type, {'attr': {'class': 'form-select border border-dark rounded-0', 'onchange': 'toggleDisabilityExplanation(this)'}}) }}
+            {{ form_errors(form.disability_type) }}
+        </div>
+
+        <!-- Disability Explanation (Conditional - Only for "Other") -->
+        <div id="disabilityExplanation" style="display: none;" class="mt-3">
+            {{ form_label(form.disability_explanation, null, {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+            {{ form_widget(form.disability_explanation, {'attr': {'class': 'form-control border border-dark rounded-0', 'rows': 3}}) }}
+            {{ form_errors(form.disability_explanation) }}
+        </div>
 
                                             <!-- Personal Identification Verification -->
                                             <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3 mt-4"
@@ -874,632 +875,641 @@
     {% include 'home/_footer.html.twig' %}
     <!-- end footer -->
 
-    <script>
-        // Application Form Manager
-        class ApplicationFormManager {
-            constructor() {
-                this.init();
+ <script>
+    // Application Form Manager
+    class ApplicationFormManager {
+        constructor() {
+            this.init();
+        }
+
+        init() {
+            this.setupFileUpload();
+            this.setupRealTimeValidation();
+            this.setupTabProtection();
+            this.setupLanguageSwitcher();
+            this.initializeFormState();
+        }
+
+        forcePlaceholderSelection() {
+            const regionSelect = document.getElementById('{{ form.region.vars.id }}');
+            if (regionSelect) {
+                setTimeout(() => {
+                    if (regionSelect.selectedIndex !== 0) {
+                        regionSelect.selectedIndex = 0;
+                    }
+                }, 100);
             }
+        }
 
-            init() {
-                this.setupFileUpload();
-                this.setupRealTimeValidation();
-                this.setupTabProtection();
-                this.setupLanguageSwitcher();
-                this.initializeFormState();
-            }
+        // File Upload Management
+        setupFileUpload() {
+            const fileDropAreas = document.querySelectorAll('.file-drop-area');
 
+            fileDropAreas.forEach(area => {
+                const fileInput = area.querySelector('.file-input');
+                const fileList = area.querySelector('.file-list');
 
-            forcePlaceholderSelection() {
-                const regionSelect = document.getElementById('{{ form.region.vars.id }}');
-                if (regionSelect) {
-                    // Wait a brief moment for the DOM to be fully ready
-                    setTimeout(() => {
-                        if (regionSelect.selectedIndex !== 0) {
-                            regionSelect.selectedIndex = 0;
-                        }
-                    }, 100);
-                }
-            }
-
-
-            // File Upload Management
-            setupFileUpload() {
-                const fileDropAreas = document.querySelectorAll('.file-drop-area');
-
-                fileDropAreas.forEach(area => {
-                    const fileInput = area.querySelector('.file-input');
-                    const fileList = area.querySelector('.file-list');
-
-                    // Click to open file dialog
-                    area.addEventListener('click', (e) => {
-                        if (!e.target.closest('button') && !e.target.closest('.file-remove')) {
-                            fileInput.click();
-                        }
-                    });
-
-                    // Handle file selection
-                    fileInput.addEventListener('change', (e) => {
-                        this.handleFiles(e.target.files, fileList, fileInput);
-                    });
-
-                    // Drag and drop functionality
-                    area.addEventListener('dragover', (e) => {
-                        e.preventDefault();
-                        area.classList.add('dragover');
-                    });
-
-                    area.addEventListener('dragleave', (e) => {
-                        e.preventDefault();
-                        area.classList.remove('dragover');
-                    });
-
-                    area.addEventListener('drop', (e) => {
-                        e.preventDefault();
-                        area.classList.remove('dragover');
-                        this.handleFiles(e.dataTransfer.files, fileList, fileInput);
-                    });
+                area.addEventListener('click', (e) => {
+                    if (!e.target.closest('button') && !e.target.closest('.file-remove')) {
+                        fileInput.click();
+                    }
                 });
-            }
 
-            handleFiles(files, fileList, fileInput) {
-                for (let file of files) {
-                    this.addFileToList(file, fileList, fileInput);
-                }
-            }
+                fileInput.addEventListener('change', (e) => {
+                    this.handleFiles(e.target.files, fileList, fileInput);
+                });
 
-            addFileToList(file, fileList, fileInput) {
-                const fileItem = document.createElement('div');
-                fileItem.className = 'file-item';
-                fileItem.innerHTML = `
+                area.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    area.classList.add('dragover');
+                });
+
+                area.addEventListener('dragleave', (e) => {
+                    e.preventDefault();
+                    area.classList.remove('dragover');
+                });
+
+                area.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    area.classList.remove('dragover');
+                    this.handleFiles(e.dataTransfer.files, fileList, fileInput);
+                });
+            });
+        }
+
+        handleFiles(files, fileList, fileInput) {
+            for (let file of files) {
+                this.addFileToList(file, fileList, fileInput);
+            }
+        }
+
+        addFileToList(file, fileList, fileInput) {
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            fileItem.innerHTML = `
                 <span class="file-name">${file.name}</span>
                 <span class="file-remove" onclick="appFormManager.removeFile(this)">×</span>
             `;
-                fileList.appendChild(fileItem);
+            fileList.appendChild(fileItem);
 
-                this.updateFileAreaValidation(fileList.closest('.file-drop-area'));
-                this.validateStep1();
-            }
+            this.updateFileAreaValidation(fileList.closest('.file-drop-area'));
+            this.validateStep1();
+        }
 
-            removeFile(element) {
-                const fileItem = element.parentElement;
-                const fileArea = fileItem.closest('.file-drop-area');
-                fileItem.remove();
-                this.updateFileAreaValidation(fileArea);
-                this.validateStep1();
-            }
+        removeFile(element) {
+            const fileItem = element.parentElement;
+            const fileArea = fileItem.closest('.file-drop-area');
+            fileItem.remove();
+            this.updateFileAreaValidation(fileArea);
+            this.validateStep1();
+        }
 
-            updateFileAreaValidation(fileArea) {
-                const fileList = fileArea.querySelector('.file-list');
-                const hasFiles = fileList && fileList.children.length > 0;
+        updateFileAreaValidation(fileArea) {
+            const fileList = fileArea.querySelector('.file-list');
+            const hasFiles = fileList && fileList.children.length > 0;
 
-                fileArea.classList.toggle('file-area-error', !hasFiles);
-                fileArea.classList.toggle('file-area-valid', hasFiles);
+            fileArea.classList.toggle('file-area-error', !hasFiles);
+            fileArea.classList.toggle('file-area-valid', hasFiles);
+        }
 
-                const existingError = fileArea.querySelector('.file-error-message');
-                if (existingError && hasFiles) {
-                    existingError.remove();
+        // Validation Management
+        setupRealTimeValidation() {
+            const requiredFields = [
+                '{{ form.full_name.vars.id }}',
+                '{{ form.phone.vars.id }}',
+                '{{ form.gender.vars.id }}',
+                '{{ form.nationality.vars.id }}',
+                '{{ form.date_of_birth.vars.id }}',
+                '{{ form.region.vars.id }}',
+                '{{ form.disability.vars.id }}',
+            ];
+
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    ['blur', 'change', 'input'].forEach(event => {
+                        field.addEventListener(event, () => this.validateStep1());
+                    });
                 }
-            }
+            });
 
-            // Validation Management
-            setupRealTimeValidation() {
-                const requiredFields = [
-                    '{{ form.full_name.vars.id }}',
-                    '{{ form.phone.vars.id }}',
-                    '{{ form.gender.vars.id }}',
-                    '{{ form.nationality.vars.id }}',
-                    '{{ form.date_of_birth.vars.id }}',
-                    '{{ form.region.vars.id }}',
-                    '{{ form.disability.vars.id }}',
-                ];
+            const fileLists = document.querySelectorAll('.file-list');
+            fileLists.forEach(list => {
+                const observer = new MutationObserver(() => this.validateStep1());
+                observer.observe(list, { childList: true });
+            });
+        }
 
+        validateStep1() {
+            const requiredFields = {
+                '{{ form.full_name.vars.id }}': 'Full name is required',
+                '{{ form.gender.vars.id }}': 'Gender is required',
+                '{{ form.phone.vars.id }}': 'Phone number is required',
+                '{{ form.nationality.vars.id }}': 'Nationality is required',
+                '{{ form.date_of_birth.vars.id }}': 'Date of birth is required',
+                '{{ form.region.vars.id }}': 'Region is required',
+                '{{ form.disability.vars.id }}': 'Disability information is required'
+            };
 
+            let isValid = true;
+            this.clearValidationErrors();
 
-                requiredFields.forEach(fieldId => {
-                    const field = document.getElementById(fieldId);
-                    if (field) {
-                        ['blur', 'change', 'input'].forEach(event => {
-                            field.addEventListener(event, () => this.validateStep1());
-                        });
-                    }
-                });
-
-                // Monitor file changes
-                const fileLists = document.querySelectorAll('.file-list');
-                fileLists.forEach(list => {
-                    const observer = new MutationObserver(() => this.validateStep1());
-                    observer.observe(list, { childList: true });
-                });
-            }
-
-            validateStep1() {
-                const requiredFields = {
-                    '{{ form.full_name.vars.id }}': 'Full name is required',
-                    '{{ form.gender.vars.id }}': 'Gender is required',
-                    '{{ form.phone.vars.id }}': 'Phone number is required',
-                    '{{ form.nationality.vars.id }}': 'Nationality is required',
-                    '{{ form.date_of_birth.vars.id }}': 'Date of birth is required',
-                    '{{ form.region.vars.id }}': 'Region is required',
-                    '{{ form.disability.vars.id }}': 'Disability information is required'
-                };
-
-
-
-                let isValid = true;
-
-                // Clear previous errors
-                this.clearValidationErrors();
-
-                // Validate fields
-                for (const [fieldId, message] of Object.entries(requiredFields)) {
-                    const field = document.getElementById(fieldId);
-                    if (field && !field.value.trim()) {
-                        isValid = false;
-                    }
-                }
-
-                // Validate identity attachment
-                const identityArea = document.querySelector('[data-field-name="identity_attachment"]');
-                const hasIdentityFiles = identityArea &&
-                    identityArea.querySelector('.file-list') &&
-                    identityArea.querySelector('.file-list').children.length > 0;
-
-                if (!hasIdentityFiles) {
+            // Validate basic fields
+            for (const [fieldId, message] of Object.entries(requiredFields)) {
+                const field = document.getElementById(fieldId);
+                if (field && !field.value.trim()) {
                     isValid = false;
                 }
-
-                this.updateNextStepButton(isValid);
-                this.updateTabAccessibility(isValid);
-
-                return isValid;
             }
 
-            validateStep1WithFeedback() {
-                if (!this.validateStep1()) {
-                    this.showAlertMessage('Please complete all required fields before proceeding.', 'danger');
-                    const firstError = document.querySelector('.is-invalid, .file-area-error');
-                    if (firstError) {
-                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                    return false;
+            // Validate disability type if disability is "Yes"
+            const disabilityField = document.getElementById('{{ form.disability.vars.id }}');
+            const disabilityTypeField = document.getElementById('{{ form.disability_type.vars.id }}');
+            const disabilityTypeSection = document.getElementById('disabilityTypeSection');
+            
+            if (disabilityField && disabilityField.value === 'Yes' && disabilityTypeSection && disabilityTypeSection.style.display !== 'none') {
+                if (!disabilityTypeField || !disabilityTypeField.value.trim()) {
+                    isValid = false;
                 }
-                return true;
             }
 
-            validateFileAttachments() {
-                const certificatesArea = document.querySelector('[data-field-name="certificate_attachment"]');
-                let hasCertificateFiles = false;
+            // Validate identity attachment
+            const identityArea = document.querySelector('[data-field-name="identity_attachment"]');
+            const hasIdentityFiles = identityArea &&
+                identityArea.querySelector('.file-list') &&
+                identityArea.querySelector('.file-list').children.length > 0;
 
-                if (certificatesArea) {
-                    const fileList = certificatesArea.querySelector('.file-list');
-                    hasCertificateFiles = fileList && fileList.children.length > 0;
+            if (!hasIdentityFiles) {
+                isValid = false;
+            }
 
-                    if (!hasCertificateFiles) {
-                        certificatesArea.classList.add('file-area-error');
-                    } else {
-                        certificatesArea.classList.remove('file-area-error');
-                    }
+            this.updateNextStepButton(isValid);
+            this.updateTabAccessibility(isValid);
+
+            return isValid;
+        }
+
+        validateStep1WithFeedback() {
+            if (!this.validateStep1()) {
+                this.showAlertMessage('Please complete all required fields before proceeding.', 'danger');
+                const firstError = document.querySelector('.is-invalid, .file-area-error');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
+                return false;
+            }
+            return true;
+        }
+
+        validateFileAttachments() {
+            const certificatesArea = document.querySelector('[data-field-name="certificate_attachment"]');
+            let hasCertificateFiles = false;
+
+            if (certificatesArea) {
+                const fileList = certificatesArea.querySelector('.file-list');
+                hasCertificateFiles = fileList && fileList.children.length > 0;
 
                 if (!hasCertificateFiles) {
-                    this.showAlertMessage('Please upload at least one certificate document.', 'danger');
-                    return false;
+                    certificatesArea.classList.add('file-area-error');
+                } else {
+                    certificatesArea.classList.remove('file-area-error');
                 }
-
-                return true;
             }
 
-
-            setupDeclarationSection() {
-                this.initializeDeclarationFields();
-                this.setupDeclarationValidation();
+            if (!hasCertificateFiles) {
+                this.showAlertMessage('Please upload at least one certificate document.', 'danger');
+                return false;
             }
 
-            initializeDeclarationFields() {
-                // Set today's date
-                const today = new Date().toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                });
-                document.getElementById('declarationDate').value = today;
+            return true;
+        }
 
-                // Auto-fill name from step 1
-                const fullNameField = document.getElementById('{{ form.full_name.vars.id }}');
-                if (fullNameField) {
-                    // Set initial value
+        setupDeclarationSection() {
+            this.initializeDeclarationFields();
+            this.setupDeclarationValidation();
+        }
+
+        initializeDeclarationFields() {
+            const today = new Date().toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            document.getElementById('declarationDate').value = today;
+
+            const fullNameField = document.getElementById('{{ form.full_name.vars.id }}');
+            if (fullNameField) {
+                document.getElementById('declarationFullName').value = fullNameField.value;
+                fullNameField.addEventListener('input', () => {
                     document.getElementById('declarationFullName').value = fullNameField.value;
-
-                    // Update on changes
-                    fullNameField.addEventListener('input', () => {
-                        document.getElementById('declarationFullName').value = fullNameField.value;
-                    });
-                }
-            }
-
-            setupDeclarationValidation() {
-                const agreementCheckbox = document.getElementById('declarationAgreement');
-                const submitBtn = document.getElementById('submitBtn');
-
-                if (agreementCheckbox && submitBtn) {
-                    agreementCheckbox.addEventListener('change', () => {
-                        this.updateSubmitButtonState();
-                    });
-                }
-            }
-
-            updateSubmitButtonState() {
-                const agreementCheckbox = document.getElementById('declarationAgreement');
-                const submitBtn = document.getElementById('submitBtn');
-
-                if (agreementCheckbox && submitBtn) {
-                    const isAgreed = agreementCheckbox.checked;
-                    submitBtn.disabled = !isAgreed;
-                    submitBtn.classList.toggle('btn-disabled', !isAgreed);
-                }
-            }
-
-            // UI Management
-            updateNextStepButton(isValid) {
-                const nextStepButton = document.getElementById('nextStepButton');
-                if (nextStepButton) {
-                    nextStepButton.disabled = !isValid;
-                    nextStepButton.classList.toggle('btn-disabled', !isValid);
-                }
-            }
-
-            updateTabAccessibility(isValid) {
-                const step2Tab = document.getElementById('step2-tab');
-                if (step2Tab) {
-                    step2Tab.classList.toggle('disabled-tab', !isValid);
-                    step2Tab.style.pointerEvents = isValid ? 'auto' : 'none';
-                    step2Tab.style.opacity = isValid ? '1' : '0.6';
-                }
-            }
-
-            setupTabProtection() {
-                const step2Tab = document.getElementById('step2-tab');
-                if (step2Tab) {
-                    step2Tab.addEventListener('click', (e) => {
-                        if (step2Tab.classList.contains('disabled-tab')) {
-                            e.preventDefault();
-                            this.showAlertMessage('Please complete all required fields in Step 1 first.', 'warning');
-                        }
-                    });
-                }
-            }
-
-            // Form Operations
-            switchTab(tabName) {
-                if (tabName === 'step2' && !this.validateStep1WithFeedback()) {
-                    return false;
-                }
-
-                const tab = new bootstrap.Tab(document.querySelector(`a[href="#${tabName}"]`));
-                tab.show();
-
-                if (tabName === 'step2') {
-                    setTimeout(() => this.validateFileAttachments(), 100);
-                }
-            }
-
-            submitApplication() {
-                if (!this.validateStep1WithFeedback() || !this.validateFileAttachments()) {
-                    return false;
-                }
-
-                const form = document.getElementById('register_form');
-                const submitBtn = document.getElementById('submitBtn');
-
-                if (form.reportValidity()) {
-                    if (submitBtn) {
-                        submitBtn.disabled = true;
-                        submitBtn.innerHTML = 'Submitting... <i class="fa-solid fa-spinner fa-spin ms-2"></i>';
-                    }
-                    form.submit();
-                }
-            }
-
-            // Utility Methods
-            clearValidationErrors() {
-                document.querySelectorAll('.is-invalid').forEach(field => {
-                    field.classList.remove('is-invalid');
                 });
+            }
+        }
 
-                const alert = document.querySelector('.validation-alert');
-                if (alert) {
-                    alert.remove();
-                }
+        setupDeclarationValidation() {
+            const agreementCheckbox = document.getElementById('declarationAgreement');
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (agreementCheckbox && submitBtn) {
+                agreementCheckbox.addEventListener('change', () => {
+                    this.updateSubmitButtonState();
+                });
+            }
+        }
+
+        updateSubmitButtonState() {
+            const agreementCheckbox = document.getElementById('declarationAgreement');
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (agreementCheckbox && submitBtn) {
+                const isAgreed = agreementCheckbox.checked;
+                submitBtn.disabled = !isAgreed;
+                submitBtn.classList.toggle('btn-disabled', !isAgreed);
+            }
+        }
+
+        // UI Management
+        updateNextStepButton(isValid) {
+            const nextStepButton = document.getElementById('nextStepButton');
+            if (nextStepButton) {
+                nextStepButton.disabled = !isValid;
+                nextStepButton.classList.toggle('btn-disabled', !isValid);
+            }
+        }
+
+        updateTabAccessibility(isValid) {
+            const step2Tab = document.getElementById('step2-tab');
+            if (step2Tab) {
+                step2Tab.classList.toggle('disabled-tab', !isValid);
+                step2Tab.style.pointerEvents = isValid ? 'auto' : 'none';
+                step2Tab.style.opacity = isValid ? '1' : '0.6';
+            }
+        }
+
+        setupTabProtection() {
+            const step2Tab = document.getElementById('step2-tab');
+            if (step2Tab) {
+                step2Tab.addEventListener('click', (e) => {
+                    if (step2Tab.classList.contains('disabled-tab')) {
+                        e.preventDefault();
+                        this.showAlertMessage('Please complete all required fields in Step 1 first.', 'warning');
+                    }
+                });
+            }
+        }
+
+        // Form Operations
+        switchTab(tabName) {
+            if (tabName === 'step2' && !this.validateStep1WithFeedback()) {
+                return false;
             }
 
-            showAlertMessage(message, type = 'danger') {
-                const existingAlert = document.querySelector('.validation-alert');
-                if (existingAlert) {
-                    existingAlert.remove();
-                }
+            const tab = new bootstrap.Tab(document.querySelector(`a[href="#${tabName}"]`));
+            tab.show();
 
-                const alertDiv = document.createElement('div');
-                alertDiv.className = `alert alert-${type} validation-alert mt-3 alert-modern`;
-                alertDiv.innerHTML = `
+            if (tabName === 'step2') {
+                setTimeout(() => this.validateFileAttachments(), 100);
+            }
+        }
+
+        submitApplication() {
+            if (!this.validateStep1WithFeedback() || !this.validateFileAttachments()) {
+                return false;
+            }
+
+            const form = document.getElementById('register_form');
+            const submitBtn = document.getElementById('submitBtn');
+
+            if (form.reportValidity()) {
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = 'Submitting... <i class="fa-solid fa-spinner fa-spin ms-2"></i>';
+                }
+                form.submit();
+            }
+        }
+
+        // Utility Methods
+        clearValidationErrors() {
+            document.querySelectorAll('.is-invalid').forEach(field => {
+                field.classList.remove('is-invalid');
+            });
+
+            const alert = document.querySelector('.validation-alert');
+            if (alert) {
+                alert.remove();
+            }
+        }
+
+        showAlertMessage(message, type = 'danger') {
+            const existingAlert = document.querySelector('.validation-alert');
+            if (existingAlert) {
+                existingAlert.remove();
+            }
+
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} validation-alert mt-3 alert-modern`;
+            alertDiv.innerHTML = `
                 <div class="d-flex align-items-center">
                     <i class="fa fa-exclamation-circle me-2"></i>
                     <span>${message}</span>
                 </div>
             `;
 
-                const tabContent = document.querySelector('.tab-content');
-                if (tabContent) {
-                    tabContent.parentNode.insertBefore(alertDiv, tabContent);
-                }
+            const tabContent = document.querySelector('.tab-content');
+            if (tabContent) {
+                tabContent.parentNode.insertBefore(alertDiv, tabContent);
             }
+        }
 
-            // Language Switcher
-            setupLanguageSwitcher() {
-                document.querySelectorAll('.language-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const lang = e.target.getAttribute('data-lang');
-                        fetch(`/change-language/${lang}`)
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    document.querySelectorAll('.language-btn').forEach(b => b.classList.remove('active'));
-                                    e.target.classList.add('active');
-                                    location.reload();
-                                }
-                            })
-                            .catch(error => console.error('Error changing language:', error));
-                    });
+        // Language Switcher
+        setupLanguageSwitcher() {
+            document.querySelectorAll('.language-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const lang = e.target.getAttribute('data-lang');
+                    fetch(`/change-language/${lang}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                document.querySelectorAll('.language-btn').forEach(b => b.classList.remove('active'));
+                                e.target.classList.add('active');
+                                location.reload();
+                            }
+                        })
+                        .catch(error => console.error('Error changing language:', error));
                 });
+            });
+        }
+
+        // Initialization
+        initializeFormState() {
+            this.clearValidationErrors();
+            this.initializeRegionDistrict();
+            this.initializeInstituteCourseDynamics();
+            this.setupDeclarationSection();
+            this.validateStep1();
+            this.forcePlaceholderSelection();
+
+            // Initialize file area validation state
+            document.querySelectorAll('.file-drop-area').forEach(area => {
+                this.updateFileAreaValidation(area);
+            });
+
+            // Initialize disability fields state
+            const disabilitySelect = document.getElementById('{{ form.disability.vars.id }}');
+            if (disabilitySelect) {
+                toggleDisabilityFields(disabilitySelect);
             }
+        }
 
-            // Initialization
-            initializeFormState() {
-                this.clearValidationErrors();
-                this.initializeRegionDistrict();
-                this.initializeInstituteCourseDynamics();
-                this.setupDeclarationSection();
-                this.validateStep1();
-                this.forcePlaceholderSelection();
+        initializeRegionDistrict() {
+            const regionSelect = document.getElementById('{{ form.region.vars.id }}');
+            const districtSelect = document.getElementById('{{ form.district.vars.id }}');
+            const selectRegionFirstText = "{{ trans.trans('select_region_first')|e('js') }}";
 
-                // Initialize file area validation state
-                document.querySelectorAll('.file-drop-area').forEach(area => {
-                    this.updateFileAreaValidation(area);
-                });
-            }
-
-            initializeRegionDistrict() {
-                const regionSelect = document.getElementById('{{ form.region.vars.id }}');
-                const districtSelect = document.getElementById('{{ form.district.vars.id }}');
-                const selectRegionFirstText = "{{ trans.trans('select_region_first')|e('js') }}";
-
-                if (regionSelect && regionSelect.value) {
-                    this.loadDistricts(regionSelect.value);
-                } else if (districtSelect) {
-                    districtSelect.innerHTML = `<option value="">${selectRegionFirstText}</option>`;
-                    districtSelect.disabled = true;
-
-                    // If there's only one region in the dropdown, automatically select it and load districts
-                    if (regionSelect && regionSelect.options.length === 2) { // 2 because of placeholder + one region
-                        regionSelect.selectedIndex = 1;
-                        this.loadDistricts(regionSelect.value);
-                    }
-                }
-
-                if (regionSelect) {
-                    regionSelect.addEventListener('change', (e) => {
-                        this.loadDistricts(e.target.value);
-                    });
-                }
-            }
-
-            initializeInstituteCourseDynamics() {
-                // Only initialize for non-literacy scholarships
-                {% if type != 'l' %}
-                const instituteSelect = document.getElementById('{{ form.institute.vars.id }}');
-                const courseSelect = document.getElementById('{{ form.course.vars.id }}');
-
-                if (instituteSelect && courseSelect) {
-                    instituteSelect.addEventListener('change', (e) => {
-                        this.loadCourses(e.target.value);
-                    });
-
-                    // Initialize courses based on selected institute
-                    if (instituteSelect.value) {
-                        this.loadCourses(instituteSelect.value);
-                    } else {
-                        this.resetCourseSelect();
-                    }
-                }
-                {% endif %}
-            }
-
-
-
-            // API Calls
-            loadDistricts(regionId) {
-                const districtSelect = document.getElementById('{{ form.district.vars.id }}');
-                const selectDistrictText = "{{ trans.trans('district_placeholder')|e('js') }}";
-
-                if (!districtSelect) return;
-
-                if (!regionId) {
-                    districtSelect.innerHTML = '<option value="">${selectDistrictText}</option>';
-                    districtSelect.disabled = true;
-                    return;
-                }
-
-                districtSelect.innerHTML = '<option value="">Loading districts...</option>';
+            if (regionSelect && regionSelect.value) {
+                this.loadDistricts(regionSelect.value);
+            } else if (districtSelect) {
+                districtSelect.innerHTML = `<option value="">${selectRegionFirstText}</option>`;
                 districtSelect.disabled = true;
 
-                const currentPath = window.location.pathname;
-                const apiUrl = `${currentPath}?action=get_districts&region_id=${regionId}`;
-
-                fetch(apiUrl, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    }
-                })
-                    .then(response => {
-                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                        return response.json();
-                    })
-                    .then(districts => {
-                        districtSelect.innerHTML = `<option value="">${selectDistrictText}</option>`;
-                        districtSelect.disabled = false;
-
-                        if (districts && districts.length > 0) {
-                            districts.forEach(district => {
-                                const option = document.createElement('option');
-                                option.value = district.id;
-                                option.textContent = district.name;
-                                districtSelect.appendChild(option);
-                            });
-                        } else {
-                            districtSelect.innerHTML = '<option value="">No districts available</option>';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error loading districts:', error);
-                        districtSelect.innerHTML = '<option value="">Error loading districts</option>';
-                        districtSelect.disabled = false;
-                    });
+                if (regionSelect && regionSelect.options.length === 2) {
+                    regionSelect.selectedIndex = 1;
+                    this.loadDistricts(regionSelect.value);
+                }
             }
 
-            loadCourses(instituteId) {
-                // Only proceed for non-literacy scholarships
-                {% if type != 'l' %}
-                const courseSelect = document.getElementById('{{ form.course.vars.id }}');
+            if (regionSelect) {
+                regionSelect.addEventListener('change', (e) => {
+                    this.loadDistricts(e.target.value);
+                });
+            }
+        }
 
-                if (!courseSelect) return;
+        initializeInstituteCourseDynamics() {
+            {% if type != 'l' %}
+            const instituteSelect = document.getElementById('{{ form.institute.vars.id }}');
+            const courseSelect = document.getElementById('{{ form.course.vars.id }}');
 
-                if (!instituteId) {
+            if (instituteSelect && courseSelect) {
+                instituteSelect.addEventListener('change', (e) => {
+                    this.loadCourses(e.target.value);
+                });
+
+                if (instituteSelect.value) {
+                    this.loadCourses(instituteSelect.value);
+                } else {
                     this.resetCourseSelect();
-                    return;
                 }
+            }
+            {% endif %}
+        }
 
-                courseSelect.innerHTML = '<option value="">Loading courses...</option>';
-                courseSelect.disabled = true;
+        // API Calls
+        loadDistricts(regionId) {
+            const districtSelect = document.getElementById('{{ form.district.vars.id }}');
+            const selectDistrictText = "{{ trans.trans('district_placeholder')|e('js') }}";
 
-                const currentPath = window.location.pathname;
-                const apiUrl = `${currentPath}?action=get_courses&institute_id=${instituteId}`;
+            if (!districtSelect) return;
 
-                fetch(apiUrl, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
+            if (!regionId) {
+                districtSelect.innerHTML = `<option value="">${selectDistrictText}</option>`;
+                districtSelect.disabled = true;
+                return;
+            }
+
+            districtSelect.innerHTML = '<option value="">Loading districts...</option>';
+            districtSelect.disabled = true;
+
+            const currentPath = window.location.pathname;
+            const apiUrl = `${currentPath}?action=get_districts&region_id=${regionId}`;
+
+            fetch(apiUrl, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                })
+                .then(districts => {
+                    districtSelect.innerHTML = `<option value="">${selectDistrictText}</option>`;
+                    districtSelect.disabled = false;
+
+                    if (districts && districts.length > 0) {
+                        districts.forEach(district => {
+                            const option = document.createElement('option');
+                            option.value = district.id;
+                            option.textContent = district.name;
+                            districtSelect.appendChild(option);
+                        });
+                    } else {
+                        districtSelect.innerHTML = '<option value="">No districts available</option>';
                     }
                 })
-                    .then(response => {
-                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                        return response.json();
-                    })
-                    .then(courses => {
-                        if (!courseSelect) return;
- const selectCourseText = "{{ trans.trans('course_placeholder')|e('js') }}"
-                        courseSelect.innerHTML = `<option value="">${selectCourseText}</option>`;
-                        courseSelect.disabled = false;
+                .catch(error => {
+                    console.error('Error loading districts:', error);
+                    districtSelect.innerHTML = '<option value="">Error loading districts</option>';
+                    districtSelect.disabled = false;
+                });
+        }
 
-                        if (courses && courses.length > 0) {
-                            courses.forEach(course => {
-                                const option = document.createElement('option');
-                                option.value = course.id;
-                                option.textContent = course.name;
-                                courseSelect.appendChild(option);
-                            });
-                        } else {
-                            courseSelect.innerHTML = '<option value="">No courses available</option>';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error loading courses:', error);
-                        if (courseSelect) {
-                            courseSelect.innerHTML = '<option value="">Error loading courses</option>';
-                            courseSelect.disabled = false;
-                        }
-                    });
-                {% endif %}
+        loadCourses(instituteId) {
+            {% if type != 'l' %}
+            const courseSelect = document.getElementById('{{ form.course.vars.id }}');
+
+            if (!courseSelect) return;
+
+            if (!instituteId) {
+                this.resetCourseSelect();
+                return;
             }
 
+            courseSelect.innerHTML = '<option value="">Loading courses...</option>';
+            courseSelect.disabled = true;
 
-            resetCourseSelect() {
-                // Only proceed for non-literacy scholarships
-                {% if type != 'l' %}
-                const courseSelect = document.getElementById('{{ form.course.vars.id }}');
-                const selectInstitueText = "{{ trans.trans('select_institute_placeholder')|e('js') }}";
+            const currentPath = window.location.pathname;
+            const apiUrl = `${currentPath}?action=get_courses&institute_id=${instituteId}`;
 
-                if (courseSelect) {
-                    courseSelect.innerHTML = `<option value="">${selectInstitueText}</option>`;
-                    courseSelect.disabled = true;
+            fetch(apiUrl, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
                 }
-                {% endif %}
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                })
+                .then(courses => {
+                    if (!courseSelect) return;
+                    const selectCourseText = "{{ trans.trans('course_placeholder')|e('js') }}";
+                    courseSelect.innerHTML = `<option value="">${selectCourseText}</option>`;
+                    courseSelect.disabled = false;
+
+                    if (courses && courses.length > 0) {
+                        courses.forEach(course => {
+                            const option = document.createElement('option');
+                            option.value = course.id;
+                            option.textContent = course.name;
+                            courseSelect.appendChild(option);
+                        });
+                    } else {
+                        courseSelect.innerHTML = '<option value="">No courses available</option>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading courses:', error);
+                    if (courseSelect) {
+                        courseSelect.innerHTML = '<option value="">Error loading courses</option>';
+                        courseSelect.disabled = false;
+                    }
+                });
+            {% endif %}
+        }
+
+        resetCourseSelect() {
+            {% if type != 'l' %}
+            const courseSelect = document.getElementById('{{ form.course.vars.id }}');
+            const selectInstituteText = "{{ trans.trans('select_institute_placeholder')|e('js') }}";
+
+            if (courseSelect) {
+                courseSelect.innerHTML = `<option value="">${selectInstituteText}</option>`;
+                courseSelect.disabled = true;
             }
-
+            {% endif %}
         }
+    }
 
+    // Global functions for inline event handlers
+    function switchTab(tabName) {
+        appFormManager.switchTab(tabName);
+    }
 
+    function submitApplication() {
+        appFormManager.submitApplication();
+    }
 
-        // Global functions for inline event handlers
-        function switchTab(tabName) {
-            appFormManager.switchTab(tabName);
-        }
-
-        function submitApplication() {
-            appFormManager.submitApplication();
-        }
-
-
-// Standalone disability toggle function
-function toggleDisabilityExplanation(selectElement) {
-    const explanationDiv = document.getElementById('disabilityExplanation');
-    if (explanationDiv) {
-        // Get the selected option text and value for debugging
+    // Updated disability toggle functions
+    function toggleDisabilityFields(selectElement) {
+        const disabilityTypeSection = document.getElementById('disabilityTypeSection');
+        const disabilityExplanation = document.getElementById('disabilityExplanation');
+        
+        // Get the selected option text and value
         const selectedOption = selectElement.options[selectElement.selectedIndex];
         const optionText = selectedOption.text.trim().toLowerCase();
         const optionValue = selectElement.value.toLowerCase();
         
-        console.log('Disability selected - Text:', optionText, 'Value:', optionValue);
-        
-        // Show explanation field if "Yes" is selected (check both text and value in multiple languages)
+        // Show disability type field if "Yes" is selected
         const yesValues = ['yes', 'haa', '1', 'true', 'y', 'aye'];
         const isDisabled = yesValues.includes(optionText) || yesValues.includes(optionValue);
         
-        console.log('Show explanation:', isDisabled);
+        if (disabilityTypeSection) {
+            disabilityTypeSection.style.display = isDisabled ? 'block' : 'none';
+        }
         
-        // Toggle visibility
-        explanationDiv.style.display = isDisabled ? 'block' : 'none';
+        // Reset and hide dependent fields when disability is not "Yes"
+        if (!isDisabled) {
+            if (disabilityExplanation) {
+                disabilityExplanation.style.display = 'none';
+            }
+            
+            // Reset disability type and explanation fields
+            const disabilityTypeField = document.getElementById('{{ form.disability_type.vars.id }}');
+            const explanationField = document.getElementById('{{ form.disability_explanation.vars.id }}');
+            
+            if (disabilityTypeField) {
+                disabilityTypeField.value = '';
+                disabilityTypeField.required = false;
+            }
+            if (explanationField) {
+                explanationField.value = '';
+                explanationField.required = false;
+            }
+        } else {
+            // Make disability type required when "Yes" is selected
+            const disabilityTypeField = document.getElementById('{{ form.disability_type.vars.id }}');
+            if (disabilityTypeField) {
+                disabilityTypeField.required = true;
+            }
+        }
+    }
+
+    function toggleDisabilityExplanation(selectElement) {
+        const disabilityExplanation = document.getElementById('disabilityExplanation');
         
-        // Make the explanation field required only if "Yes" is selected
+        if (!disabilityExplanation) return;
+        
+        // Show explanation field only if "Other" is selected
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        const optionText = selectedOption.text.trim().toLowerCase();
+        const optionValue = selectElement.value.toLowerCase();
+        
+        const otherValues = ['other', 'kale', 'else'];
+        const isOther = otherValues.includes(optionText) || otherValues.includes(optionValue);
+        
+        disabilityExplanation.style.display = isOther ? 'block' : 'none';
+        
+        // Make explanation field required only if "Other" is selected
         const explanationField = document.getElementById('{{ form.disability_explanation.vars.id }}');
         if (explanationField) {
-            explanationField.required = isDisabled;
+            explanationField.required = isOther;
             
             // Clear the field when hiding it
-            if (!isDisabled) {
+            if (!isOther) {
                 explanationField.value = '';
             }
         }
     }
-}
 
-
-
-// Initialize application when DOM is loaded
-        let appFormManager;
-        document.addEventListener('DOMContentLoaded', function () {
-            appFormManager = new ApplicationFormManager();
- // Initialize disability field state
-    const disabilitySelect = document.getElementById('{{ form.disability.vars.id }}');
-    if (disabilitySelect) {
-        toggleDisabilityExplanation(disabilitySelect);
-    }
-        });
-
-
-
-    </script>
-
+    // Initialize application when DOM is loaded
+    let appFormManager;
+    document.addEventListener('DOMContentLoaded', function () {
+        appFormManager = new ApplicationFormManager();
+    });
+</script>
     <script src="{{ asset('assets/js/jquery.js') }}"></script>
     <script src="{{ asset('assets/js/vendors.min.js') }}"></script>
     <script src="{{ asset('assets/js/main.js') }}"></script>

@@ -92,6 +92,15 @@ class TranslationService
                 'disability_explanation' => 'Please explain your disability or learning difficulty',
                 'disability_explanation_placeholder' => 'Please describe your disability',
 
+ // Disability Section - Updated
+    'disability_type' => 'Disability Type',
+    'select_disability_type' => 'Select Disability Type',
+    'blind' => 'Blind',
+    'physical' => 'Physical',
+    'deaf' => 'Deaf', 
+    'learning_disability' => 'Learning Disability',
+    'other' => 'Other',
+
                 // Identity Verification
                 'personal_identification' => 'Personal Identification Verification',
                 'identity_type' => 'Identity Type',
@@ -225,6 +234,15 @@ class TranslationService
                 'disability_question' => 'Ma haysaa naafoonimo ama dhibaatooyin waxbarasho aad jeclaan lahayd inaan ogaanno?',
                 'disability_explanation' => 'Fadlan sharax naafoonimadaada ama dhibaatooyinka waxbarashada',
                 'disability_explanation_placeholder' => 'Fadlan sharax naafoonimadaada',
+
+   // Disability Section - Updated (Somali)
+    'disability_type' => 'Nooca Naafada',
+    'select_disability_type' => 'Dooro Nooca Naafada',
+    'blind' => 'Indhoole',
+    'physical' => 'Jir',
+    'deaf' => 'Dhagool',
+    'learning_disability' => 'Naafo Barasho',
+    'other' => 'Kale',
 
                 // Identity Verification
                 'personal_identification' => 'Xaqiijinta Aqoonsiga Shakhsiga',
