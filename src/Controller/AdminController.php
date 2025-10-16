@@ -409,7 +409,7 @@ public function index(
         return $this->render('admin/emailTemps.html.twig', compact('applications'));
     }
 
-   #[Route('/accounts', name: 'app_admin_accounts')]
+   #[Route('/manage-users', name: 'app_admin_accounts')]
 public function accounts(
     Request $request,
     EntityManagerInterface $em,
