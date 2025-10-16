@@ -148,6 +148,8 @@ class AppCustomAuthenticator extends AbstractLoginFormAuthenticator
             return new RedirectResponse($this->urlGenerator->generate('app_employer'));
         } elseif (in_array('ROLE_SUPER_ADMIN', $user->getRoles(), true)) {
             return new RedirectResponse($this->urlGenerator->generate('app_admin'));
+        } elseif (in_array('ROLE_USER', $user->getRoles(), true)) {
+            return new RedirectResponse($this->urlGenerator->generate('app_admin'));
         } elseif (in_array('ROLE_JOBSEEKER', $user->getRoles(), true)) {
              $redirectUrl = $session->get('redirect_after_auth');
         

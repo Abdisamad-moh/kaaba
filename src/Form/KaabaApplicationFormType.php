@@ -321,17 +321,20 @@ class KaabaApplicationFormType extends AbstractType
                 'attr' => [
                     'class' => 'form-select'                ]
             ])
-            ->add('institute', EntityType::class, [
-                'class' => KaabaInstitute::class,
-                'choice_label' => 'name',
-                'label' => $this->translator->trans('institute'),
-                'required' => false,
-                'placeholder' => $this->translator->trans('institute'),
-                'choices' => $institutes, // Use filtered institutes
-                'attr' => [
-                    'class' => 'form-select'
-                ]
-            ])
+           ->add('institute', EntityType::class, [
+    'class' => KaabaInstitute::class,
+    'choice_label' => 'name',
+    'label' => $this->translator->trans('institute'),
+    'required' => true, // Changed from false to true
+    'placeholder' => $this->translator->trans('institute'),
+    'choices' => $institutes,
+    'attr' => [
+        'class' => 'form-select'
+    ],
+    'constraints' => [
+        new NotBlank(['message' => 'Institute selection is required.'])
+    ]
+])
             // ->add('secondary_region', EntityType::class, [
             //     'class' => KaabaRegion::class,
             //     'choice_label' => 'name',
@@ -351,15 +354,19 @@ class KaabaApplicationFormType extends AbstractType
             //         'class' => 'form-select'
             //     ]
             // ])
-            ->add('course', EntityType::class, [
-                'class' => KaabaCourse::class,
-                'choice_label' => 'name',
-                'label' => $this->translator->trans('course'),
-                'required' => false, // Changed to false
-                'attr' => [
-                    'class' => 'form-select'
-                ]
-            ])
+         ->add('course', EntityType::class, [
+    'class' => KaabaCourse::class,
+    'choice_label' => 'name',
+    'label' => $this->translator->trans('course'),
+    'required' => true, // Changed from false to true
+    'placeholder' => $this->translator->trans('course_placeholder'),
+    'attr' => [
+        'class' => 'form-select'
+    ],
+    'constraints' => [
+        new NotBlank(['message' => 'Course selection is required.'])
+    ]
+])
            ->add('literacy_level', ChoiceType::class, [
     'label' => $this->translator->trans('literacy_level'),
     'required' => false,

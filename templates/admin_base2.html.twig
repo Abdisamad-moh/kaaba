@@ -135,7 +135,7 @@
 							<!-- ---------------------------------- -->
 							<!-- Dashboard -->
 							<!-- ---------------------------------- -->
-								{% if is_granted('ROLE_SUPER_ADMIN') %}
+        {% if is_granted('ROLE_SUPER_ADMIN') or is_granted('ROLE_USER') %}
                                   
 									<li class="sidebar-item"> <a class="sidebar-link" href="{{path('app_admin')}}" id="get-url" aria-expanded="false">
 										<span>
@@ -153,14 +153,17 @@
 									</a>
 								</li>
 								
-								<li class="sidebar-item">
-									<a class="sidebar-link" href="#" aria-expanded="false">
-										<span>
-											<i class="ti ti-list"></i>
-										</span>
-										<span class="hide-menu">Reports</span>
-									</a>
-								</li>
+								  {# Hide Users Management for ROLE_USER #}
+            {% if is_granted('ROLE_SUPER_ADMIN') %}
+                <li class="sidebar-item">
+                    <a class="sidebar-link" href="{{path('app_admin_accounts')}}" aria-expanded="false">
+                        <span>
+                            <i class="ti ti-users"></i>
+                        </span>
+                        <span class="hide-menu">Users Management</span>
+                    </a>
+                </li>
+            {% endif %}
 								<li class="sidebar-item">
 									<a class="sidebar-link" href="{{path('app_employer_account_settings')}}" aria-expanded="false">
 										<span>
@@ -195,14 +198,7 @@
                         <span class="hide-menu">Courses</span>
                     </a>
                 </li>
-                <li class="sidebar-item">
-                    <a href="{{ path('app_admin_kaaba_qualifications') }}" class="sidebar-link">
-                        <div class="round-16 d-flex align-items-center justify-content-center">
-                            <i class="ti ti-certificate"></i>
-                        </div>
-                        <span class="hide-menu">Qualifications</span>
-                    </a>
-                </li>
+              
                 <li class="sidebar-item">
                     <a href="{{ path('app_admin_kaaba_institutes') }}" class="sidebar-link">
                         <div class="round-16 d-flex align-items-center justify-content-center">
@@ -214,53 +210,59 @@
             </ul>
         </li>
 
-        <!-- Kaaba Geographic Settings -->
-        <li class="sidebar-item">
-            <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
-                <div class="round-16 d-flex align-items-center justify-content-center">
-                    <i class="ti ti-map"></i>
-                </div>
-                <span class="hide-menu">Geographic</span>
-            </a>
-            <ul aria-expanded="false" class="collapse second-level">
-                <li class="sidebar-item">
-                    <a href="{{ path('app_admin_kaaba_regions') }}" class="sidebar-link">
-                        <div class="round-16 d-flex align-items-center justify-content-center">
-                            <i class="ti ti-map-pin"></i>
-                        </div>
-                        <span class="hide-menu">Regions</span>
-                    </a>
-                </li>
-                <li class="sidebar-item">
-                    <a href="{{ path('app_admin_kaaba_districts') }}" class="sidebar-link">
-                        <div class="round-16 d-flex align-items-center justify-content-center">
-                            <i class="ti ti-location"></i>
-                        </div>
-                        <span class="hide-menu">Districts</span>
-                    </a>
-                </li>
-            </ul>
-        </li>
+    <!-- Kaaba Geographic Settings - Hide for ROLE_USER -->
+                        {% if is_granted('ROLE_SUPER_ADMIN') %}
+                            <li class="sidebar-item">
+                                <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+                                    <div class="round-16 d-flex align-items-center justify-content-center">
+                                        <i class="ti ti-map"></i>
+                                    </div>
+                                    <span class="hide-menu">Geographic</span>
+                                </a>
+                                <ul aria-expanded="false" class="collapse second-level">
+                                    <li class="sidebar-item">
+                                        <a href="{{ path('app_admin_kaaba_regions') }}" class="sidebar-link">
+                                            <div class="round-16 d-flex align-items-center justify-content-center">
+                                                <i class="ti ti-map-pin"></i>
+                                            </div>
+                                            <span class="hide-menu">Regions</span>
+                                        </a>
+                                    </li>
+                                    <li class="sidebar-item">
+                                        <a href="{{ path('app_admin_kaaba_districts') }}" class="sidebar-link">
+                                            <div class="round-16 d-flex align-items-center justify-content-center">
+                                                <i class="ti ti-location"></i>
+                                            </div>
+                                            <span class="hide-menu">Districts</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        {% endif %}
 
-        <!-- Kaaba Scholarship Settings -->
-        <li class="sidebar-item">
-            <a href="{{ path('app_admin_kaaba_scholarships') }}" class="sidebar-link">
-                <div class="round-16 d-flex align-items-center justify-content-center">
-                    <i class="ti ti-award"></i>
-                </div>
-                <span class="hide-menu">Scholarships</span>
-            </a>
-        </li>
+                        <!-- Kaaba Scholarship Settings - Hide for ROLE_USER -->
+                        {% if is_granted('ROLE_SUPER_ADMIN') %}
+                            <li class="sidebar-item">
+                                <a href="{{ path('app_admin_kaaba_scholarships') }}" class="sidebar-link">
+                                    <div class="round-16 d-flex align-items-center justify-content-center">
+                                        <i class="ti ti-award"></i>
+                                    </div>
+                                    <span class="hide-menu">Scholarships</span>
+                                </a>
+                            </li>
+                        {% endif %}
 
-        <!-- Kaaba Identity Settings -->
-        <li class="sidebar-item">
-            <a href="{{ path('app_admin_kaaba_identity_types') }}" class="sidebar-link">
-                <div class="round-16 d-flex align-items-center justify-content-center">
-                    <i class="ti ti-id"></i>
-                </div>
-                <span class="hide-menu">Identity Types</span>
-            </a>
-        </li>
+                        <!-- Kaaba Identity Settings - Hide for ROLE_USER -->
+                        {% if is_granted('ROLE_SUPER_ADMIN') %}
+                            <li class="sidebar-item">
+                                <a href="{{ path('app_admin_kaaba_identity_types') }}" class="sidebar-link">
+                                    <div class="round-16 d-flex align-items-center justify-content-center">
+                                        <i class="ti ti-id"></i>
+                                    </div>
+                                    <span class="hide-menu">Identity Types</span>
+                                </a>
+                            </li>
+                        {% endif %}
                 
               </ul>
             </li>
@@ -440,11 +442,7 @@
 						<!-- Start Vertical Layout Header -->
 						<!-- ---------------------------------- -->
 							<nav class="navbar navbar-expand-lg p-0"> <ul class="navbar-nav">
-								<li class="nav-item nav-icon-hover-bg rounded-circle ms-n2">
-									<a class="nav-link sidebartoggler" id="headerCollapse" href="javascript:void(0)">
-										<i class="ti ti-menu-2"></i>
-									</a>
-								</li>
+								
 
 							</ul>
 

@@ -139,29 +139,32 @@ class AdminController extends AbstractController
     }
 
 
-    #[Route('/', name: 'app_admin')]
+#[Route('/', name: 'app_admin')]
 public function index(
     KaabaApplicationRepository $applicationRepository,
     ChartBuilderInterface $chartBuilder
 ): Response {
-    // Get statistics
-    $totalApplications = $applicationRepository->countTotalApplications();
-    $lastYearApplications = $applicationRepository->countLastYearApplications();
-    $pendingApplications = $applicationRepository->countApplicationsByStatus('Pending');
-     $appliedApplications = $applicationRepository->countApplicationsByStatus('applied');
-    $acceptedApplications = $applicationRepository->countApplicationsByStatus('accepted');
-    $rejectedApplications = $applicationRepository->countApplicationsByStatus('rejected');
-    $shortlistedApplications = $applicationRepository->countApplicationsByStatus('shortlisted');
-    // Get data for charts
-    $applicationsByRegion = $applicationRepository->countApplicationsByRegion();
-    $applicationsByDistrict = $applicationRepository->countApplicationsByDistrict();
-    $applicationsByGender = $applicationRepository->countApplicationsByGender();
-    $applicationsByInstitute = $applicationRepository->countApplicationsByInstitute();
-    $applicationsByScholarship = $applicationRepository->countApplicationsByScholarship();
-    $applicationsByMonth = $applicationRepository->countApplicationsByMonth();
+    // Get current user
+    $user = $this->getUser();
 
-    // Get recent applications
-    $recentApplications = $applicationRepository->findRecentApplications(5);
+    // Get statistics with user filtering
+    $totalApplications = $applicationRepository->countTotalApplications($user);
+    $lastYearApplications = $applicationRepository->countLastYearApplications($user);
+    $appliedApplications = $applicationRepository->countApplicationsByStatus('applied', $user);
+    $acceptedApplications = $applicationRepository->countApplicationsByStatus('accepted', $user);
+    $rejectedApplications = $applicationRepository->countApplicationsByStatus('rejected', $user);
+    $shortlistedApplications = $applicationRepository->countApplicationsByStatus('shortlisted', $user);
+
+    // Get data for charts with user filtering
+    $applicationsByRegion = $applicationRepository->countApplicationsByRegion($user);
+    $applicationsByDistrict = $applicationRepository->countApplicationsByDistrict($user);
+    $applicationsByGender = $applicationRepository->countApplicationsByGender($user);
+    $applicationsByInstitute = $applicationRepository->countApplicationsByInstitute($user);
+    $applicationsByScholarship = $applicationRepository->countApplicationsByScholarship($user);
+    $applicationsByMonth = $applicationRepository->countApplicationsByMonth($user);
+
+    // Get recent applications with user filtering
+    $recentApplications = $applicationRepository->findRecentApplications(5, $user);
 
     // Define colors for charts
     $backgroundColors = [
@@ -344,8 +347,8 @@ public function index(
     return $this->render('admin/index.html.twig', [
         'totalApplications' => $totalApplications,
         'lastYearApplications' => $lastYearApplications,
-         'appliedApplications' => $appliedApplications, // Changed from pendingApplications
-        'acceptedApplications' => $acceptedApplications, // Changed from approvedApplications
+        'appliedApplications' => $appliedApplications,
+        'acceptedApplications' => $acceptedApplications,
         'rejectedApplications' => $rejectedApplications,
         'shortlistedApplications' => $shortlistedApplications,
         'recentApplications' => $recentApplications,
@@ -354,6 +357,7 @@ public function index(
         'instituteChart' => $instituteChart,
         'monthlyChart' => $monthlyChart,
         'scholarshipChart' => $scholarshipChart,
+        'current_user' => $user, // Pass user to template if needed
     ]);
 }
     #[Route('/packages', name: 'app_admin_packages')]
@@ -405,110 +409,190 @@ public function index(
         return $this->render('admin/emailTemps.html.twig', compact('applications'));
     }
 
-    #[Route('/accounts', name: 'app_admin_accounts')]
-    public function accounts(
+   #[Route('/accounts', name: 'app_admin_accounts')]
+public function accounts(
+    Request $request,
+    EntityManagerInterface $em,
+    UserRepository $accounts,
+    PaginatorInterface $paginator,
+): Response {
+    $searchForm = $this->createFormBuilder(null)
+    ->add('email', EmailType::class, [
+        'required' => false,
+        'mapped' => false,
+        'attr' => [
+            'class' => 'form-control',
+            'col_class' => 'col-4',
+            'placeholder' => 'Filter By Email'
+        ],
+    ])
+    ->add('status', ChoiceType::class, [
+        'required' => false,
+        'mapped' => false,
+        'choices' => [
+            'Active' => true,
+            'Inactive' => false,
+        ],
+        'attr' => [
+            'class' => 'form-control required',
+            'col_class' => 'col-4',
+        ],
+        'placeholder' => 'Filter by status',
+    ])
+    ->add('verification', ChoiceType::class, [
+        'required' => false,
+        'mapped' => false,
+        'choices' => [
+            'Yes' => true,
+            'No' => false,
+        ],
+        'attr' => [
+            'class' => 'form-control required',
+            'col_class' => 'col-4',
+        ],
+        'placeholder' => 'Select Verification',
+    ])
+    ->getForm();
 
-        Request $request,
-        EntityManagerInterface $em,
-        UserRepository $accounts,
-        PaginatorInterface $paginator,
-    ): Response {
-        $searchForm = $this->createFormBuilder(null)
-            ->add('email', EmailType::class, [
-                'required' => false,
-                'mapped' => false,
-                'attr' => [
-                    'class' => 'form-control',
-                    'col_class' => 'col-3',
-                    'placeholder' => 'Filter By Email'
-                ],
-            ])
-            ->add('status', ChoiceType::class, [
-                'required' => false,
-                'mapped' => false,
-                'choices' => [
-                    'Active' => true,
-                    'Inactive' => false,
-                ],
-                'attr' => [
-                    'class' => 'form-control required',
-                    'col_class' => 'col-3',
-                ],
-                'placeholder' => 'Filter by status',
-            ])
-            ->add('type', ChoiceType::class, [
-                'required' => false,
-                'mapped' => false,
-                'choices' => [
-                    'Employer' => 'employer',
-                    'Job Seeker' => 'jobseeker',
-                ],
-                'attr' => [
-                    'class' => 'form-control required',
-                    'col_class' => 'col-3',
-                ],
-                'placeholder' => 'Select Account Type',
-            ])
-            ->add('verification', ChoiceType::class, [
-                'required' => false,
-                'mapped' => false,
-                'choices' => [
-                    'Yes' => true,
-                    'No' => false,
-                ],
-                'attr' => [
-                    'class' => 'form-control required',
-                    'col_class' => 'col-3',
-                ],
-                'placeholder' => 'Select Verification',
-            ])
-            ->getForm();
+    $searchForm->handleRequest($request);
+    if ($searchForm->isSubmitted() && $searchForm->isValid()) {
+        $status = $searchForm->get("status")->getData();
+        $email = $searchForm->get("email")->getData();
+        $is_verified = $searchForm->get("verification")->getData();
+        $datatable = $accounts->filterAccounts(
+            $status,
+            $email,
+            $is_verified
+        );
+        $count = count($datatable);
+        $accounts = $paginator->paginate(
+            $datatable,
+            $request->query->get('page', 1),
+            100
+        );
+    } else {
+        $datatable = $accounts->filterAccounts(
+            null,
+            null,
+            null,
+            null
+        );
 
-        $searchForm->handleRequest($request);
-        if ($searchForm->isSubmitted() && $searchForm->isValid()) {
-            $status = $searchForm->get("status")->getData();
-            $email = $searchForm->get("email")->getData();
-            $type = $searchForm->get("type")->getData();
-            $is_verified = $searchForm->get("verification")->getData();
-            $datatable = $accounts->filterAccounts(
-                $type,
-                $status,
-                $email,
-                $is_verified
-            );
-            // $total = $cashierCollectionRepository->search($student, $faculty, $department, $term, $semester, $year, 'total');
-            $count = count($datatable);
-            $accounts = $paginator->paginate(
-                $datatable,
-                $request->query->get('page', 1),
-                100
-            );
-        } else {
-            $datatable = $accounts->filterAccounts(
-                null,
-                null,
-                null,
-                null
-            );
-
-
-
-            // $total = $cashierCollectionRepository->search($student, $faculty, $department, $term, $semester, $year, 'total');
-            $count = count($datatable);
-            $accounts = $paginator->paginate(
-                $datatable,
-                $request->query->get('page', 1),
-                100
-            );
-        }
-
-        return $this->render('admin/accounts.html.twig', compact(
-            'accounts',
-            'searchForm',
-            'count'
-        ));
+        $count = count($datatable);
+        $accounts = $paginator->paginate(
+            $datatable,
+            $request->query->get('page', 1),
+            100
+        );
     }
 
+    return $this->render('admin/accounts.html.twig', compact(
+        'accounts',
+        'searchForm',
+        'count'
+    ));
+}
+
+
+
+#[Route('/user/create', name: 'app_admin_create_user')]
+public function createUser(
+    Request $request,
+    UserPasswordHasherInterface $userPasswordHasher,
+    EntityManagerInterface $entityManager,
+): Response {
+    $user = new User();
+    
+    $form = $this->createFormBuilder($user)
+        ->add('name', TextType::class, [
+            'required' => true,
+            'attr' => [
+                'class' => 'form-control'
+            ],
+            'label' => 'Full Name',
+            'constraints' => [
+                new NotBlank([
+                    'message' => 'Please provide a name',
+                ]),
+            ],
+        ])
+        ->add('email', EmailType::class, [
+            'required' => true,
+            'attr' => [
+                'class' => 'form-control'
+            ],
+            'label' => 'Email Address',
+            'constraints' => [
+                new NotBlank([
+                    'message' => 'Please enter an email address',
+                ]),
+                new Email([
+                    'message' => 'Please enter a valid email address',
+                ]),
+            ],
+        ])
+        ->add('status', CheckboxType::class, [
+            'required' => false,
+            'label' => 'Active Account',
+            'data' => true, // Default to active
+            'attr' => [
+                'class' => 'form-check-input'
+            ],
+        ])
+        ->add('plainPassword', PasswordType::class, [
+            'mapped' => false,
+            'constraints' => [
+                new NotBlank([
+                    'message' => 'Please enter a password',
+                ]),
+                new Length([
+                    'min' => 6,
+                    'minMessage' => 'Your password should be at least {{ limit }} characters',
+                    'max' => 4096,
+                ]),
+            ],
+            'attr' => [
+                'autocomplete' => 'new-password',
+                'class' => 'form-control'
+            ],
+            'label' => 'Password',
+        ])
+        ->add('confirmPassword', PasswordType::class, [
+            'mapped' => false,
+            'label' => 'Confirm Password',
+            'attr' => [
+                'class' => 'form-control'
+            ],
+        ])
+        ->getForm();
+
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+        // Set additional user properties
+        $user->setUsername($form->get('email')->getData());
+        $user->setRoles(["ROLE_USER"]); // Default role
+        $user->setType("user"); // Default type
+        $user->setVerified(true); // Auto-verify admin-created accounts
+        $user->setPassword(
+            $userPasswordHasher->hashPassword(
+                $user,
+                $form->get('plainPassword')->getData()
+            )
+        );
+
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'User created successfully!');
+        return $this->redirectToRoute('app_admin_accounts');
+    }
+
+    return $this->render('admin/add_account.html.twig', [
+        'form' => $form,
+        'type' => 'User',
+    ]);
+}
 
     #[Route('/jobs', name: 'app_admin_jobs')]
     public function jobs(
@@ -2677,6 +2761,7 @@ public function kaabaInstitutes(
     Request $request,
     KaabaInstituteRepository $kaabaInstituteRepository,
     KaabaScholarshipRepository $kaabaScholarshipRepository,
+    UserRepository $userRepository,
     EntityManagerInterface $em,
 ): Response {
     // Fetch all institutes for the table
@@ -2684,6 +2769,7 @@ public function kaabaInstitutes(
 
     // Fetch active scholarships for the dropdown
     $activeScholarships = $kaabaScholarshipRepository->findBy(['status' => true]);
+    $activeUsers = $userRepository->findBy(['status' => true]);
 
     // Check if editing or creating a new institute
     $editUuid = $request->query->get('edit');
@@ -2710,6 +2796,19 @@ public function kaabaInstitutes(
             ],
             'constraints' => [
                 new NotBlank(['message' => 'Please select a scholarship.'])
+            ]
+        ])
+        ->add('manager', EntityType::class, [
+            'class' => User::class,
+            'choice_label' => 'name',
+            'label' => 'Manager',
+            'placeholder' => 'Select a user',
+            'choices' => $activeUsers,
+            'attr' => [
+                'class' => 'form-select'
+            ],
+            'constraints' => [
+                new NotBlank(['message' => 'Please select a User.'])
             ]
         ])
         ->add('name', TextType::class, [
@@ -3204,6 +3303,9 @@ public function kaabaApplications(
     PaginatorInterface $paginator,
 ): Response {
 
+    // Get current user
+    $user = $this->getUser();
+
     // Fetch filter options
     $statuses = $statusRepository->findAll();
     $regions = $regionRepository->findAll();
@@ -3212,7 +3314,7 @@ public function kaabaApplications(
     $genders = $genderRepository->findAll();
     $scholarships = $scholarshipRepository->findAll();
 
-  $searchForm = $this->createFormBuilder(null)
+    $searchForm = $this->createFormBuilder(null)
         ->add('status', EntityType::class, [
             'class' => KaabaApplicationStatus::class,
             'choice_label' => 'name',
@@ -3341,7 +3443,8 @@ public function kaabaApplications(
             $district,
             $qualification,
             $gender,
-            $scholarship
+            $scholarship,
+            $user // Pass current user
         );
 
         $count = count($datatable);
@@ -3351,7 +3454,10 @@ public function kaabaApplications(
             20
         );
     } else {
-        $datatable = $applicationsRepository->filterApplications();
+        $datatable = $applicationsRepository->filterApplications(
+            null, null, null, null, null, null, null, null, null,
+            $user // Pass current user
+        );
         $count = count($datatable);
         $applications = $paginator->paginate(
             $datatable,
@@ -3364,9 +3470,9 @@ public function kaabaApplications(
         'applications' => $applications,
         'searchForm' => $searchForm->createView(),
         'total_count' => $count,
+        'current_user' => $user, // Pass user to template if needed
     ]);
 }
-
 
 #[Route('/logs/{uuid}', name: 'app_admin_kaaba_application_logs', methods: ['GET', 'POST'])]
 public function viewLogs(

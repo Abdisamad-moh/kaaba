@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\User;
 use App\Entity\KaabaGender;
 use App\Entity\KaabaRegion;
 use App\Entity\KaabaDistrict;
@@ -31,7 +32,8 @@ public function filterApplications(
         ?KaabaDistrict $district = null,
         ?KaabaQualification $qualification = null,
         ?KaabaGender $gender = null,
-        ?KaabaScholarship $scholarship = null
+        ?KaabaScholarship $scholarship = null,
+ ?User $user = null
     ): array {
         $qb = $this->createQueryBuilder('a')
             ->leftJoin('a.status', 's')
@@ -40,7 +42,16 @@ public function filterApplications(
             ->leftJoin('a.highest_qualification', 'q')
             ->leftJoin('a.gender', 'g')
             ->leftJoin('a.scholarship', 'sch')
+  ->leftJoin('a.institute', 'i')
             ->orderBy('a.created_at', 'DESC');
+
+
+
+    // Add user-specific filtering for ROLE_USER
+    if ($user && in_array('ROLE_USER', $user->getRoles()) && !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+        $qb->andWhere('i.manager = :user')
+           ->setParameter('user', $user);
+    }
 
         if ($status) {
             $qb->andWhere('a.status = :status')
@@ -91,147 +102,215 @@ public function filterApplications(
     }
 
 
-    // Count applications by status
-    public function countApplicationsByStatus(string $status): int
+   // Count applications by status
+    public function countApplicationsByStatus(string $status, ?User $user = null): int
     {
-        return $this->createQueryBuilder('a')
+        $qb = $this->createQueryBuilder('a')
             ->select('COUNT(a.id)')
             ->join('a.status', 's')
             ->where('s.name = :status')
-            ->setParameter('status', $status)
-            ->getQuery()
-            ->getSingleScalarResult();
+            ->setParameter('status', $status);
+
+        // Add user-specific filtering for ROLE_USER
+        if ($user && in_array('ROLE_USER', $user->getRoles()) && !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+            $qb->join('a.institute', 'i')
+               ->andWhere('i.manager = :user')
+               ->setParameter('user', $user);
+        }
+
+        return $qb->getQuery()->getSingleScalarResult();
     }
 
     // Count total applications
-    public function countTotalApplications(): int
+    public function countTotalApplications(?User $user = null): int
     {
-        return $this->createQueryBuilder('a')
-            ->select('COUNT(a.id)')
-            ->getQuery()
-            ->getSingleScalarResult();
+        $qb = $this->createQueryBuilder('a')
+            ->select('COUNT(a.id)');
+
+        // Add user-specific filtering for ROLE_USER
+        if ($user && in_array('ROLE_USER', $user->getRoles()) && !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+            $qb->join('a.institute', 'i')
+               ->andWhere('i.manager = :user')
+               ->setParameter('user', $user);
+        }
+
+        return $qb->getQuery()->getSingleScalarResult();
     }
 
     // Count applications from last year
-    public function countLastYearApplications(): int
+    public function countLastYearApplications(?User $user = null): int
     {
         $lastYear = new \DateTime('first day of January last year');
         $endOfLastYear = new \DateTime('last day of December last year');
 
-        return $this->createQueryBuilder('a')
+        $qb = $this->createQueryBuilder('a')
             ->select('COUNT(a.id)')
             ->where('a.application_date BETWEEN :start AND :end')
             ->setParameter('start', $lastYear)
-            ->setParameter('end', $endOfLastYear)
-            ->getQuery()
-            ->getSingleScalarResult();
+            ->setParameter('end', $endOfLastYear);
+
+        // Add user-specific filtering for ROLE_USER
+        if ($user && in_array('ROLE_USER', $user->getRoles()) && !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+            $qb->join('a.institute', 'i')
+               ->andWhere('i.manager = :user')
+               ->setParameter('user', $user);
+        }
+
+        return $qb->getQuery()->getSingleScalarResult();
     }
 
     // Count applications by region
-    public function countApplicationsByRegion(): array
+    public function countApplicationsByRegion(?User $user = null): array
     {
-        return $this->createQueryBuilder('a')
+        $qb = $this->createQueryBuilder('a')
             ->select('r.name as region_name, COUNT(a.id) as application_count')
             ->join('a.region', 'r')
             ->groupBy('r.id')
-            ->orderBy('application_count', 'DESC')
-            ->getQuery()
-            ->getResult();
+            ->orderBy('application_count', 'DESC');
+
+        // Add user-specific filtering for ROLE_USER
+        if ($user && in_array('ROLE_USER', $user->getRoles()) && !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+            $qb->join('a.institute', 'i')
+               ->andWhere('i.manager = :user')
+               ->setParameter('user', $user);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     // Count applications by district
-    public function countApplicationsByDistrict(): array
+    public function countApplicationsByDistrict(?User $user = null): array
     {
-        return $this->createQueryBuilder('a')
+        $qb = $this->createQueryBuilder('a')
             ->select('d.name as district_name, COUNT(a.id) as application_count')
             ->join('a.district', 'd')
             ->groupBy('d.id')
-            ->orderBy('application_count', 'DESC')
-            ->getQuery()
-            ->getResult();
+            ->orderBy('application_count', 'DESC');
+
+        // Add user-specific filtering for ROLE_USER
+        if ($user && in_array('ROLE_USER', $user->getRoles()) && !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+            $qb->join('a.institute', 'i')
+               ->andWhere('i.manager = :user')
+               ->setParameter('user', $user);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     // Count applications by gender
-    public function countApplicationsByGender(): array
+    public function countApplicationsByGender(?User $user = null): array
     {
-        return $this->createQueryBuilder('a')
+        $qb = $this->createQueryBuilder('a')
             ->select('g.name as gender_name, COUNT(a.id) as application_count')
             ->join('a.gender', 'g')
-            ->groupBy('g.id')
-            ->getQuery()
-            ->getResult();
+            ->groupBy('g.id');
+
+        // Add user-specific filtering for ROLE_USER
+        if ($user && in_array('ROLE_USER', $user->getRoles()) && !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+            $qb->join('a.institute', 'i')
+               ->andWhere('i.manager = :user')
+               ->setParameter('user', $user);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     // Count applications by institute
-    public function countApplicationsByInstitute(): array
+    public function countApplicationsByInstitute(?User $user = null): array
     {
-        return $this->createQueryBuilder('a')
+        $qb = $this->createQueryBuilder('a')
             ->select('i.name as institute_name, COUNT(a.id) as application_count')
             ->join('a.institute', 'i')
             ->groupBy('i.id')
-            ->orderBy('application_count', 'DESC')
-            ->getQuery()
-            ->getResult();
+            ->orderBy('application_count', 'DESC');
+
+        // Add user-specific filtering for ROLE_USER - show only their institutes
+        if ($user && in_array('ROLE_USER', $user->getRoles()) && !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+            $qb->andWhere('i.manager = :user')
+               ->setParameter('user', $user);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     // Count applications by scholarship
-    public function countApplicationsByScholarship(): array
+    public function countApplicationsByScholarship(?User $user = null): array
     {
-        return $this->createQueryBuilder('a')
+        $qb = $this->createQueryBuilder('a')
             ->select('s.title as scholarship_title, COUNT(a.id) as application_count')
             ->join('a.scholarship', 's')
             ->groupBy('s.id')
-            ->orderBy('application_count', 'DESC')
-            ->getQuery()
-            ->getResult();
+            ->orderBy('application_count', 'DESC');
+
+        // Add user-specific filtering for ROLE_USER
+        if ($user && in_array('ROLE_USER', $user->getRoles()) && !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+            $qb->join('a.institute', 'i')
+               ->andWhere('i.manager = :user')
+               ->setParameter('user', $user);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     // Count applications by month for current year
-   // Count applications by month for current year
-public function countApplicationsByMonth(): array
-{
-    $currentYear = (new \DateTime())->format('Y');
-    $startDate = new \DateTime("$currentYear-01-01");
-    $endDate = new \DateTime("$currentYear-12-31");
+    public function countApplicationsByMonth(?User $user = null): array
+    {
+        $currentYear = (new \DateTime())->format('Y');
+        $startDate = new \DateTime("$currentYear-01-01");
+        $endDate = new \DateTime("$currentYear-12-31");
 
-    $applications = $this->createQueryBuilder('a')
-        ->select('a.application_date')
-        ->where('a.application_date BETWEEN :start AND :end')
-        ->setParameter('start', $startDate)
-        ->setParameter('end', $endDate)
-        ->getQuery()
-        ->getResult();
+        $qb = $this->createQueryBuilder('a')
+            ->select('a.application_date')
+            ->where('a.application_date BETWEEN :start AND :end')
+            ->setParameter('start', $startDate)
+            ->setParameter('end', $endDate);
 
-    // Process in PHP
-    $monthlyCounts = array_fill(1, 12, 0);
-    
-    foreach ($applications as $application) {
-        $month = (int)$application['application_date']->format('n'); // 1-12
-        $monthlyCounts[$month]++;
+        // Add user-specific filtering for ROLE_USER
+        if ($user && in_array('ROLE_USER', $user->getRoles()) && !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+            $qb->join('a.institute', 'i')
+               ->andWhere('i.manager = :user')
+               ->setParameter('user', $user);
+        }
+
+        $applications = $qb->getQuery()->getResult();
+
+        // Process in PHP
+        $monthlyCounts = array_fill(1, 12, 0);
+        
+        foreach ($applications as $application) {
+            $month = (int)$application['application_date']->format('n'); // 1-12
+            $monthlyCounts[$month]++;
+        }
+
+        $result = [];
+        foreach ($monthlyCounts as $month => $count) {
+            $result[] = [
+                'month' => $month,
+                'application_count' => $count
+            ];
+        }
+
+        return $result;
     }
-
-    $result = [];
-    foreach ($monthlyCounts as $month => $count) {
-        $result[] = [
-            'month' => $month,
-            'application_count' => $count
-        ];
-    }
-
-    return $result;
-}
 
     // Get recent applications
-    public function findRecentApplications(int $limit = 5): array
+    public function findRecentApplications(int $limit = 5, ?User $user = null): array
     {
-        return $this->createQueryBuilder('a')
+        $qb = $this->createQueryBuilder('a')
             ->select('a', 's', 'r', 'sch')
             ->leftJoin('a.status', 's')
             ->leftJoin('a.region', 'r')
             ->leftJoin('a.scholarship', 'sch')
             ->orderBy('a.created_at', 'DESC')
-            ->setMaxResults($limit)
-            ->getQuery()
-            ->getResult();
+            ->setMaxResults($limit);
+
+        // Add user-specific filtering for ROLE_USER
+        if ($user && in_array('ROLE_USER', $user->getRoles()) && !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+            $qb->join('a.institute', 'i')
+               ->andWhere('i.manager = :user')
+               ->setParameter('user', $user);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 }

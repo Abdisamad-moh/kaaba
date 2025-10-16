@@ -51,11 +51,11 @@ security:
     access_control:
     - { path: ^/home, roles: PUBLIC_ACCESS }
     - { path: ^/auth, roles: PUBLIC_ACCESS }
-    - { path: ^/admin, roles: ROLE_SUPER_ADMIN }
+    - { path: ^/admin, roles: [ROLE_USER, ROLE_SUPER_ADMIN] }
 
     # Employer access control
     - { path: ^/employer/profile-image, roles: PUBLIC_ACCESS }
-    - { path: ^/employer, roles: [ROLE_EMPLOYER, ROLE_SUPER_ADMIN] }
+    - { path: ^/employer, roles: [ROLE_USER, ROLE_SUPER_ADMIN] }
 
     # Jobseeker access control
     - { path: ^/jobseeker/pricing, roles: PUBLIC_ACCESS }

@@ -327,6 +327,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: EmployerStaff::class, mappedBy: 'employer')]
     private Collection $employerStaff;
 
+    /**
+     * @var Collection<int, KaabaInstitute>
+     */
+    #[ORM\OneToMany(targetEntity: KaabaInstitute::class, mappedBy: 'manager')]
+    private Collection $kaabaInstitutes;
+
     public function __construct()
     {
         $this->employerJobs = new ArrayCollection();
@@ -367,6 +373,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->downloadables = new ArrayCollection();
         $this->metierAds = new ArrayCollection();
         $this->employerStaff = new ArrayCollection();
+        $this->kaabaInstitutes = new ArrayCollection();
     }
 
     public function getActiveSubscription(): ?MetierOrder
@@ -1879,6 +1886,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($employerStaff->getEmployer() === $this) {
                 $employerStaff->setEmployer(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, KaabaInstitute>
+     */
+    public function getKaabaInstitutes(): Collection
+    {
+        return $this->kaabaInstitutes;
+    }
+
+    public function addKaabaInstitute(KaabaInstitute $kaabaInstitute): static
+    {
+        if (!$this->kaabaInstitutes->contains($kaabaInstitute)) {
+            $this->kaabaInstitutes->add($kaabaInstitute);
+            $kaabaInstitute->setManager($this);
+        }
+
+        return $this;
+    }
+
+    public function removeKaabaInstitute(KaabaInstitute $kaabaInstitute): static
+    {
+        if ($this->kaabaInstitutes->removeElement($kaabaInstitute)) {
+            // set the owning side to null (unless already changed)
+            if ($kaabaInstitute->getManager() === $this) {
+                $kaabaInstitute->setManager(null);
             }
         }
 

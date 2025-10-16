@@ -253,6 +253,35 @@
             white-space: nowrap;
             z-index: 1000;
         }
+
+/* Validation States */
+.is-valid {
+    border-color: #198754 !important;
+}
+
+.is-invalid {
+    border-color: #dc3545 !important;
+}
+
+.field-error-message {
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+/* Institute and Course specific styling */
+.form-select.is-invalid {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath d='m5.8 3.6.4.4.4-.4'/%3e%3cpath d='M6 7v1'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+.form-select.is-valid {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
     </style>
 </head>
 
@@ -973,81 +1002,139 @@
         }
 
         // Validation Management
-        setupRealTimeValidation() {
-            const requiredFields = [
-                '{{ form.full_name.vars.id }}',
-                '{{ form.phone.vars.id }}',
-                '{{ form.gender.vars.id }}',
-                '{{ form.nationality.vars.id }}',
-                '{{ form.date_of_birth.vars.id }}',
-                '{{ form.region.vars.id }}',
-                '{{ form.disability.vars.id }}',
-            ];
+     setupRealTimeValidation() {
+    const requiredFields = [
+        '{{ form.full_name.vars.id }}',
+        '{{ form.phone.vars.id }}',
+        '{{ form.gender.vars.id }}',
+        '{{ form.nationality.vars.id }}',
+        '{{ form.date_of_birth.vars.id }}',
+        '{{ form.region.vars.id }}',
+        '{{ form.disability.vars.id }}',
+    ];
 
-            requiredFields.forEach(fieldId => {
-                const field = document.getElementById(fieldId);
-                if (field) {
-                    ['blur', 'change', 'input'].forEach(event => {
-                        field.addEventListener(event, () => this.validateStep1());
-                    });
-                }
-            });
+    // Add institute and course if scholarship type is not 'l'
+    {% if type != 'l' %}
+    requiredFields.push('{{ form.institute.vars.id }}');
+    requiredFields.push('{{ form.course.vars.id }}');
+    {% endif %}
 
-            const fileLists = document.querySelectorAll('.file-list');
-            fileLists.forEach(list => {
-                const observer = new MutationObserver(() => this.validateStep1());
-                observer.observe(list, { childList: true });
+    requiredFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            ['blur', 'change', 'input'].forEach(event => {
+                field.addEventListener(event, () => this.validateStep1());
             });
         }
+    });
 
-        validateStep1() {
-            const requiredFields = {
-                '{{ form.full_name.vars.id }}': 'Full name is required',
-                '{{ form.gender.vars.id }}': 'Gender is required',
-                '{{ form.phone.vars.id }}': 'Phone number is required',
-                '{{ form.nationality.vars.id }}': 'Nationality is required',
-                '{{ form.date_of_birth.vars.id }}': 'Date of birth is required',
-                '{{ form.region.vars.id }}': 'Region is required',
-                '{{ form.disability.vars.id }}': 'Disability information is required'
-            };
+    // Also validate when institute changes to update course validation
+    const instituteSelect = document.getElementById('{{ form.institute.vars.id }}');
+    if (instituteSelect) {
+        instituteSelect.addEventListener('change', () => {
+            setTimeout(() => this.validateStep1(), 100);
+        });
+    }
 
-            let isValid = true;
-            this.clearValidationErrors();
+    const fileLists = document.querySelectorAll('.file-list');
+    fileLists.forEach(list => {
+        const observer = new MutationObserver(() => this.validateStep1());
+        observer.observe(list, { childList: true });
+    });
+}
 
-            // Validate basic fields
-            for (const [fieldId, message] of Object.entries(requiredFields)) {
-                const field = document.getElementById(fieldId);
-                if (field && !field.value.trim()) {
-                    isValid = false;
-                }
-            }
+      validateStep1() {
+    const requiredFields = {
+        '{{ form.full_name.vars.id }}': 'Full name is required',
+        '{{ form.gender.vars.id }}': 'Gender is required',
+        '{{ form.phone.vars.id }}': 'Phone number is required',
+        '{{ form.nationality.vars.id }}': 'Nationality is required',
+        '{{ form.date_of_birth.vars.id }}': 'Date of birth is required',
+        '{{ form.region.vars.id }}': 'Region is required',
+        '{{ form.disability.vars.id }}': 'Disability information is required'
+    };
 
-            // Validate disability type if disability is "Yes"
-            const disabilityField = document.getElementById('{{ form.disability.vars.id }}');
-            const disabilityTypeField = document.getElementById('{{ form.disability_type.vars.id }}');
-            const disabilityTypeSection = document.getElementById('disabilityTypeSection');
-            
-            if (disabilityField && disabilityField.value === 'Yes' && disabilityTypeSection && disabilityTypeSection.style.display !== 'none') {
-                if (!disabilityTypeField || !disabilityTypeField.value.trim()) {
-                    isValid = false;
-                }
-            }
+    // Add institute and course fields if scholarship type is not 'l'
+    {% if type != 'l' %}
+    requiredFields['{{ form.institute.vars.id }}'] = 'Institute selection is required';
+    requiredFields['{{ form.course.vars.id }}'] = 'Course selection is required';
+    {% endif %}
 
-            // Validate identity attachment
-            const identityArea = document.querySelector('[data-field-name="identity_attachment"]');
-            const hasIdentityFiles = identityArea &&
-                identityArea.querySelector('.file-list') &&
-                identityArea.querySelector('.file-list').children.length > 0;
+    let isValid = true;
+    this.clearValidationErrors();
 
-            if (!hasIdentityFiles) {
-                isValid = false;
-            }
-
-            this.updateNextStepButton(isValid);
-            this.updateTabAccessibility(isValid);
-
-            return isValid;
+    // Validate basic fields
+    for (const [fieldId, message] of Object.entries(requiredFields)) {
+        const field = document.getElementById(fieldId);
+        if (field && !field.value.trim()) {
+            isValid = false;
+            this.markFieldAsInvalid(field, message);
+        } else if (field) {
+            this.markFieldAsValid(field);
         }
+    }
+
+    // Validate disability type if disability is "Yes"
+    const disabilityField = document.getElementById('{{ form.disability.vars.id }}');
+    const disabilityTypeField = document.getElementById('{{ form.disability_type.vars.id }}');
+    const disabilityTypeSection = document.getElementById('disabilityTypeSection');
+    
+    if (disabilityField && disabilityField.value === 'Yes' && disabilityTypeSection && disabilityTypeSection.style.display !== 'none') {
+        if (!disabilityTypeField || !disabilityTypeField.value.trim()) {
+            isValid = false;
+            this.markFieldAsInvalid(disabilityTypeField, 'Disability type is required when disability is "Yes"');
+        } else {
+            this.markFieldAsValid(disabilityTypeField);
+        }
+    }
+
+    // Validate identity attachment
+    const identityArea = document.querySelector('[data-field-name="identity_attachment"]');
+    const hasIdentityFiles = identityArea &&
+        identityArea.querySelector('.file-list') &&
+        identityArea.querySelector('.file-list').children.length > 0;
+
+    if (!hasIdentityFiles) {
+        isValid = false;
+        identityArea.classList.add('file-area-error');
+    } else {
+        identityArea.classList.remove('file-area-error');
+    }
+
+    this.updateNextStepButton(isValid);
+    this.updateTabAccessibility(isValid);
+
+    return isValid;
+}
+
+// Add these helper methods to the ApplicationFormManager class
+markFieldAsInvalid(field, message) {
+    field.classList.add('is-invalid');
+    field.classList.remove('is-valid');
+    
+    // Remove existing error message
+    const existingError = field.parentNode.querySelector('.field-error-message');
+    if (existingError) {
+        existingError.remove();
+    }
+    
+    // Add new error message
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'field-error-message invalid-feedback';
+    errorDiv.textContent = message;
+    field.parentNode.appendChild(errorDiv);
+}
+
+markFieldAsValid(field) {
+    field.classList.remove('is-invalid');
+    field.classList.add('is-valid');
+    
+    // Remove error message
+    const existingError = field.parentNode.querySelector('.field-error-message');
+    if (existingError) {
+        existingError.remove();
+    }
+}
 
         validateStep1WithFeedback() {
             if (!this.validateStep1()) {
@@ -1356,59 +1443,63 @@
                 });
         }
 
-        loadCourses(instituteId) {
-            {% if type != 'l' %}
-            const courseSelect = document.getElementById('{{ form.course.vars.id }}');
+     loadCourses(instituteId) {
+    {% if type != 'l' %}
+    const courseSelect = document.getElementById('{{ form.course.vars.id }}');
 
-            if (!courseSelect) return;
+    if (!courseSelect) return;
 
-            if (!instituteId) {
-                this.resetCourseSelect();
-                return;
-            }
+    if (!instituteId) {
+        this.resetCourseSelect();
+        this.validateStep1(); // Trigger validation
+        return;
+    }
 
-            courseSelect.innerHTML = '<option value="">Loading courses...</option>';
-            courseSelect.disabled = true;
+    courseSelect.innerHTML = '<option value="">Loading courses...</option>';
+    courseSelect.disabled = true;
 
-            const currentPath = window.location.pathname;
-            const apiUrl = `${currentPath}?action=get_courses&institute_id=${instituteId}`;
+    const currentPath = window.location.pathname;
+    const apiUrl = `${currentPath}?action=get_courses&institute_id=${instituteId}`;
 
-            fetch(apiUrl, {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json'
-                }
-            })
-                .then(response => {
-                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                    return response.json();
-                })
-                .then(courses => {
-                    if (!courseSelect) return;
-                    const selectCourseText = "{{ trans.trans('course_placeholder')|e('js') }}";
-                    courseSelect.innerHTML = `<option value="">${selectCourseText}</option>`;
-                    courseSelect.disabled = false;
-
-                    if (courses && courses.length > 0) {
-                        courses.forEach(course => {
-                            const option = document.createElement('option');
-                            option.value = course.id;
-                            option.textContent = course.name;
-                            courseSelect.appendChild(option);
-                        });
-                    } else {
-                        courseSelect.innerHTML = '<option value="">No courses available</option>';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error loading courses:', error);
-                    if (courseSelect) {
-                        courseSelect.innerHTML = '<option value="">Error loading courses</option>';
-                        courseSelect.disabled = false;
-                    }
-                });
-            {% endif %}
+    fetch(apiUrl, {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
         }
+    })
+        .then(response => {
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            return response.json();
+        })
+        .then(courses => {
+            if (!courseSelect) return;
+            const selectCourseText = "{{ trans.trans('course_placeholder')|e('js') }}";
+            courseSelect.innerHTML = `<option value="">${selectCourseText}</option>`;
+            courseSelect.disabled = false;
+
+            if (courses && courses.length > 0) {
+                courses.forEach(course => {
+                    const option = document.createElement('option');
+                    option.value = course.id;
+                    option.textContent = course.name;
+                    courseSelect.appendChild(option);
+                });
+            } else {
+                courseSelect.innerHTML = '<option value="">No courses available</option>';
+            }
+            
+            this.validateStep1(); // Trigger validation after courses are loaded
+        })
+        .catch(error => {
+            console.error('Error loading courses:', error);
+            if (courseSelect) {
+                courseSelect.innerHTML = '<option value="">Error loading courses</option>';
+                courseSelect.disabled = false;
+            }
+            this.validateStep1(); // Trigger validation even on error
+        });
+    {% endif %}
+}
 
         resetCourseSelect() {
             {% if type != 'l' %}

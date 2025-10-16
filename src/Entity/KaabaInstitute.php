@@ -37,8 +37,11 @@ class KaabaInstitute
 
 
  #[ORM\ManyToOne(inversedBy: 'institutes')]
-    #[ORM\JoinColumn(nullable: true)] // Institute MUST belong to a scholarship
-    private ?KaabaScholarship $scholarship = null;
+             #[ORM\JoinColumn(nullable: true)] // Institute MUST belong to a scholarship
+             private ?KaabaScholarship $scholarship = null;
+
+    #[ORM\ManyToOne(inversedBy: 'kaabaInstitutes')]
+    private ?User $manager = null;
 
 
     public function __construct()
@@ -145,6 +148,18 @@ class KaabaInstitute
     public function setScholarship(?KaabaScholarship $scholarship): static
     {
         $this->scholarship = $scholarship;
+
+        return $this;
+    }
+
+    public function getManager(): ?User
+    {
+        return $this->manager;
+    }
+
+    public function setManager(?User $manager): static
+    {
+        $this->manager = $manager;
 
         return $this;
     }
