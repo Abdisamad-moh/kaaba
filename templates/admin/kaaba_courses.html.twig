@@ -19,10 +19,17 @@
                     </nav>
                 </div>
                 <div class="col-3">
-                    <a href="{{ path('app_admin_kaaba_courses', { create: 1 }) }}" class="btn btn-primary float-end">
-                        <i class="ti ti-plus me-2"></i>
-                        Add New Course
-                    </a>
+                    {% if not app.user.status %}
+                        <button class="btn btn-danger text-white float-end" title="User Disabled - Cannot Add Courses" disabled>
+                            <i class="ti ti-plus me-2"></i>
+                            User Disabled - Cannot Add Courses
+                        </button>
+                    {% else %}
+                        <a href="{{ path('app_admin_kaaba_courses', { create: 1 }) }}" class="btn btn-primary float-end">
+                            <i class="ti ti-plus me-2"></i>
+                            Add New Course
+                        </a>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -179,29 +186,33 @@
         {{ applicationsCount }} application(s)
     </span>
 </td>
-                                <td>
-                                    <div class="btn-group btn-group-sm" role="group">
-                                        <a href="{{ path('app_admin_kaaba_courses', { edit: course.uuid }) }}" 
-                                           class="btn btn-warning" 
-                                           title="Edit course">
-                                            <i class="ti ti-edit me-1"></i> Edit
-                                        </a>
-                                 {% if course.kaabaApplications|length == 0 %}
-    <a href="{{ path('app_admin_kaaba_courses', { delete: course.uuid }) }}" 
-       class="btn btn-danger" 
-       onclick="return confirm('Are you sure you want to delete \"{{ course.name }}\"? This action cannot be undone.')"
-       title="Delete course">
-        <i class="ti ti-trash me-1"></i> Delete
-    </a>
-{% else %}
-    <button class="btn btn-secondary" 
-            title="Cannot delete - this course has {{ course.kaabaApplications|length }} application(s). Reassign or delete those applications first."
-            data-bs-toggle="tooltip"
-            disabled>
-        <i class="ti ti-trash-off me-1"></i> Delete
-    </button>
-{% endif %}
-                                    </div>
+                                <td class="text-center">
+                                    {% if not app.user.status %}
+                                        <span class="text-muted small">User Disabled</span>
+                                    {% else %}
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            <a href="{{ path('app_admin_kaaba_courses', { edit: course.uuid }) }}" 
+                                               class="btn btn-warning" 
+                                               title="Edit course">
+                                                <i class="ti ti-edit me-1"></i> Edit
+                                            </a>
+                                            {% if course.kaabaApplications|length == 0 %}
+                                                <a href="{{ path('app_admin_kaaba_courses', { delete: course.uuid }) }}" 
+                                                   class="btn btn-danger" 
+                                                   onclick="return confirm('Are you sure you want to delete \"{{ course.name }}\"? This action cannot be undone.')"
+                                                   title="Delete course">
+                                                    <i class="ti ti-trash me-1"></i> Delete
+                                                </a>
+                                            {% else %}
+                                                <button class="btn btn-secondary" 
+                                                        title="Cannot delete - this course has {{ course.kaabaApplications|length }} application(s). Reassign or delete those applications first."
+                                                        data-bs-toggle="tooltip"
+                                                        disabled>
+                                                    <i class="ti ti-trash-off me-1"></i> Delete
+                                                </button>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
                                 </td>
                             </tr>
                         {% endfor %}
@@ -215,9 +226,13 @@
                 </div>
                 <h5 class="alert-heading">No Courses Found</h5>
                 <p class="mb-3">Get started by creating your first academic course.</p>
-                <a href="{{ path('app_admin_kaaba_courses', { create: 1 }) }}" class="btn btn-primary">
-                    <i class="ti ti-plus me-2"></i>Create First Course
-                </a>
+                {% if app.user.status %}
+                    <a href="{{ path('app_admin_kaaba_courses', { create: 1 }) }}" class="btn btn-primary">
+                        <i class="ti ti-plus me-2"></i>Create First Course
+                    </a>
+                {% else %}
+                    <button class="btn btn-secondary" disabled>User Disabled - Cannot Add Courses</button>
+                {% endif %}
             </div>
             {% endif %}
         </div>

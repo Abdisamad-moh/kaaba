@@ -1043,7 +1043,7 @@
     });
 }
 
-      validateStep1() {
+  validateStep1() {
     const requiredFields = {
         '{{ form.full_name.vars.id }}': 'Full name is required',
         '{{ form.gender.vars.id }}': 'Gender is required',
@@ -1084,8 +1084,12 @@
             isValid = false;
             this.markFieldAsInvalid(disabilityTypeField, 'Disability type is required when disability is "Yes"');
         } else {
+            // This is the key fix - mark as valid when a disability type is selected
             this.markFieldAsValid(disabilityTypeField);
         }
+    } else if (disabilityTypeField) {
+        // If disability is not "Yes", ensure the field is marked as valid (not showing errors)
+        this.markFieldAsValid(disabilityTypeField);
     }
 
     // Validate identity attachment
@@ -1107,8 +1111,60 @@
     return isValid;
 }
 
-// Add these helper methods to the ApplicationFormManager class
+// Add event listener for disability type field changes
+setupRealTimeValidation() {
+    const requiredFields = [
+        '{{ form.full_name.vars.id }}',
+        '{{ form.phone.vars.id }}',
+        '{{ form.gender.vars.id }}',
+        '{{ form.nationality.vars.id }}',
+        '{{ form.date_of_birth.vars.id }}',
+        '{{ form.region.vars.id }}',
+        '{{ form.disability.vars.id }}',
+    ];
+
+    // Add institute and course if scholarship type is not 'l'
+    {% if type != 'l' %}
+    requiredFields.push('{{ form.institute.vars.id }}');
+    requiredFields.push('{{ form.course.vars.id }}');
+    {% endif %}
+
+    requiredFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            ['blur', 'change', 'input'].forEach(event => {
+                field.addEventListener(event, () => this.validateStep1());
+            });
+        }
+    });
+
+    // Add event listener for disability type field
+    const disabilityTypeField = document.getElementById('{{ form.disability_type.vars.id }}');
+    if (disabilityTypeField) {
+        ['blur', 'change'].forEach(event => {
+            disabilityTypeField.addEventListener(event, () => this.validateStep1());
+        });
+    }
+
+    // Also validate when institute changes to update course validation
+    const instituteSelect = document.getElementById('{{ form.institute.vars.id }}');
+    if (instituteSelect) {
+        instituteSelect.addEventListener('change', () => {
+            setTimeout(() => this.validateStep1(), 100);
+        });
+    }
+
+    const fileLists = document.querySelectorAll('.file-list');
+    fileLists.forEach(list => {
+        const observer = new MutationObserver(() => this.validateStep1());
+        observer.observe(list, { childList: true });
+    });
+}
+
+// Enhanced field validation methods
 markFieldAsInvalid(field, message) {
+    if (!field) return;
+    
     field.classList.add('is-invalid');
     field.classList.remove('is-valid');
     
@@ -1126,6 +1182,8 @@ markFieldAsInvalid(field, message) {
 }
 
 markFieldAsValid(field) {
+    if (!field) return;
+    
     field.classList.remove('is-invalid');
     field.classList.add('is-valid');
     
@@ -1523,77 +1581,90 @@ markFieldAsValid(field) {
         appFormManager.submitApplication();
     }
 
-    // Updated disability toggle functions
-    function toggleDisabilityFields(selectElement) {
-        const disabilityTypeSection = document.getElementById('disabilityTypeSection');
-        const disabilityExplanation = document.getElementById('disabilityExplanation');
-        
-        // Get the selected option text and value
-        const selectedOption = selectElement.options[selectElement.selectedIndex];
-        const optionText = selectedOption.text.trim().toLowerCase();
-        const optionValue = selectElement.value.toLowerCase();
-        
-        // Show disability type field if "Yes" is selected
-        const yesValues = ['yes', 'haa', '1', 'true', 'y', 'aye'];
-        const isDisabled = yesValues.includes(optionText) || yesValues.includes(optionValue);
-        
-        if (disabilityTypeSection) {
-            disabilityTypeSection.style.display = isDisabled ? 'block' : 'none';
-        }
-        
-        // Reset and hide dependent fields when disability is not "Yes"
-        if (!isDisabled) {
-            if (disabilityExplanation) {
-                disabilityExplanation.style.display = 'none';
-            }
-            
-            // Reset disability type and explanation fields
-            const disabilityTypeField = document.getElementById('{{ form.disability_type.vars.id }}');
-            const explanationField = document.getElementById('{{ form.disability_explanation.vars.id }}');
-            
-            if (disabilityTypeField) {
-                disabilityTypeField.value = '';
-                disabilityTypeField.required = false;
-            }
-            if (explanationField) {
-                explanationField.value = '';
-                explanationField.required = false;
-            }
-        } else {
-            // Make disability type required when "Yes" is selected
-            const disabilityTypeField = document.getElementById('{{ form.disability_type.vars.id }}');
-            if (disabilityTypeField) {
-                disabilityTypeField.required = true;
-            }
-        }
+function toggleDisabilityFields(selectElement) {
+    const disabilityTypeSection = document.getElementById('disabilityTypeSection');
+    const disabilityExplanation = document.getElementById('disabilityExplanation');
+    
+    // Get the selected option text and value
+    const selectedOption = selectElement.options[selectElement.selectedIndex];
+    const optionText = selectedOption.text.trim().toLowerCase();
+    const optionValue = selectElement.value.toLowerCase();
+    
+    // Show disability type field if "Yes" is selected
+    const yesValues = ['yes', 'haa', '1', 'true', 'y', 'aye'];
+    const isDisabled = yesValues.includes(optionText) || yesValues.includes(optionValue);
+    
+    if (disabilityTypeSection) {
+        disabilityTypeSection.style.display = isDisabled ? 'block' : 'none';
     }
-
-    function toggleDisabilityExplanation(selectElement) {
-        const disabilityExplanation = document.getElementById('disabilityExplanation');
+    
+    // Reset and hide dependent fields when disability is not "Yes"
+    if (!isDisabled) {
+        if (disabilityExplanation) {
+            disabilityExplanation.style.display = 'none';
+        }
         
-        if (!disabilityExplanation) return;
-        
-        // Show explanation field only if "Other" is selected
-        const selectedOption = selectElement.options[selectElement.selectedIndex];
-        const optionText = selectedOption.text.trim().toLowerCase();
-        const optionValue = selectElement.value.toLowerCase();
-        
-        const otherValues = ['other', 'kale', 'else'];
-        const isOther = otherValues.includes(optionText) || otherValues.includes(optionValue);
-        
-        disabilityExplanation.style.display = isOther ? 'block' : 'none';
-        
-        // Make explanation field required only if "Other" is selected
+        // Reset disability type and explanation fields
+        const disabilityTypeField = document.getElementById('{{ form.disability_type.vars.id }}');
         const explanationField = document.getElementById('{{ form.disability_explanation.vars.id }}');
+        
+        if (disabilityTypeField) {
+            disabilityTypeField.value = '';
+            disabilityTypeField.required = false;
+        }
         if (explanationField) {
-            explanationField.required = isOther;
-            
-            // Clear the field when hiding it
-            if (!isOther) {
-                explanationField.value = '';
-            }
+            explanationField.value = '';
+            explanationField.required = false;
+        }
+    } else {
+        // Make disability type required when "Yes" is selected
+        const disabilityTypeField = document.getElementById('{{ form.disability_type.vars.id }}');
+        if (disabilityTypeField) {
+            disabilityTypeField.required = true;
         }
     }
+    
+    // Trigger validation after toggling fields
+    setTimeout(() => {
+        if (appFormManager) {
+            appFormManager.validateStep1();
+        }
+    }, 100);
+}
+
+function toggleDisabilityExplanation(selectElement) {
+    const disabilityExplanation = document.getElementById('disabilityExplanation');
+    
+    if (!disabilityExplanation) return;
+    
+    // Show explanation field only if "Other" is selected
+    const selectedOption = selectElement.options[selectElement.selectedIndex];
+    const optionText = selectedOption.text.trim().toLowerCase();
+    const optionValue = selectElement.value.toLowerCase();
+    
+    const otherValues = ['other', 'kale', 'else'];
+    const isOther = otherValues.includes(optionText) || otherValues.includes(optionValue);
+    
+    disabilityExplanation.style.display = isOther ? 'block' : 'none';
+    
+    // Make explanation field required only if "Other" is selected
+    const explanationField = document.getElementById('{{ form.disability_explanation.vars.id }}');
+    if (explanationField) {
+        explanationField.required = isOther;
+        
+        // Clear the field when hiding it
+        if (!isOther) {
+            explanationField.value = '';
+        }
+    }
+    
+    // Trigger validation after toggling explanation field
+    setTimeout(() => {
+        if (appFormManager) {
+            appFormManager.validateStep1();
+        }
+    }, 100);
+}
 
     // Initialize application when DOM is loaded
     let appFormManager;

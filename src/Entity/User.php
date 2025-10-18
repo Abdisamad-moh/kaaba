@@ -333,6 +333,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: KaabaInstitute::class, mappedBy: 'manager')]
     private Collection $kaabaInstitutes;
 
+
     public function __construct()
     {
         $this->employerJobs = new ArrayCollection();

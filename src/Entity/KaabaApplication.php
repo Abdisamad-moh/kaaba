@@ -168,6 +168,11 @@ private ?string $disability_type = null;
 #[ORM\OneToMany(mappedBy: 'application', targetEntity: KaabaApplicationLog::class, cascade: ['persist'])]
 private Collection $logs;
 
+
+
+#[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+private ?\DateTimeInterface $waitlisted_date = null;
+
     public function __construct()
     {
         $this->created_at = new \DateTime();        
@@ -763,5 +768,35 @@ public function setDisabilityType(?string $disability_type): static
     $this->disability_type = $disability_type;
 
     return $this;
+}
+
+
+public function getWaitlistedDate(): ?\DateTimeInterface
+{
+    return $this->waitlisted_date;
+}
+
+public function setWaitlistedDate(?\DateTimeInterface $waitlisted_date): static
+{
+    $this->waitlisted_date = $waitlisted_date;
+
+    return $this;
+}
+
+// In KaabaApplication entity
+public function wasRejectedBy(User $user): bool
+{
+    $logs = $this->getLogs();
+    
+    foreach ($logs as $log) {
+        if ($log->getAction() === 'status_change' && 
+            $log->getUser() === $user &&
+            (strpos($log->getDescription(), "to 'Rejected'") !== false || 
+             strpos($log->getDescription(), "to 'rejected'") !== false)) {
+            return true;
+        }
+    }
+    
+    return false;
 }
 }

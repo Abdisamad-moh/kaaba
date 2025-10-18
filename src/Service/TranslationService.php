@@ -110,7 +110,7 @@ class TranslationService
                 // Enrollment
                 'enrollment_school' => 'Enrollment - School Selection',
                 'enrollment_course' => 'Enrollment - Course Selection',
-                'institute' => 'Institute',
+                'institute' => 'Select Institute',
                 'institute_placeholder' => 'Select Institute',
 
                 // Secondary Education
@@ -253,7 +253,7 @@ class TranslationService
                 // Enrollment
                 'enrollment_school' => 'Isku Qorista - Xulashada Dugsiyeenta',
                 'enrollment_course' => 'Isku Qorista - Xulashada Koorsada',
-                'institute' => 'Hay\'adda',
+                'institute' => 'Dooro Hay\'adda',
                 'course' => 'koorsada',
                 'course_placeholder' => 'Dooro koorsada',
 

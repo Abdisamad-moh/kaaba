@@ -10,38 +10,38 @@ font-size: 35px !important;
 .statistics-cards p{
 font-size: 18px !important;
 }
-
-
 </style>
-<!-- Counter Carousel -->
+
 <!-- Statistics Cards with Tabler Icons -->
 <div class="row statistics-cards">
+    <!-- Applied Card -->
     <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 mb-4">
         <div class="card border-0 zoom-in bg-primary-subtle shadow-none h-100">
             <div class="card-body">
                 <div class="text-center">
-                    <i class="ti ti-users fs-1 text-primary mb-3"></i>
-                    <p class="fw-semibold fs-3 text-primary mb-1">Total Applications</p>
-                    <h5 class="fw-semibold text-primary mb-0">{{ totalApplications }}</h5>
+                    <i class="ti ti-file-text fs-1 text-primary mb-3"></i>
+                    <p class="fw-semibold fs-3 text-primary mb-1">Applied</p>
+                    <h5 class="fw-semibold text-primary mb-0">{{ appliedApplications }}</h5>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Waitlisted Card -->
     <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 mb-4">
         <div class="card border-0 zoom-in bg-warning-subtle shadow-none h-100">
             <div class="card-body">
                 <div class="text-center">
-                    <i class="ti ti-file-text fs-1 text-warning mb-3"></i>
-                    <p class="fw-semibold fs-3 text-warning mb-1">Applied</p>
-                    <h5 class="fw-semibold text-warning mb-0">{{ appliedApplications }}</h5>
+                    <i class="ti ti-clock fs-1 text-warning mb-3"></i>
+                    <p class="fw-semibold fs-3 text-warning mb-1">Waitlisted</p>
+                    <h5 class="fw-semibold text-warning mb-0">{{ waitlistedApplications }}</h5>
                 </div>
             </div>
         </div>
     </div>
 
-
- <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 mb-4">
+    <!-- Shortlisted Card -->
+    <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 mb-4">
         <div class="card border-0 zoom-in bg-info-subtle shadow-none h-100">
             <div class="card-body">
                 <div class="text-center">
@@ -53,18 +53,20 @@ font-size: 18px !important;
         </div>
     </div>
 
+    <!-- Approved Card -->
     <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 mb-4">
         <div class="card border-0 zoom-in bg-success-subtle shadow-none h-100">
             <div class="card-body">
                 <div class="text-center">
                     <i class="ti ti-circle-check fs-1 text-success mb-3"></i>
-                    <p class="fw-semibold fs-3 text-success mb-1">Accepted</p>
-                    <h5 class="fw-semibold text-success mb-0">{{ acceptedApplications }}</h5>
+                    <p class="fw-semibold fs-3 text-success mb-1">Approved</p>
+                    <h5 class="fw-semibold text-success mb-0">{{ approvedApplications }}</h5>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Rejected Card -->
     <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 mb-4">
         <div class="card border-0 zoom-in bg-danger-subtle shadow-none h-100">
             <div class="card-body">
@@ -77,22 +79,21 @@ font-size: 18px !important;
         </div>
     </div>
 
-   
-
+    <!-- Total Applications Card -->
     <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 mb-4">
         <div class="card border-0 zoom-in bg-secondary-subtle shadow-none h-100">
             <div class="card-body">
                 <div class="text-center">
-                    <i class="ti ti-calendar fs-1 text-secondary mb-3"></i>
-                    <p class="fw-semibold fs-3 text-secondary mb-1">Last Year</p>
-                    <h5 class="fw-semibold text-secondary mb-0">{{ lastYearApplications }}</h5>
+                    <i class="ti ti-users fs-1 text-secondary mb-3"></i>
+                    <p class="fw-semibold fs-3 text-secondary mb-1">Total</p>
+                    <h5 class="fw-semibold text-secondary mb-0">{{ totalApplications }}</h5>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Charts Row 1 -->
+<!-- Rest of your charts and content remains the same -->
 <div class="row">
     <div class="col-lg-6 d-flex align-items-stretch">
         <div class="card w-100">
@@ -207,15 +208,17 @@ font-size: 18px !important;
                                    <td>
                                         {% if application.status %}
                                             <span class="badge fw-semibold py-1 w-85 
-                                                {% if application.status.name == 'accepted' %}bg-success-subtle text-success
-                                                {% elseif application.status.name == 'rejected' %}bg-danger-subtle text-danger
-                                                {% elseif application.status.name == 'shortlisted' %}bg-info-subtle text-info
-                                                {% elseif application.status.name == 'applied' %}bg-primary-subtle text-primary
+                                                {% if application.status.name == 'accepted' or application.status.name == 'Accepted' %}bg-success-subtle text-success
+                                                {% elseif application.status.name == 'rejected' or application.status.name == 'Rejected' %}bg-danger-subtle text-danger
+                                                {% elseif application.status.name == 'shortlisted' or application.status.name == 'Shortlisted' %}bg-info-subtle text-info
+                                                {% elseif application.status.name == 'waitlisted' or application.status.name == 'Waitlisted' %}bg-warning-subtle text-warning
+                                                {% elseif application.status.name == 'applied' or application.status.name == 'Applied' %}bg-primary-subtle text-primary
                                                 {% else %}bg-secondary-subtle text-secondary{% endif %}">
-                                                {{ application.status.name|capitalize }}
+                                                {% if application.status.name == 'accepted' or application.status.name == 'Accepted' %}Approved
+                                                {% else %}{{ application.status.name|capitalize }}{% endif %}
                                             </span>
                                         {% else %}
-                                            <span class="badge bg-secondary-subtle text-secondary fw-semibold py-1 w-85">
+                                            <span class="badge bg-primary-subtle text-primary fw-semibold py-1 w-85">
                                                 Applied
                                             </span>
                                         {% endif %}

@@ -313,4 +313,23 @@ public function filterApplications(
 
         return $qb->getQuery()->getResult();
     }
+
+// Count applications by status ID
+public function countApplicationsByStatusId(int $statusId, ?User $user = null): int
+{
+    $qb = $this->createQueryBuilder('a')
+        ->select('COUNT(a.id)')
+        ->join('a.status', 's')
+        ->where('s.id = :statusId')
+        ->setParameter('statusId', $statusId);
+
+    // Add user-specific filtering for ROLE_USER
+    if ($user && in_array('ROLE_USER', $user->getRoles()) && !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+        $qb->join('a.institute', 'i')
+           ->andWhere('i.manager = :user')
+           ->setParameter('user', $user);
+    }
+
+    return $qb->getQuery()->getSingleScalarResult();
+}
 }

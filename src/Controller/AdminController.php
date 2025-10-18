@@ -147,13 +147,16 @@ public function index(
     // Get current user
     $user = $this->getUser();
 
-    // Get statistics with user filtering
+    // Get statistics with user filtering - using status IDs
     $totalApplications = $applicationRepository->countTotalApplications($user);
     $lastYearApplications = $applicationRepository->countLastYearApplications($user);
-    $appliedApplications = $applicationRepository->countApplicationsByStatus('applied', $user);
-    $acceptedApplications = $applicationRepository->countApplicationsByStatus('accepted', $user);
-    $rejectedApplications = $applicationRepository->countApplicationsByStatus('rejected', $user);
-    $shortlistedApplications = $applicationRepository->countApplicationsByStatus('shortlisted', $user);
+    
+    // Count by status IDs
+    $appliedApplications = $applicationRepository->countApplicationsByStatusId(1, $user); // ID 1 = Applied
+    $shortlistedApplications = $applicationRepository->countApplicationsByStatusId(2, $user); // ID 2 = Shortlisted
+    $rejectedApplications = $applicationRepository->countApplicationsByStatusId(3, $user); // ID 3 = Rejected
+    $approvedApplications = $applicationRepository->countApplicationsByStatusId(4, $user); // ID 4 = Accepted/Approved
+    $waitlistedApplications = $applicationRepository->countApplicationsByStatusId(5, $user); // ID 5 = Waitlisted
 
     // Get data for charts with user filtering
     $applicationsByRegion = $applicationRepository->countApplicationsByRegion($user);
@@ -348,16 +351,17 @@ public function index(
         'totalApplications' => $totalApplications,
         'lastYearApplications' => $lastYearApplications,
         'appliedApplications' => $appliedApplications,
-        'acceptedApplications' => $acceptedApplications,
+        'approvedApplications' => $approvedApplications,
         'rejectedApplications' => $rejectedApplications,
         'shortlistedApplications' => $shortlistedApplications,
+        'waitlistedApplications' => $waitlistedApplications,
         'recentApplications' => $recentApplications,
         'regionChart' => $regionChart,
         'genderChart' => $genderChart,
         'instituteChart' => $instituteChart,
         'monthlyChart' => $monthlyChart,
         'scholarshipChart' => $scholarshipChart,
-        'current_user' => $user, // Pass user to template if needed
+        'current_user' => $user,
     ]);
 }
     #[Route('/packages', name: 'app_admin_packages')]
@@ -574,6 +578,9 @@ public function createUser(
         $user->setRoles(["ROLE_USER"]); // Default role
         $user->setType("user"); // Default type
         $user->setVerified(true); // Auto-verify admin-created accounts
+ $user->setOtpEnabled(false); // Disable OTP for admin-created users
+        $user->setOtpAttempts(0); // Reset OTP attempts
+        $user->setOtp(null); // Clear any OTP value
         $user->setPassword(
             $userPasswordHasher->hashPassword(
                 $user,
@@ -3464,7 +3471,7 @@ public function kaabaApplications(
         $applications = $paginator->paginate(
             $datatable,
             $request->query->get('page', 1),
-            20
+            100
         );
     } else {
         $datatable = $applicationsRepository->filterApplications(
@@ -3475,7 +3482,7 @@ public function kaabaApplications(
         $applications = $paginator->paginate(
             $datatable,
             $request->query->get('page', 1),
-            20
+            100
         );
     }
 
@@ -3487,6 +3494,39 @@ public function kaabaApplications(
     ]);
 }
 
+
+#[Route('/soft-delete-user', name: 'app_admin_soft_delete_user', methods: ['POST'])]
+public function softDeleteUser(Request $request, EntityManagerInterface $em, UserRepository $userRepository): JsonResponse
+{
+    $data = json_decode($request->getContent(), true);
+    $userId = $data['userId'] ?? null;
+
+    if (!$userId) {
+        return $this->json(['success' => false, 'message' => 'User ID is required'], 400);
+    }
+
+    $user = $userRepository->find($userId);
+    if (!$user) {
+        return $this->json(['success' => false, 'message' => 'User not found'], 404);
+    }
+
+    try {
+        // Soft delete by setting is_deleted to true and status to false
+        $user->setDeleted(true);
+        $user->setStatus(false);
+        $em->flush();
+
+        return $this->json([
+            'success' => true, 
+            'message' => 'User has been deleted successfully'
+        ]);
+    } catch (\Exception $e) {
+        return $this->json([
+            'success' => false, 
+            'message' => 'Failed to delete user: ' . $e->getMessage()
+        ], 500);
+    }
+}
 #[Route('/logs/{uuid}', name: 'app_admin_kaaba_application_logs', methods: ['GET', 'POST'])]
 public function viewLogs(
     KaabaApplication $application,
@@ -3514,7 +3554,6 @@ public function viewLogs(
     ]);
 }
 
-
 #[Route('/kaaba-applications/update-status', name: 'app_admin_kaaba_application_update_status', methods: ['POST'])]
 public function updateApplicationStatus(
     Request $request,
@@ -3523,6 +3562,14 @@ public function updateApplicationStatus(
     EntityManagerInterface $entityManager,
     ApplicationLogger $applicationLogger
 ): JsonResponse {
+    // Check if request is AJAX
+    if (!$request->isXmlHttpRequest()) {
+        return $this->json([
+            'success' => false,
+            'message' => 'Invalid request type.'
+        ], 400);
+    }
+
     $data = json_decode($request->getContent(), true);
     $applicationId = $data['applicationId'] ?? null;
     $statusAction = $data['statusAction'] ?? null;
@@ -3553,14 +3600,28 @@ public function updateApplicationStatus(
             ], 404);
         }
 
-        // Get the old status for logging BEFORE changing it
-        $oldStatus = $application->getStatus() ? $application->getStatus()->getName() : 'None';
+        // Get current user and role-based permissions
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->json([
+                'success' => false,
+                'message' => 'User not authenticated.'
+            ], 401);
+        }
 
-        // Map status actions to status names
+        $isSuperAdmin = $this->isGranted('ROLE_SUPER_ADMIN');
+        $isRegularUser = $this->isGranted('ROLE_USER') && !$isSuperAdmin;
+
+        $currentStatus = $application->getStatus();
+        $currentStatusName = $currentStatus ? $currentStatus->getName() : 'Applied';
+        $oldStatus = $currentStatusName;
+
+        // Define status mapping with IDs
         $statusMap = [
-            'shortlisted' => 'Shortlisted',
-            'accepted' => 'Accepted', 
-            'rejected' => 'Rejected'
+            'shortlisted' => ['name' => 'Shortlisted', 'id' => 2],
+            'waitlisted' => ['name' => 'Waitlisted', 'id' => 5],
+            'approved' => ['name' => 'Accepted', 'id' => 4],
+            'rejected' => ['name' => 'Rejected', 'id' => 3]
         ];
 
         if (!isset($statusMap[$statusAction])) {
@@ -3570,20 +3631,37 @@ public function updateApplicationStatus(
             ], 400);
         }
 
-        $statusName = $statusMap[$statusAction];
-        $status = $statusRepository->findOneBy(['name' => $statusName]);
-        
-        // If not found, try case-insensitive
-        if (!$status) {
-            $allStatuses = $statusRepository->findAll();
-            foreach ($allStatuses as $s) {
-                if (strtolower($s->getName()) === strtolower($statusName)) {
-                    $status = $s;
-                    break;
+        // Role-based permission checks
+        if ($isRegularUser) {
+            $allowedFromApplied = ['shortlisted', 'waitlisted', 'rejected'];
+            $currentStatusId = $currentStatus ? $currentStatus->getId() : 1;
+            
+            if ($currentStatusId !== 1 || !in_array($statusAction, $allowedFromApplied)) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'You can only update applications from "Applied" status to Shortlisted, Waitlisted, or Rejected.'
+                ], 403);
+            }
+        } elseif ($isSuperAdmin) {
+            if ($statusAction === 'approved') {
+                $currentStatusId = $currentStatus ? $currentStatus->getId() : 1;
+                if (!in_array($currentStatusId, [2, 5])) {
+                    return $this->json([
+                        'success' => false,
+                        'message' => 'You can only approve applications that are Shortlisted or Waitlisted.'
+                    ], 403);
                 }
             }
+        } else {
+            return $this->json([
+                'success' => false,
+                'message' => 'Insufficient permissions.'
+            ], 403);
         }
 
+        $targetStatus = $statusMap[$statusAction];
+        $status = $statusRepository->find($targetStatus['id']);
+        
         if (!$status) {
             return $this->json([
                 'success' => false,
@@ -3596,8 +3674,13 @@ public function updateApplicationStatus(
         switch ($statusAction) {
             case 'shortlisted':
                 $application->setShortlistedDate($now);
+                $application->setWaitlistedDate(null);
                 break;
-            case 'accepted':
+            case 'waitlisted':
+                $application->setWaitlistedDate($now);
+                $application->setShortlistedDate(null);
+                break;
+            case 'approved':
                 $application->setAcceptedDate($now);
                 break;
             case 'rejected':
@@ -3605,35 +3688,44 @@ public function updateApplicationStatus(
                 break;
         }
 
+        // Clear other dates when changing status
+        if ($statusAction !== 'rejected') {
+            $application->setRejectedDate(null);
+        }
+        if ($statusAction !== 'approved') {
+            $application->setAcceptedDate(null);
+        }
+
         // Update application status
         $application->setStatus($status);
         
-          // ✅ FIX: Use the generic log() method instead of logStatusChange()
+        // Log the action
         $applicationLogger->log(
             $application,
-            'status_change', // This will trigger the status_change case in your switch statement
-            sprintf("Status changed from '%s' to '%s' via admin panel", $oldStatus, $statusName),
-            $this->getUser() // current admin user
+            'status_change',
+            sprintf("Status changed from '%s' to '%s' by %s", $oldStatus, $targetStatus['name'], $user->getUserIdentifier()),
+            $user
         );
-
 
         $entityManager->flush();
 
         // Generate new status badge HTML
+        $displayStatus = $targetStatus['name'] === 'Accepted' ? 'Approved' : $targetStatus['name'];
         $newStatusBadge = sprintf(
             '<span class="badge %s">%s</span>',
-            match($statusName) {
+            match($targetStatus['name']) {
                 'Accepted' => 'bg-success',
                 'Rejected' => 'bg-danger',
                 'Shortlisted' => 'bg-info text-white',
+                'Waitlisted' => 'bg-warning text-dark',
                 default => 'bg-secondary'
             },
-            $statusName
+            $displayStatus
         );
 
         return $this->json([
             'success' => true,
-            'message' => "Application status updated to {$statusName} successfully.",
+            'message' => "Application status updated to {$displayStatus} successfully.",
             'newStatusBadge' => $newStatusBadge
         ]);
 
@@ -3651,8 +3743,16 @@ public function revertApplicationStatus(
     Request $request,
     KaabaApplicationStatusRepository $statusRepository,
     EntityManagerInterface $entityManager,
-    ApplicationLogger $applicationLogger // Add this
+    ApplicationLogger $applicationLogger
 ): JsonResponse {
+    // Check if request is AJAX
+    if (!$request->isXmlHttpRequest()) {
+        return $this->json([
+            'success' => false,
+            'message' => 'Invalid request type.'
+        ], 400);
+    }
+
     $csrfToken = $request->request->get('_token') ?? $request->headers->get('X-CSRF-Token');
 
     // Validate CSRF token
@@ -3673,61 +3773,68 @@ public function revertApplicationStatus(
             ], 400);
         }
 
+        $currentStatusId = $currentStatus->getId();
         $currentStatusName = $currentStatus->getName();
 
-        // Define allowed reverts with case-insensitive matching
-        $allowedReverts = [
-            'accepted' => 'applied', // or 'shortlisted' depending on your flow
-            'shortlisted' => 'applied'
-        ];
-
-        // Normalize the current status name to lowercase for comparison
-        $normalizedCurrentStatus = strtolower($currentStatusName);
-
-        if (!isset($allowedReverts[$normalizedCurrentStatus])) {
+        // Get user and role
+        $user = $this->getUser();
+        if (!$user) {
             return $this->json([
                 'success' => false,
-                'message' => 'Cannot revert from current status: ' . $currentStatusName . '. Allowed reverts: from accepted or shortlisted to applied.'
-            ], 400);
+                'message' => 'User not authenticated.'
+            ], 401);
         }
 
-        $targetStatusName = $allowedReverts[$normalizedCurrentStatus];
+        $isSuperAdmin = $this->isGranted('ROLE_SUPER_ADMIN');
+
+        // Define revert rules based on role and current status
+        $revertMap = [];
         
-        // Find the target status - try both exact match and case-insensitive
-        $newStatus = $statusRepository->findOneBy(['name' => $targetStatusName]);
-        
-        // If not found with exact case, try case-insensitive search
-        if (!$newStatus) {
-            $allStatuses = $statusRepository->findAll();
-            foreach ($allStatuses as $status) {
-                if (strtolower($status->getName()) === $targetStatusName) {
-                    $newStatus = $status;
-                    break;
-                }
+        if ($isSuperAdmin) {
+            // Admin can revert from approved to shortlisted (default)
+            if ($currentStatusId === 4) { // Approved/Accepted
+                $revertMap[4] = 2; // Default to shortlisted
             }
         }
 
+        // Both roles can revert from shortlisted/waitlisted to applied
+        $revertMap[2] = 1; // Shortlisted → Applied
+        $revertMap[5] = 1; // Waitlisted → Applied
+
+        if (!isset($revertMap[$currentStatusId])) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Cannot revert from current status: ' . $currentStatusName
+            ], 400);
+        }
+
+        $targetStatusId = $revertMap[$currentStatusId];
+        $newStatus = $statusRepository->find($targetStatusId);
+
         if (!$newStatus) {
             return $this->json([
                 'success' => false,
-                'message' => 'Target status not found: ' . $targetStatusName
+                'message' => 'Target status not found.'
             ], 404);
         }
 
         // Clear status dates when reverting
-        switch ($normalizedCurrentStatus) {
-            case 'accepted':
+        switch ($currentStatusId) {
+            case 4: // Approved
                 $application->setAcceptedDate(null);
                 break;
-            case 'shortlisted':
+            case 2: // Shortlisted
                 $application->setShortlistedDate(null);
+                break;
+            case 5: // Waitlisted
+                $application->setWaitlistedDate(null);
                 break;
         }
 
         // Update application status
         $application->setStatus($newStatus);
         
-        // ✅ ADD LOGGING HERE
+        // Log the revert action
         $applicationLogger->log(
             $application,
             'revert',
@@ -3736,7 +3843,7 @@ public function revertApplicationStatus(
                 $currentStatusName, 
                 $newStatus->getName()
             ),
-            $this->getUser() // current admin user
+            $user
         );
 
         $entityManager->flush();
@@ -3746,11 +3853,12 @@ public function revertApplicationStatus(
         // Generate new status badge HTML
         $newStatusBadge = sprintf(
             '<span class="badge %s">%s</span>',
-            match(strtolower($newStatusDisplayName)) {
-                'accepted' => 'bg-success',
-                'rejected' => 'bg-danger',
-                'shortlisted' => 'bg-info',
-                'applied' => 'bg-primary',
+            match($targetStatusId) {
+                4 => 'bg-success',
+                3 => 'bg-danger',
+                2 => 'bg-info text-white',
+                5 => 'bg-warning text-dark',
+                1 => 'bg-primary',
                 default => 'bg-secondary'
             },
             $newStatusDisplayName
@@ -3771,14 +3879,40 @@ public function revertApplicationStatus(
     }
 }
 
+
+private function getStatusByName(string $statusName): ?KaabaApplicationStatus
+{
+    // Implement this based on your status repository
+    $statusMap = [
+        'Shortlisted' => 2,
+        'Waitlisted' => 5,
+        'Applied' => 1,
+        'Rejected' => 3
+    ];
+    
+    if (isset($statusMap[$statusName])) {
+        return $this->getDoctrine()->getRepository(KaabaApplicationStatus::class)->find($statusMap[$statusName]);
+    }
+    
+    return null;
+}
+
 #[Route('/kaaba-applications/revert-rejected/{id}', name: 'app_admin_kaaba_application_revert_rejected', methods: ['POST'])]
 public function revertRejectedApplication(
     KaabaApplication $application,
     Request $request,
     KaabaApplicationStatusRepository $statusRepository,
     EntityManagerInterface $entityManager,
-    ApplicationLogger $applicationLogger // Add this
+    ApplicationLogger $applicationLogger
 ): JsonResponse {
+    // Check if request is AJAX
+    if (!$request->isXmlHttpRequest()) {
+        return $this->json([
+            'success' => false,
+            'message' => 'Invalid request type.'
+        ], 400);
+    }
+
     $csrfToken = $request->request->get('_token') ?? $request->headers->get('X-CSRF-Token');
 
     // Validate CSRF token
@@ -3801,7 +3935,7 @@ public function revertRejectedApplication(
 
         $currentStatusName = $currentStatus->getName();
 
-        // Only allow reverting from Rejected status (case-insensitive)
+        // Only allow reverting from Rejected status
         if (strtolower($currentStatusName) !== 'rejected') {
             return $this->json([
                 'success' => false,
@@ -3809,18 +3943,11 @@ public function revertRejectedApplication(
             ], 400);
         }
 
-        // Find applied status - try both exact match and case-insensitive
-        $appliedStatus = $statusRepository->findOneBy(['name' => 'applied']);
+        // Find applied status
+        $appliedStatus = $statusRepository->findOneBy(['name' => 'Applied']);
         
-        // If not found with exact case, try case-insensitive search
         if (!$appliedStatus) {
-            $allStatuses = $statusRepository->findAll();
-            foreach ($allStatuses as $status) {
-                if (strtolower($status->getName()) === 'applied') {
-                    $appliedStatus = $status;
-                    break;
-                }
-            }
+            $appliedStatus = $statusRepository->find(1); // Try by ID
         }
         
         if (!$appliedStatus) {
@@ -3830,11 +3957,20 @@ public function revertRejectedApplication(
             ], 404);
         }
 
+        // Get current user for logging
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->json([
+                'success' => false,
+                'message' => 'User not authenticated.'
+            ], 401);
+        }
+
         // Clear rejected date and set to applied
         $application->setRejectedDate(null);
         $application->setStatus($appliedStatus);
         
-        // ✅ ADD LOGGING HERE
+        // Log the action
         $applicationLogger->log(
             $application,
             'revert',
@@ -3842,7 +3978,7 @@ public function revertRejectedApplication(
                 "Rejected application reverted to '%s' status", 
                 $appliedStatus->getName()
             ),
-            $this->getUser() // current admin user
+            $user
         );
 
         $entityManager->flush();

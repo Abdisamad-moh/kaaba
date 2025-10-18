@@ -18,7 +18,12 @@
                     <span class="badge bg-primary">Total: {{ total_count }}</span>
                 </div>
                 <div class="col-3">
-                    
+                    <!-- User role indicator -->
+                    {% if is_granted('ROLE_SUPER_ADMIN') %}
+                        <span class="badge bg-success">Admin View</span>
+                    {% elseif is_granted('ROLE_USER') %}
+                        <span class="badge bg-info">User View</span>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -32,13 +37,14 @@
                         {{ macros.render_search_form(searchForm, 'Filter Applications') }}
 
                         <div class="table-responsive">
-                            <table id="file_export" class="table w-100 table-striped table-bordered display text-nowrap" width="100%" data-controller="general">
+                            <table id="file_exports" class="table w-100 table-striped table-bordered display text-nowrap" width="100%" data-controller="general">
                                 <thead>
                                     <tr>
+                                        <th>#</th>
                                         <th>Applicant Details</th>
                                         <th>Scholarship</th>
                                         <th>Region & District</th>
-                                        <th>Institue & Course</th>
+                                        <th>Institute & Course</th>
                                         <th>Application Date</th>
                                         <th>Status</th>
                                         <th>Actions</th>
@@ -47,6 +53,7 @@
                                 <tbody>
                                     {% for application in applications %}
                                         <tr id="application-{{ application.id }}">
+                                            <td class="text-muted">{{ loop.index }}</td>
                                             <td>
                                                 <div class="d-flex justify-content-between align-items-start">
                                                     <strong>{{ application.fullname }}</strong>
@@ -60,7 +67,6 @@
                                                 <div class="text-primary small mt-1">
                                                     <i class="ti ti-phone"></i> {{ application.phone }}
                                                 </div>
-                                          
                                             </td>
                                             <td>
                                                 {% if application.scholarship %}
@@ -73,7 +79,6 @@
                                                 {% else %}
                                                     <span class="text-muted">N/A</span>
                                                 {% endif %}
-                                                
                                             </td>
                                             <td>
                                                 {% if application.region %}
@@ -82,7 +87,7 @@
                                                     <span class="text-muted">N/A</span>
                                                 {% endif %}
                                                 {% if application.district %}
-                                                    <div class="text-muted ">{{ application.district.name }}</div>
+                                                    <div class="text-muted">{{ application.district.name }}</div>
                                                 {% endif %}
                                             </td>
                                             <td>
@@ -91,12 +96,11 @@
                                                 {% else %}
                                                     <span class="text-muted">N/A</span>
                                                 {% endif %}
-{% if application.course %}
-                                                    <div class="text-info  mt-1">
-                                                      <strong>course:</strong> {{ application.course.name }}
+                                                {% if application.course %}
+                                                    <div class="text-info mt-1">
+                                                        <strong>course:</strong> {{ application.course.name }}
                                                     </div>
                                                 {% endif %}
-                                               
                                             </td>
                                             <td>
                                                 {{ application.applicationdate|date('d-m-Y') }}
@@ -104,8 +108,11 @@
                                                     {% if application.shortlisteddate %}
                                                         <div>Shortlisted: {{ application.shortlisteddate|date('d-m-Y') }}</div>
                                                     {% endif %}
+                                                    {% if application.waitlisteddate %}
+                                                        <div>Waitlisted: {{ application.waitlisteddate|date('d-m-Y') }}</div>
+                                                    {% endif %}
                                                     {% if application.accepteddate %}
-                                                        <div>Accepted: {{ application.accepteddate|date('d-m-Y') }}</div>
+                                                        <div>Approved: {{ application.accepteddate|date('d-m-Y') }}</div>
                                                     {% endif %}
                                                     {% if application.rejecteddate %}
                                                         <div>Rejected: {{ application.rejecteddate|date('d-m-Y') }}</div>
@@ -118,122 +125,189 @@
                                                         {% if application.status.name == 'applied' or application.status.name == 'Applied' %}bg-primary
                                                         {% elseif application.status.name == 'rejected' or application.status.name == 'Rejected' %}bg-danger
                                                         {% elseif application.status.name == 'shortlisted' or application.status.name == 'Shortlisted' %}bg-info text-white
-                                                        {% elseif application.status.name == 'accepted' or application.status.name == 'Accepted' %}bg-success
+                                                        {% elseif application.status.name == 'accepted' or application.status.name == 'Accepted' or application.status.name == 'approved' or application.status.name == 'Approved' %}bg-success
+                                                        {% elseif application.status.name == 'waitlisted' or application.status.name == 'Waitlisted' %}bg-warning text-dark
                                                         {% elseif application.status.name == 'Under Review' %}bg-primary
                                                         {% else %}bg-secondary{% endif %}">
-                                                        {{ application.status.name }}
+                                                        {% if application.status.name == 'accepted' %}Approved{% else %}{{ application.status.name }}{% endif %}
                                                     </span>
                                                 {% else %}
                                                     <span class="badge bg-primary text-white">applied</span>
                                                 {% endif %}
                                             </td>
                                             <td>
-                                                <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-                                                    <div class="btn-group me-2 mb-2" role="group" aria-label="Application actions">
-                                                       <a href="{{ path('app_admin_kaaba_application_view', {'uuid': application.uuid}) }}" 
-   class="btn btn-secondary btn-sm" 
-   title="View Application Details">
-    <i class="ti ti-eye fs-4"></i>
-    View
-</a>
+                                                {# Check if user is ROLE_USER and inactive #}
+                                                {% if is_granted('ROLE_USER') and not is_granted('ROLE_SUPER_ADMIN') and not app.user.status %}
+                                                    <span class="text-muted small">User Disabled</span>
+                                                {% else %}
+                                                    <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+                                                        <div class="btn-group me-2 mb-2" role="group" aria-label="Application actions">
+                                                            <a href="{{ path('app_admin_kaaba_application_view', {'uuid': application.uuid}) }}" 
+                                                               class="btn btn-secondary btn-sm" 
+                                                               title="View Application Details">
+                                                                <i class="ti ti-eye fs-4"></i>
+                                                                View
+                                                            </a>
 
-                                                        
-                                                       {% set statusName = application.status ? application.status.name|lower : '' %}
+                                                            {% set statusName = application.status ? application.status.name|lower : '' %}
+                                                            {% set statusId = application.status ? application.status.id : 1 %}
 
-{# Only show Update Status dropdown if NOT rejected #}
-{% if statusName != 'rejected' %}
-    <div class="btn-group dropend" role="group">
-        <button type="button"
-                class="btn btn-primary btn-sm dropdown-toggle"
-                data-bs-toggle="dropdown"
-                data-bs-boundary="viewport"
-                aria-expanded="false"
-                {% if statusName in ['accepted'] %}disabled{% endif %}>
-            <i class="ti ti-edit fs-4"></i>
-            Update Status
+                                                            {# ROLE_USER: Can update from applied to shortlisted, waitlisted, or rejected #}
+                                                            {% if is_granted('ROLE_USER') and not is_granted('ROLE_SUPER_ADMIN') %}
+                                                                {% if statusId == 1 %} {# Applied #}
+                                                                    <div class="btn-group dropend" role="group">
+                                                                        <button type="button"
+                                                                                class="btn btn-primary btn-sm dropdown-toggle"
+                                                                                data-bs-toggle="dropdown"
+                                                                                data-bs-boundary="viewport"
+                                                                                aria-expanded="false">
+                                                                            <i class="ti ti-edit fs-4"></i>
+                                                                            Update Status
+                                                                        </button>
+                                                                        <ul class="dropdown-menu">
+                                                                            <li class="bg-info">
+                                                                                <a class="dropdown-item update-status bg-info text-white" href="#"
+                                                                                   data-application-id="{{ application.id }}"
+                                                                                   data-status-action="shortlisted"
+                                                                                   data-applicant-name="{{ application.fullname }}">
+                                                                                    <i class="ti ti-check text-white me-2 fs-20"></i>
+                                                                                    Shortlist Application
+                                                                                </a>
+                                                                            </li>
+                                                                            <li class="bg-warning">
+                                                                                <a class="dropdown-item update-status bg-warning text-dark" href="#"
+                                                                                   data-application-id="{{ application.id }}"
+                                                                                   data-status-action="waitlisted"
+                                                                                   data-applicant-name="{{ application.fullname }}">
+                                                                                    <i class="ti ti-clock me-2 fs-20"></i>
+                                                                                    Waitlist Application
+                                                                                </a>
+                                                                            </li>
+                                                                            <li><hr class="dropdown-divider"></li>
+                                                                            <li class="bg-danger">
+                                                                                <a class="dropdown-item update-status bg-danger text-white" href="#"
+                                                                                   data-application-id="{{ application.id }}"
+                                                                                   data-status-action="rejected"
+                                                                                   data-applicant-name="{{ application.fullname }}">
+                                                                                    <i class="ti ti-x text-white me-2 fs-20"></i>
+                                                                                    Reject Application
+                                                                                </a>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                {% endif %}
+
+                                                            {# ROLE_SUPER_ADMIN: Can approve shortlisted/waitlisted or reject any non-rejected #}
+                                                            {% elseif is_granted('ROLE_SUPER_ADMIN') %}
+                                                                {# Show Update Status dropdown if NOT rejected AND NOT approved #}
+                                                                {% if statusName != 'rejected' and statusName != 'accepted' and statusName != 'approved' %}
+                                                                    <div class="btn-group dropend" role="group">
+                                                                        <button type="button"
+                                                                                class="btn btn-primary btn-sm dropdown-toggle"
+                                                                                data-bs-toggle="dropdown"
+                                                                                data-bs-boundary="viewport"
+                                                                                aria-expanded="false">
+                                                                            <i class="ti ti-edit fs-4"></i>
+                                                                            Update Status
+                                                                        </button>
+                                                                        <ul class="dropdown-menu">
+                                                                            {# Show Approve option for shortlisted or waitlisted #}
+                                                                            {% if statusName in ['shortlisted', 'waitlisted'] %}
+                                                                                <li class="bg-success">
+                                                                                    <a class="dropdown-item update-status bg-success text-white" href="#"
+                                                                                       data-application-id="{{ application.id }}"
+                                                                                       data-status-action="approved"
+                                                                                       data-applicant-name="{{ application.fullname }}">
+                                                                                        <i class="ti ti-check text-white me-2 fs-20"></i>
+                                                                                        Approve Application
+                                                                                    </a>
+                                                                                </li>
+                                                                                <li><hr class="dropdown-divider"></li>
+                                                                            {% endif %}
+
+                                                                            {# Always show Reject option unless already rejected #}
+                                                                            <li class="bg-danger">
+                                                                                <a class="dropdown-item update-status bg-danger text-white" href="#"
+                                                                                   data-application-id="{{ application.id }}"
+                                                                                   data-status-action="rejected"
+                                                                                   data-applicant-name="{{ application.fullname }}">
+                                                                                    <i class="ti ti-x text-white me-2 fs-20"></i>
+                                                                                    Reject Application
+                                                                                </a>
+                                                                            </li>
+                                                                        </ul>
+                                                                    </div>
+                                                                {% endif %}
+                                                            {% endif %}
+
+                                                          {# In the Actions column, replace the revert button sections with: #}
+
+{# Revert Status Button - Show for appropriate statuses based on role #}
+{% if is_granted('ROLE_SUPER_ADMIN') %}
+    {# Admin can revert from approved to previous status (shortlisted/waitlisted) #}
+    {% if statusName in ['accepted', 'approved'] %}
+        <button type="button" 
+                class="btn btn-dark btn-sm revert-status"
+                data-application-id="{{ application.id }}"
+                data-applicant-name="{{ application.fullname }}"
+                title="Revert to previous status">
+            <i class="ti ti-arrow-back-up fs-4"></i>
+            Revert
         </button>
-
-        <ul class="dropdown-menu">
-            {# Show Shortlist option only if not already shortlisted, accepted, or rejected #}
-            {% if not application.status or (statusName not in ['shortlisted', 'accepted', 'rejected']) %}
-                <li class="bg-info">
-                    <a class="dropdown-item update-status bg-info text-white" href="#"
-                       data-application-id="{{ application.id }}"
-                       data-status-action="shortlisted"
-                       data-applicant-name="{{ application.fullname }}">
-                        <i class="ti ti-check text-white me-2 fs-20"></i>
-                        Shortlist Application
-                    </a>
-                </li>
-            {% endif %}
-
-            {# Show Accept option only if currently shortlisted #}
-            {% if statusName == 'shortlisted' %}
-                <li class="bg-success">
-                    <a class="dropdown-item update-status bg-success text-white" href="#"
-                       data-application-id="{{ application.id }}"
-                       data-status-action="accepted"
-                       data-applicant-name="{{ application.fullname }}">
-                        <i class="ti ti-check text-white me-2 fs-20"></i>
-                        Accept Application
-                    </a>
-                </li>
-            {% endif %}
-
-            <li><hr class="dropdown-divider"></li>
-
-            {# Always show Reject option unless already rejected #}
-            {% if statusName != 'rejected' %}
-                <li class="bg-danger">
-                    <a class="dropdown-item update-status bg-danger text-white" href="#"
-                       data-application-id="{{ application.id }}"
-                       data-status-action="rejected"
-                       data-applicant-name="{{ application.fullname }}">
-                        <i class="ti ti-x text-white me-2 fs-20"></i>
-                        Reject Application
-                    </a>
-                </li>
-            {% endif %}
-        </ul>
-    </div>
+    {% endif %}
 {% endif %}
 
-{# Revert Status Button - Show for Accepted and Shortlisted statuses #}
-{% if statusName in ['accepted', 'shortlisted'] %}
+{# Both roles can revert from shortlisted/waitlisted to applied #}
+{% if statusName in ['shortlisted', 'waitlisted'] %}
     <button type="button" 
             class="btn btn-dark btn-sm revert-status"
             data-application-id="{{ application.id }}"
             data-applicant-name="{{ application.fullname }}"
-            title="Revert to previous status">
+            title="Revert to applied status">
         <i class="ti ti-arrow-back-up fs-4"></i>
         Revert
     </button>
 {% endif %}
 
-{# Revert Rejected Button - Show only for Rejected status #}
+{# Revert Rejected Button - Show based on permissions #}
 {% if statusName == 'rejected' %}
-    <button type="button" 
-            class="btn btn-dark btn-sm revert-rejected"
-            data-application-id="{{ application.id }}"
-            data-applicant-name="{{ application.fullname }}"
-            title="Revert rejected application to applied">
-        <i class="ti ti-arrow-back-up fs-4"></i>
-        Revert to Applied
-    </button>
+    {% set canRevertRejected = false %}
+    
+    {# Admin can always revert rejected applications #}
+    {% if is_granted('ROLE_SUPER_ADMIN') %}
+        {% set canRevertRejected = true %}
+    {# User can only revert if they were the one who rejected it #}
+    {% elseif is_granted('ROLE_USER') and not is_granted('ROLE_SUPER_ADMIN') %}
+        {# You'll need to pass this information from controller or create a custom function #}
+        {# For now, we'll assume a helper method exists to check this #}
+        {% set userRejectedThis = application.wasRejectedBy(app.user) %}
+        {% set canRevertRejected = userRejectedThis %}
+    {% endif %}
+    
+    {% if canRevertRejected %}
+        <button type="button" 
+                class="btn btn-dark btn-sm revert-rejected"
+                data-application-id="{{ application.id }}"
+                data-applicant-name="{{ application.fullname }}"
+                title="Revert rejected application">
+            <i class="ti ti-arrow-back-up fs-4"></i>
+            Revert
+        </button>
+    {% endif %}
 {% endif %}
 
-    <button class="btn text-white btn-sm" style="background: gray;"
-       data-action="click->general#operations" data-type="get logs" data-item="{{ application.uuid }}" data-url="{{ path('app_admin_kaaba_application_logs', {'uuid': application.uuid}) }}" data-utility-modal-param="fullModal">
-        <i class="ti ti-history me-2"></i> View Logs
-    </button>
-
+                                                            <button class="btn text-white btn-sm" style="background: gray;"
+                                                               data-action="click->general#operations" data-type="get logs" data-item="{{ application.uuid }}" data-url="{{ path('app_admin_kaaba_application_logs', {'uuid': application.uuid}) }}" data-utility-modal-param="fullModal">
+                                                                <i class="ti ti-history me-2"></i> View Logs
+                                                            </button>
+                                                        </div>
                                                     </div>
-                                                </div>
+                                                {% endif %}
                                             </td>
                                         </tr>
                                     {% else %}
                                         <tr>
-                                            <td colspan="7" class="text-center py-4">
+                                            <td colspan="8" class="text-center py-4">
                                                 <div class="alert alert-info mb-0">
                                                     <i class="ti ti-info-circle me-2"></i>
                                                     No scholarship applications found.
@@ -246,14 +320,9 @@
                         </div>
 
                         <!-- Pagination -->
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <div class="text-muted">
-                                Showing {{ applications.getCurrentPageNumber }} of {{ applications.getPageCount }} pages
-                                (Total: {{ total_count }} applications)
-                            </div>
-                            <div>
-                                {{ knp_pagination_render(applications) }}
-                            </div>
+                       <div class="navigation mt-4">
+                            {% do applications.setPageRange(2) %}
+                            {{ knp_pagination_render(applications, 'pagination.html.twig') }}
                         </div>
                     </div>
                 </div>
@@ -261,6 +330,8 @@
         </div>
     </div>
 </div>
+
+<!-- Modal and styles remain the same -->
 <div class="modal fade" id="fullModal" tabindex="-1" aria-labelledby="fullModalLabel" aria-hidden="true">
    <div class="modal-dialog modal-lg modal-dialog-scrollable">
       <div class="modal-content">
@@ -279,12 +350,13 @@
       </div>
    </div>
 </div>
+
 <style>
 .bg-danger{
-background-color:red !important;
+    background-color:red !important;
 } 
 .fs-20{
-font-size:20px;
+    font-size:20px;
 }
 .bg-purple {
     background-color: #6f42c1 !important;
@@ -322,7 +394,6 @@ font-size:20px;
     z-index: 1060;
 }
 
-/* Improve table readability */
 .table td {
     vertical-align: top;
     padding: 12px 8px;
@@ -332,12 +403,12 @@ font-size:20px;
 
 {% block javascripts %}
 {{ parent() }}
-<!-- Include SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
+// Replace your existing JavaScript with this improved version
 document.addEventListener('DOMContentLoaded', function() {
-    // Status update functionality with SweetAlert confirmation
+    // Status update functionality
     document.querySelectorAll('.update-status').forEach(button => {
         button.addEventListener('click', function(e) {
             e.preventDefault();
@@ -357,9 +428,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     title = 'Shortlist Application';
                     icon = 'info';
                     break;
-                case 'accepted':
-                    actionText = 'accept';
-                    title = 'Accept Application';
+                case 'waitlisted':
+                    actionText = 'waitlist';
+                    title = 'Waitlist Application';
+                    icon = 'warning';
+                    break;
+                case 'approved':
+                    actionText = 'approve';
+                    title = 'Approve Application';
                     icon = 'success';
                     break;
                 case 'rejected':
@@ -396,8 +472,16 @@ document.addEventListener('DOMContentLoaded', function() {
                         }),
                     })
                     .then(response => {
+                        // Check if response is HTML (error page)
+                        const contentType = response.headers.get('content-type');
+                        if (contentType && contentType.includes('text/html')) {
+                            return response.text().then(html => {
+                                throw new Error('Server returned HTML instead of JSON. This might be an authentication or server error.');
+                            });
+                        }
+                        
                         if (!response.ok) {
-                            throw new Error('Network response was not ok');
+                            throw new Error(`HTTP error! status: ${response.status}`);
                         }
                         return response.json();
                     })
@@ -409,182 +493,212 @@ document.addEventListener('DOMContentLoaded', function() {
                                 statusBadge.innerHTML = data.newStatusBadge;
                             }
                             
-                            // Show success message
-                            Swal.fire({
-                                title: 'Success!',
-                                text: data.message,
-                                icon: 'success',
-                                confirmButtonText: 'OK'
-                            }).then(() => {
-                                // Reload the page to reflect changes in the dropdown
-                                window.location.reload();
-                            });
+                            return data;
                         } else {
                             throw new Error(data.message || 'Failed to update status');
                         }
                     })
                     .catch(error => {
+                        console.error('Update status error:', error);
                         Swal.showValidationMessage(
                             `Request failed: ${error.message}`
                         );
                     });
                 },
                 allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+                if (result.isConfirmed && result.value) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: result.value.message,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        // Reload the page to reflect changes
+                        window.location.reload();
+                    });
+                }
             });
         });
     });
 
-// Revert Status functionality
-document.querySelectorAll('.revert-status').forEach(button => {
-    button.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        const applicationId = this.getAttribute('data-application-id');
-        const applicantName = this.getAttribute('data-applicant-name');
-        
-        // Show SweetAlert confirmation
-        Swal.fire({
-            title: 'Revert Status',
-            html: `Are you sure you want to revert the status for <strong>${applicantName}</strong> to the previous status?`,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#ffc107',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Yes, revert status!',
-            cancelButtonText: 'Cancel',
-            showLoaderOnConfirm: true,
-            preConfirm: () => {
-                const formData = new URLSearchParams();
-                formData.append('_token', '{{ csrf_token("revert_application_status") }}');
-                
-                return fetch(`/admin/kaaba-applications/revert-status/${applicationId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: formData
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        // Get the error message from the response
-                        return response.json().then(errorData => {
-                            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        // Update status badge
-                        const statusBadge = document.getElementById(`status-${applicationId}`);
-                        if (statusBadge) {
-                            statusBadge.innerHTML = data.newStatusBadge;
+    // Revert Status functionality
+    document.querySelectorAll('.revert-status').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const applicationId = this.getAttribute('data-application-id');
+            const applicantName = this.getAttribute('data-applicant-name');
+            
+            // Show SweetAlert confirmation
+            Swal.fire({
+                title: 'Revert Status',
+                html: `Are you sure you want to revert the status for <strong>${applicantName}</strong> to the previous status?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#ffc107',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, revert status!',
+                cancelButtonText: 'Cancel',
+                showLoaderOnConfirm: true,
+                preConfirm: () => {
+                    const formData = new URLSearchParams();
+                    formData.append('_token', '{{ csrf_token("revert_application_status") }}');
+                    
+                    return fetch(`/admin/kaaba-applications/revert-status/${applicationId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: formData
+                    })
+                    .then(response => {
+                        // Check if response is HTML (error page)
+                        const contentType = response.headers.get('content-type');
+                        if (contentType && contentType.includes('text/html')) {
+                            return response.text().then(html => {
+                                throw new Error('Server returned HTML instead of JSON. This might be an authentication or server error.');
+                            });
                         }
                         
-                        return data;
-                    } else {
-                        throw new Error(data.message || 'Failed to revert status');
-                    }
-                })
-                .catch(error => {
-                    Swal.showValidationMessage(
-                        `Request failed: ${error.message}`
-                    );
-                });
-            },
-            allowOutsideClick: () => !Swal.isLoading()
-        }).then((result) => {
-            if (result.isConfirmed && result.value) {
-                Swal.fire({
-                    title: 'Success!',
-                    text: result.value.message,
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                }).then(() => {
-                    // Reload the page to reflect changes
-                    window.location.reload();
-                });
-            }
+                        if (!response.ok) {
+                            return response.text().then(errorText => {
+                                try {
+                                    const errorData = JSON.parse(errorText);
+                                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                                } catch (e) {
+                                    throw new Error(`HTTP error! status: ${response.status}`);
+                                }
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            // Update status badge
+                            const statusBadge = document.getElementById(`status-${applicationId}`);
+                            if (statusBadge) {
+                                statusBadge.innerHTML = data.newStatusBadge;
+                            }
+                            
+                            return data;
+                        } else {
+                            throw new Error(data.message || 'Failed to revert status');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Revert status error:', error);
+                        Swal.showValidationMessage(
+                            `Request failed: ${error.message}`
+                        );
+                    });
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+                if (result.isConfirmed && result.value) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: result.value.message,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        // Reload the page to reflect changes
+                        window.location.reload();
+                    });
+                }
+            });
         });
     });
-});
 
-// Revert Rejected functionality
-document.querySelectorAll('.revert-rejected').forEach(button => {
-    button.addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        const applicationId = this.getAttribute('data-application-id');
-        const applicantName = this.getAttribute('data-applicant-name');
-        
-        // Show SweetAlert confirmation
-        Swal.fire({
-            title: 'Revert Rejected Application',
-            html: `Are you sure you want to revert the rejected application for <strong>${applicantName}</strong> back to Applied status?`,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#17a2b8',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Yes, revert to applied!',
-            cancelButtonText: 'Cancel',
-            showLoaderOnConfirm: true,
-            preConfirm: () => {
-                const formData = new URLSearchParams();
-                formData.append('_token', '{{ csrf_token("revert_rejected_application") }}');
-                
-                return fetch(`/admin/kaaba-applications/revert-rejected/${applicationId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: formData
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        // Get the error message from the response
-                        return response.json().then(errorData => {
-                            throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
-                        });
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.success) {
-                        // Update status badge
-                        const statusBadge = document.getElementById(`status-${applicationId}`);
-                        if (statusBadge) {
-                            statusBadge.innerHTML = data.newStatusBadge;
+    // Revert Rejected functionality
+    document.querySelectorAll('.revert-rejected').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const applicationId = this.getAttribute('data-application-id');
+            const applicantName = this.getAttribute('data-applicant-name');
+            
+            // Show SweetAlert confirmation
+            Swal.fire({
+                title: 'Revert Rejected Application',
+                html: `Are you sure you want to revert the rejected application for <strong>${applicantName}</strong>?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#17a2b8',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes, revert!',
+                cancelButtonText: 'Cancel',
+                showLoaderOnConfirm: true,
+                preConfirm: () => {
+                    const formData = new URLSearchParams();
+                    formData.append('_token', '{{ csrf_token("revert_rejected_application") }}');
+                    
+                    return fetch(`/admin/kaaba-applications/revert-rejected/${applicationId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: formData
+                    })
+                    .then(response => {
+                        // Check if response is HTML (error page)
+                        const contentType = response.headers.get('content-type');
+                        if (contentType && contentType.includes('text/html')) {
+                            return response.text().then(html => {
+                                throw new Error('Server returned HTML instead of JSON. This might be an authentication or server error.');
+                            });
                         }
                         
-                        return data;
-                    } else {
-                        throw new Error(data.message || 'Failed to revert rejected application');
-                    }
-                })
-                .catch(error => {
-                    Swal.showValidationMessage(
-                        `Request failed: ${error.message}`
-                    );
-                });
-            },
-            allowOutsideClick: () => !Swal.isLoading()
-        }).then((result) => {
-            if (result.isConfirmed && result.value) {
-                Swal.fire({
-                    title: 'Success!',
-                    text: result.value.message,
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                }).then(() => {
-                    // Reload the page to reflect changes
-                    window.location.reload();
-                });
-            }
+                        if (!response.ok) {
+                            return response.text().then(errorText => {
+                                try {
+                                    const errorData = JSON.parse(errorText);
+                                    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+                                } catch (e) {
+                                    throw new Error(`HTTP error! status: ${response.status}`);
+                                }
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            // Update status badge
+                            const statusBadge = document.getElementById(`status-${applicationId}`);
+                            if (statusBadge) {
+                                statusBadge.innerHTML = data.newStatusBadge;
+                            }
+                            
+                            return data;
+                        } else {
+                            throw new Error(data.message || 'Failed to revert rejected application');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Revert rejected error:', error);
+                        Swal.showValidationMessage(
+                            `Request failed: ${error.message}`
+                        );
+                    });
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+                if (result.isConfirmed && result.value) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: result.value.message,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        // Reload the page to reflect changes
+                        window.location.reload();
+                    });
+                }
+            });
         });
     });
-});
 });
 </script>
 {% endblock %}

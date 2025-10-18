@@ -41,6 +41,8 @@
                             <th>#</th>
                             <th>Name</th>
                             <th>Email</th>
+                            <th>User Role</th>
+                            <th>Institutes Managed</th>
                             <th>Status</th>
                             <th>Actions</th>
                             <th>Date Created</th>
@@ -53,9 +55,38 @@
                                 <td>{{ user.name }}</td>
                                 <td>{{ user.email }}</td>
                                 <td>
-                                    <span class="badge {% if user.status %} bg-success {% else %} bg-danger {% endif %}">
-                                        {{ user.status ? 'Active' : 'Inactive' }}
-                                    </span>
+                                    {% set userRoles = user.roles %}
+                                    {% if 'ROLE_SUPER_ADMIN' in userRoles %}
+                                        <span class="badge bg-danger">Super Admin</span>
+                                    {% elseif 'ROLE_USER' in userRoles %}
+                                        <span class="badge bg-info">User</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">
+                                            {{ userRoles|length > 0 ? userRoles[0]|replace({'ROLE_': ''})|title : 'User' }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if user.kaabaInstitutes|length > 0 %}
+                                        <div class="d-flex flex-wrap gap-1">
+                                            {% for institute in user.kaabaInstitutes %}
+                                                <span class="badge bg-primary" title="{{ institute.name }}">
+                                                    {{ institute.name|length > 20 ? institute.name|slice(0, 20) ~ '...' : institute.name }}
+                                                </span>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <span class="text-muted">No institutes</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if user.isDeleted %}
+                                        <span class="badge bg-secondary">Deleted</span>
+                                    {% else %}
+                                        <span class="badge {% if user.status %} bg-success {% else %} bg-danger {% endif %}">
+                                            {{ user.status ? 'Active' : 'Inactive' }}
+                                        </span>
+                                    {% endif %}
                                 </td>
                                 <td>
                                     <div class="btn-group" role="group">
@@ -63,15 +94,23 @@
                                             Actions
                                         </button>
                                         <div class="dropdown-menu">
-                                            <a data-type="change status" data-status="{{ user.status ? 'disable' : 'activate' }}" data-account="{{ user.email }}" data-action="click->admin#operation" class="dropdown-item" href="javascript:void(0)">
-                                                {{ user.status ? 'Disable' : 'Activate' }}
-                                            </a>
+                                            {% if not user.isDeleted %}
+                                                <a data-type="change status" data-status="{{ user.status ? 'disable' : 'activate' }}" data-account="{{ user.email }}" data-action="click->admin#operation" class="dropdown-item" href="javascript:void(0)">
+                                                    {{ user.status ? 'Disable' : 'Activate' }}
+                                                </a>
+                                            {% endif %}
                                             <a class="dropdown-item" href="">
                                                 Edit
                                             </a>
-                                            <a class="dropdown-item text-danger" href="javascript:void(0)" onclick="confirmDelete({{ user.id }})">
-                                                Delete
-                                            </a>
+                                            {% if not user.isDeleted %}
+                                                <a class="dropdown-item text-danger soft-delete-user" href="javascript:void(0)" data-user-id="{{ user.id }}" data-user-name="{{ user.name }}">
+                                                    Delete
+                                                </a>
+                                            {% else %}
+                                                <a class="dropdown-item text-success restore-user" href="javascript:void(0)" data-user-id="{{ user.id }}" data-user-name="{{ user.name }}">
+                                                    Restore
+                                                </a>
+                                            {% endif %}
                                         </div>
                                     </div>
                                 </td>
@@ -81,7 +120,7 @@
                             </tr>
                         {% else %}
                             <tr>
-                                <td colspan="6" class="text-center">No records found.</td>
+                                <td colspan="8" class="text-center">No records found.</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -97,12 +136,75 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-function confirmDelete(userId) {
-    if (confirm('Are you sure you want to delete this user?')) {
-        // Implement delete functionality here
-        console.log('Delete user:', userId);
-    }
-}
+// Soft delete functionality
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.soft-delete-user').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const userId = this.getAttribute('data-user-id');
+            const userName = this.getAttribute('data-user-name');
+            
+            Swal.fire({
+                title: 'Delete User?',
+                html: `Are you sure you want to delete <strong>${userName}</strong>?<br><small class="text-muted">This will soft delete the user - they will no longer be able to access the system.</small>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete user!',
+                cancelButtonText: 'Cancel',
+                showLoaderOnConfirm: true,
+                preConfirm: () => {
+                    return fetch('{{ path("app_admin_soft_delete_user") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({
+                            userId: userId,
+                            _token: '{{ csrf_token("soft_delete_user") }}',
+                        }),
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            return data;
+                        } else {
+                            throw new Error(data.message || 'Failed to delete user');
+                        }
+                    })
+                    .catch(error => {
+                        Swal.showValidationMessage(
+                            `Request failed: ${error.message}`
+                        );
+                    });
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+                if (result.isConfirmed && result.value) {
+                    Swal.fire({
+                        title: 'Deleted!',
+                        text: result.value.message,
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                }
+            });
+        });
+    });
+
+
+});
 </script>
 {% endblock %}

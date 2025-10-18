@@ -62,7 +62,9 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
           // Normalize to ensure full-day coverage
         //   $startOfDay = Carbon::instance($from_date)->startOfDay()->toDateTime();
         //   $endOfDay = Carbon::instance($to_date)->endOfDay()->toDateTime();
-        $qb = $this->createQueryBuilder('p');
+         $qb = $this->createQueryBuilder('p')
+        ->andWhere('p.is_deleted = false OR p.is_deleted IS NULL') // Exclude soft-deleted users
+        ->orderBy('p.createdAt', 'DESC');
         // Ensure we exclude deleted projects
         // $qb->where('p.is_deleted = :is_deleted')
         //     ->setParameter('is_deleted', false);
