@@ -1,0 +1,32 @@
+{# templates/pagination.html.twig #}
+<div class="pagination">
+    <ul class="pagination">
+        {% if pagination.currentPageNumber > 1 %}
+            <li class="page-item">
+                <a class="page-link" href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'page': 1, 'limit': limit|default(100)})) }}">First</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'page': pagination.currentPageNumber - 1, 'limit': limit|default(100)})) }}">Previous</a>
+            </li>
+        {% endif %}
+
+        {% for page in pagination.pagesInRange %}
+            <li class="page-item {% if page == pagination.currentPageNumber %}active{% endif %}">
+                <a class="page-link" href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'page': page, 'limit': limit|default(100)})) }}">{{ page }}</a>
+            </li>
+        {% endfor %}
+
+        {% if pagination.currentPageNumber < pagination.pageCount %}
+            <li class="page-item">
+                <a class="page-link" href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'page': pagination.currentPageNumber + 1, 'limit': limit|default(100)})) }}">Next</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="{{ path(app.request.attributes.get('_route'), app.request.query.all|merge({'page': pagination.pageCount, 'limit': limit|default(100)})) }}">Last</a>
+            </li>
+        {% endif %}
+    </ul>
+    
+    <div class="pagination-info text-muted small mt-2">
+        Showing {{ pagination.getItemNumberPerPage }} of {{ pagination.totalItemCount }} items per page
+    </div>
+</div>

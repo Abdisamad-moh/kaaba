@@ -154,7 +154,7 @@ class TranslationService
 
 //Declaration Section
                 'declaration' => 'Declaration',
-                'declaration_text' => 'I hereby affirm that all information provided in this application form is true, accurate, andcomplete to the best of my knowledge. I further express my earnest commitment to fullyengage with the learning opportunity offered through this scholarship. Due to financialconstraints, I have been unable to pursue studies at other institutions, and I amtherefore sincerely motivated to benefit from this program.',
+                'declaration_text' => 'I hereby affirm that all information provided in this application form is true, accurate, and complete to the best of my knowledge. I further express my earnest commitment to fullyengage with the learning opportunity offered through this scholarship. Due to financial constraints, I have been unable to pursue studies at other institutions, and I am therefore sincerely motivated to benefit from this program.',
               
 
 // Acknowledgment Section

@@ -3439,11 +3439,33 @@ public function kaabaApplications(
                 'placeholder' => 'Filter by Gender'
             ],
         ])
+        ->add('limit', ChoiceType::class, [
+            'required' => false,
+            'mapped' => false,
+            'label' => 'Items per Page',
+            'choices' => [
+                '25' => 25,
+                '50' => 50,
+                '100' => 100,
+                '200' => 200,
+                '500' => 500,
+            ],
+            'data' => 100, // Default value
+            'attr' => [
+                'class' => 'form-control',
+                'col_class' => 'col-md-2',
+            ],
+        ])
         ->getForm();
 
     $searchForm->handleRequest($request);
 
+    // Get the limit from form or use default
+    $limit = 100; // Default limit
     if ($searchForm->isSubmitted() && $searchForm->isValid()) {
+        $formLimit = $searchForm->get("limit")->getData();
+        $limit = $formLimit ?: 100;
+        
         $status = $searchForm->get("status")->getData();
         $scholarship = $searchForm->get("scholarship")->getData();
         $fromDate = $searchForm->get("from_date")->getData();
@@ -3471,9 +3493,12 @@ public function kaabaApplications(
         $applications = $paginator->paginate(
             $datatable,
             $request->query->get('page', 1),
-            100
+            $limit
         );
     } else {
+        // Check if limit is in query parameters (for pagination links)
+        $limit = $request->query->get('limit', 100);
+        
         $datatable = $applicationsRepository->filterApplications(
             null, null, null, null, null, null, null, null, null,
             $user // Pass current user
@@ -3482,7 +3507,7 @@ public function kaabaApplications(
         $applications = $paginator->paginate(
             $datatable,
             $request->query->get('page', 1),
-            100
+            $limit
         );
     }
 
@@ -3491,9 +3516,9 @@ public function kaabaApplications(
         'searchForm' => $searchForm->createView(),
         'total_count' => $count,
         'current_user' => $user, // Pass user to template if needed
+        'current_limit' => $limit, // Pass current limit to template
     ]);
 }
-
 
 #[Route('/soft-delete-user', name: 'app_admin_soft_delete_user', methods: ['POST'])]
 public function softDeleteUser(Request $request, EntityManagerInterface $em, UserRepository $userRepository): JsonResponse

@@ -128,24 +128,51 @@
                         </div>
                     </div>
                     
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group row">
-                                <label class="form-label text-end col-md-3">Disability:</label>
-                                <div class="col-md-9">
-                                    <p>{{ application.disability ?? 'N/A' }}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group row">
-                                <label class="form-label text-end col-md-3">Application Date:</label>
-                                <div class="col-md-9">
-                                    <p>{{ application.applicationdate|date('d-m-Y') }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+            <div class="row">
+    <div class="col-md-6">
+        <div class="form-group row">
+            <label class="form-label text-end col-md-3">Disability Status:</label>
+            <div class="col-md-9">
+                <p>{{ application.disability ?? 'N/A' }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group row">
+            <label class="form-label text-end col-md-3">Application Date:</label>
+            <div class="col-md-9">
+                <p>{{ application.applicationdate|date('d-m-Y') }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if application.disability == 'Yes' or application.disabilityType %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group row">
+            <label class="form-label text-end col-md-3">Disability Type:</label>
+            <div class="col-md-9">
+                <p>{{ application.disabilityType ?? 'N/A' }}</p>
+            </div>
+        </div>
+    </div>
+    {% if application.disabilityType == 'Other' and application.disabilityExplanation %}
+    <div class="col-md-6">
+        <div class="form-group row">
+            <label class="form-label text-end col-md-3">Disability Explanation:</label>
+            <div class="col-md-9">
+                <p>{{ application.disabilityExplanation ?? 'N/A' }}</p>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="col-md-6">
+        <!-- Empty column to maintain layout -->
+    </div>
+    {% endif %}
+</div>
+{% endif %}
                 </div>
 
                 <!-- Address Information Section -->
@@ -416,6 +443,50 @@
  
 </div>
 
+<!-- Declaration Section -->
+<div class="card-body">
+    <h5 class="card-title mb-0">Declaration</h5>
+</div>
+<hr class="m-0"/>
+<div class="card-body">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group row">
+                <label class="form-label text-end col-md-3">Declaration Accepted:</label>
+                <div class="col-md-9">
+                    <div class="d-flex align-items-center">
+                        <i class="ti ti-check text-success me-2 fs-5"></i>
+                        <span class="fw-semibold text-success">Yes</span>
+                    </div>
+                    <small class="text-muted">Applicant accepted the declaration</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group row">
+                <label class="form-label text-end col-md-3">Accepted on:</label>
+                <div class="col-md-9">
+                    <p>{{ application.applicationdate|date('d-m-Y') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group row">
+                <label class="form-label text-end col-md-3">Declaration Statement:</label>
+                <div class="col-md-9">
+                    <div class="border rounded-2 p-3 bg-light">
+                        <p class="mb-0" style="font-size: 14px; line-height: 1.5;">
+                            I hereby affirm that all information provided in this application form is true, accurate, and complete to the best of my knowledge. I further express my earnest commitment to fully engage with the learning opportunity offered through this scholarship. Due to financial constraints, I have been unable to pursue studies at other institutions, and I am therefore sincerely motivated to benefit from this program.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
                 </div>
 

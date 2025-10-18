@@ -321,9 +321,11 @@
 
                         <!-- Pagination -->
                        <div class="navigation mt-4">
-                            {% do applications.setPageRange(2) %}
-                            {{ knp_pagination_render(applications, 'pagination.html.twig') }}
-                        </div>
+    {% do applications.setPageRange(2) %}
+    {{ knp_pagination_render(applications, 'pagination.html.twig', {
+        'limit': current_limit
+    }) }}
+</div>
                     </div>
                 </div>
             </div>
