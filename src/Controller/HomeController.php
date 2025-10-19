@@ -1081,7 +1081,7 @@ class HomeController extends AbstractController
 
 
 
-#[Route('/{_locale}', name: 'app_home', requirements: ['_locale' => 'en|so'], defaults: ['_locale' => 'en'])]
+#[Route('/{_locale}', name: 'app_home', requirements: ['_locale' => 'en|so'], defaults: ['_locale' => 'so'])]
 public function SomaliIndex(KaabaScholarshipRepository $repo, Request $request, TranslationService $translationService): Response
 {
     $scholarships = $repo->findBy(['status' => true], ['closing_date' => 'ASC']);
