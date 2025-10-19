@@ -181,14 +181,19 @@ class KaabaApplicationFormType extends AbstractType
                     'data-area' => 'identityArea'
                 ]
             ])
-            ->add('secondary_school', TextType::class, [
-                'label' => $this->translator->trans('secondary_school'),
-                'required' => false, // Changed to false
-                'attr' => [
-                    'class' => 'form-control',
-                    'placeholder' => $this->translator->trans('secondary_school_placeholder')
-                ]
-            ])
+            ->add('secondary_school', ChoiceType::class, [
+    'label' => $this->translator->trans('secondary_school'),
+    'required' => false,
+    'choices' => [
+        $this->translator->trans('secondary_certificate') => 'Secondary Certificate',
+        $this->translator->trans('primary_certificate') => 'Primary Certificate', 
+        $this->translator->trans('other_certificates') => 'Other Certificates',
+    ],
+    'placeholder' => $this->translator->trans('secondary_school_placeholder'),
+    'attr' => [
+        'class' => 'form-control',
+    ]
+])
             ->add('secondary_graduation_year', TextType::class, [
                 'label' => $this->translator->trans('secondary_graduation_year'),
                 'required' => false, // Changed to false
@@ -213,54 +218,7 @@ class KaabaApplicationFormType extends AbstractType
             //         'placeholder' => $this->translator->trans('highest_qualification_detail_placeholder')
             //     ]
             // ])
-            ->add('institution_name', TextType::class, [
-                'label' => $this->translator->trans('institution_name'),
-                'required' => false, // Changed to false
-                'attr' => [
-                    'class' => 'form-control',
-                    'placeholder' => $this->translator->trans('institution_name_placeholder')
-                ]
-            ])
-            ->add('location', TextType::class, [
-                'label' => $this->translator->trans('location'),
-                'required' => false, // Changed to false
-                'attr' => [
-                    'class' => 'form-control',
-                    'placeholder' => $this->translator->trans('location_placeholder')
-                ]
-            ])
-            ->add('start_year', TextType::class, [
-                'label' => $this->translator->trans('start_year'),
-                'required' => false, // Changed to false
-                'attr' => [
-                    'class' => 'form-control',
-                    'placeholder' => $this->translator->trans('start_year_placeholder')
-                ]
-            ])
-            ->add('end_year', TextType::class, [
-                'label' => $this->translator->trans('end_year'),
-                'required' => false, // Changed to false
-                'attr' => [
-                    'class' => 'form-control',
-                    'placeholder' => $this->translator->trans('end_year_placeholder')
-                ]
-            ])
-            ->add('qualification', TextType::class, [
-                'label' => $this->translator->trans('qualification'),
-                'required' => false, // Changed to false
-                'attr' => [
-                    'class' => 'form-control',
-                    'placeholder' => $this->translator->trans('qualification_placeholder')
-                ]
-            ])
-            ->add('minimum_grade', TextType::class, [
-                'label' => $this->translator->trans('minimum_grade'),
-                'required' => false, // Changed to false
-                'attr' => [
-                    'class' => 'form-control',
-                    'placeholder' => $this->translator->trans('minimum_grade_placeholder')
-                ]
-            ])
+          
             ->add('certificate_attachment', FileType::class, [
                 'label' => $this->translator->trans('certificates_attachment'),
                 'required' => false,

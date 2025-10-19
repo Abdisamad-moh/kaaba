@@ -201,14 +201,7 @@
                     </div>
                     
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group row">
-                                <label class="form-label text-end col-md-3">Town:</label>
-                                <div class="col-md-9">
-                                    <p>{{ application.town ?? 'N/A' }}</p>
-                                </div>
-                            </div>
-                        </div>
+                      
                         <div class="col-md-6">
                             <div class="form-group row">
                                 <label class="form-label text-end col-md-3">Village:</label>
@@ -230,14 +223,15 @@
                         <div class="col-md-6">
                             <div class="form-group row">
                                 <label class="form-label text-end col-md-3">Scholarship:</label>
-                                <div class="col-md-9">
-                                    <p class="fw-semibold">{{ application.scholarship.title ?? 'N/A' }}</p>
+                                <div class="col-md-9 mb-3">
+                                    <p class="fw-semibold" style="padding: 0 !important; margin: 0 !important;">{{ application.scholarship.title ?? 'N/A' }}</p>
                                     {% if application.scholarship %}
-                                        <small class="text-muted">Closing Date: {{ application.scholarship.closingDate|date('d-m-Y') }}</small>
+                                        <small class="text-muted badge bg-info-subtle">Closing Date: {{ application.scholarship.closingDate|date('d-m-Y') }}</small>
                                     {% endif %}
                                 </div>
                             </div>
                         </div>
+                      {% if application.scholarship.type != 'l' %}
                         <div class="col-md-6">
                             <div class="form-group row">
                                 <label class="form-label text-end col-md-3">Institute:</label>
@@ -246,9 +240,12 @@
                                 </div>
                             </div>
                         </div>
+                        {% endif %}
                     </div>
                     
                     <div class="row">
+                         {# Only show Course if scholarship type is NOT 'l' #}
+                        {% if application.scholarship.type != 'l' %}
                         <div class="col-md-6">
                             <div class="form-group row">
                                 <label class="form-label text-end col-md-3">Course:</label>
@@ -257,43 +254,119 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group row">
-                                <label class="form-label text-end col-md-3">Highest Qualification:</label>
-                                <div class="col-md-9">
-                                    <p>{{ application.highestqualification.name ?? 'N/A' }}</p>
-                                </div>
-                            </div>
-                        </div>
+                        {% endif %}
+                      
                     </div>
                 </div>
 
-                <!-- Educational Background Section -->
+            
+
+             
+                {# Conditional Section: Literacy & Numeracy for type 'l', Academic Qualification for other types #}
+                {% if application.scholarship.type == 'l' %}
+<!-- Literacy & Numeracy Section -->
+<div class="card-body">
+    <h5 class="card-title mb-0">Literacy & Numeracy Assessment</h5>
+</div>
+<hr class="m-0"/>
+<div class="card-body">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group row">
+                <label class="form-label text-end col-md-3">Literacy Level:</label>
+                <div class="col-md-9">
+                    <p>
+                        {% if application.literacylevel %}
+                            <span class="badge literacy-badge 
+                                {% if application.literacylevel == 'no_skills' %}bg-danger
+                                {% elseif application.literacylevel == 'limited' %}bg-warning text-dark
+                                {% elseif application.literacylevel == 'moderate' %}bg-info
+                                {% elseif application.literacylevel == 'proficient' %}bg-success
+                                {% else %}bg-secondary{% endif %}">
+                                {% if application.literacylevel == 'no_skills' %}{{ 'I do not possess reading or writing skills'|trans }}
+                                {% elseif application.literacylevel == 'limited' %}{{ 'I have limited proficiency in reading and writing'|trans }}
+                                {% elseif application.literacylevel == 'moderate' %}{{ 'I have moderate proficiency in reading and writing'|trans }}
+                                {% elseif application.literacylevel == 'proficient' %}{{ 'I am proficient in reading and writing'|trans }}
+                                {% else %}{{ application.literacylevel }}{% endif %}
+                            </span>
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group row">
+                <label class="form-label text-end col-md-3">Numeracy Level:</label>
+                <div class="col-md-9">
+                    <p>
+                        {% if application.numeracylevel %}
+                            <span class="badge literacy-badge 
+                                {% if application.numeracylevel == 'no_skills' %}bg-danger
+                                {% elseif application.numeracylevel == 'limited' %}bg-warning text-dark
+                                {% elseif application.numeracylevel == 'moderate' %}bg-info
+                                {% elseif application.numeracylevel == 'proficient' %}bg-success
+                                {% else %}bg-secondary{% endif %}">
+                                {% if application.numeracylevel == 'no_skills' %}{{ 'I do not possess basic numeracy skills'|trans }}
+                                {% elseif application.numeracylevel == 'limited' %}{{ 'I have limited proficiency in numeracy'|trans }}
+                                {% elseif application.numeracylevel == 'moderate' %}{{ 'I have moderate proficiency in numeracy'|trans }}
+                                {% elseif application.numeracylevel == 'proficient' %}{{ 'I am proficient in numeracy'|trans }}
+                                {% else %}{{ application.numeracylevel }}{% endif %}
+                            </span>
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group row">
+                <label class="form-label text-end col-md-3">Recent Education:</label>
+                <div class="col-md-9">
+                    <p>{{ application.recenteducation ?? 'N/A' }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group row">
+                <label class="form-label text-end col-md-3">Literacy & Numeracy Qualification:</label>
+                <div class="col-md-9">
+                    <p>{{ application.literacynumeracyqualification ?? 'N/A' }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>                {% else %}
+                <!-- Academic Qualification Section -->
                 <div class="card-body">
-                    <h5 class="card-title mb-0">Educational Background</h5>
+                    <h5 class="card-title mb-0">Academic Qualification</h5>
                 </div>
                 <hr class="m-0"/>
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group row">
-                                <label class="form-label text-end col-md-3">Secondary School:</label>
+                                <label class="form-label text-end col-md-3">Certificate Type:</label>
                                 <div class="col-md-9">
-                                    <p>{{ application.secondaryschool ?? 'N/A' }}</p>
+                                    <p>
+                                        {% if application.secondaryschool == 'Secondary Certificate' %}
+                                            <span class="badge bg-primary">{{ application.secondaryschool ?? 'N/A' }}</span>
+                                        {% elseif application.secondaryschool == 'Primary Certificate' %}
+                                            <span class="badge bg-info">{{ application.secondaryschool ?? 'N/A' }}</span>
+                                        {% elseif application.secondaryschool == 'Other Certificates' %}
+                                            <span class="badge bg-secondary">{{ application.secondaryschool ?? 'N/A' }}</span>
+                                        {% else %}
+                                            {{ application.secondaryschool ?? 'N/A' }}
+                                        {% endif %}
+                                    </p>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group row">
-                                <label class="form-label text-end col-md-3">Secondary Region:</label>
-                                <div class="col-md-9">
-                                    <p>{{ application.secondaryregion.name ?? 'N/A' }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group row">
                                 <label class="form-label text-end col-md-3">Graduation Year:</label>
@@ -302,91 +375,23 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    
+                    <div class="row">
                         <div class="col-md-6">
                             <div class="form-group row">
-                                <label class="form-label text-end col-md-3">Secondary Grade:</label>
+                                <label class="form-label text-end col-md-3">Grade/Score:</label>
                                 <div class="col-md-9">
                                     <p>{{ application.secondarygrade ?? 'N/A' }}</p>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="row">
                         <div class="col-md-6">
-                            <div class="form-group row">
-                                <label class="form-label text-end col-md-3">Qualification Details:</label>
-                                <div class="col-md-9">
-                                    <p>{{ application.highestqualificationdetail ?? 'N/A' }}</p>
-                                </div>
-                            </div>
+                            <!-- Empty column for layout balance -->
                         </div>
                     </div>
                 </div>
-
-                <!-- Higher Education Section -->
-                <div class="card-body">
-                    <h5 class="card-title mb-0">Higher Education</h5>
-                </div>
-                <hr class="m-0"/>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group row">
-                                <label class="form-label text-end col-md-3">Institution Name:</label>
-                                <div class="col-md-9">
-                                    <p>{{ application.institutionname ?? 'N/A' }}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group row">
-                                <label class="form-label text-end col-md-3">Location:</label>
-                                <div class="col-md-9">
-                                    <p>{{ application.location ?? 'N/A' }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group row">
-                                <label class="form-label text-end col-md-3">Start Year:</label>
-                                <div class="col-md-9">
-                                    <p>{{ application.startyear ?? 'N/A' }}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group row">
-                                <label class="form-label text-end col-md-3">End Year:</label>
-                                <div class="col-md-9">
-                                    <p>{{ application.endyear ?? 'N/A' }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group row">
-                                <label class="form-label text-end col-md-3">Qualification:</label>
-                                <div class="col-md-9">
-                                    <p>{{ application.qualification ?? 'N/A' }}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group row">
-                                <label class="form-label text-end col-md-3">Minimum Grade:</label>
-                                <div class="col-md-9">
-                                    <p>{{ application.minimumrade ?? 'N/A' }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {% endif %}
 
                 <!-- Documents Section -->
                 <div class="card-body">

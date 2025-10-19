@@ -114,14 +114,19 @@ class TranslationService
                 'institute_placeholder' => 'Select Institute',
 
                 // Secondary Education
-                'secondary_school_education' => 'Secondary School Education',
+                'secondary_school_education' => 'Academic Qualification',
                 'secondary_region' => 'Secondary Region',
                 'secondary_school' => 'Secondary School',
-                'secondary_school_placeholder' => 'Enter secondary school name',
                 'secondary_graduation_year' => 'Secondary Graduation Year',
                 'secondary_graduation_year_placeholder' => 'Enter graduation year',
                 'secondary_grade' => 'Secondary Grade',
                 'secondary_grade_placeholder' => 'Enter secondary grade',
+
+ // Secondary School Choices
+    'secondary_certificate' => 'Secondary Certificate',
+    'primary_certificate' => 'Primary Certificate',
+    'other_certificates' => 'Other Certificates',
+    'secondary_school_placeholder' => 'Select Certificate Type',
 
                 // Higher Education
                 'higher_education' => 'Higher Education Qualification',
@@ -258,14 +263,19 @@ class TranslationService
                 'course_placeholder' => 'Dooro koorsada',
 
                 // Secondary Education
-                'secondary_school_education' => 'Waxbarashada Dugsiyeenta Sare',
+                'secondary_school_education' => 'Aqoonta tacliinta sare',
                 'secondary_region' => 'Gobolka Dugsiga Sare',
                 'secondary_school' => 'Dugsiga Sare',
-                'secondary_school_placeholder' => 'Geli magaca dugsiga sare',
                 'secondary_graduation_year' => 'Sannadka Qalin Jabinta',
                 'secondary_graduation_year_placeholder' => 'Geli sannadka qalin jabinta',
                 'secondary_grade' => 'Darajada Sare',
                 'secondary_grade_placeholder' => 'Geli darajada sare',
+
+ // Secondary School Choices
+    'secondary_certificate' => 'Shahaadada Dugsiga Sare',
+    'primary_certificate' => 'Shahaadada Dugsiga Hoose',
+    'other_certificates' => 'Shahaadooyin Kale',
+    'secondary_school_placeholder' => 'Dooro Nooca Shahaadada',
 
                 // Higher Education
                 'higher_education' => 'Aqoonta Ugu Sarreysa',

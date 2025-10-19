@@ -282,6 +282,26 @@
     background-position: right calc(0.375em + 0.1875rem) center;
     background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
 }
+
+
+/* Add these styles to your existing CSS */
+.is-valid {
+    border-color: #198754 !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+    padding-right: 2.5rem;
+}
+
+.form-control.is-valid, .form-select.is-valid {
+    border-color: #198754 !important;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
     </style>
 </head>
 
@@ -672,14 +692,13 @@
                                                     <div class="mt-3">
                                                         <div class="row g-3">
 
-                                                            <div class="col-md-6">
-                                                                {{ form_label(form.secondary_school, null,
-                                                                {'label_attr': {'class': 'form-label fw-600
-                                                                text-dark-gray'}}) }}
-                                                                {{ form_widget(form.secondary_school, {'attr': {'class':
-                                                                'form-control border border-dark rounded-0'}}) }}
-                                                                {{ form_errors(form.secondary_school) }}
-                                                            </div>
+                                                          <div class="col-md-6">
+    {{ form_label(form.secondary_school, null,
+    {'label_attr': {'class': 'form-label fw-600 text-dark-gray'}}) }}
+    {{ form_widget(form.secondary_school, {'attr': {'class':
+    'form-select border border-dark rounded-0'}}) }}
+    {{ form_errors(form.secondary_school) }}
+</div>
                                                             <div class="col-md-6">
                                                                 {{ form_label(form.secondary_graduation_year, null,
                                                                 {'label_attr': {'class': 'form-label fw-600
@@ -702,83 +721,7 @@
                                             </div>
                                             {% endif %}
 
-                                            <!-- Last Education Training Institution Section -->
-                                            {% if type != 'l' %}
-                                            <div class="row justify-content-center mt-4">
-                                                <div class="col-12">
-                                                    <h6 class="fw-600 text-white text-uppercase mb-0 py-2 px-3"
-                                                        style="background-color:#1b5e20; font-size:14px;">
-                                                        {{ 'last_education'|trans }}
-                                                    </h6>
-
-                                                    <div class="mt-3">
-                                                        <div class="border rounded-2 p-3 bg-light">
-                                                            <div class="row g-4">
-                                                                <!-- Institution/Plan Name -->
-                                                                <div class="col-md-6">
-                                                                    {{ form_label(form.institution_name, null,
-                                                                    {'label_attr': {'class': 'form-label fw-600
-                                                                    text-dark-gray'}}) }}
-                                                                    {{ form_widget(form.institution_name, {'attr':
-                                                                    {'class': 'form-control border border-dark
-                                                                    rounded-0'}}) }}
-                                                                    {{ form_errors(form.institution_name) }}
-                                                                </div>
-
-                                                                <!-- Location -->
-                                                                <div class="col-md-6">
-                                                                    {{ form_label(form.location, null, {'label_attr':
-                                                                    {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                                                                    {{ form_widget(form.location, {'attr': {'class':
-                                                                    'form-control border border-dark rounded-0'}}) }}
-                                                                    {{ form_errors(form.location) }}
-                                                                </div>
-
-                                                                <!-- Start Year -->
-                                                                <div class="col-md-6">
-                                                                    {{ form_label(form.start_year, null, {'label_attr':
-                                                                    {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                                                                    {{ form_widget(form.start_year, {'attr': {'class':
-                                                                    'form-control border border-dark rounded-0'}}) }}
-                                                                    {{ form_errors(form.start_year) }}
-                                                                </div>
-
-                                                                <!-- End Year -->
-                                                                <div class="col-md-6">
-                                                                    {{ form_label(form.end_year, null, {'label_attr':
-                                                                    {'class': 'form-label fw-600 text-dark-gray'}}) }}
-                                                                    {{ form_widget(form.end_year, {'attr': {'class':
-                                                                    'form-control border border-dark rounded-0'}}) }}
-                                                                    {{ form_errors(form.end_year) }}
-                                                                </div>
-
-                                                                <!-- Qualification -->
-                                                                <div class="col-md-6">
-                                                                    {{ form_label(form.qualification, null,
-                                                                    {'label_attr': {'class': 'form-label fw-600
-                                                                    text-dark-gray'}}) }}
-                                                                    {{ form_widget(form.qualification, {'attr':
-                                                                    {'class': 'form-control border border-dark
-                                                                    rounded-0'}}) }}
-                                                                    {{ form_errors(form.qualification) }}
-                                                                </div>
-
-                                                                <!-- Minimum Grade/GPA -->
-                                                                <div class="col-md-6">
-                                                                    {{ form_label(form.minimum_grade, null,
-                                                                    {'label_attr': {'class': 'form-label fw-600
-                                                                    text-dark-gray'}}) }}
-                                                                    {{ form_widget(form.minimum_grade, {'attr':
-                                                                    {'class': 'form-control border border-dark
-                                                                    rounded-0'}}) }}
-                                                                    {{ form_errors(form.minimum_grade) }}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            {% endif %}
+                                         
 
 
                                             <div class="col-12 text-end mt-4">
@@ -904,7 +847,7 @@
     {% include 'home/_footer.html.twig' %}
     <!-- end footer -->
 
- <script>
+<script>
     // Application Form Manager
     class ApplicationFormManager {
         constructor() {
@@ -1002,197 +945,175 @@
         }
 
         // Validation Management
-     setupRealTimeValidation() {
-    const requiredFields = [
-        '{{ form.full_name.vars.id }}',
-        '{{ form.phone.vars.id }}',
-        '{{ form.gender.vars.id }}',
-        '{{ form.nationality.vars.id }}',
-        '{{ form.date_of_birth.vars.id }}',
-        '{{ form.region.vars.id }}',
-        '{{ form.disability.vars.id }}',
-    ];
+        setupRealTimeValidation() {
+            const requiredFields = [
+                '{{ form.full_name.vars.id }}',
+                '{{ form.phone.vars.id }}',
+                '{{ form.gender.vars.id }}',
+                '{{ form.nationality.vars.id }}',
+                '{{ form.date_of_birth.vars.id }}',
+                '{{ form.region.vars.id }}',
+                '{{ form.district.vars.id }}', // Added district
+                '{{ form.disability.vars.id }}',
+                '{{ form.identity_type.vars.id }}', // Added identity type
+            ];
 
-    // Add institute and course if scholarship type is not 'l'
-    {% if type != 'l' %}
-    requiredFields.push('{{ form.institute.vars.id }}');
-    requiredFields.push('{{ form.course.vars.id }}');
-    {% endif %}
+            // Add institute and course if scholarship type is not 'l'
+            {% if type != 'l' %}
+            requiredFields.push('{{ form.institute.vars.id }}');
+            requiredFields.push('{{ form.course.vars.id }}');
+            {% endif %}
 
-    requiredFields.forEach(fieldId => {
-        const field = document.getElementById(fieldId);
-        if (field) {
-            ['blur', 'change', 'input'].forEach(event => {
-                field.addEventListener(event, () => this.validateStep1());
+            // Add academic qualification fields if scholarship type is not 'l'
+            {% if type != 'l' %}
+            requiredFields.push('{{ form.secondary_school.vars.id }}');
+            requiredFields.push('{{ form.secondary_graduation_year.vars.id }}');
+            requiredFields.push('{{ form.secondary_grade.vars.id }}');
+            {% endif %}
+
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    ['blur', 'change', 'input'].forEach(event => {
+                        field.addEventListener(event, () => this.validateStep1());
+                    });
+                }
+            });
+
+            // Add event listener for disability type field
+            const disabilityTypeField = document.getElementById('{{ form.disability_type.vars.id }}');
+            if (disabilityTypeField) {
+                ['blur', 'change'].forEach(event => {
+                    disabilityTypeField.addEventListener(event, () => this.validateStep1());
+                });
+            }
+
+            {% if type != 'l' %}
+            // Also validate when institute changes to update course validation
+            const instituteSelect = document.getElementById('{{ form.institute.vars.id }}');
+            if (instituteSelect) {
+                instituteSelect.addEventListener('change', () => {
+                    setTimeout(() => this.validateStep1(), 100);
+                });
+            }
+            {% endif %}
+
+            const fileLists = document.querySelectorAll('.file-list');
+            fileLists.forEach(list => {
+                const observer = new MutationObserver(() => this.validateStep1());
+                observer.observe(list, { childList: true });
             });
         }
-    });
 
-    // Also validate when institute changes to update course validation
-    const instituteSelect = document.getElementById('{{ form.institute.vars.id }}');
-    if (instituteSelect) {
-        instituteSelect.addEventListener('change', () => {
-            setTimeout(() => this.validateStep1(), 100);
-        });
-    }
+        validateStep1() {
+            const requiredFields = {
+                '{{ form.full_name.vars.id }}': 'Full name is required',
+                '{{ form.gender.vars.id }}': 'Gender is required',
+                '{{ form.phone.vars.id }}': 'Phone number is required',
+                '{{ form.nationality.vars.id }}': 'Nationality is required',
+                '{{ form.date_of_birth.vars.id }}': 'Date of birth is required',
+                '{{ form.region.vars.id }}': 'Region is required',
+                '{{ form.district.vars.id }}': 'District is required', // Added district
+                '{{ form.disability.vars.id }}': 'Disability information is required',
+                '{{ form.identity_type.vars.id }}': 'Identity type is required' // Added identity type
+            };
 
-    const fileLists = document.querySelectorAll('.file-list');
-    fileLists.forEach(list => {
-        const observer = new MutationObserver(() => this.validateStep1());
-        observer.observe(list, { childList: true });
-    });
-}
+            // Add institute and course fields if scholarship type is not 'l'
+            {% if type != 'l' %}
+            requiredFields['{{ form.institute.vars.id }}'] = 'Institute selection is required';
+            requiredFields['{{ form.course.vars.id }}'] = 'Course selection is required';
+            {% endif %}
 
-  validateStep1() {
-    const requiredFields = {
-        '{{ form.full_name.vars.id }}': 'Full name is required',
-        '{{ form.gender.vars.id }}': 'Gender is required',
-        '{{ form.phone.vars.id }}': 'Phone number is required',
-        '{{ form.nationality.vars.id }}': 'Nationality is required',
-        '{{ form.date_of_birth.vars.id }}': 'Date of birth is required',
-        '{{ form.region.vars.id }}': 'Region is required',
-        '{{ form.disability.vars.id }}': 'Disability information is required'
-    };
+            // Add academic qualification fields if scholarship type is not 'l'
+            {% if type != 'l' %}
+            requiredFields['{{ form.secondary_school.vars.id }}'] = 'Certificate type is required';
+            requiredFields['{{ form.secondary_graduation_year.vars.id }}'] = 'Graduation year is required';
+            requiredFields['{{ form.secondary_grade.vars.id }}'] = 'Grade/score is required';
+            {% endif %}
 
-    // Add institute and course fields if scholarship type is not 'l'
-    {% if type != 'l' %}
-    requiredFields['{{ form.institute.vars.id }}'] = 'Institute selection is required';
-    requiredFields['{{ form.course.vars.id }}'] = 'Course selection is required';
-    {% endif %}
+            let isValid = true;
+            this.clearValidationErrors();
 
-    let isValid = true;
-    this.clearValidationErrors();
+            // Validate basic fields
+            for (const [fieldId, message] of Object.entries(requiredFields)) {
+                const field = document.getElementById(fieldId);
+                if (field && !field.value.trim()) {
+                    isValid = false;
+                    this.markFieldAsInvalid(field, message);
+                } else if (field) {
+                    this.markFieldAsValid(field);
+                }
+            }
 
-    // Validate basic fields
-    for (const [fieldId, message] of Object.entries(requiredFields)) {
-        const field = document.getElementById(fieldId);
-        if (field && !field.value.trim()) {
-            isValid = false;
-            this.markFieldAsInvalid(field, message);
-        } else if (field) {
-            this.markFieldAsValid(field);
+            // Validate disability type if disability is "Yes"
+            const disabilityField = document.getElementById('{{ form.disability.vars.id }}');
+            const disabilityTypeField = document.getElementById('{{ form.disability_type.vars.id }}');
+            const disabilityTypeSection = document.getElementById('disabilityTypeSection');
+            
+            if (disabilityField && disabilityField.value === 'Yes' && disabilityTypeSection && disabilityTypeSection.style.display !== 'none') {
+                if (!disabilityTypeField || !disabilityTypeField.value.trim()) {
+                    isValid = false;
+                    this.markFieldAsInvalid(disabilityTypeField, 'Disability type is required when disability is "Yes"');
+                } else {
+                    this.markFieldAsValid(disabilityTypeField);
+                }
+            } else if (disabilityTypeField) {
+                this.markFieldAsValid(disabilityTypeField);
+            }
+
+            // Validate identity attachment
+            const identityArea = document.querySelector('[data-field-name="identity_attachment"]');
+            const hasIdentityFiles = identityArea &&
+                identityArea.querySelector('.file-list') &&
+                identityArea.querySelector('.file-list').children.length > 0;
+
+            if (!hasIdentityFiles) {
+                isValid = false;
+                identityArea.classList.add('file-area-error');
+                identityArea.classList.remove('file-area-valid');
+            } else {
+                identityArea.classList.remove('file-area-error');
+                identityArea.classList.add('file-area-valid');
+            }
+
+            this.updateNextStepButton(isValid);
+            this.updateTabAccessibility(isValid);
+
+            return isValid;
         }
-    }
 
-    // Validate disability type if disability is "Yes"
-    const disabilityField = document.getElementById('{{ form.disability.vars.id }}');
-    const disabilityTypeField = document.getElementById('{{ form.disability_type.vars.id }}');
-    const disabilityTypeSection = document.getElementById('disabilityTypeSection');
-    
-    if (disabilityField && disabilityField.value === 'Yes' && disabilityTypeSection && disabilityTypeSection.style.display !== 'none') {
-        if (!disabilityTypeField || !disabilityTypeField.value.trim()) {
-            isValid = false;
-            this.markFieldAsInvalid(disabilityTypeField, 'Disability type is required when disability is "Yes"');
-        } else {
-            // This is the key fix - mark as valid when a disability type is selected
-            this.markFieldAsValid(disabilityTypeField);
+        // Enhanced field validation methods
+        markFieldAsInvalid(field, message) {
+            if (!field) return;
+            
+            field.classList.add('is-invalid');
+            field.classList.remove('is-valid');
+            
+            // Remove existing error message
+            const existingError = field.parentNode.querySelector('.field-error-message');
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            // Add new error message
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'field-error-message invalid-feedback';
+            errorDiv.textContent = message;
+            field.parentNode.appendChild(errorDiv);
         }
-    } else if (disabilityTypeField) {
-        // If disability is not "Yes", ensure the field is marked as valid (not showing errors)
-        this.markFieldAsValid(disabilityTypeField);
-    }
 
-    // Validate identity attachment
-    const identityArea = document.querySelector('[data-field-name="identity_attachment"]');
-    const hasIdentityFiles = identityArea &&
-        identityArea.querySelector('.file-list') &&
-        identityArea.querySelector('.file-list').children.length > 0;
-
-    if (!hasIdentityFiles) {
-        isValid = false;
-        identityArea.classList.add('file-area-error');
-    } else {
-        identityArea.classList.remove('file-area-error');
-    }
-
-    this.updateNextStepButton(isValid);
-    this.updateTabAccessibility(isValid);
-
-    return isValid;
-}
-
-// Add event listener for disability type field changes
-setupRealTimeValidation() {
-    const requiredFields = [
-        '{{ form.full_name.vars.id }}',
-        '{{ form.phone.vars.id }}',
-        '{{ form.gender.vars.id }}',
-        '{{ form.nationality.vars.id }}',
-        '{{ form.date_of_birth.vars.id }}',
-        '{{ form.region.vars.id }}',
-        '{{ form.disability.vars.id }}',
-    ];
-
-    // Add institute and course if scholarship type is not 'l'
-    {% if type != 'l' %}
-    requiredFields.push('{{ form.institute.vars.id }}');
-    requiredFields.push('{{ form.course.vars.id }}');
-    {% endif %}
-
-    requiredFields.forEach(fieldId => {
-        const field = document.getElementById(fieldId);
-        if (field) {
-            ['blur', 'change', 'input'].forEach(event => {
-                field.addEventListener(event, () => this.validateStep1());
-            });
+        markFieldAsValid(field) {
+            if (!field) return;
+            
+            field.classList.remove('is-invalid');
+            field.classList.add('is-valid');
+            
+            // Remove error message
+            const existingError = field.parentNode.querySelector('.field-error-message');
+            if (existingError) {
+                existingError.remove();
+            }
         }
-    });
-
-    // Add event listener for disability type field
-    const disabilityTypeField = document.getElementById('{{ form.disability_type.vars.id }}');
-    if (disabilityTypeField) {
-        ['blur', 'change'].forEach(event => {
-            disabilityTypeField.addEventListener(event, () => this.validateStep1());
-        });
-    }
-
-    // Also validate when institute changes to update course validation
-    const instituteSelect = document.getElementById('{{ form.institute.vars.id }}');
-    if (instituteSelect) {
-        instituteSelect.addEventListener('change', () => {
-            setTimeout(() => this.validateStep1(), 100);
-        });
-    }
-
-    const fileLists = document.querySelectorAll('.file-list');
-    fileLists.forEach(list => {
-        const observer = new MutationObserver(() => this.validateStep1());
-        observer.observe(list, { childList: true });
-    });
-}
-
-// Enhanced field validation methods
-markFieldAsInvalid(field, message) {
-    if (!field) return;
-    
-    field.classList.add('is-invalid');
-    field.classList.remove('is-valid');
-    
-    // Remove existing error message
-    const existingError = field.parentNode.querySelector('.field-error-message');
-    if (existingError) {
-        existingError.remove();
-    }
-    
-    // Add new error message
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'field-error-message invalid-feedback';
-    errorDiv.textContent = message;
-    field.parentNode.appendChild(errorDiv);
-}
-
-markFieldAsValid(field) {
-    if (!field) return;
-    
-    field.classList.remove('is-invalid');
-    field.classList.add('is-valid');
-    
-    // Remove error message
-    const existingError = field.parentNode.querySelector('.field-error-message');
-    if (existingError) {
-        existingError.remove();
-    }
-}
 
         validateStep1WithFeedback() {
             if (!this.validateStep1()) {
@@ -1405,6 +1326,14 @@ markFieldAsValid(field) {
             if (disabilitySelect) {
                 toggleDisabilityFields(disabilitySelect);
             }
+
+            // Initialize district validation when region changes
+            const regionSelect = document.getElementById('{{ form.region.vars.id }}');
+            if (regionSelect) {
+                regionSelect.addEventListener('change', () => {
+                    setTimeout(() => this.validateStep1(), 300); // Validate after districts load
+                });
+            }
         }
 
         initializeRegionDistrict() {
@@ -1501,63 +1430,63 @@ markFieldAsValid(field) {
                 });
         }
 
-     loadCourses(instituteId) {
-    {% if type != 'l' %}
-    const courseSelect = document.getElementById('{{ form.course.vars.id }}');
+        loadCourses(instituteId) {
+            {% if type != 'l' %}
+            const courseSelect = document.getElementById('{{ form.course.vars.id }}');
 
-    if (!courseSelect) return;
-
-    if (!instituteId) {
-        this.resetCourseSelect();
-        this.validateStep1(); // Trigger validation
-        return;
-    }
-
-    courseSelect.innerHTML = '<option value="">Loading courses...</option>';
-    courseSelect.disabled = true;
-
-    const currentPath = window.location.pathname;
-    const apiUrl = `${currentPath}?action=get_courses&institute_id=${instituteId}`;
-
-    fetch(apiUrl, {
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json'
-        }
-    })
-        .then(response => {
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            return response.json();
-        })
-        .then(courses => {
             if (!courseSelect) return;
-            const selectCourseText = "{{ trans.trans('course_placeholder')|e('js') }}";
-            courseSelect.innerHTML = `<option value="">${selectCourseText}</option>`;
-            courseSelect.disabled = false;
 
-            if (courses && courses.length > 0) {
-                courses.forEach(course => {
-                    const option = document.createElement('option');
-                    option.value = course.id;
-                    option.textContent = course.name;
-                    courseSelect.appendChild(option);
+            if (!instituteId) {
+                this.resetCourseSelect();
+                this.validateStep1(); // Trigger validation
+                return;
+            }
+
+            courseSelect.innerHTML = '<option value="">Loading courses...</option>';
+            courseSelect.disabled = true;
+
+            const currentPath = window.location.pathname;
+            const apiUrl = `${currentPath}?action=get_courses&institute_id=${instituteId}`;
+
+            fetch(apiUrl, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    return response.json();
+                })
+                .then(courses => {
+                    if (!courseSelect) return;
+                    const selectCourseText = "{{ trans.trans('course_placeholder')|e('js') }}";
+                    courseSelect.innerHTML = `<option value="">${selectCourseText}</option>`;
+                    courseSelect.disabled = false;
+
+                    if (courses && courses.length > 0) {
+                        courses.forEach(course => {
+                            const option = document.createElement('option');
+                            option.value = course.id;
+                            option.textContent = course.name;
+                            courseSelect.appendChild(option);
+                        });
+                    } else {
+                        courseSelect.innerHTML = '<option value="">No courses available</option>';
+                    }
+                    
+                    this.validateStep1(); // Trigger validation after courses are loaded
+                })
+                .catch(error => {
+                    console.error('Error loading courses:', error);
+                    if (courseSelect) {
+                        courseSelect.innerHTML = '<option value="">Error loading courses</option>';
+                        courseSelect.disabled = false;
+                    }
+                    this.validateStep1(); // Trigger validation even on error
                 });
-            } else {
-                courseSelect.innerHTML = '<option value="">No courses available</option>';
-            }
-            
-            this.validateStep1(); // Trigger validation after courses are loaded
-        })
-        .catch(error => {
-            console.error('Error loading courses:', error);
-            if (courseSelect) {
-                courseSelect.innerHTML = '<option value="">Error loading courses</option>';
-                courseSelect.disabled = false;
-            }
-            this.validateStep1(); // Trigger validation even on error
-        });
-    {% endif %}
-}
+            {% endif %}
+        }
 
         resetCourseSelect() {
             {% if type != 'l' %}
@@ -1581,90 +1510,90 @@ markFieldAsValid(field) {
         appFormManager.submitApplication();
     }
 
-function toggleDisabilityFields(selectElement) {
-    const disabilityTypeSection = document.getElementById('disabilityTypeSection');
-    const disabilityExplanation = document.getElementById('disabilityExplanation');
-    
-    // Get the selected option text and value
-    const selectedOption = selectElement.options[selectElement.selectedIndex];
-    const optionText = selectedOption.text.trim().toLowerCase();
-    const optionValue = selectElement.value.toLowerCase();
-    
-    // Show disability type field if "Yes" is selected
-    const yesValues = ['yes', 'haa', '1', 'true', 'y', 'aye'];
-    const isDisabled = yesValues.includes(optionText) || yesValues.includes(optionValue);
-    
-    if (disabilityTypeSection) {
-        disabilityTypeSection.style.display = isDisabled ? 'block' : 'none';
-    }
-    
-    // Reset and hide dependent fields when disability is not "Yes"
-    if (!isDisabled) {
-        if (disabilityExplanation) {
-            disabilityExplanation.style.display = 'none';
+    function toggleDisabilityFields(selectElement) {
+        const disabilityTypeSection = document.getElementById('disabilityTypeSection');
+        const disabilityExplanation = document.getElementById('disabilityExplanation');
+        
+        // Get the selected option text and value
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        const optionText = selectedOption.text.trim().toLowerCase();
+        const optionValue = selectElement.value.toLowerCase();
+        
+        // Show disability type field if "Yes" is selected
+        const yesValues = ['yes', 'haa', '1', 'true', 'y', 'aye'];
+        const isDisabled = yesValues.includes(optionText) || yesValues.includes(optionValue);
+        
+        if (disabilityTypeSection) {
+            disabilityTypeSection.style.display = isDisabled ? 'block' : 'none';
         }
         
-        // Reset disability type and explanation fields
-        const disabilityTypeField = document.getElementById('{{ form.disability_type.vars.id }}');
-        const explanationField = document.getElementById('{{ form.disability_explanation.vars.id }}');
+        // Reset and hide dependent fields when disability is not "Yes"
+        if (!isDisabled) {
+            if (disabilityExplanation) {
+                disabilityExplanation.style.display = 'none';
+            }
+            
+            // Reset disability type and explanation fields
+            const disabilityTypeField = document.getElementById('{{ form.disability_type.vars.id }}');
+            const explanationField = document.getElementById('{{ form.disability_explanation.vars.id }}');
+            
+            if (disabilityTypeField) {
+                disabilityTypeField.value = '';
+                disabilityTypeField.required = false;
+            }
+            if (explanationField) {
+                explanationField.value = '';
+                explanationField.required = false;
+            }
+        } else {
+            // Make disability type required when "Yes" is selected
+            const disabilityTypeField = document.getElementById('{{ form.disability_type.vars.id }}');
+            if (disabilityTypeField) {
+                disabilityTypeField.required = true;
+            }
+        }
         
-        if (disabilityTypeField) {
-            disabilityTypeField.value = '';
-            disabilityTypeField.required = false;
-        }
-        if (explanationField) {
-            explanationField.value = '';
-            explanationField.required = false;
-        }
-    } else {
-        // Make disability type required when "Yes" is selected
-        const disabilityTypeField = document.getElementById('{{ form.disability_type.vars.id }}');
-        if (disabilityTypeField) {
-            disabilityTypeField.required = true;
-        }
+        // Trigger validation after toggling fields
+        setTimeout(() => {
+            if (appFormManager) {
+                appFormManager.validateStep1();
+            }
+        }, 100);
     }
-    
-    // Trigger validation after toggling fields
-    setTimeout(() => {
-        if (appFormManager) {
-            appFormManager.validateStep1();
-        }
-    }, 100);
-}
 
-function toggleDisabilityExplanation(selectElement) {
-    const disabilityExplanation = document.getElementById('disabilityExplanation');
-    
-    if (!disabilityExplanation) return;
-    
-    // Show explanation field only if "Other" is selected
-    const selectedOption = selectElement.options[selectElement.selectedIndex];
-    const optionText = selectedOption.text.trim().toLowerCase();
-    const optionValue = selectElement.value.toLowerCase();
-    
-    const otherValues = ['other', 'kale', 'else'];
-    const isOther = otherValues.includes(optionText) || otherValues.includes(optionValue);
-    
-    disabilityExplanation.style.display = isOther ? 'block' : 'none';
-    
-    // Make explanation field required only if "Other" is selected
-    const explanationField = document.getElementById('{{ form.disability_explanation.vars.id }}');
-    if (explanationField) {
-        explanationField.required = isOther;
+    function toggleDisabilityExplanation(selectElement) {
+        const disabilityExplanation = document.getElementById('disabilityExplanation');
         
-        // Clear the field when hiding it
-        if (!isOther) {
-            explanationField.value = '';
+        if (!disabilityExplanation) return;
+        
+        // Show explanation field only if "Other" is selected
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        const optionText = selectedOption.text.trim().toLowerCase();
+        const optionValue = selectElement.value.toLowerCase();
+        
+        const otherValues = ['other', 'kale', 'else'];
+        const isOther = otherValues.includes(optionText) || otherValues.includes(optionValue);
+        
+        disabilityExplanation.style.display = isOther ? 'block' : 'none';
+        
+        // Make explanation field required only if "Other" is selected
+        const explanationField = document.getElementById('{{ form.disability_explanation.vars.id }}');
+        if (explanationField) {
+            explanationField.required = isOther;
+            
+            // Clear the field when hiding it
+            if (!isOther) {
+                explanationField.value = '';
+            }
         }
+        
+        // Trigger validation after toggling explanation field
+        setTimeout(() => {
+            if (appFormManager) {
+                appFormManager.validateStep1();
+            }
+        }, 100);
     }
-    
-    // Trigger validation after toggling explanation field
-    setTimeout(() => {
-        if (appFormManager) {
-            appFormManager.validateStep1();
-        }
-    }, 100);
-}
 
     // Initialize application when DOM is loaded
     let appFormManager;
@@ -1672,6 +1601,7 @@ function toggleDisabilityExplanation(selectElement) {
         appFormManager = new ApplicationFormManager();
     });
 </script>
+
     <script src="{{ asset('assets/js/jquery.js') }}"></script>
     <script src="{{ asset('assets/js/vendors.min.js') }}"></script>
     <script src="{{ asset('assets/js/main.js') }}"></script>
