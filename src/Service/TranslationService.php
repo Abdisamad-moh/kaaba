@@ -116,17 +116,17 @@ class TranslationService
                 // Secondary Education
                 'secondary_school_education' => 'Academic Qualification',
                 'secondary_region' => 'Secondary Region',
-                'secondary_school' => 'Secondary School',
-                'secondary_graduation_year' => 'Secondary Graduation Year',
+                'secondary_school' => 'Highest Qualification',
+                'secondary_graduation_year' => 'Graduation Year',
                 'secondary_graduation_year_placeholder' => 'Enter graduation year',
-                'secondary_grade' => 'Secondary Grade',
-                'secondary_grade_placeholder' => 'Enter secondary grade',
+                'secondary_grade' => 'Grade',
+                'secondary_grade_placeholder' => 'Enter grade',
 
  // Secondary School Choices
     'secondary_certificate' => 'Secondary Certificate',
     'primary_certificate' => 'Primary Certificate',
     'other_certificates' => 'Other Certificates',
-    'secondary_school_placeholder' => 'Select Certificate Type',
+    'secondary_school_placeholder' => 'Select Highest Qualification',
 
                 // Higher Education
                 'higher_education' => 'Higher Education Qualification',
@@ -265,17 +265,17 @@ class TranslationService
                 // Secondary Education
                 'secondary_school_education' => 'Aqoonta tacliinta sare',
                 'secondary_region' => 'Gobolka Dugsiga Sare',
-                'secondary_school' => 'Dugsiga Sare',
+                'secondary_school' => 'Heerka Aqoonta',
                 'secondary_graduation_year' => 'Sannadka Qalin Jabinta',
                 'secondary_graduation_year_placeholder' => 'Geli sannadka qalin jabinta',
-                'secondary_grade' => 'Darajada Sare',
-                'secondary_grade_placeholder' => 'Geli darajada sare',
+                'secondary_grade' => 'Darajada',
+                'secondary_grade_placeholder' => 'Geli darajada',
 
  // Secondary School Choices
     'secondary_certificate' => 'Shahaadada Dugsiga Sare',
     'primary_certificate' => 'Shahaadada Dugsiga Hoose',
     'other_certificates' => 'Shahaadooyin Kale',
-    'secondary_school_placeholder' => 'Dooro Nooca Shahaadada',
+    'secondary_school_placeholder' => 'Dooro Heerka Aqoonta',
 
                 // Higher Education
                 'higher_education' => 'Aqoonta Ugu Sarreysa',
