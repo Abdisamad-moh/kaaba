@@ -143,8 +143,7 @@ class CarbonExtension extends AbstractExtension
           }
     }
     public function lastChat(User $currentUser, User $clientUser){
-        $chat = $this->em->getRepository(MetierChat::class)->findLastChatBetweenUsers($currentUser, $clientUser);
-        return $chat;
+        return null;
     }
 
     public function serveImage(string $filename, string $type)

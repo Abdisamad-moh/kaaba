@@ -99,62 +99,7 @@ class SecurityController extends AbstractController
         ]);
     }
 
-    #[Route('/forgot-password', name: 'app_forgot_password_request')]
-    public function request(Request $request, UserRepository $users, MailService $mailService, EntityManagerInterface $em, RouterInterface $router, EventDispatcherInterface $eventDispatcher): Response
-    {
-        $form = $this->createForm(ResetPasswordRequestFormType::class);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $user = $users->findOneBy(['email' => $form->get('email')->getData()]);
-
-            if ($user) {
-                $token = bin2hex(random_bytes(32));
-                $hashedToken = password_hash($token, PASSWORD_DEFAULT);
-                $user->setResetToken($hashedToken);
-                $user->setResetTokenExpiration(new \DateTime('+1 hour'));
-                $em->persist($user);
-                $em->flush();
-
-                $resetUrl = $router->generate('app_reset_password', [
-                    'token' => $token
-                ], UrlGeneratorInterface::ABSOLUTE_URL);
-
-                $employer_otp_template = $em->getRepository(MetierEmailTemps::class)->findOneBy(["action" => "user_password_forgot"]) ?? new MetierEmailTemps();
-                $otp_email_data = [
-                    "name" => "",
-                    "email" => $user->getEmail(),
-                    "type" => $employer_otp_template->getType(),
-                    "content" => $employer_otp_template->getContent(),
-                    "subject" => $employer_otp_template->getSubject(),
-                    "header" => $employer_otp_template->getHeader(),
-                    "cat" => "",
-                    "extra" => "",
-                    "otp" => "",
-                    "employer" => $user->getName(),
-                    "interview_date" => "",
-                    "platform" => "",
-                    "job_title" => "",
-                    "link" => $resetUrl,
-                    "job_id" => "",
-                    "closing_date" => "",
-                    "interview_time" => "",
-                ];
-
-
-                // 
-                $event = new SendEmailEvent($otp_email_data);
-                $eventDispatcher->dispatch($event, SendEmailEvent::class);
-            }
-
-            sweetalert()->success("Done. Please check your email with a link to reset your password");
-            return $this->redirectToRoute('app_forgot_password_request');
-        }
-
-        return $this->render('security/request.html.twig', [
-            'form' => $form->createView(),
-        ]);
-    }
+ 
 
     #[Route(path: '/employer_login', name: 'app_employer_login')]
     public function employer_login(AuthenticationUtils $authenticationUtils): Response

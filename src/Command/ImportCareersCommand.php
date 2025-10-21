@@ -8,7 +8,6 @@
     use Symfony\Component\Console\Style\SymfonyStyle;
     use Doctrine\ORM\EntityManagerInterface;
     use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
-    use App\Entity\MetierCareers;
     
     class ImportCareersCommand extends Command
     {
@@ -45,19 +44,7 @@
                 for ($row = 2; $row <= $highestRow; $row++) {
                     $name = $worksheet->getCell("A$row")->getValue();
     
-                    $existingCareer = $this->entityManager->getRepository(MetierCareers::class)->findOneBy(['name' => $name]);
-    
-                    if (!$existingCareer) {
-                        $career = new MetierCareers();
-                        $career->setName($name);
-    
-                        $this->entityManager->persist($career);
-                        $this->entityManager->flush();
-    
-                        $io->success("Created new MetierCareers: {$name}");
-                    } else {
-                        $io->info("MetierCareers already exists: {$name}");
-                    }
+                   
                 }
     
                 $io->success('Import completed successfully!');

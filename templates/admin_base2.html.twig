@@ -468,15 +468,9 @@
 										<!-- start language Dropdown -->
 										<!-- ------------------------------- -->
 											
-										<!-- <li class="nav-item mmm">
-
-											<a href="{{path('app_employer_messages')}}">
-												<i class="ti ti-message-dots awa"></i>
-												Messages
-											</a>
-										</li> -->
+										
 										<li class="nav-item mmm">
-											<a href="{{ path('app_employer_notifications_list')}}">
+											<a href="#">
 												<i class="ti ti-bell-ringing awa"></i>
 												Notifications</a>
 										</li>
@@ -487,12 +481,7 @@
 												<div class="d-flex align-items-center">
 													<div class="user-profile-img">
 
-														{% if app.user.employerDetails %}
 															<img src="{{ asset('assets/images/hero-logo.png') }}" class="rounded-circle" width="35" height="35" alt="logo-img"/>
-														{% else %}
-															<img src="{{ asset('assets/images/hero-logo.png') }}" class="rounded-circle" width="35" height="35" alt="logo-img"/>
-														{% endif %}
-													</div>
 												</div>
 											</a>
 											<div class="dropdown-menu content-dd dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop1">
@@ -503,11 +492,7 @@
 													<div class="d-flex align-items-center py-9 mx-7 border-bottom">
 
 
-														{% if app.user.employerDetails %}
 															<img src="{{ asset('assets/images/hero-logo.png') }}" class="rounded-circle" width="80" height="80" alt="logo-img"/>
-														{% else %}
-															<img src="{{ asset('assets/images/hero-logo.png') }}" class="rounded-circle" width="80" height="80" alt="logo-img"/>
-														{% endif %}
 														<div class="ms-3">
 															<h5 class="mb-1 fs-3">{{  app.user.name }}</h5>
 														</div>

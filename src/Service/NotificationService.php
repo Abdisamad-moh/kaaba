@@ -18,26 +18,16 @@ class NotificationService
         $this->urlGenerator = $urlGenerator;
     }
 
-    public function createNotification(string $type, string $message, $user, string $routeName, array $routeParams = []): MetierNotification
+    public function createNotification(string $type, string $message, $user, string $routeName, array $routeParams = []): void
     {
-        $notification = new MetierNotification();
-        $notification->setType($type);
-        $notification->setContent($message);
-        $notification->setUser($user);
-        $notification->setRead(false);
-        // $notification->setAction($this->urlGenerator->generate($routeName, $routeParams));
-        $notification->setAction("");
+      
 
-        // $this->entityManager->persist($notification);
-        // $this->entityManager->flush();
-
-        return $notification;
+       
     }
 
-    public function deleteNotification(MetierNotification $notification): void
+    public function deleteNotification(): void
     {
-        $this->entityManager->remove($notification);
-        $this->entityManager->flush();
+        
     }
 }
 

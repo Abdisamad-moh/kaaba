@@ -276,7 +276,7 @@ public function filterApplications(
 
         // Process in PHP
         $monthlyCounts = array_fill(1, 12, 0);
-        
+
         foreach ($applications as $application) {
             $month = (int)$application['application_date']->format('n'); // 1-12
             $monthlyCounts[$month]++;

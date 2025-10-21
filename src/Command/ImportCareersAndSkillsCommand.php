@@ -2,8 +2,7 @@
 
 namespace App\Command;
 
-use App\Entity\MetierCareers;
-use App\Entity\MetierSkills;
+
 use Doctrine\ORM\EntityManagerInterface;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Symfony\Component\Console\Command\Command;
@@ -46,10 +45,9 @@ class ImportCareersAndSkillsCommand extends Command
         $spreadsheet = IOFactory::load($filePath);
         $worksheet = $spreadsheet->getActiveSheet();
 
-        $careerRepo = $this->entityManager->getRepository(MetierCareers::class);
 
         // Fetch all existing careers from the database
-        $existingCareers = $careerRepo->findAll();
+        $existingCareers = [];
         $existingCareersIndexed = [];
         foreach ($existingCareers as $career) {
             $existingCareersIndexed[$career->getName()] = $career;
@@ -65,18 +63,7 @@ class ImportCareersAndSkillsCommand extends Command
             }
 
             // Check if the career exists in the database
-            if (isset($existingCareersIndexed[$careerName])) {
-                $career = $existingCareersIndexed[$careerName];
-
-                // Create a new MetierSkills entity for the skill
-                $skill = new MetierSkills();
-                $skill->setName($skillName);
-                $skill->setCareer($career);
-                $skill->setCareerName($careerName);
-
-                $career->addSkill($skill); // Add the skill to the career entity (important)
-                $this->entityManager->persist($skill);
-            }
+            
         }
 
         // Flush all changes to the database
