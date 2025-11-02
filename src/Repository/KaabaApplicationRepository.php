@@ -43,7 +43,7 @@ public function filterApplications(
             ->leftJoin('a.gender', 'g')
             ->leftJoin('a.scholarship', 'sch')
   ->leftJoin('a.institute', 'i')
-            ->orderBy('a.created_at', 'DESC');
+            ->orderBy('a.id', 'ASC');
 
 
 
