@@ -794,8 +794,8 @@ public function wasRejectedBy(User $user): bool
     foreach ($logs as $log) {
         if ($log->getAction() === 'status_change' && 
             $log->getUser() === $user &&
-            (strpos($log->getDescription(), "to 'Rejected'") !== false || 
-             strpos($log->getDescription(), "to 'rejected'") !== false)) {
+            (strpos($log->getNote(), "to 'Rejected'") !== false || 
+             strpos($log->getNote(), "to 'rejected'") !== false)) {
             return true;
         }
     }
