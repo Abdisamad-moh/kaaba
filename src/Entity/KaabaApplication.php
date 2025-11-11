@@ -153,7 +153,7 @@ private ?string $disability_type = null;
 
 
  #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $applied_date = null;
+             private ?\DateTimeInterface $applied_date = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $shortlisted_date = null;
@@ -172,6 +172,9 @@ private Collection $logs;
 
 #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
 private ?\DateTimeInterface $waitlisted_date = null;
+
+#[ORM\Column(type: Types::TEXT, nullable: true)]
+private ?string $rejection_reason = null;
 
     public function __construct()
     {
@@ -798,5 +801,17 @@ public function wasRejectedBy(User $user): bool
     }
     
     return false;
+}
+
+public function getRejectionReason(): ?string
+{
+    return $this->rejection_reason;
+}
+
+public function setRejectionReason(?string $rejection_reason): static
+{
+    $this->rejection_reason = $rejection_reason;
+
+    return $this;
 }
 }

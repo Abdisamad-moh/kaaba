@@ -3,9 +3,11 @@
 namespace App\Repository;
 
 use App\Entity\User;
+use App\Entity\KaabaCourse;
 use App\Entity\KaabaGender;
 use App\Entity\KaabaRegion;
 use App\Entity\KaabaDistrict;
+use App\Entity\KaabaInstitute;
 use App\Entity\KaabaApplication;
 use App\Entity\KaabaScholarship;
 use App\Entity\KaabaQualification;
@@ -24,28 +26,29 @@ class KaabaApplicationRepository extends ServiceEntityRepository
     }
 
 public function filterApplications(
-        ?KaabaApplicationStatus $status = null,
-        ?\DateTimeInterface $fromDate = null,
-        ?\DateTimeInterface $toDate = null,
-        ?string $phone = null,
-        ?KaabaRegion $region = null,
-        ?KaabaDistrict $district = null,
-        ?KaabaQualification $qualification = null,
-        ?KaabaGender $gender = null,
-        ?KaabaScholarship $scholarship = null,
- ?User $user = null
-    ): array {
-        $qb = $this->createQueryBuilder('a')
-            ->leftJoin('a.status', 's')
-            ->leftJoin('a.region', 'r')
-            ->leftJoin('a.district', 'd')
-            ->leftJoin('a.highest_qualification', 'q')
-            ->leftJoin('a.gender', 'g')
-            ->leftJoin('a.scholarship', 'sch')
-  ->leftJoin('a.institute', 'i')
-            ->orderBy('a.id', 'ASC');
-
-
+    ?KaabaApplicationStatus $status = null,
+    ?\DateTimeInterface $fromDate = null,
+    ?\DateTimeInterface $toDate = null,
+    ?string $phone = null,
+    ?KaabaRegion $region = null,
+    ?KaabaDistrict $district = null,
+    ?KaabaQualification $qualification = null,
+    ?KaabaGender $gender = null,
+    ?KaabaScholarship $scholarship = null,
+    ?KaabaInstitute $institute = null,
+    ?KaabaCourse $course = null,
+    ?User $user = null
+): array {
+    $qb = $this->createQueryBuilder('a')
+        ->leftJoin('a.status', 's')
+        ->leftJoin('a.region', 'r')
+        ->leftJoin('a.district', 'd')
+        ->leftJoin('a.highest_qualification', 'q')
+        ->leftJoin('a.gender', 'g')
+        ->leftJoin('a.scholarship', 'sch')
+        ->leftJoin('a.institute', 'i')
+        ->leftJoin('a.course', 'c')
+        ->orderBy('a.id', 'ASC');
 
     // Add user-specific filtering for ROLE_USER
     if ($user && in_array('ROLE_USER', $user->getRoles()) && !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
@@ -53,53 +56,65 @@ public function filterApplications(
            ->setParameter('user', $user);
     }
 
-        if ($status) {
-            $qb->andWhere('a.status = :status')
-                ->setParameter('status', $status);
-        }
-
-        if ($fromDate) {
-            $qb->andWhere('a.application_date >= :fromDate')
-                ->setParameter('fromDate', $fromDate);
-        }
-
-        if ($toDate) {
-            $qb->andWhere('a.application_date <= :toDate')
-                ->setParameter('toDate', $toDate);
-        }
-
-        if ($phone) {
-            $qb->andWhere('a.phone LIKE :phone')
-                ->setParameter('phone', '%' . $phone . '%');
-        }
-
-        if ($region) {
-            $qb->andWhere('a.region = :region')
-                ->setParameter('region', $region);
-        }
-
-        if ($district) {
-            $qb->andWhere('a.district = :district')
-                ->setParameter('district', $district);
-        }
-
-        if ($qualification) {
-            $qb->andWhere('a.highest_qualification = :qualification')
-                ->setParameter('qualification', $qualification);
-        }
-
-        if ($gender) {
-            $qb->andWhere('a.gender = :gender')
-                ->setParameter('gender', $gender);
-        }
-
-        if ($scholarship) {
-            $qb->andWhere('a.scholarship = :scholarship')
-                ->setParameter('scholarship', $scholarship);
-        }
-
-        return $qb->getQuery()->getResult();
+    if ($status) {
+        $qb->andWhere('a.status = :status')
+            ->setParameter('status', $status);
     }
+
+    if ($fromDate) {
+        $qb->andWhere('a.application_date >= :fromDate')
+            ->setParameter('fromDate', $fromDate);
+    }
+
+    if ($toDate) {
+        $qb->andWhere('a.application_date <= :toDate')
+            ->setParameter('toDate', $toDate);
+    }
+
+    if ($phone) {
+        $qb->andWhere('a.phone LIKE :phone')
+            ->setParameter('phone', '%' . $phone . '%');
+    }
+
+    if ($region) {
+        $qb->andWhere('a.region = :region')
+            ->setParameter('region', $region);
+    }
+
+    if ($district) {
+        $qb->andWhere('a.district = :district')
+            ->setParameter('district', $district);
+    }
+
+    if ($qualification) {
+        $qb->andWhere('a.highest_qualification = :qualification')
+            ->setParameter('qualification', $qualification);
+    }
+
+    if ($gender) {
+        $qb->andWhere('a.gender = :gender')
+            ->setParameter('gender', $gender);
+    }
+
+    if ($scholarship) {
+        $qb->andWhere('a.scholarship = :scholarship')
+            ->setParameter('scholarship', $scholarship);
+    }
+
+    // Add institute filter
+    if ($institute) {
+        $qb->andWhere('a.institute = :institute')
+            ->setParameter('institute', $institute);
+    }
+
+    // Add course filter
+    if ($course) {
+        $qb->andWhere('a.course = :course')
+            ->setParameter('course', $course);
+    }
+
+    return $qb->getQuery()->getResult();
+}
 
 
    // Count applications by status
