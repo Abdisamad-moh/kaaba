@@ -26,16 +26,45 @@ class KaabaApplicationStatus
 #[ORM\OneToMany(mappedBy: 'status', targetEntity: KaabaApplication::class)]
 private Collection $kaabaApplications;
 
-
+#[ORM\OneToMany(mappedBy: 'status', targetEntity: KaabaApplicationDuplicate::class)]
+private Collection $kaabaApplicationDuplicates;
 
 public function __construct()
 {
     $this->kaabaApplications = new ArrayCollection();
+       $this->kaabaApplicationDuplicates = new ArrayCollection();
 }
     public function getId(): ?int
     {
         return $this->id;
     }
+
+    public function getKaabaApplicationDuplicates(): Collection
+{
+    return $this->kaabaApplicationDuplicates;
+}
+
+public function addKaabaApplicationDuplicate(KaabaApplicationDuplicate $kaabaApplicationDuplicate): static
+{
+    if (!$this->kaabaApplicationDuplicates->contains($kaabaApplicationDuplicate)) {
+        $this->kaabaApplicationDuplicates->add($kaabaApplicationDuplicate);
+        $kaabaApplicationDuplicate->setStatus($this);
+    }
+
+    return $this;
+}
+
+public function removeKaabaApplicationDuplicate(KaabaApplicationDuplicate $kaabaApplicationDuplicate): static
+{
+    if ($this->kaabaApplicationDuplicates->removeElement($kaabaApplicationDuplicate)) {
+        // set the owning side to null (unless already changed)
+        if ($kaabaApplicationDuplicate->getStatus() === $this) {
+            $kaabaApplicationDuplicate->setStatus(null);
+        }
+    }
+
+    return $this;
+}
 
     public function getName(): ?string
     {

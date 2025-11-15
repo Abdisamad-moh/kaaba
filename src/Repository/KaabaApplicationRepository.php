@@ -25,6 +25,34 @@ class KaabaApplicationRepository extends ServiceEntityRepository
         parent::__construct($registry, KaabaApplication::class);
     }
 
+    /**
+ * Find potential duplicates based on name and phone
+ */
+public function findPotentialDuplicates(): array
+{
+    return $this->createQueryBuilder('a')
+        ->select('a.full_name, a.phone, COUNT(a.id) as duplicate_count')
+        ->groupBy('a.full_name, a.phone')
+        ->having('COUNT(a.id) > 1')
+        ->getQuery()
+        ->getResult();
+}
+
+/**
+ * Find applications by name and phone
+ */
+public function findByFullNameAndPhone(string $fullName, string $phone): array
+{
+    return $this->createQueryBuilder('a')
+        ->where('a.full_name = :fullName')
+        ->andWhere('a.phone = :phone')
+        ->setParameter('fullName', $fullName)
+        ->setParameter('phone', $phone)
+        ->orderBy('a.id', 'ASC')
+        ->getQuery()
+        ->getResult();
+}
+
 public function filterApplications(
     ?KaabaApplicationStatus $status = null,
     ?\DateTimeInterface $fromDate = null,
@@ -112,6 +140,8 @@ public function filterApplications(
         $qb->andWhere('a.course = :course')
             ->setParameter('course', $course);
     }
+
+    $qb->andWhere('a.is_duplicate IS NULL OR a.is_duplicate = false');
 
     return $qb->getQuery()->getResult();
 }

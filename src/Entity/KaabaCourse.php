@@ -34,13 +34,42 @@ class KaabaCourse
     #[ORM\ManyToOne(inversedBy: 'kaabaCourses')]
     private ?KaabaInstitute $institute = null;
 
-
+#[ORM\OneToMany(mappedBy: 'course', targetEntity: KaabaApplicationDuplicate::class)]
+private Collection $kaabaApplicationDuplicates;
 
      public function __construct()
     {
          $this->uuid = Uuid::v4();
          $this->kaabaApplications = new ArrayCollection();
+             $this->kaabaApplicationDuplicates = new ArrayCollection();
     }
+
+    public function getKaabaApplicationDuplicates(): Collection
+{
+    return $this->kaabaApplicationDuplicates;
+}
+
+public function addKaabaApplicationDuplicate(KaabaApplicationDuplicate $kaabaApplicationDuplicate): static
+{
+    if (!$this->kaabaApplicationDuplicates->contains($kaabaApplicationDuplicate)) {
+        $this->kaabaApplicationDuplicates->add($kaabaApplicationDuplicate);
+        $kaabaApplicationDuplicate->setCourse($this);
+    }
+
+    return $this;
+}
+
+public function removeKaabaApplicationDuplicate(KaabaApplicationDuplicate $kaabaApplicationDuplicate): static
+{
+    if ($this->kaabaApplicationDuplicates->removeElement($kaabaApplicationDuplicate)) {
+        // set the owning side to null (unless already changed)
+        if ($kaabaApplicationDuplicate->getCourse() === $this) {
+            $kaabaApplicationDuplicate->setCourse(null);
+        }
+    }
+
+    return $this;
+}
 
 
     public function getId(): ?int

@@ -42,13 +42,39 @@ class KaabaRegion
     #[ORM\OneToMany(targetEntity: KaabaDistrict::class, mappedBy: 'region')]
     private Collection $kaabaDistricts;
 
+    #[ORM\OneToMany(mappedBy: 'region', targetEntity: KaabaApplicationDuplicate::class)]
+private Collection $kaabaApplicationDuplicates;
+
     public function __construct()
     {
         $this->kaabaApplications = new ArrayCollection();
         $this->kaabaApplicationsSchools = new ArrayCollection();
         $this->uuid = Uuid::v4();
         $this->kaabaDistricts = new ArrayCollection();
+           $this->kaabaApplicationDuplicates = new ArrayCollection();
     }
+
+    public function addKaabaApplicationDuplicate(KaabaApplicationDuplicate $kaabaApplicationDuplicate): static
+{
+    if (!$this->kaabaApplicationDuplicates->contains($kaabaApplicationDuplicate)) {
+        $this->kaabaApplicationDuplicates->add($kaabaApplicationDuplicate);
+        $kaabaApplicationDuplicate->setRegion($this);
+    }
+
+    return $this;
+}
+
+public function removeKaabaApplicationDuplicate(KaabaApplicationDuplicate $kaabaApplicationDuplicate): static
+{
+    if ($this->kaabaApplicationDuplicates->removeElement($kaabaApplicationDuplicate)) {
+        // set the owning side to null (unless already changed)
+        if ($kaabaApplicationDuplicate->getRegion() === $this) {
+            $kaabaApplicationDuplicate->setRegion(null);
+        }
+    }
+
+    return $this;
+}
 
     public function getId(): ?int
     {

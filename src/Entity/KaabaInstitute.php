@@ -43,13 +43,45 @@ class KaabaInstitute
     #[ORM\ManyToOne(inversedBy: 'kaabaInstitutes')]
     private ?User $manager = null;
 
+    #[ORM\OneToMany(mappedBy: 'highest_qualification', targetEntity: KaabaApplicationDuplicate::class)]
+private Collection $kaabaApplicationDuplicates;
+
 
     public function __construct()
     {
         $this->kaabaApplications = new ArrayCollection();
          $this->uuid = Uuid::v4();
          $this->kaabaCourses = new ArrayCollection();
+             $this->kaabaApplicationDuplicates = new ArrayCollection();
     }
+
+    // Add getters and setters
+public function getKaabaApplicationDuplicates(): Collection
+{
+    return $this->kaabaApplicationDuplicates;
+}
+
+public function addKaabaApplicationDuplicate(KaabaApplicationDuplicate $kaabaApplicationDuplicate): static
+{
+    if (!$this->kaabaApplicationDuplicates->contains($kaabaApplicationDuplicate)) {
+        $this->kaabaApplicationDuplicates->add($kaabaApplicationDuplicate);
+        $kaabaApplicationDuplicate->setHighestQualification($this);
+    }
+
+    return $this;
+}
+
+public function removeKaabaApplicationDuplicate(KaabaApplicationDuplicate $kaabaApplicationDuplicate): static
+{
+    if ($this->kaabaApplicationDuplicates->removeElement($kaabaApplicationDuplicate)) {
+        // set the owning side to null (unless already changed)
+        if ($kaabaApplicationDuplicate->getHighestQualification() === $this) {
+            $kaabaApplicationDuplicate->setHighestQualification(null);
+        }
+    }
+
+    return $this;
+}
     public function getId(): ?int
     {
         return $this->id;

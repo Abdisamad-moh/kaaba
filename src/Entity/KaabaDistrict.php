@@ -34,11 +34,42 @@ class KaabaDistrict
     #[ORM\JoinColumn(nullable: false)]
     private ?KaabaRegion $region = null;
 
+    #[ORM\OneToMany(mappedBy: 'district', targetEntity: KaabaApplicationDuplicate::class)]
+private Collection $kaabaApplicationDuplicates;
+
     public function __construct()
     {
         $this->kaabaApplications = new ArrayCollection();
          $this->uuid = Uuid::v4();
+             $this->kaabaApplicationDuplicates = new ArrayCollection();
     }
+
+    public function getKaabaApplicationDuplicates(): Collection
+{
+    return $this->kaabaApplicationDuplicates;
+}
+
+public function addKaabaApplicationDuplicate(KaabaApplicationDuplicate $kaabaApplicationDuplicate): static
+{
+    if (!$this->kaabaApplicationDuplicates->contains($kaabaApplicationDuplicate)) {
+        $this->kaabaApplicationDuplicates->add($kaabaApplicationDuplicate);
+        $kaabaApplicationDuplicate->setDistrict($this);
+    }
+
+    return $this;
+}
+
+public function removeKaabaApplicationDuplicate(KaabaApplicationDuplicate $kaabaApplicationDuplicate): static
+{
+    if ($this->kaabaApplicationDuplicates->removeElement($kaabaApplicationDuplicate)) {
+        // set the owning side to null (unless already changed)
+        if ($kaabaApplicationDuplicate->getDistrict() === $this) {
+            $kaabaApplicationDuplicate->setDistrict(null);
+        }
+    }
+
+    return $this;
+}
 
     public function getId(): ?int
     {

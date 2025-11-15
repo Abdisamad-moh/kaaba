@@ -1863,186 +1863,201 @@ class AdminController extends AbstractController
     }
 
     #[Route('/kaaba-applications/update-status', name: 'app_admin_kaaba_application_update_status', methods: ['POST'])]
-    public function updateApplicationStatus(
-        Request $request,
-        KaabaApplicationRepository $applicationRepository,
-        KaabaApplicationStatusRepository $statusRepository,
-        EntityManagerInterface $entityManager,
-        ApplicationLogger $applicationLogger
-    ): JsonResponse {
-        // Check if request is AJAX
-        if (!$request->isXmlHttpRequest()) {
+public function updateApplicationStatus(
+    Request $request,
+    KaabaApplicationRepository $applicationRepository,
+    KaabaApplicationStatusRepository $statusRepository,
+    EntityManagerInterface $entityManager,
+    ApplicationLogger $applicationLogger
+): JsonResponse {
+    // Check if request is AJAX
+    if (!$request->isXmlHttpRequest()) {
+        return $this->json([
+            'success' => false,
+            'message' => 'Invalid request type.'
+        ], 400);
+    }
+
+    $data = json_decode($request->getContent(), true);
+    $applicationId = $data['applicationId'] ?? null;
+    $statusAction = $data['statusAction'] ?? null;
+    $shortlistReason = $data['shortlistReason'] ?? null; // Add this line
+    $csrfToken = $data['_token'] ?? null;
+
+    // Validate CSRF token
+    if (!$this->isCsrfTokenValid('update_application_status', $csrfToken)) {
+        return $this->json([
+            'success' => false,
+            'message' => 'Invalid CSRF token.'
+        ], 400);
+    }
+
+    if (!$applicationId || !$statusAction) {
+        return $this->json([
+            'success' => false,
+            'message' => 'Missing required parameters.'
+        ], 400);
+    }
+
+    try {
+        $application = $applicationRepository->find($applicationId);
+
+        if (!$application) {
             return $this->json([
                 'success' => false,
-                'message' => 'Invalid request type.'
+                'message' => 'Application not found.'
+            ], 404);
+        }
+
+        // Get current user and role-based permissions
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->json([
+                'success' => false,
+                'message' => 'User not authenticated.'
+            ], 401);
+        }
+
+        $isSuperAdmin = $this->isGranted('ROLE_SUPER_ADMIN');
+        $isRegularUser = $this->isGranted('ROLE_USER') && !$isSuperAdmin;
+
+        $currentStatus = $application->getStatus();
+        $currentStatusName = $currentStatus ? $currentStatus->getName() : 'Applied';
+        $oldStatus = $currentStatusName;
+
+        // Define status mapping with IDs
+        $statusMap = [
+            'shortlisted' => ['name' => 'Shortlisted', 'id' => 2],
+            'waitlisted' => ['name' => 'Waitlisted', 'id' => 5],
+            'approved' => ['name' => 'Accepted', 'id' => 4],
+            'rejected' => ['name' => 'Rejected', 'id' => 3]
+        ];
+
+        if (!isset($statusMap[$statusAction])) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Invalid status action.'
             ], 400);
         }
 
-        $data = json_decode($request->getContent(), true);
-        $applicationId = $data['applicationId'] ?? null;
-        $statusAction = $data['statusAction'] ?? null;
-        $csrfToken = $data['_token'] ?? null;
+        // Role-based permission checks
+        if ($isRegularUser) {
+            $allowedFromApplied = ['shortlisted', 'waitlisted', 'rejected'];
+            $currentStatusId = $currentStatus ? $currentStatus->getId() : 1;
 
-        // Validate CSRF token
-        if (!$this->isCsrfTokenValid('update_application_status', $csrfToken)) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Invalid CSRF token.'
-            ], 400);
-        }
-
-        if (!$applicationId || !$statusAction) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Missing required parameters.'
-            ], 400);
-        }
-
-        try {
-            $application = $applicationRepository->find($applicationId);
-
-            if (!$application) {
+            if ($currentStatusId !== 1 || !in_array($statusAction, $allowedFromApplied)) {
                 return $this->json([
                     'success' => false,
-                    'message' => 'Application not found.'
-                ], 404);
-            }
-
-            // Get current user and role-based permissions
-            $user = $this->getUser();
-            if (!$user) {
-                return $this->json([
-                    'success' => false,
-                    'message' => 'User not authenticated.'
-                ], 401);
-            }
-
-            $isSuperAdmin = $this->isGranted('ROLE_SUPER_ADMIN');
-            $isRegularUser = $this->isGranted('ROLE_USER') && !$isSuperAdmin;
-
-            $currentStatus = $application->getStatus();
-            $currentStatusName = $currentStatus ? $currentStatus->getName() : 'Applied';
-            $oldStatus = $currentStatusName;
-
-            // Define status mapping with IDs
-            $statusMap = [
-                'shortlisted' => ['name' => 'Shortlisted', 'id' => 2],
-                'waitlisted' => ['name' => 'Waitlisted', 'id' => 5],
-                'approved' => ['name' => 'Accepted', 'id' => 4],
-                'rejected' => ['name' => 'Rejected', 'id' => 3]
-            ];
-
-            if (!isset($statusMap[$statusAction])) {
-                return $this->json([
-                    'success' => false,
-                    'message' => 'Invalid status action.'
-                ], 400);
-            }
-
-            // Role-based permission checks
-            if ($isRegularUser) {
-                $allowedFromApplied = ['shortlisted', 'waitlisted', 'rejected'];
-                $currentStatusId = $currentStatus ? $currentStatus->getId() : 1;
-
-                if ($currentStatusId !== 1 || !in_array($statusAction, $allowedFromApplied)) {
-                    return $this->json([
-                        'success' => false,
-                        'message' => 'You can only update applications from "Applied" status to Shortlisted, Waitlisted, or Rejected.'
-                    ], 403);
-                }
-            } elseif ($isSuperAdmin) {
-                if ($statusAction === 'approved') {
-                    $currentStatusId = $currentStatus ? $currentStatus->getId() : 1;
-                    if (!in_array($currentStatusId, [2, 5])) {
-                        return $this->json([
-                            'success' => false,
-                            'message' => 'You can only approve applications that are Shortlisted or Waitlisted.'
-                        ], 403);
-                    }
-                }
-            } else {
-                return $this->json([
-                    'success' => false,
-                    'message' => 'Insufficient permissions.'
+                    'message' => 'You can only update applications from "Applied" status to Shortlisted, Waitlisted, or Rejected.'
                 ], 403);
             }
-
-            $targetStatus = $statusMap[$statusAction];
-            $status = $statusRepository->find($targetStatus['id']);
-
-            if (!$status) {
-                return $this->json([
-                    'success' => false,
-                    'message' => 'Status not found.'
-                ], 404);
+        } elseif ($isSuperAdmin) {
+            if ($statusAction === 'approved') {
+                $currentStatusId = $currentStatus ? $currentStatus->getId() : 1;
+                if (!in_array($currentStatusId, [2, 5])) {
+                    return $this->json([
+                        'success' => false,
+                        'message' => 'You can only approve applications that are Shortlisted or Waitlisted.'
+                    ], 403);
+                }
             }
-
-            // Set status dates
-            $now = new \DateTime();
-            switch ($statusAction) {
-                case 'shortlisted':
-                    $application->setShortlistedDate($now);
-                    $application->setWaitlistedDate(null);
-                    break;
-                case 'waitlisted':
-                    $application->setWaitlistedDate($now);
-                    $application->setShortlistedDate(null);
-                    break;
-                case 'approved':
-                    $application->setAcceptedDate($now);
-                    break;
-                case 'rejected':
-                    $application->setRejectedDate($now);
-                    break;
-            }
-
-            // Clear other dates when changing status
-            if ($statusAction !== 'rejected') {
-                $application->setRejectedDate(null);
-            }
-            if ($statusAction !== 'approved') {
-                $application->setAcceptedDate(null);
-            }
-
-            // Update application status
-            $application->setStatus($status);
-
-            // Log the action
-            $applicationLogger->log(
-                $application,
-                'status_change',
-                sprintf("Status changed from '%s' to '%s' by %s", $oldStatus, $targetStatus['name'], $user->getUserIdentifier()),
-                $user
-            );
-
-            $entityManager->flush();
-
-            // Generate new status badge HTML
-            $displayStatus = $targetStatus['name'] === 'Accepted' ? 'Approved' : $targetStatus['name'];
-            $newStatusBadge = sprintf(
-                '<span class="badge %s">%s</span>',
-                match ($targetStatus['name']) {
-                    'Accepted' => 'bg-success',
-                    'Rejected' => 'bg-danger',
-                    'Shortlisted' => 'bg-info text-white',
-                    'Waitlisted' => 'bg-warning text-dark',
-                    default => 'bg-secondary'
-                },
-                $displayStatus
-            );
-
-            return $this->json([
-                'success' => true,
-                'message' => "Application status updated to {$displayStatus} successfully.",
-                'newStatusBadge' => $newStatusBadge
-            ]);
-
-        } catch (\Exception $e) {
+        } else {
             return $this->json([
                 'success' => false,
-                'message' => 'Error updating application status: ' . $e->getMessage()
-            ], 500);
+                'message' => 'Insufficient permissions.'
+            ], 403);
         }
+
+        $targetStatus = $statusMap[$statusAction];
+        $status = $statusRepository->find($targetStatus['id']);
+
+        if (!$status) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Status not found.'
+            ], 404);
+        }
+
+        // Set status dates and reasons
+        $now = new \DateTime();
+        switch ($statusAction) {
+            case 'shortlisted':
+                $application->setShortlistedDate($now);
+                $application->setWaitlistedDate(null);
+                $application->setShortlistReason($shortlistReason); // Set shortlist reason
+                break;
+            case 'waitlisted':
+                $application->setWaitlistedDate($now);
+                $application->setShortlistedDate(null);
+                $application->setShortlistReason(null); // Clear shortlist reason if not shortlisting
+                break;
+            case 'approved':
+                $application->setAcceptedDate($now);
+                $application->setShortlistReason(null); // Clear shortlist reason
+                break;
+            case 'rejected':
+                $application->setRejectedDate($now);
+                $application->setShortlistReason(null); // Clear shortlist reason
+                break;
+        }
+
+        // Clear other dates when changing status
+        if ($statusAction !== 'rejected') {
+            $application->setRejectedDate(null);
+            $application->setRejectionReason(null); // Clear rejection reason
+        }
+        if ($statusAction !== 'approved') {
+            $application->setAcceptedDate(null);
+        }
+
+        // Update application status
+        $application->setStatus($status);
+
+        // Log the action
+        $logMessage = sprintf("Status changed from '%s' to '%s'", $oldStatus, $targetStatus['name']);
+        
+        // Add reason to log if provided
+        if ($statusAction === 'shortlisted' && !empty($shortlistReason)) {
+            $logMessage .= ". Shortlist reason: " . $shortlistReason;
+        }
+        
+        $logMessage .= " by " . $user->getUserIdentifier();
+
+        $applicationLogger->log(
+            $application,
+            'status_change',
+            $logMessage,
+            $user
+        );
+
+        $entityManager->flush();
+
+        // Generate new status badge HTML
+        $displayStatus = $targetStatus['name'] === 'Accepted' ? 'Approved' : $targetStatus['name'];
+        $newStatusBadge = sprintf(
+            '<span class="badge %s">%s</span>',
+            match ($targetStatus['name']) {
+                'Accepted' => 'bg-success',
+                'Rejected' => 'bg-danger',
+                'Shortlisted' => 'bg-info text-white',
+                'Waitlisted' => 'bg-warning text-dark',
+                default => 'bg-secondary'
+            },
+            $displayStatus
+        );
+
+        return $this->json([
+            'success' => true,
+            'message' => "Application status updated to {$displayStatus} successfully.",
+            'newStatusBadge' => $newStatusBadge
+        ]);
+
+    } catch (\Exception $e) {
+        return $this->json([
+            'success' => false,
+            'message' => 'Error updating application status: ' . $e->getMessage()
+        ], 500);
+    }
     }
 
     #[Route('/kaaba-applications/revert-status/{id}', name: 'app_admin_kaaba_application_revert_status', methods: ['POST'])]
@@ -2185,6 +2200,161 @@ class AdminController extends AbstractController
                 'message' => 'Error reverting application status: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    #[Route('/find-duplicates', name: 'admin_find_duplicates', methods: ['POST', 'GET'])]
+    public function findAndMarkDuplicates(EntityManagerInterface $entityManager): JsonResponse
+    {
+        try {
+            // Get all applications ordered by ID to ensure we keep the oldest one
+            $applications = $entityManager->getRepository(KaabaApplication::class)
+                ->findBy([], ['id' => 'ASC']);
+
+            $duplicateGroups = [];
+            $processed = [];
+            $duplicatesFound = 0;
+            $duplicatesUpdated = 0;
+
+            // Group applications by full_name and phone
+            foreach ($applications as $application) {
+                $key = $this->generateDuplicateKey($application);
+                
+                if ($key === null) {
+                    continue; // Skip if essential fields are missing
+                }
+
+                if (!isset($duplicateGroups[$key])) {
+                    $duplicateGroups[$key] = [];
+                }
+                
+                $duplicateGroups[$key][] = $application;
+            }
+
+            // Process duplicate groups
+            foreach ($duplicateGroups as $key => $group) {
+                if (count($group) > 1) {
+                    $duplicatesFound += count($group) - 1; // Count all except the first one
+                    
+                    // Sort by ID to ensure we keep the oldest application
+                    usort($group, fn($a, $b) => $a->getId() <=> $b->getId());
+                    
+                    $originalApplication = $group[0];
+                    $duplicateApplications = array_slice($group, 1);
+                    
+                    foreach ($duplicateApplications as $duplicateApp) {
+                        // Skip if already processed or already marked as duplicate
+                        if (in_array($duplicateApp->getId(), $processed) || $duplicateApp->isDuplicate()) {
+                            continue;
+                        }
+                        
+                        // Mark as duplicate and set parent
+                        $duplicateApp->setDuplicate(true);
+                        $duplicateApp->setDuplicateParent($originalApplication);
+                        
+                        $entityManager->persist($duplicateApp);
+                        $processed[] = $duplicateApp->getId();
+                        $duplicatesUpdated++;
+                    }
+                }
+            }
+
+            $entityManager->flush();
+
+            return new JsonResponse([
+                'success' => true,
+                'message' => 'Duplicate processing completed',
+                'data' => [
+                    'total_duplicates_found' => $duplicatesFound,
+                    'duplicates_updated' => $duplicatesUpdated,
+                    'duplicate_groups_processed' => count(array_filter($duplicateGroups, fn($group) => count($group) > 1)),
+                    'already_marked_duplicates' => $duplicatesFound - $duplicatesUpdated
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Error processing duplicates: ' . $e->getMessage(),
+                'data' => []
+            ], 500);
+        }
+    }
+
+    /**
+     * Generate a unique key for duplicate detection based on full_name and phone
+     */
+    private function generateDuplicateKey(KaabaApplication $application): ?string
+    {
+        $fullName = $application->getFullName();
+        $phone = $application->getPhone();
+
+        // Skip if essential fields are empty
+        if (empty($fullName) || empty($phone)) {
+            return null;
+        }
+
+        // Normalize the data for better matching
+        $normalizedName = $this->normalizeString($fullName);
+        $normalizedPhone = $this->normalizePhone($phone);
+
+        return md5($normalizedName . '|' . $normalizedPhone);
+    }
+
+    /**
+     * Normalize string for duplicate comparison
+     */
+    private function normalizeString(string $string): string
+    {
+        return trim(mb_strtolower($string));
+    }
+
+    /**
+     * Normalize phone number for duplicate comparison
+     */
+    private function normalizePhone(string $phone): string
+    {
+        // Remove all non-digit characters except +
+        $normalized = preg_replace('/[^\d+]/', '', $phone);
+        
+        // Remove country code if it's 255 (Tanzania) and replace with 0
+        if (str_starts_with($normalized, '255') && strlen($normalized) === 12) {
+            $normalized = '0' . substr($normalized, 3);
+        }
+        
+        // Remove leading + if present
+        $normalized = ltrim($normalized, '+');
+        
+        return $normalized;
+    }
+
+    /**
+     * Additional route to get duplicate statistics
+     */
+    #[Route('/admin/duplicate-stats', name: 'admin_duplicate_stats', methods: ['GET'])]
+    public function getDuplicateStats(EntityManagerInterface $entityManager): JsonResponse
+    {
+        $totalApplications = $entityManager->getRepository(KaabaApplication::class)
+            ->count([]);
+
+        $duplicateApplications = $entityManager->getRepository(KaabaApplication::class)
+            ->count(['is_duplicate' => true]);
+
+        $originalApplicationsWithDuplicates = $entityManager->getRepository(KaabaApplication::class)
+            ->createQueryBuilder('a')
+            ->select('COUNT(DISTINCT a.id)')
+            ->where('a.kaabaApplications IS NOT EMPTY')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return new JsonResponse([
+            'success' => true,
+            'data' => [
+                'total_applications' => $totalApplications,
+                'marked_as_duplicate' => $duplicateApplications,
+                'original_applications_with_duplicates' => $originalApplicationsWithDuplicates,
+                'unique_applications' => $totalApplications - $duplicateApplications
+            ]
+        ]);
     }
 
 

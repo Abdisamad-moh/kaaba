@@ -6,29 +6,33 @@ use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Uid\Uuid;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
-use App\Repository\KaabaApplicationRepository;
+use App\Repository\KaabaApplicationDuplicateRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 
-#[ORM\Entity(repositoryClass: KaabaApplicationRepository::class)]
-class KaabaApplication
+#[ORM\Entity(repositoryClass: KaabaApplicationDuplicateRepository::class)]
+class KaabaApplicationDuplicate
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\ManyToOne(targetEntity: KaabaApplication::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?KaabaApplication $original_application = null;
+
     #[ORM\Column(length: 255)]
     private ?string $full_name = null;
 
-    #[ORM\ManyToOne(inversedBy: 'kaabaApplications')]
+    #[ORM\ManyToOne(inversedBy: 'kaabaApplicationDuplicates')]
     #[ORM\JoinColumn(nullable: false)]
     private ?KaabaRegion $region = null;
 
-    #[ORM\ManyToOne(inversedBy: 'kaabaApplications')]
+    #[ORM\ManyToOne(inversedBy: 'kaabaApplicationDuplicates')]
     #[ORM\JoinColumn(nullable: false)]
     private ?KaabaGender $gender = null;
 
-    #[ORM\ManyToOne(inversedBy: 'kaabaApplications')]
+    #[ORM\ManyToOne(inversedBy: 'kaabaApplicationDuplicates')]
     private ?KaabaDistrict $district = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
@@ -37,7 +41,7 @@ class KaabaApplication
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $town = null;
 
-    #[ORM\ManyToOne(inversedBy: 'kaabaApplications')]
+    #[ORM\ManyToOne(inversedBy: 'kaabaApplicationDuplicates')]
     private ?KaabaNationality $nationality = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -59,14 +63,14 @@ class KaabaApplication
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $identity_attachment = null;
 
-    #[ORM\ManyToOne(inversedBy: 'kaabaApplications')]
+    #[ORM\ManyToOne(inversedBy: 'kaabaApplicationDuplicates')]
     #[ORM\JoinColumn(nullable: true)]
     private ?KaabaInstitute $institute = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $secondary_school = null;
 
-    #[ORM\ManyToOne(inversedBy: 'kaabaApplicationsSchools')]
+    #[ORM\ManyToOne(inversedBy: 'kaabaApplicationDuplicatesSchools')]
     #[ORM\JoinColumn(nullable: true)]
     private ?KaabaRegion $secondary_region = null;
 
@@ -76,10 +80,10 @@ class KaabaApplication
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $secondary_grade = null;
 
-    #[ORM\ManyToOne(inversedBy: 'kaabaApplications')]
+    #[ORM\ManyToOne(inversedBy: 'kaabaApplicationDuplicates')]
     private ?KaabaQualification $highest_qualification = null;
 
-    #[ORM\ManyToOne(inversedBy: 'kaabaApplications')]
+    #[ORM\ManyToOne(inversedBy: 'kaabaApplicationDuplicates')]
     private ?KaabaCourse $course = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -121,20 +125,19 @@ class KaabaApplication
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $application_date = null;
 
-
-    #[ORM\ManyToOne(inversedBy: 'kaabaApplications')]
+    #[ORM\ManyToOne(inversedBy: 'kaabaApplicationDuplicates')]
     #[ORM\JoinColumn(nullable: true)]
     private ?KaabaApplicationStatus $status = null;
 
-    #[ORM\ManyToOne(inversedBy: 'kaabaApplications')]
+    #[ORM\ManyToOne(inversedBy: 'kaabaApplicationDuplicates')]
     #[ORM\JoinColumn(nullable: false)]
     private ?KaabaScholarship $scholarship = null;
 
     #[ORM\Column(type: Types::GUID)]
     private ?string $uuid = null;
 
-#[ORM\Column(length: 255, nullable: true)]
-private ?string $disability_type = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $disability_type = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $disability_explanation = null;
@@ -151,9 +154,8 @@ private ?string $disability_type = null;
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $literacy_numeracy_qualification = null;
 
-
- #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-                                              private ?\DateTimeInterface $applied_date = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $applied_date = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $shortlisted_date = null;
@@ -164,35 +166,23 @@ private ?string $disability_type = null;
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $rejected_date = null;
 
+    #[ORM\OneToMany(mappedBy: 'application_duplicate', targetEntity: KaabaApplicationLog::class, cascade: ['persist'])]
+    private Collection $logs;
 
-#[ORM\OneToMany(mappedBy: 'application', targetEntity: KaabaApplicationLog::class, cascade: ['persist'])]
-private Collection $logs;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $waitlisted_date = null;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $rejection_reason = null;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $shortlist_reason = null;
 
-#[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-private ?\DateTimeInterface $waitlisted_date = null;
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $duplicate_reason = null;
 
-#[ORM\Column(type: Types::TEXT, nullable: true)]
-private ?string $rejection_reason = null;
-
-
-#[ORM\Column(type: Types::TEXT, nullable: true)]
-private ?string $shortlist_reason = null;
-
-#[ORM\Column(nullable: true)]
-private ?bool $is_duplicate = null;
-
-#[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'kaabaApplications')]
-private ?self $duplicate_parent = null;
-
-/**
- * @var Collection<int, self>
- */
-#[ORM\OneToMany(targetEntity: self::class, mappedBy: 'duplicate_parent')]
-private Collection $kaabaApplications;
-
-
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $marked_as_duplicate_at = null;
 
     public function __construct()
     {
@@ -200,16 +190,27 @@ private Collection $kaabaApplications;
         $this->application_date = new \DateTime();  
         $this->uuid = Uuid::v4();
         $this->applied_date = new \DateTime(); 
-    $this->logs = new ArrayCollection();
-    $this->kaabaApplications = new ArrayCollection();
-
-
+        $this->logs = new ArrayCollection();
+        $this->marked_as_duplicate_at = new \DateTime();
     }
 
     public function getId(): ?int
     {
         return $this->id;
     }
+
+    public function getOriginalApplication(): ?KaabaApplication
+    {
+        return $this->original_application;
+    }
+
+    public function setOriginalApplication(?KaabaApplication $original_application): static
+    {
+        $this->original_application = $original_application;
+
+        return $this;
+    }
+
     public function getUuid(): ?string
     {
         return $this->uuid;
@@ -449,6 +450,7 @@ private Collection $kaabaApplications;
 
         return $this;
     }
+
     public function getCourse(): ?KaabaCourse
     {
         return $this->course;
@@ -617,7 +619,6 @@ private Collection $kaabaApplications;
         return $this;
     }
 
-
     public function getStatus(): ?KaabaApplicationStatus
     {
         return $this->status;
@@ -702,8 +703,7 @@ private Collection $kaabaApplications;
         return $this;
     }
 
-
-   public function getAppliedDate(): ?\DateTimeInterface
+    public function getAppliedDate(): ?\DateTimeInterface
     {
         return $this->applied_date;
     }
@@ -751,151 +751,102 @@ private Collection $kaabaApplications;
         return $this;
     }
 
-// Add these methods:
-public function getLogs(): Collection
-{
-    return $this->logs;
-}
-
-public function addLog(KaabaApplicationLog $log): static
-{
-    if (!$this->logs->contains($log)) {
-        $this->logs->add($log);
-        $log->setApplication($this);
-    }
-
-    return $this;
-}
-
-public function removeLog(KaabaApplicationLog $log): static
-{
-    if ($this->logs->removeElement($log)) {
-        // set the owning side to null (unless already changed)
-        if ($log->getApplication() === $this) {
-            $log->setApplication(null);
-        }
-    }
-
-    return $this;
-}
-
-
-public function getDisabilityType(): ?string
-{
-    return $this->disability_type;
-}
-
-public function setDisabilityType(?string $disability_type): static
-{
-    $this->disability_type = $disability_type;
-
-    return $this;
-}
-
-
-public function getWaitlistedDate(): ?\DateTimeInterface
-{
-    return $this->waitlisted_date;
-}
-
-public function setWaitlistedDate(?\DateTimeInterface $waitlisted_date): static
-{
-    $this->waitlisted_date = $waitlisted_date;
-
-    return $this;
-}
-
-// In KaabaApplication entity
-public function wasRejectedBy(User $user): bool
+    public function getLogs(): Collection
     {
-        foreach ($this->logs as $log) {
-            if (
-                $log->getAction() === 'status_change' &&
-                $log->getUser() === $user &&
-                (
-                    stripos($log->getNote(), "to 'Rejected'") !== false
-                )
-            ) {
-                return true;
+        return $this->logs;
+    }
+
+    public function addLog(KaabaApplicationLog $log): static
+    {
+        if (!$this->logs->contains($log)) {
+            $this->logs->add($log);
+            $log->setApplicationDuplicate($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLog(KaabaApplicationLog $log): static
+    {
+        if ($this->logs->removeElement($log)) {
+            // set the owning side to null (unless already changed)
+            if ($log->getApplicationDuplicate() === $this) {
+                $log->setApplicationDuplicate(null);
             }
         }
-        return false;
+
+        return $this;
     }
 
-public function getRejectionReason(): ?string
-{
-    return $this->rejection_reason;
-}
-
-public function setRejectionReason(?string $rejection_reason): static
-{
-    $this->rejection_reason = $rejection_reason;
-
-    return $this;
-}
-public function getShortlistReason(): ?string
-{
-    return $this->shortlist_reason;
-}
-
-public function setShortlistReason(?string $shortlist_reason): static
-{
-    $this->shortlist_reason = $shortlist_reason;
-
-    return $this;
-}
-
-public function isDuplicate(): ?bool
-{
-    return $this->is_duplicate;
-}
-
-public function setDuplicate(?bool $is_duplicate): static
-{
-    $this->is_duplicate = $is_duplicate;
-
-    return $this;
-}
-
-public function getDuplicateParent(): ?self
-{
-    return $this->duplicate_parent;
-}
-
-public function setDuplicateParent(?self $duplicate_parent): static
-{
-    $this->duplicate_parent = $duplicate_parent;
-
-    return $this;
-}
-
-/**
- * @return Collection<int, self>
- */
-public function getKaabaApplications(): Collection
-{
-    return $this->kaabaApplications;
-}
-
-public function addKaabaApplication(self $kaabaApplication): static
-{
-    if (!$this->kaabaApplications->contains($kaabaApplication)) {
-        $this->kaabaApplications->add($kaabaApplication);
-        $kaabaApplication->setDuplicateParent($this);
+    public function getDisabilityType(): ?string
+    {
+        return $this->disability_type;
     }
 
-    return $this;
-}
+    public function setDisabilityType(?string $disability_type): static
+    {
+        $this->disability_type = $disability_type;
 
-public function removeKaabaApplication(self $kaabaApplication): static
-{
-    if ($this->kaabaApplications->removeElement($kaabaApplication)) {
-        // set the owning side to null (unless already changed)
-        if ($kaabaApplication->getDuplicateParent() === $this) {
-            $kaabaApplication->setDuplicateParent(null);
-        }
+        return $this;
     }
 
-    return $this;
-}
+    public function getWaitlistedDate(): ?\DateTimeInterface
+    {
+        return $this->waitlisted_date;
+    }
+
+    public function setWaitlistedDate(?\DateTimeInterface $waitlisted_date): static
+    {
+        $this->waitlisted_date = $waitlisted_date;
+
+        return $this;
+    }
+
+    public function getRejectionReason(): ?string
+    {
+        return $this->rejection_reason;
+    }
+
+    public function setRejectionReason(?string $rejection_reason): static
+    {
+        $this->rejection_reason = $rejection_reason;
+
+        return $this;
+    }
+
+    public function getShortlistReason(): ?string
+    {
+        return $this->shortlist_reason;
+    }
+
+    public function setShortlistReason(?string $shortlist_reason): static
+    {
+        $this->shortlist_reason = $shortlist_reason;
+
+        return $this;
+    }
+
+    public function getDuplicateReason(): ?string
+    {
+        return $this->duplicate_reason;
+    }
+
+    public function setDuplicateReason(?string $duplicate_reason): static
+    {
+        $this->duplicate_reason = $duplicate_reason;
+
+        return $this;
+    }
+
+    public function getMarkedAsDuplicateAt(): ?\DateTimeInterface
+    {
+        return $this->marked_as_duplicate_at;
+    }
+
+    public function setMarkedAsDuplicateAt(\DateTimeInterface $marked_as_duplicate_at): static
+    {
+        $this->marked_as_duplicate_at = $marked_as_duplicate_at;
+
+        return $this;
+    }
 }

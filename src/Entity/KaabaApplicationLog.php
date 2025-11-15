@@ -32,6 +32,10 @@ class KaabaApplicationLog
     #[ORM\JoinColumn(nullable: true)]
     private ?User $user = null; // If you want to track which admin made changes
 
+    #[ORM\ManyToOne(targetEntity: KaabaApplicationDuplicate::class, inversedBy: 'logs')]
+    #[ORM\JoinColumn(name: 'application_duplicate_id', referencedColumnName: 'id', nullable: true, onDelete: 'CASCADE')]
+    private ?KaabaApplicationDuplicate $application_duplicate = null;
+
     public function __construct()
     {
         $this->created_at = new \DateTime();
@@ -45,6 +49,18 @@ class KaabaApplicationLog
     public function getApplication(): ?KaabaApplication
     {
         return $this->application;
+    }
+
+     public function getApplicationDuplicate(): ?KaabaApplicationDuplicate
+    {
+        return $this->application_duplicate;
+    }
+
+    public function setApplicationDuplicate(?KaabaApplicationDuplicate $application_duplicate): static
+    {
+        $this->application_duplicate = $application_duplicate;
+
+        return $this;
     }
 
     public function setApplication(?KaabaApplication $application): static

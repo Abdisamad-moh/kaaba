@@ -24,10 +24,41 @@ class KaabaNationality
     #[ORM\OneToMany(targetEntity: KaabaApplication::class, mappedBy: 'nationality')]
     private Collection $kaabaApplications;
 
+    #[ORM\OneToMany(mappedBy: 'nationality', targetEntity: KaabaApplicationDuplicate::class)]
+private Collection $kaabaApplicationDuplicates;
+
     public function __construct()
     {
         $this->kaabaApplications = new ArrayCollection();
+            $this->kaabaApplicationDuplicates = new ArrayCollection();
     }
+
+    public function getKaabaApplicationDuplicates(): Collection
+{
+    return $this->kaabaApplicationDuplicates;
+}
+
+public function addKaabaApplicationDuplicate(KaabaApplicationDuplicate $kaabaApplicationDuplicate): static
+{
+    if (!$this->kaabaApplicationDuplicates->contains($kaabaApplicationDuplicate)) {
+        $this->kaabaApplicationDuplicates->add($kaabaApplicationDuplicate);
+        $kaabaApplicationDuplicate->setNationality($this);
+    }
+
+    return $this;
+}
+
+public function removeKaabaApplicationDuplicate(KaabaApplicationDuplicate $kaabaApplicationDuplicate): static
+{
+    if ($this->kaabaApplicationDuplicates->removeElement($kaabaApplicationDuplicate)) {
+        // set the owning side to null (unless already changed)
+        if ($kaabaApplicationDuplicate->getNationality() === $this) {
+            $kaabaApplicationDuplicate->setNationality(null);
+        }
+    }
+
+    return $this;
+}
 
     public function getId(): ?int
     {
