@@ -141,7 +141,7 @@ public function filterApplications(
             ->setParameter('course', $course);
     }
 
-    $qb->andWhere('a.is_duplicate IS NULL OR a.is_duplicate = false');
+    // $qb->andWhere('a.is_duplicate IS NULL OR a.is_duplicate = false');
 
     return $qb->getQuery()->getResult();
 }
@@ -178,7 +178,6 @@ public function filterApplications(
                ->andWhere('i.manager = :user')
                ->setParameter('user', $user);
         }
-        $qb->andWhere('a.is_duplicate IS NULL OR a.is_duplicate = false');
 
         return $qb->getQuery()->getSingleScalarResult();
     }
@@ -201,7 +200,7 @@ public function filterApplications(
                ->andWhere('i.manager = :user')
                ->setParameter('user', $user);
         }
-        $qb->andWhere('a.is_duplicate IS NULL OR a.is_duplicate = false');
+
         return $qb->getQuery()->getSingleScalarResult();
     }
 
@@ -220,7 +219,7 @@ public function filterApplications(
                ->andWhere('i.manager = :user')
                ->setParameter('user', $user);
         }
-        $qb->andWhere('a.is_duplicate IS NULL OR a.is_duplicate = false');
+
         return $qb->getQuery()->getResult();
     }
 
@@ -239,7 +238,7 @@ public function filterApplications(
                ->andWhere('i.manager = :user')
                ->setParameter('user', $user);
         }
-        $qb->andWhere('a.is_duplicate IS NULL OR a.is_duplicate = false');
+
         return $qb->getQuery()->getResult();
     }
 
@@ -257,7 +256,7 @@ public function filterApplications(
                ->andWhere('i.manager = :user')
                ->setParameter('user', $user);
         }
-        $qb->andWhere('a.is_duplicate IS NULL OR a.is_duplicate = false');
+
         return $qb->getQuery()->getResult();
     }
 
@@ -275,7 +274,7 @@ public function filterApplications(
             $qb->andWhere('i.manager = :user')
                ->setParameter('user', $user);
         }
-        $qb->andWhere('a.is_duplicate IS NULL OR a.is_duplicate = false');
+
         return $qb->getQuery()->getResult();
     }
 
@@ -294,7 +293,7 @@ public function filterApplications(
                ->andWhere('i.manager = :user')
                ->setParameter('user', $user);
         }
-        $qb->andWhere('a.is_duplicate IS NULL OR a.is_duplicate = false');
+
         return $qb->getQuery()->getResult();
     }
 
@@ -335,7 +334,7 @@ public function filterApplications(
                 'application_count' => $count
             ];
         }
-$qb->andWhere('a.is_duplicate IS NULL OR a.is_duplicate = false');
+
         return $result;
     }
 
@@ -356,7 +355,7 @@ $qb->andWhere('a.is_duplicate IS NULL OR a.is_duplicate = false');
                ->andWhere('i.manager = :user')
                ->setParameter('user', $user);
         }
-$qb->andWhere('a.is_duplicate IS NULL OR a.is_duplicate = false');
+
         return $qb->getQuery()->getResult();
     }
 
@@ -375,7 +374,7 @@ public function countApplicationsByStatusId(int $statusId, ?User $user = null): 
            ->andWhere('i.manager = :user')
            ->setParameter('user', $user);
     }
-$qb->andWhere('a.is_duplicate IS NULL OR a.is_duplicate = false');
+
     return $qb->getQuery()->getSingleScalarResult();
 }
 }

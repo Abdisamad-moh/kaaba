@@ -1788,9 +1788,10 @@ class AdminController extends AbstractController
 
     // Add this new route for AJAX course loading
     #[Route('/kaaba-applications/courses-by-institute/{instituteId}', name: 'app_admin_kaaba_applications_courses_by_institute', methods: ['GET'])]
-    public function getCoursesByInstitute(int $instituteId, KaabaCourseRepository $courseRepository): JsonResponse
-    {
-        $courses = $courseRepository->findBy(['institute' => $instituteId]);
+public function getCoursesByInstitute(int $instituteId, KaabaCourseRepository $courseRepository): JsonResponse
+{
+    try {
+        $courses = $courseRepository->findBy(['institute' => $instituteId], ['name' => 'ASC']);
 
         $courseArray = [];
         foreach ($courses as $course) {
@@ -1801,7 +1802,10 @@ class AdminController extends AbstractController
         }
 
         return $this->json($courseArray);
+    } catch (\Exception $e) {
+        return $this->json(['error' => 'Failed to load courses'], 500);
     }
+}
 
     #[Route('/soft-delete-user', name: 'app_admin_soft_delete_user', methods: ['POST'])]
     public function softDeleteUser(Request $request, EntityManagerInterface $em, UserRepository $userRepository): JsonResponse
