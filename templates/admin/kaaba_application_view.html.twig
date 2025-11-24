@@ -52,15 +52,7 @@
     <div class="card">
         <div class="card-header text-bg-primary d-flex justify-content-between align-items-center">
             <h5 class="mb-0 text-white">Application Details</h5>
-            <span class="status-badge badge 
-                {% if application.status.name == 'Approved' %}bg-success
-                {% elseif application.status.name == 'Rejected' %}bg-danger
-                {% elseif application.status.name == 'Pending' %}bg-warning text-dark
-                {% elseif application.status.name == 'Shortlisted' %}bg-info
-                {% elseif application.status.name == 'Under Review' %}bg-primary
-                {% else %}bg-secondary{% endif %}">
-                {{ application.status.name ?? 'Pending' }}
-            </span>
+           
         </div>
         
         <form class="form-horizontal">
@@ -447,7 +439,49 @@
     </div>
  
 </div>
+<!-- Status Information Section -->
+<div class="card-body">
+    <h5 class="card-title mb-0">Application Status</h5>
+</div>
+<hr class="m-0"/>
+<div class="card-body">
+    <div class="row">
+        <div class="col-12">
+            <div class="d-flex align-items-center mb-3">
+                <strong class="me-3">Current Status:</strong>
+                <span class="status-badge badge 
+                    {% if application.status.name == 'accepted' or application.status.name == 'approved' %}bg-success
+                    {% elseif application.status.name == 'rejected' %}bg-danger
+                    {% elseif application.status.name == 'applied' %}bg-primary
+                    {% elseif application.status.name == 'shortlisted' %}bg-info text-white
+                    {% elseif application.status.name == 'waitlisted' %}bg-warning text-white
+                    {% else %}bg-secondary{% endif %}">
+                    {% if application.status.name == 'accepted' %}approved
+                    {% else %}
+                        {{ application.status.name }}
+                    {% endif %}
+                </span>
+            </div>
 
+        
+            {# Rejection Reason - only show for rejected status #}
+            {% if application.status.name == 'rejected' and application.rejectionreason %}
+                <div class="alert alert-danger mt-3">
+                    <div class="d-flex align-items-start">
+                        <i class="ti ti-alert-circle text-danger me-2 mt-1 fs-5"></i>
+                        <div>
+                            <strong>Rejection Reason:</strong>
+                            <p class="mb-0 mt-1">{{ application.rejectionreason }}</p>
+                            {% if application.rejecteddate %}
+                                <small class="text-muted">Rejected on: {{ application.rejecteddate|date('d-m-Y H:i') }}</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
 <!-- Declaration Section -->
 <div class="card-body">
     <h5 class="card-title mb-0">Declaration</h5>
@@ -492,6 +526,10 @@
         </div>
     </div>
 </div>
+
+
+
+
 
                 </div>
 
