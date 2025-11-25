@@ -76,21 +76,7 @@
                                                         {{ application.phone }}
                                                     </div>
                                                     
-                                                    {# Show rejection reason if exists #}
-                                                    {% if application.rejectionreason %}
-                                                        <div class="text-danger small mt-1">
-                                                            <strong>Rejection Reason:</strong>
-                                                            {{ application.rejectionreason }}
-                                                        </div>
-                                                    {% endif %}
-                                                    
-                                                    {# Show shortlist reason if exists #}
-                                                    {% if application.shortlistreason %}
-                                                        <div class="text-info small mt-1">
-                                                            <strong>Shortlist Reason:</strong>
-                                                            {{ application.shortlistreason }}
-                                                        </div>
-                                                    {% endif %}
+                                                   
                                                 </td>
                                                 <td>
                                                     {% if application.scholarship %}
