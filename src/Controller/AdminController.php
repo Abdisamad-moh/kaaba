@@ -1506,285 +1506,345 @@ class AdminController extends AbstractController
         ]);
     }
 
-    #[Route('/kaaba-applications', name: 'app_admin_kaaba_applications')]
-    public function kaabaApplications(
-        KaabaApplicationRepository $applicationsRepository,
-        KaabaApplicationStatusRepository $statusRepository,
-        KaabaRegionRepository $regionRepository,
-        KaabaDistrictRepository $districtRepository,
-        KaabaQualificationRepository $qualificationRepository,
-        KaabaGenderRepository $genderRepository,
-        KaabaScholarshipRepository $scholarshipRepository,
-        KaabaInstituteRepository $instituteRepository,
-        KaabaCourseRepository $courseRepository,
-        Request $request,
-        PaginatorInterface $paginator,
-    ): Response {
+#[Route('/kaaba-applications', name: 'app_admin_kaaba_applications')]
+public function kaabaApplications(
+    KaabaApplicationRepository $applicationsRepository,
+    KaabaApplicationStatusRepository $statusRepository,
+    KaabaRegionRepository $regionRepository,
+    KaabaDistrictRepository $districtRepository,
+    KaabaQualificationRepository $qualificationRepository,
+    KaabaGenderRepository $genderRepository,
+    KaabaScholarshipRepository $scholarshipRepository,
+    KaabaInstituteRepository $instituteRepository,
+    KaabaCourseRepository $courseRepository,
+    Request $request,
+    PaginatorInterface $paginator,
+): Response {
+    // Get current user
+    $user = $this->getUser();
 
-        // Get current user
-        $user = $this->getUser();
+    // Fetch filter options
+    $statuses = $statusRepository->findAll();
+    $regions = $regionRepository->findAll();
+    $districts = $districtRepository->findAll();
+    $qualifications = $qualificationRepository->findAll();
+    $genders = $genderRepository->findAll();
+    $scholarships = $scholarshipRepository->findAll();
 
-        // Fetch filter options
-        $statuses = $statusRepository->findAll();
-        $regions = $regionRepository->findAll();
-        $districts = $districtRepository->findAll();
-        $qualifications = $qualificationRepository->findAll();
-        $genders = $genderRepository->findAll();
-        $scholarships = $scholarshipRepository->findAll();
-
-        // Get institutes based on user role
-        if ($user && in_array('ROLE_USER', $user->getRoles()) && !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
-            $institutes = $instituteRepository->findBy(['manager' => $user]);
-        } else {
-            $institutes = $instituteRepository->findAll();
-        }
-
-        $courses = $courseRepository->findAll();
-
-        $searchForm = $this->createFormBuilder(null)
-            ->add('status', EntityType::class, [
-                'class' => KaabaApplicationStatus::class,
-                'choice_label' => 'name',
-                'required' => false,
-                'mapped' => false,
-                'label' => 'Status',
-                'attr' => [
-                    'class' => 'form-control',
-                    'col_class' => 'col-md-3',
-                    'placeholder' => 'Filter by Status'
-                ],
-            ])
-            ->add('scholarship', EntityType::class, [
-                'class' => KaabaScholarship::class,
-                'choice_label' => 'title',
-                'required' => false,
-                'mapped' => false,
-                'label' => 'Scholarship',
-                'attr' => [
-                    'class' => 'form-control',
-                    'col_class' => 'col-md-3',
-                    'placeholder' => 'Filter by Scholarship'
-                ],
-            ])
-            ->add('institute', EntityType::class, [
-                'class' => KaabaInstitute::class,
-                'choice_label' => 'name',
-                'required' => false,
-                'mapped' => false,
-                'label' => 'Institute',
-                'choices' => $institutes,
-                'attr' => [
-                    'class' => 'form-control institute-select',
-                    'col_class' => 'col-md-3',
-                    'placeholder' => 'Filter by Institute',
-                    'data-dependent' => 'course'
-                ],
-            ])
-            ->add('course', EntityType::class, [
-                'class' => KaabaCourse::class,
-                'choice_label' => 'name',
-                'required' => false,
-                'mapped' => false,
-                'label' => 'Course',
-                'attr' => [
-                    'class' => 'form-control course-select',
-                    'col_class' => 'col-md-3',
-                    'placeholder' => 'Filter by Course',
-                    'disabled' => false
-                ],
-            ])
-            ->add('from_date', DateType::class, [
-                'required' => false,
-                'mapped' => false,
-                'widget' => 'single_text',
-                'label' => 'From Date',
-                'attr' => [
-                    'class' => 'form-control',
-                    'col_class' => 'col-md-3',
-                    'placeholder' => 'From Date'
-                ],
-            ])
-            ->add('to_date', DateType::class, [
-                'required' => false,
-                'mapped' => false,
-                'widget' => 'single_text',
-                'label' => 'To Date',
-                'attr' => [
-                    'class' => 'form-control',
-                    'col_class' => 'col-md-3',
-                    'placeholder' => 'To Date'
-                ],
-            ])
-            ->add('phone', TextType::class, [
-                'required' => false,
-                'mapped' => false,
-                'label' => 'Phone Number',
-                'attr' => [
-                    'class' => 'form-control',
-                    'col_class' => 'col-md-3',
-                    'placeholder' => 'Filter by Phone'
-                ],
-            ])
-            ->add('region', EntityType::class, [
-                'class' => KaabaRegion::class,
-                'choice_label' => 'name',
-                'required' => false,
-                'mapped' => false,
-                'label' => 'Region',
-                'attr' => [
-                    'class' => 'form-control',
-                    'col_class' => 'col-md-3',
-                    'placeholder' => 'Filter by Region'
-                ],
-            ])
-            ->add('district', EntityType::class, [
-                'class' => KaabaDistrict::class,
-                'choice_label' => 'name',
-                'required' => false,
-                'mapped' => false,
-                'label' => 'District',
-                'attr' => [
-                    'class' => 'form-control',
-                    'col_class' => 'col-md-3',
-                    'placeholder' => 'Filter by District'
-                ],
-            ])
-            ->add('qualification', EntityType::class, [
-                'class' => KaabaQualification::class,
-                'choice_label' => 'name',
-                'required' => false,
-                'mapped' => false,
-                'label' => 'Qualification',
-                'attr' => [
-                    'class' => 'form-control',
-                    'col_class' => 'col-md-3',
-                    'placeholder' => 'Filter by Qualification'
-                ],
-            ])
-            ->add('gender', EntityType::class, [
-                'class' => KaabaGender::class,
-                'choice_label' => 'name',
-                'required' => false,
-                'mapped' => false,
-                'label' => 'Gender',
-                'attr' => [
-                    'class' => 'form-control',
-                    'col_class' => 'col-md-3',
-                    'placeholder' => 'Filter by Gender'
-                ],
-            ])
-            ->add('limit', ChoiceType::class, [
-                'required' => false,
-                'mapped' => false,
-                'label' => 'Items per Page',
-                'choices' => [
-                    '25' => 25,
-                    '50' => 50,
-                    '100' => 100,
-                    '200' => 200,
-                    '500' => 500,
-                ],
-                'data' => 100, // Default value
-                'attr' => [
-                    'class' => 'form-control',
-                    'col_class' => 'col-md-2',
-                ],
-            ])
-            ->getForm();
-
-        $searchForm->handleRequest($request);
-
-        // Get the limit from form or use default
-        $limit = 100; // Default limit
-        if ($searchForm->isSubmitted() && $searchForm->isValid()) {
-            $formLimit = $searchForm->get("limit")->getData();
-            $limit = $formLimit ?: 100;
-
-            $status = $searchForm->get("status")->getData();
-            $scholarship = $searchForm->get("scholarship")->getData();
-            $institute = $searchForm->get("institute")->getData();
-            $course = $searchForm->get("course")->getData();
-            $fromDate = $searchForm->get("from_date")->getData();
-            $toDate = $searchForm->get("to_date")->getData();
-            $phone = $searchForm->get("phone")->getData();
-            $region = $searchForm->get("region")->getData();
-            $district = $searchForm->get("district")->getData();
-            $qualification = $searchForm->get("qualification")->getData();
-            $gender = $searchForm->get("gender")->getData();
-
-            $datatable = $applicationsRepository->filterApplications(
-                $status,
-                $fromDate,
-                $toDate,
-                $phone,
-                $region,
-                $district,
-                $qualification,
-                $gender,
-                $scholarship,
-                $institute,
-                $course,
-                $user // Pass current user
-            );
-
-            // Apply institute and course filters manually since they're not in the repository method
-            if ($institute || $course) {
-                $datatable = array_filter($datatable, function ($application) use ($institute, $course) {
-                    $instituteMatch = true;
-                    $courseMatch = true;
-
-                    if ($institute) {
-                        $instituteMatch = $application->getInstitute() && $application->getInstitute()->getId() === $institute->getId();
-                    }
-
-                    if ($course) {
-                        $courseMatch = $application->getCourse() && $application->getCourse()->getId() === $course->getId();
-                    }
-
-                    return $instituteMatch && $courseMatch;
-                });
-            }
-
-            $count = count($datatable);
-            $applications = $paginator->paginate(
-                $datatable,
-                $request->query->get('page', 1),
-                $limit
-            );
-        } else {
-            // Check if limit is in query parameters (for pagination links)
-            $limit = $request->query->get('limit', 100);
-
-            $datatable = $applicationsRepository->filterApplications(
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                null,
-                $user // Pass current user
-            );
-            $count = count($datatable);
-            $applications = $paginator->paginate(
-                $datatable,
-                $request->query->get('page', 1),
-                $limit
-            );
-        }
-
-        return $this->render('admin/kaaba_applications.html.twig', [
-            'applications' => $applications,
-            'searchForm' => $searchForm->createView(),
-            'total_count' => $count,
-            'current_user' => $user, // Pass user to template if needed
-            'current_limit' => $limit, // Pass current limit to template
-        ]);
+    // Get institutes based on user role
+    if ($user && in_array('ROLE_USER', $user->getRoles()) && !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+        $institutes = $instituteRepository->findBy(['manager' => $user]);
+    } else {
+        $institutes = $instituteRepository->findAll();
     }
+
+    // Handle AJAX course request
+    if ($request->isXmlHttpRequest() && $request->query->get('action') === 'get_courses') {
+        $instituteId = $request->query->get('institute_id');
+        $courses = $courseRepository->findBy(['institute' => $instituteId]);
+        
+        $courseArray = [];
+        foreach ($courses as $course) {
+            $courseArray[] = [
+                'id' => $course->getId(),
+                'name' => $course->getName()
+            ];
+        }
+        
+        return new JsonResponse($courseArray);
+    }
+
+    // Get current course ID from request for form initialization
+    $currentCourseId = $request->query->get('course');
+    $currentInstituteId = $request->query->get('institute');
+    
+    // If we have an institute from query, get its courses
+    $coursesForInstitute = [];
+    if ($currentInstituteId) {
+        $coursesForInstitute = $courseRepository->findBy(['institute' => $currentInstituteId]);
+    }
+
+    $searchForm = $this->createFormBuilder(null, [
+            'method' => 'GET',
+            'csrf_protection' => false,
+        ])
+        ->add('status', EntityType::class, [
+            'class' => KaabaApplicationStatus::class,
+            'choice_label' => 'name',
+            'required' => false,
+            'mapped' => false,
+            'label' => 'Status',
+            'data' => $request->query->get('status') ? $statusRepository->find($request->query->get('status')) : null,
+            'attr' => [
+                'class' => 'form-control',
+                'col_class' => 'col-md-3',
+                'placeholder' => 'Filter by Status'
+            ],
+        ])
+        ->add('scholarship', EntityType::class, [
+            'class' => KaabaScholarship::class,
+            'choice_label' => 'title',
+            'required' => false,
+            'mapped' => false,
+            'data' => $request->query->get('scholarship') ? $scholarshipRepository->find($request->query->get('scholarship')) : null,
+            'attr' => [
+                'class' => 'form-control',
+                'col_class' => 'col-md-3',
+                'placeholder' => 'Filter by Scholarship'
+            ],
+        ])
+        ->add('institute', EntityType::class, [
+            'class' => KaabaInstitute::class,
+            'choice_label' => 'name',
+            'required' => false,
+            'mapped' => false,
+            'data' => $currentInstituteId ? $instituteRepository->find($currentInstituteId) : null,
+            'choices' => $institutes,
+            'attr' => [
+                'class' => 'form-control institute-select',
+                'col_class' => 'col-md-3',
+                'placeholder' => 'Filter by Institute',
+                'data-dependent' => 'course'
+            ],
+        ])
+     ->add('course', ChoiceType::class, [
+    'required' => false,
+    'mapped' => false,
+    'choices' => $coursesForInstitute,
+    'choice_label' => 'name',
+    'choice_value' => 'id',
+    'data' => $currentCourseId,
+    'placeholder' => 'Select Course',
+    'attr' => [
+        'class' => 'form-control course-select',
+        'col_class' => 'col-md-3',
+    ],
+])
+        ->add('from_date', DateType::class, [
+            'required' => false,
+            'mapped' => false,
+            'widget' => 'single_text',
+            'label' => 'From Date',
+            'data' => $request->query->get('from_date') ? new \DateTime($request->query->get('from_date')) : null,
+            'attr' => [
+                'class' => 'form-control',
+                'col_class' => 'col-md-3',
+                'placeholder' => 'From Date'
+            ],
+        ])
+        ->add('to_date', DateType::class, [
+            'required' => false,
+            'mapped' => false,
+            'widget' => 'single_text',
+            'label' => 'To Date',
+            'data' => $request->query->get('to_date') ? new \DateTime($request->query->get('to_date')) : null,
+            'attr' => [
+                'class' => 'form-control',
+                'col_class' => 'col-md-3',
+                'placeholder' => 'To Date'
+            ],
+        ])
+        ->add('phone', TextType::class, [
+            'required' => false,
+            'mapped' => false,
+            'label' => 'Phone Number',
+            'data' => $request->query->get('phone'),
+            'attr' => [
+                'class' => 'form-control',
+                'col_class' => 'col-md-3',
+                'placeholder' => 'Filter by Phone'
+            ],
+        ])
+        ->add('region', EntityType::class, [
+            'class' => KaabaRegion::class,
+            'choice_label' => 'name',
+            'required' => false,
+            'mapped' => false,
+            'data' => $request->query->get('region') ? $regionRepository->find($request->query->get('region')) : null,
+            'attr' => [
+                'class' => 'form-control',
+                'col_class' => 'col-md-3',
+                'placeholder' => 'Filter by Region'
+            ],
+        ])
+        ->add('district', EntityType::class, [
+            'class' => KaabaDistrict::class,
+            'choice_label' => 'name',
+            'required' => false,
+            'mapped' => false,
+            'data' => $request->query->get('district') ? $districtRepository->find($request->query->get('district')) : null,
+            'attr' => [
+                'class' => 'form-control',
+                'col_class' => 'col-md-3',
+                'placeholder' => 'Filter by District'
+            ],
+        ])
+        ->add('qualification', EntityType::class, [
+            'class' => KaabaQualification::class,
+            'choice_label' => 'name',
+            'required' => false,
+            'mapped' => false,
+            'data' => $request->query->get('qualification') ? $qualificationRepository->find($request->query->get('qualification')) : null,
+            'attr' => [
+                'class' => 'form-control',
+                'col_class' => 'col-md-3',
+                'placeholder' => 'Filter by Qualification'
+            ],
+        ])
+        ->add('gender', EntityType::class, [
+            'class' => KaabaGender::class,
+            'choice_label' => 'name',
+            'required' => false,
+            'mapped' => false,
+            'data' => $request->query->get('gender') ? $genderRepository->find($request->query->get('gender')) : null,
+            'attr' => [
+                'class' => 'form-control',
+                'col_class' => 'col-md-3',
+                'placeholder' => 'Filter by Gender'
+            ],
+        ])
+        ->add('limit', ChoiceType::class, [
+            'required' => false,
+            'mapped' => false,
+            'label' => 'Items per Page',
+            'choices' => [
+                '25' => 25,
+                '50' => 50,
+                '100' => 100,
+                '200' => 200,
+                '500' => 500,
+            ],
+            'data' => $request->query->get('limit', 100),
+            'attr' => [
+                'class' => 'form-control',
+                'col_class' => 'col-md-2',
+            ],
+        ])
+        ->getForm();
+
+    $searchForm->handleRequest($request);
+
+    // Initialize variables
+    $datatable = [];
+    $count = 0;
+    $limit = $request->query->get('limit', 100);
+    // Always use query parameters for filtering (works for both form submission and pagination)
+    $status = $request->query->get('status') ? $statusRepository->find($request->query->get('status')) : null;
+    $scholarship = $request->query->get('scholarship') ? $scholarshipRepository->find($request->query->get('scholarship')) : null;
+    $institute = $request->query->get('institute') ? $instituteRepository->find($request->query->get('institute')) : null;
+    $course = $request->query->get('course') ? $courseRepository->find($request->query->get('course')) : null;
+    $fromDate = $request->query->get('from_date') ? new \DateTime($request->query->get('from_date')) : null;
+    $toDate = $request->query->get('to_date') ? new \DateTime($request->query->get('to_date')) : null;
+    $phone = $request->query->get('phone');
+    $region = $request->query->get('region') ? $regionRepository->find($request->query->get('region')) : null;
+    $district = $request->query->get('district') ? $districtRepository->find($request->query->get('district')) : null;
+    $qualification = $request->query->get('qualification') ? $qualificationRepository->find($request->query->get('qualification')) : null;
+    $gender = $request->query->get('gender') ? $genderRepository->find($request->query->get('gender')) : null;
+    
+    // If form was submitted, we need to redirect with query parameters
+    if ($searchForm->isSubmitted() && $searchForm->isValid()) {
+        $formData = $searchForm->getData();
+        // dd($searchForm->get('status')->getData(),'.ddddd');
+        // Build query parameters from form data
+        $queryParams = [];
+        
+        if (!empty($formData['status'])) {
+            $queryParams['status'] = $formData['status']->getId();
+        }
+        if (!empty($formData['scholarship'])) {
+            $queryParams['scholarship'] = $formData['scholarship']->getId();
+        }
+        if (!empty($formData['institute'])) {
+            $queryParams['institute'] = $formData['institute']->getId();
+        }
+        if (!empty($formData['course'])) {
+            $queryParams['course'] = $formData['course']->getId();
+        }
+        if (!empty($formData['from_date'])) {
+            $queryParams['from_date'] = $formData['from_date']->format('Y-m-d');
+        }
+        if (!empty($formData['to_date'])) {
+            $queryParams['to_date'] = $formData['to_date']->format('Y-m-d');
+        }
+        if (!empty($formData['phone'])) {
+            $queryParams['phone'] = $formData['phone'];
+        }
+        if (!empty($formData['region'])) {
+            $queryParams['region'] = $formData['region']->getId();
+        }
+        if (!empty($formData['district'])) {
+            $queryParams['district'] = $formData['district']->getId();
+        }
+        if (!empty($formData['qualification'])) {
+            $queryParams['qualification'] = $formData['qualification']->getId();
+        }
+        if (!empty($formData['gender'])) {
+            $queryParams['gender'] = $formData['gender']->getId();
+        }
+        if (!empty($formData['limit'])) {
+            $queryParams['limit'] = $formData['limit'];
+        }
+
+        // Redirect with query parameters
+        return $this->redirectToRoute('app_admin_kaaba_applications', $queryParams);
+    }
+
+//  dd($statuses, $fromDate, $toDate, $phone, $region, $district, $qualification, $gender, $scholarship, $institute, $course);
+    // Apply filters using repository method
+    $datatable = $applicationsRepository->filterApplications(
+        $status,
+        $fromDate,
+        $toDate,
+        $phone,
+        $region,
+        $district,
+        $qualification,
+        $gender,
+        $scholarship,
+        $institute,
+        $course,
+        $user
+    );
+
+    $count = count($datatable);
+    $applications = $paginator->paginate(
+        $datatable,
+        $request->query->get('page', 1),
+        $limit
+    );
+
+    return $this->render('admin/kaaba_applications.html.twig', [
+        'applications' => $applications,
+        'searchForm' => $searchForm->createView(),
+        'total_count' => $count,
+        'current_user' => $user,
+        'current_limit' => $limit,
+    ]);
+}
+
+#[Route('/kaaba-applications/get-courses', name: 'app_admin_kaaba_applications_get_courses')]
+public function getCoursesByyInstitute(
+    KaabaCourseRepository $courseRepository,
+    Request $request
+): Response {
+    $instituteId = $request->query->get('institute_id');
+    
+    if (!$instituteId) {
+        return new JsonResponse([]);
+    }
+    
+    $courses = $courseRepository->findBy(['institute' => $instituteId]);
+    
+    $courseArray = [];
+    foreach ($courses as $course) {
+        $courseArray[] = [
+            'id' => $course->getId(),
+            'name' => $course->getName()
+        ];
+    }
+    
+    return new JsonResponse($courseArray);
+}
 
     // Add this new route for AJAX course loading
     #[Route('/kaaba-applications/courses-by-institute/{instituteId}', name: 'app_admin_kaaba_applications_courses_by_institute', methods: ['GET'])]

@@ -135,13 +135,11 @@ public function filterApplications(
             ->setParameter('institute', $institute);
     }
 
-    // Add course filter
-    if ($course) {
+    // Add course filter - check if course exists and has ID
+    if ($course && $course->getId()) {
         $qb->andWhere('a.course = :course')
             ->setParameter('course', $course);
     }
-
-    // $qb->andWhere('a.is_duplicate IS NULL OR a.is_duplicate = false');
 
     return $qb->getQuery()->getResult();
 }

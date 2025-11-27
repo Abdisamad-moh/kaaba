@@ -36,6 +36,9 @@
                         <div class="card-body">
                             {{ macros.render_search_form(searchForm, 'Filter Applications') }}
 
+
+
+
                             <div class="table-responsive">
                                 <table id="file_exports" class="table w-100 table-striped table-bordered display text-nowrap" width="100%" data-controller="general">
                                     <thead>
@@ -401,93 +404,129 @@
     <script>
     document.addEventListener('DOMContentLoaded', function() {
 
-        // Institute-Course dependent dropdown functionality
-    function initializeDependentDropdowns() {
-            const instituteSelect = document.querySelector('select[name="search_form[institute]"]');
-            const courseSelect = document.querySelector('select[name="search_form[course]"]');
-            
-            if (instituteSelect && courseSelect) {
-                console.log('Initializing dependent dropdowns'); // Debug log
-                
-                // Initialize course select state on page load
-                function initializeCourseSelect() {
-                    console.log('Initializing course select, current institute value:', instituteSelect.value); // Debug log
-                    
-                    if (instituteSelect.value) {
-                        courseSelect.disabled = false;
-                        // If there's a value but no courses loaded, load them
-                        if (courseSelect.options.length <= 1 && instituteSelect.value) {
-                            loadCoursesForInstitute(instituteSelect.value);
-                        }
-                    } else {
-                        courseSelect.disabled = true;
-                        courseSelect.innerHTML = '<option value="">Select Institute First</option>';
-                    }
-                }
-
-                // Function to load courses for a specific institute
-                function loadCoursesForInstitute(instituteId) {
-                    console.log('Loading courses for institute:', instituteId); // Debug log
-                    
-                    courseSelect.disabled = false;
-                    courseSelect.innerHTML = '<option value="">Loading courses...</option>';
-                    
-                    fetch(`/admin/kaaba-applications/courses-by-institute/${instituteId}`)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-                            return response.json();
-                        })
-                        .then(courses => {
-                            console.log('Courses loaded:', courses); // Debug log
-                            courseSelect.innerHTML = '<option value="">All Courses</option>';
-                            courses.forEach(course => {
-                                const option = document.createElement('option');
-                                option.value = course.id;
-                                option.textContent = course.name;
-                                courseSelect.appendChild(option);
-                            });
-                            
-                            // If there's a previously selected course value, try to restore it
-                            const urlParams = new URLSearchParams(window.location.search);
-                            const courseParam = urlParams.get('search_form[course]');
-                            if (courseParam) {
-                                courseSelect.value = courseParam;
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error loading courses:', error);
-                            courseSelect.innerHTML = '<option value="">Error loading courses</option>';
-                        });
-                }
-
-                // Add event listener for institute change
-                instituteSelect.addEventListener('change', function() {
-                    const instituteId = this.value;
-                    console.log('Institute changed to:', instituteId); // Debug log
-                    
-                    if (instituteId) {
-                        loadCoursesForInstitute(instituteId);
-                    } else {
-                        courseSelect.disabled = true;
-                        courseSelect.innerHTML = '<option value="">Select Institute First</option>';
-                    }
-                });
-                
-                // Initialize on page load
-                initializeCourseSelect();
-                
-                // Also initialize when the form is rendered (in case of form submission)
-                setTimeout(initializeCourseSelect, 500);
-            }
-        }
-
-        // Initialize the dependent dropdowns when DOM is ready
-        initializeDependentDropdowns();
+    // Function to find form elements by partial name match
+    function findFormElement(partialName) {
+        const selectors = [
+            `select[name*="${partialName}"]`,
+            `select[name$="${partialName}"]`,
+            `select[name^="${partialName}"]`
+        ];
         
-        // Re-initialize if form is dynamically reloaded
-        document.addEventListener('ajaxComplete', initializeDependentDropdowns);
+        for (const selector of selectors) {
+            const element = document.querySelector(selector);
+            if (element) return element;
+        }
+        return null;
+    }
+
+    const instituteSelect = findFormElement('institute');
+    const courseSelect = findFormElement('course');
+    
+    console.log('Found elements:', { instituteSelect, courseSelect });
+    
+if (instituteSelect && courseSelect) {
+    instituteSelect.addEventListener('change', function() {
+        const instituteId = this.value;
+        console.log('Institute changed:', instituteId);
+        
+        if (instituteId) {
+            // Remove disabled attribute
+            courseSelect.removeAttribute('disabled');
+            courseSelect.innerHTML = '<option value="">Loading courses...</option>';
+            
+            // Fetch courses for selected institute
+            fetch(`/admin/kaaba-applications/get-courses?institute_id=${instituteId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(courses => {
+                    console.log('Loaded courses:', courses);
+                    courseSelect.innerHTML = '<option value="">Select Course</option>';
+                    
+                    if (courses && courses.length > 0) {
+                        courses.forEach(course => {
+                            const option = document.createElement('option');
+                            option.value = course.id;
+                            option.textContent = course.name;
+                            courseSelect.appendChild(option);
+                        });
+                    } else {
+                        courseSelect.innerHTML = '<option value="">No courses found</option>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading courses:', error);
+                    courseSelect.innerHTML = '<option value="">Error loading courses</option>';
+                });
+        } else {
+            // No institute selected
+            courseSelect.innerHTML = '<option value="">Select institute first</option>';
+        }
+    });
+    
+    // Initialize course select state
+    if (!instituteSelect.value) {
+        courseSelect.innerHTML = '<option value="">Select institute first</option>';
+    } else {
+        // If institute is already selected, load its courses
+        instituteSelect.dispatchEvent(new Event('change'));
+    }
+}
+
+// Remove the form submission handler that enables disabled fields
+const searchForm = document.getElementById('search-form');
+if (searchForm) {
+    searchForm.addEventListener('submit', function(e) {
+        // No need to enable fields anymore since they're never disabled
+        // The form will submit normally
+    });
+}
+
+
+
+  
+    // Initialize course dropdown based on current institute selection
+    function initializeCourseDropdown() {
+        const instituteSelect = document.querySelector('select[name*="institute"]');
+        const courseSelect = document.querySelector('select[name*="course"]');
+        const currentInstituteId = instituteSelect ? instituteSelect.value : null;
+        const currentCourseId = courseSelect ? courseSelect.value : null;
+
+        if (currentInstituteId && courseSelect) {
+            // Enable course select and load courses
+            courseSelect.disabled = false;
+            courseSelect.innerHTML = '<option value="">Loading courses...</option>';
+            
+            fetch(`/admin/kaaba-applications/get-courses?institute_id=${currentInstituteId}`)
+                .then(response => response.json())
+                .then(courses => {
+                    courseSelect.innerHTML = '<option value="">Select Course</option>';
+                    if (courses && courses.length > 0) {
+                        courses.forEach(course => {
+                            const option = document.createElement('option');
+                            option.value = course.id;
+                            option.textContent = course.name;
+                            // Select the option if it matches the current course ID
+                            if (course.id == currentCourseId) {
+                                option.selected = true;
+                            }
+                            courseSelect.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading courses:', error);
+                    courseSelect.innerHTML = '<option value="">Error loading courses</option>';
+                });
+        }
+    }
+
+    // Initialize on page load
+    initializeCourseDropdown();
+
 
         // Update Status functionality with shortlist reason
         document.querySelectorAll('.update-status').forEach(button => {

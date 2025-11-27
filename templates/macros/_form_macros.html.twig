@@ -1,11 +1,11 @@
 {% macro render_search_form(form, button_label) %}
-    {{ form_start(form) }}
+    {{ form_start(form, {'attr': {'id': 'search-form'}}) }}
         <div class="row">
             {% for field in form %}
                 {% if field.vars.name != '_token' %}
                     <div class="{{ field.vars.attr.col_class|default('col-12') }}">
                         {{ form_label(field) }}
-                        {{ form_widget(field) }}
+                        {{ form_widget(field, {'attr': field.vars.attr}) }}
                         {{ form_errors(field) }}
                     </div>
                 {% endif %}
