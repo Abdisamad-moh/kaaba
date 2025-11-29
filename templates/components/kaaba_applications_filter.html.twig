@@ -1,0 +1,59 @@
+<form method="get">
+
+    <div class="row g-3">
+
+        <div class="col-md-3">
+            {{ form_row(form.status, {'label': 'Status'}) }}
+        </div>
+
+        <div class="col-md-3">
+            {{ form_row(form.scholarship, {'label': 'Scholarship'}) }}
+        </div>
+
+        <div class="col-md-3">
+            {{ form_row(form.institute, {'label': 'Institute'}) }}
+        </div>
+
+        <div class="col-md-3">
+            {{ form_row(form.course, {'label': 'Course'}) }}
+        </div>
+
+        <div class="col-md-3">
+            {{ form_row(form.phone, {'label': 'Phone'}) }}
+        </div>
+
+        <div class="col-md-3">
+            {{ form_row(form.region, {'label': 'Region'}) }}
+        </div>
+
+        <div class="col-md-3">
+            {{ form_row(form.district, {'label': 'District'}) }}
+        </div>
+
+        <div class="col-md-3">
+            {{ form_row(form.qualification, {'label': 'Qualification'}) }}
+        </div>
+
+        <div class="col-md-3">
+            {{ form_row(form.gender, {'label': 'Gender'}) }}
+        </div>
+
+        <div class="col-md-3">
+            {{ form_row(form.from_date, {'label': 'From Date'}) }}
+        </div>
+
+        <div class="col-md-3">
+            {{ form_row(form.to_date, {'label': 'To Date'}) }}
+        </div>
+
+        <div class="col-md-2">
+            {{ form_row(form.limit, {'label': 'Items per page'}) }}
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+            <button class="btn btn-primary w-100">Filter</button>
+        </div>
+
+    </div>
+
+</form>
