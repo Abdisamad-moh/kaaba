@@ -1,0 +1,132 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Assessment Result – {{ application.fullName }}{% endblock %}
+
+{% block body %}
+
+<style>
+    body { font-family: "Inter", sans-serif; }
+    .section-box { background:#f9fafb; padding:20px; border-radius:10px; }
+    .score-pill { font-weight:600; padding:8px 12px; border-radius:6px; }
+    .score-low { background:#fee2e2; color:#b91c1c; }
+    .score-mid { background:#fef9c3; color:#a16207; }
+    .score-high { background:#dcfce7; color:#15803d; }
+    .status-approved { background:#dcfce7; color:#166534; border:1px solid #bbf7d0; }
+    .status-waitlist { background:#fef9c3; color:#854d0e; border:1px solid #fef08a; }
+    .status-shortlist { background:#fee2e2; color:#9f1239; border:1px solid #fecdd3; }
+</style>
+
+
+<div class="container py-5">
+
+    <div class="card shadow p-4 p-md-5">
+
+        <h2 class="fw-bold mb-4">Assessment Result</h2>
+
+        {% set a = assessment %}
+
+        <!-- Summary Section -->
+        <div class="mb-4 d-flex justify-content-between">
+            <div>
+                <h4 class="fw-semibold">{{ application.fullName }}</h4>
+                <p class="text-muted">{{ application.phone }}</p>
+            </div>
+
+            <div class="text-end">
+                <span class="badge bg-primary fs-6">{{ a.totalScore }}/100</span>
+                <p class="text-muted small mb-2">Total Score</p>
+
+                <span class="badge 
+                    {% if a.recommendedStatus == 'APPROVED' %}status-approved
+                    {% elseif a.recommendedStatus == 'WAITLIST' %}status-waitlist
+                    {% else %}status-shortlist
+                    {% endif %}
+                    fs-6">
+                    {{ a.recommendedStatus }}
+                </span>
+            </div>
+        </div>
+
+
+        <hr>
+
+
+        <!-- SECTION: MOTIVATION -->
+        <div class="mt-4">
+            <h4 class="fw-bold">Section B – Motivation (20)</h4>
+
+            <div class="section-box mt-2">
+                {% for key,val in a.motivation %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-capitalize">{{ key|replace({'_':' '}) }}</span>
+                        <span class="score-pill 
+                            {% if val < 7 %}score-low
+                            {% elseif val < 14 %}score-mid
+                            {% else %}score-high
+                            {% endif %}
+                        ">{{ val }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+
+        <!-- SECTION: HOUSEHOLD -->
+        <div class="mt-4">
+            <h4 class="fw-bold">Section C – Household (40)</h4>
+
+            <div class="section-box mt-2">
+                {% for key,val in a.household %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-capitalize">{{ key|replace({'_':' '}) }}</span>
+                        <span class="score-pill 
+                            {% if val < 12 %}score-low
+                            {% elseif val < 24 %}score-mid
+                            {% else %}score-high
+                            {% endif %}
+                        ">{{ val }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+
+        <!-- SECTION: INCOME -->
+        <div class="mt-4">
+            <h4 class="fw-bold">Section D – Income (40)</h4>
+
+            <div class="section-box mt-2">
+                {% for key,val in a.income %}
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-capitalize">{{ key|replace({'_':' '}) }}</span>
+                        <span class="score-pill 
+                            {% if val < 12 %}score-low
+                            {% elseif val < 24 %}score-mid
+                            {% else %}score-high
+                            {% endif %}
+                        ">{{ val }}</span>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+
+        <hr class="mt-5">
+
+        <div class="d-flex justify-content-between">
+            <a href="{{ path('app_admin_kaaba_application_view', { uuid: application.uuid }) }}"
+               class="btn btn-secondary">
+                <i class="ti ti-arrow-left me-1"></i> Back to Application
+            </a>
+
+            <a href="{{ path('app_assessment_edit', { uuid: application.uuid }) }}"
+               class="btn btn-primary">
+                <i class="ti ti-edit me-1"></i> Update Assessment
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

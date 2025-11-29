@@ -6,8 +6,8 @@ use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Uid\Uuid;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\Collection;
-use App\Repository\KaabaApplicationRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use App\Repository\KaabaApplicationRepository;
 
 #[ORM\Entity(repositoryClass: KaabaApplicationRepository::class)]
 class KaabaApplication
@@ -192,7 +192,8 @@ private ?self $duplicate_parent = null;
 #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'duplicate_parent')]
 private Collection $kaabaApplications;
 
-
+#[ORM\OneToOne(mappedBy: 'application', targetEntity: KaabaAssessment::class, cascade: ['persist', 'remove'])]
+private ?KaabaAssessment $assessment = null;
 
     public function __construct()
     {
@@ -205,6 +206,17 @@ private Collection $kaabaApplications;
 
 
     }
+
+    public function getAssessment(): ?KaabaAssessment
+{
+    return $this->assessment;
+}
+
+public function setAssessment(?KaabaAssessment $assessment): static
+{
+    $this->assessment = $assessment;
+    return $this;
+}
 
     public function getId(): ?int
     {

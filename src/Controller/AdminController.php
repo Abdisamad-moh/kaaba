@@ -29,6 +29,7 @@ use App\Entity\KaabaInstitute;
 use App\Entity\MetierContacts;
 use App\Form\JobFormTypeShort;
 use App\Entity\EmployerDetails;
+use App\Entity\KaabaAssessment;
 use App\Entity\JobseekerDetails;
 use App\Entity\KaabaApplication;
 use App\Entity\KaabaScholarship;
@@ -37,7 +38,9 @@ use App\Entity\MetierEmailTemps;
 use App\Form\ChangePasswordType;
 use App\Form\InterviewQFormType;
 use App\Entity\KaabaIdentityType;
+use App\Form\KaabaAssessmentType;
 use App\Entity\InterviewQuestions;
+use App\Entity\KaabaAssessmentLog;
 use App\Entity\KaabaQualification;
 use App\Form\CustomerAutoComplete;
 use App\Repository\UserRepository;
@@ -1507,114 +1510,114 @@ class AdminController extends AbstractController
         ]);
     }
 
-#[Route('/kaaba-applications', name: 'app_admin_kaaba_applications')]
-public function kaabaApplications(
-    Request $request,
-    KaabaApplicationRepository $applicationsRepository,
-    KaabaInstituteRepository $instituteRepository,
-    PaginatorInterface $paginator,
-    KaabaCourseRepository $courseRepository,
-): Response {
+    #[Route('/kaaba-applications', name: 'app_admin_kaaba_applications')]
+    public function kaabaApplications(
+        Request $request,
+        KaabaApplicationRepository $applicationsRepository,
+        KaabaInstituteRepository $instituteRepository,
+        PaginatorInterface $paginator,
+        KaabaCourseRepository $courseRepository,
+    ): Response {
+        $user = $this->getUser();
 
-    $user = $this->getUser();
+        // Institutes by role
+        if ($user && in_array('ROLE_USER', $user->getRoles()) && !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+            $institutes = $instituteRepository->findBy(['manager' => $user]);
+        } else {
+            $institutes = $instituteRepository->findAll();
+        }
 
-    // Institutes by role
-    if ($user && in_array('ROLE_USER', $user->getRoles()) && !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
-        $institutes = $instituteRepository->findBy(['manager' => $user]);
-    } else {
-        $institutes = $instituteRepository->findAll();
+        $form = $this->createForm(KaabaApplicationSearchType::class, null, [
+            'method' => 'GET',
+            'institutes' => $institutes,
+            'request' => $request
+        ]);
+
+        $form->handleRequest($request);
+
+        $filters = [];
+        foreach ($form as $key => $field) {
+            $filters[$key] = $field->getData();
+        }
+
+        // Get the query instead of results
+        $query = $applicationsRepository->filterApplicationsQuery(
+            $filters['status'] ?? null,
+            $filters['from_date'] ?? null,
+            $filters['to_date'] ?? null,
+            $filters['phone'] ?? null,
+            $filters['region'] ?? null,
+            $filters['district'] ?? null,
+            $filters['qualification'] ?? null,
+            $filters['gender'] ?? null,
+            $filters['scholarship'] ?? null,
+            $filters['institute'] ?? null,
+            $filters['course'] ?? null,
+            $user
+        );
+
+        $limit = $filters['limit'] ?? 100;
+
+        // Paginate the query directly (this is more efficient)
+        $applications = $paginator->paginate(
+            $query, // Pass the Query object instead of array
+            $request->query->getInt('page', 1),
+            $limit
+        );
+
+        return $this->render('admin/kaaba_applications.html.twig', [
+            'applications' => $applications,
+            'searchForm' => $form->createView(),
+            'total_count' => $applications->getTotalItemCount(), // Get count from paginator
+            'current_limit' => $limit,
+        ]);
     }
 
-    $form = $this->createForm(KaabaApplicationSearchType::class, null, [
-        'method' => 'GET',
-        'institutes' => $institutes,
-        'request' => $request
-    ]);
 
-    $form->handleRequest($request);
+    #[Route('/kaaba-applications/get-courses', name: 'app_admin_kaaba_applications_get_courses')]
+    public function getCoursesByyInstitute(
+        KaabaCourseRepository $courseRepository,
+        Request $request
+    ): Response {
+        $instituteId = $request->query->get('institute_id');
 
-    $filters = [];
-    foreach ($form as $key => $field) {
-        $filters[$key] = $field->getData();
-    }
+        if (!$instituteId) {
+            return new JsonResponse([]);
+        }
 
-    // Get filtered results
-    $results = $applicationsRepository->filterApplications(
-        $filters['status'] ?? null,
-        $filters['from_date'] ?? null,
-        $filters['to_date'] ?? null,
-        $filters['phone'] ?? null,
-        $filters['region'] ?? null,
-        $filters['district'] ?? null,
-        $filters['qualification'] ?? null,
-        $filters['gender'] ?? null,
-        $filters['scholarship'] ?? null,
-        $filters['institute'] ?? null,
-        $filters['course'] ?? null,
-        $user
-    );
-
-    $limit = $filters['limit'] ?? 100;
-
-    $applications = $paginator->paginate(
-        $results,
-        $request->query->getInt('page', 1),
-        $limit
-    );
-
-    return $this->render('admin/kaaba_applications.html.twig', [
-        'applications' => $applications,
-        'searchForm' => $form->createView(),
-        'total_count' => count($results),
-        'current_limit' => $limit,
-    ]);
-}
-
-
-#[Route('/kaaba-applications/get-courses', name: 'app_admin_kaaba_applications_get_courses')]
-public function getCoursesByyInstitute(
-    KaabaCourseRepository $courseRepository,
-    Request $request
-): Response {
-    $instituteId = $request->query->get('institute_id');
-    
-    if (!$instituteId) {
-        return new JsonResponse([]);
-    }
-    
-    $courses = $courseRepository->findBy(['institute' => $instituteId]);
-    
-    $courseArray = [];
-    foreach ($courses as $course) {
-        $courseArray[] = [
-            'id' => $course->getId(),
-            'name' => $course->getName()
-        ];
-    }
-    
-    return new JsonResponse($courseArray);
-}
-
-    // Add this new route for AJAX course loading
-    #[Route('/kaaba-applications/courses-by-institute/{instituteId}', name: 'app_admin_kaaba_applications_courses_by_institute', methods: ['GET'])]
-public function getCoursesByInstitute(int $instituteId, KaabaCourseRepository $courseRepository): JsonResponse
-{
-    try {
-        $courses = $courseRepository->findBy(['institute' => $instituteId], ['name' => 'ASC']);
+        $courses = $courseRepository->findBy(['institute' => $instituteId]);
 
         $courseArray = [];
         foreach ($courses as $course) {
             $courseArray[] = [
                 'id' => $course->getId(),
-                'name' => $course->getName(),
+                'name' => $course->getName()
             ];
         }
 
-        return $this->json($courseArray);
-    } catch (\Exception $e) {
-        return $this->json(['error' => 'Failed to load courses'], 500);
+        return new JsonResponse($courseArray);
     }
-}
+
+    // Add this new route for AJAX course loading
+    #[Route('/kaaba-applications/courses-by-institute/{instituteId}', name: 'app_admin_kaaba_applications_courses_by_institute', methods: ['GET'])]
+    public function getCoursesByInstitute(int $instituteId, KaabaCourseRepository $courseRepository): JsonResponse
+    {
+        try {
+            $courses = $courseRepository->findBy(['institute' => $instituteId], ['name' => 'ASC']);
+
+            $courseArray = [];
+            foreach ($courses as $course) {
+                $courseArray[] = [
+                    'id' => $course->getId(),
+                    'name' => $course->getName(),
+                ];
+            }
+
+            return $this->json($courseArray);
+        } catch (\Exception $e) {
+            return $this->json(['error' => 'Failed to load courses'], 500);
+        }
+    }
 
     #[Route('/soft-delete-user', name: 'app_admin_soft_delete_user', methods: ['POST'])]
     public function softDeleteUser(Request $request, EntityManagerInterface $em, UserRepository $userRepository): JsonResponse
@@ -1676,201 +1679,201 @@ public function getCoursesByInstitute(int $instituteId, KaabaCourseRepository $c
     }
 
     #[Route('/kaaba-applications/update-status', name: 'app_admin_kaaba_application_update_status', methods: ['POST'])]
-public function updateApplicationStatus(
-    Request $request,
-    KaabaApplicationRepository $applicationRepository,
-    KaabaApplicationStatusRepository $statusRepository,
-    EntityManagerInterface $entityManager,
-    ApplicationLogger $applicationLogger
-): JsonResponse {
-    // Check if request is AJAX
-    if (!$request->isXmlHttpRequest()) {
-        return $this->json([
-            'success' => false,
-            'message' => 'Invalid request type.'
-        ], 400);
-    }
-
-    $data = json_decode($request->getContent(), true);
-    $applicationId = $data['applicationId'] ?? null;
-    $statusAction = $data['statusAction'] ?? null;
-    $shortlistReason = $data['shortlistReason'] ?? null; // Add this line
-    $csrfToken = $data['_token'] ?? null;
-
-    // Validate CSRF token
-    if (!$this->isCsrfTokenValid('update_application_status', $csrfToken)) {
-        return $this->json([
-            'success' => false,
-            'message' => 'Invalid CSRF token.'
-        ], 400);
-    }
-
-    if (!$applicationId || !$statusAction) {
-        return $this->json([
-            'success' => false,
-            'message' => 'Missing required parameters.'
-        ], 400);
-    }
-
-    try {
-        $application = $applicationRepository->find($applicationId);
-
-        if (!$application) {
+    public function updateApplicationStatus(
+        Request $request,
+        KaabaApplicationRepository $applicationRepository,
+        KaabaApplicationStatusRepository $statusRepository,
+        EntityManagerInterface $entityManager,
+        ApplicationLogger $applicationLogger
+    ): JsonResponse {
+        // Check if request is AJAX
+        if (!$request->isXmlHttpRequest()) {
             return $this->json([
                 'success' => false,
-                'message' => 'Application not found.'
-            ], 404);
-        }
-
-        // Get current user and role-based permissions
-        $user = $this->getUser();
-        if (!$user) {
-            return $this->json([
-                'success' => false,
-                'message' => 'User not authenticated.'
-            ], 401);
-        }
-
-        $isSuperAdmin = $this->isGranted('ROLE_SUPER_ADMIN');
-        $isRegularUser = $this->isGranted('ROLE_USER') && !$isSuperAdmin;
-
-        $currentStatus = $application->getStatus();
-        $currentStatusName = $currentStatus ? $currentStatus->getName() : 'Applied';
-        $oldStatus = $currentStatusName;
-
-        // Define status mapping with IDs
-        $statusMap = [
-            'shortlisted' => ['name' => 'Shortlisted', 'id' => 2],
-            'waitlisted' => ['name' => 'Waitlisted', 'id' => 5],
-            'approved' => ['name' => 'Accepted', 'id' => 4],
-            'rejected' => ['name' => 'Rejected', 'id' => 3]
-        ];
-
-        if (!isset($statusMap[$statusAction])) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Invalid status action.'
+                'message' => 'Invalid request type.'
             ], 400);
         }
 
-        // Role-based permission checks
-        if ($isRegularUser) {
-            $allowedFromApplied = ['shortlisted', 'waitlisted', 'rejected'];
-            $currentStatusId = $currentStatus ? $currentStatus->getId() : 1;
+        $data = json_decode($request->getContent(), true);
+        $applicationId = $data['applicationId'] ?? null;
+        $statusAction = $data['statusAction'] ?? null;
+        $shortlistReason = $data['shortlistReason'] ?? null; // Add this line
+        $csrfToken = $data['_token'] ?? null;
 
-            if ($currentStatusId !== 1 || !in_array($statusAction, $allowedFromApplied)) {
+        // Validate CSRF token
+        if (!$this->isCsrfTokenValid('update_application_status', $csrfToken)) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Invalid CSRF token.'
+            ], 400);
+        }
+
+        if (!$applicationId || !$statusAction) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Missing required parameters.'
+            ], 400);
+        }
+
+        try {
+            $application = $applicationRepository->find($applicationId);
+
+            if (!$application) {
                 return $this->json([
                     'success' => false,
-                    'message' => 'You can only update applications from "Applied" status to Shortlisted, Waitlisted, or Rejected.'
-                ], 403);
+                    'message' => 'Application not found.'
+                ], 404);
             }
-        } elseif ($isSuperAdmin) {
-            if ($statusAction === 'approved') {
+
+            // Get current user and role-based permissions
+            $user = $this->getUser();
+            if (!$user) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'User not authenticated.'
+                ], 401);
+            }
+
+            $isSuperAdmin = $this->isGranted('ROLE_SUPER_ADMIN');
+            $isRegularUser = $this->isGranted('ROLE_USER') && !$isSuperAdmin;
+
+            $currentStatus = $application->getStatus();
+            $currentStatusName = $currentStatus ? $currentStatus->getName() : 'Applied';
+            $oldStatus = $currentStatusName;
+
+            // Define status mapping with IDs
+            $statusMap = [
+                'shortlisted' => ['name' => 'Shortlisted', 'id' => 2],
+                'waitlisted' => ['name' => 'Waitlisted', 'id' => 5],
+                'approved' => ['name' => 'Accepted', 'id' => 4],
+                'rejected' => ['name' => 'Rejected', 'id' => 3]
+            ];
+
+            if (!isset($statusMap[$statusAction])) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Invalid status action.'
+                ], 400);
+            }
+
+            // Role-based permission checks
+            if ($isRegularUser) {
+                $allowedFromApplied = ['shortlisted', 'waitlisted', 'rejected'];
                 $currentStatusId = $currentStatus ? $currentStatus->getId() : 1;
-                if (!in_array($currentStatusId, [2, 5])) {
+
+                if ($currentStatusId !== 1 || !in_array($statusAction, $allowedFromApplied)) {
                     return $this->json([
                         'success' => false,
-                        'message' => 'You can only approve applications that are Shortlisted or Waitlisted.'
+                        'message' => 'You can only update applications from "Applied" status to Shortlisted, Waitlisted, or Rejected.'
                     ], 403);
                 }
+            } elseif ($isSuperAdmin) {
+                if ($statusAction === 'approved') {
+                    $currentStatusId = $currentStatus ? $currentStatus->getId() : 1;
+                    if (!in_array($currentStatusId, [2, 5])) {
+                        return $this->json([
+                            'success' => false,
+                            'message' => 'You can only approve applications that are Shortlisted or Waitlisted.'
+                        ], 403);
+                    }
+                }
+            } else {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Insufficient permissions.'
+                ], 403);
             }
-        } else {
+
+            $targetStatus = $statusMap[$statusAction];
+            $status = $statusRepository->find($targetStatus['id']);
+
+            if (!$status) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Status not found.'
+                ], 404);
+            }
+
+            // Set status dates and reasons
+            $now = new \DateTime();
+            switch ($statusAction) {
+                case 'shortlisted':
+                    $application->setShortlistedDate($now);
+                    $application->setWaitlistedDate(null);
+                    $application->setShortlistReason($shortlistReason); // Set shortlist reason
+                    break;
+                case 'waitlisted':
+                    $application->setWaitlistedDate($now);
+                    $application->setShortlistedDate(null);
+                    $application->setShortlistReason(null); // Clear shortlist reason if not shortlisting
+                    break;
+                case 'approved':
+                    $application->setAcceptedDate($now);
+                    $application->setShortlistReason(null); // Clear shortlist reason
+                    break;
+                case 'rejected':
+                    $application->setRejectedDate($now);
+                    $application->setShortlistReason(null); // Clear shortlist reason
+                    break;
+            }
+
+            // Clear other dates when changing status
+            if ($statusAction !== 'rejected') {
+                $application->setRejectedDate(null);
+                $application->setRejectionReason(null); // Clear rejection reason
+            }
+            if ($statusAction !== 'approved') {
+                $application->setAcceptedDate(null);
+            }
+
+            // Update application status
+            $application->setStatus($status);
+
+            // Log the action
+            $logMessage = sprintf("Status changed from '%s' to '%s'", $oldStatus, $targetStatus['name']);
+
+            // Add reason to log if provided
+            if ($statusAction === 'shortlisted' && !empty($shortlistReason)) {
+                $logMessage .= ". Shortlist reason: " . $shortlistReason;
+            }
+
+            $logMessage .= " by " . $user->getUserIdentifier();
+
+            $applicationLogger->log(
+                $application,
+                'status_change',
+                $logMessage,
+                $user
+            );
+
+            $entityManager->flush();
+
+            // Generate new status badge HTML
+            $displayStatus = $targetStatus['name'] === 'Accepted' ? 'Approved' : $targetStatus['name'];
+            $newStatusBadge = sprintf(
+                '<span class="badge %s">%s</span>',
+                match ($targetStatus['name']) {
+                    'Accepted' => 'bg-success',
+                    'Rejected' => 'bg-danger',
+                    'Shortlisted' => 'bg-info text-white',
+                    'Waitlisted' => 'bg-warning text-dark',
+                    default => 'bg-secondary'
+                },
+                $displayStatus
+            );
+
+            return $this->json([
+                'success' => true,
+                'message' => "Application status updated to {$displayStatus} successfully.",
+                'newStatusBadge' => $newStatusBadge
+            ]);
+
+        } catch (\Exception $e) {
             return $this->json([
                 'success' => false,
-                'message' => 'Insufficient permissions.'
-            ], 403);
+                'message' => 'Error updating application status: ' . $e->getMessage()
+            ], 500);
         }
-
-        $targetStatus = $statusMap[$statusAction];
-        $status = $statusRepository->find($targetStatus['id']);
-
-        if (!$status) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Status not found.'
-            ], 404);
-        }
-
-        // Set status dates and reasons
-        $now = new \DateTime();
-        switch ($statusAction) {
-            case 'shortlisted':
-                $application->setShortlistedDate($now);
-                $application->setWaitlistedDate(null);
-                $application->setShortlistReason($shortlistReason); // Set shortlist reason
-                break;
-            case 'waitlisted':
-                $application->setWaitlistedDate($now);
-                $application->setShortlistedDate(null);
-                $application->setShortlistReason(null); // Clear shortlist reason if not shortlisting
-                break;
-            case 'approved':
-                $application->setAcceptedDate($now);
-                $application->setShortlistReason(null); // Clear shortlist reason
-                break;
-            case 'rejected':
-                $application->setRejectedDate($now);
-                $application->setShortlistReason(null); // Clear shortlist reason
-                break;
-        }
-
-        // Clear other dates when changing status
-        if ($statusAction !== 'rejected') {
-            $application->setRejectedDate(null);
-            $application->setRejectionReason(null); // Clear rejection reason
-        }
-        if ($statusAction !== 'approved') {
-            $application->setAcceptedDate(null);
-        }
-
-        // Update application status
-        $application->setStatus($status);
-
-        // Log the action
-        $logMessage = sprintf("Status changed from '%s' to '%s'", $oldStatus, $targetStatus['name']);
-        
-        // Add reason to log if provided
-        if ($statusAction === 'shortlisted' && !empty($shortlistReason)) {
-            $logMessage .= ". Shortlist reason: " . $shortlistReason;
-        }
-        
-        $logMessage .= " by " . $user->getUserIdentifier();
-
-        $applicationLogger->log(
-            $application,
-            'status_change',
-            $logMessage,
-            $user
-        );
-
-        $entityManager->flush();
-
-        // Generate new status badge HTML
-        $displayStatus = $targetStatus['name'] === 'Accepted' ? 'Approved' : $targetStatus['name'];
-        $newStatusBadge = sprintf(
-            '<span class="badge %s">%s</span>',
-            match ($targetStatus['name']) {
-                'Accepted' => 'bg-success',
-                'Rejected' => 'bg-danger',
-                'Shortlisted' => 'bg-info text-white',
-                'Waitlisted' => 'bg-warning text-dark',
-                default => 'bg-secondary'
-            },
-            $displayStatus
-        );
-
-        return $this->json([
-            'success' => true,
-            'message' => "Application status updated to {$displayStatus} successfully.",
-            'newStatusBadge' => $newStatusBadge
-        ]);
-
-    } catch (\Exception $e) {
-        return $this->json([
-            'success' => false,
-            'message' => 'Error updating application status: ' . $e->getMessage()
-        ], 500);
-    }
     }
 
     #[Route('/kaaba-applications/revert-status/{id}', name: 'app_admin_kaaba_application_revert_status', methods: ['POST'])]
@@ -2031,7 +2034,7 @@ public function updateApplicationStatus(
             // Group applications by full_name and phone
             foreach ($applications as $application) {
                 $key = $this->generateDuplicateKey($application);
-                
+
                 if ($key === null) {
                     continue; // Skip if essential fields are missing
                 }
@@ -2039,7 +2042,7 @@ public function updateApplicationStatus(
                 if (!isset($duplicateGroups[$key])) {
                     $duplicateGroups[$key] = [];
                 }
-                
+
                 $duplicateGroups[$key][] = $application;
             }
 
@@ -2047,23 +2050,23 @@ public function updateApplicationStatus(
             foreach ($duplicateGroups as $key => $group) {
                 if (count($group) > 1) {
                     $duplicatesFound += count($group) - 1; // Count all except the first one
-                    
+
                     // Sort by ID to ensure we keep the oldest application
                     usort($group, fn($a, $b) => $a->getId() <=> $b->getId());
-                    
+
                     $originalApplication = $group[0];
                     $duplicateApplications = array_slice($group, 1);
-                    
+
                     foreach ($duplicateApplications as $duplicateApp) {
                         // Skip if already processed or already marked as duplicate
                         if (in_array($duplicateApp->getId(), $processed) || $duplicateApp->isDuplicate()) {
                             continue;
                         }
-                        
+
                         // Mark as duplicate and set parent
                         $duplicateApp->setDuplicate(true);
                         $duplicateApp->setDuplicateParent($originalApplication);
-                        
+
                         $entityManager->persist($duplicateApp);
                         $processed[] = $duplicateApp->getId();
                         $duplicatesUpdated++;
@@ -2128,15 +2131,15 @@ public function updateApplicationStatus(
     {
         // Remove all non-digit characters except +
         $normalized = preg_replace('/[^\d+]/', '', $phone);
-        
+
         // Remove country code if it's 255 (Tanzania) and replace with 0
         if (str_starts_with($normalized, '255') && strlen($normalized) === 12) {
             $normalized = '0' . substr($normalized, 3);
         }
-        
+
         // Remove leading + if present
         $normalized = ltrim($normalized, '+');
-        
+
         return $normalized;
     }
 
@@ -2456,114 +2459,114 @@ public function updateApplicationStatus(
     }
 
 
-#[Route('/kaaba-applications/edit-rejection-reason', name: 'app_admin_kaaba_application_edit_rejection_reason', methods: ['POST'])]
-public function editRejectionReason(
-    Request $request,
-    KaabaApplicationRepository $applicationRepository,
-    EntityManagerInterface $entityManager,
-    ApplicationLogger $applicationLogger
-): JsonResponse {
-    // Check if request is AJAX
-    if (!$request->isXmlHttpRequest()) {
-        return $this->json([
-            'success' => false,
-            'message' => 'Invalid request type.'
-        ], 400);
-    }
-
-    
-
-    $data = json_decode($request->getContent(), true);
-    
-    // Check if JSON decoding was successful
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        return $this->json([
-            'success' => false,
-            'message' => 'Invalid JSON data: ' . json_last_error_msg()
-        ], 400);
-    }
-    
-    $applicationId = $data['applicationId'] ?? null;
-    $rejectionReason = $data['rejectionReason'] ?? null;
-    $csrfToken = $data['_token'] ?? null;
-
-    // Validate required fields
-    if (!$applicationId) {
-        return $this->json([
-            'success' => false,
-            'message' => 'Missing application ID.'
-        ], 400);
-    }
-
-    // Validate CSRF token
-    if (!$this->isCsrfTokenValid('edit_rejection_reason', $csrfToken)) {
-        return $this->json([
-            'success' => false,
-            'message' => 'Invalid CSRF token.'
-        ], 400);
-    }
-
-    // Rest of your existing code remains the same...
-    try {
-        $application = $applicationRepository->find($applicationId);
-
-        if (!$application) {
+    #[Route('/kaaba-applications/edit-rejection-reason', name: 'app_admin_kaaba_application_edit_rejection_reason', methods: ['POST'])]
+    public function editRejectionReason(
+        Request $request,
+        KaabaApplicationRepository $applicationRepository,
+        EntityManagerInterface $entityManager,
+        ApplicationLogger $applicationLogger
+    ): JsonResponse {
+        // Check if request is AJAX
+        if (!$request->isXmlHttpRequest()) {
             return $this->json([
                 'success' => false,
-                'message' => 'Application not found.'
-            ], 404);
-        }
-
-        // Check if application is actually rejected
-        $currentStatus = $application->getStatus();
-        if (!$currentStatus || $currentStatus->getName() !== 'rejected') {
-            return $this->json([
-                'success' => false,
-                'message' => 'Can only edit rejection reason for rejected applications.'
+                'message' => 'Invalid request type.'
             ], 400);
         }
 
-        // Get current user
-        $user = $this->getUser();
-        if (!$user) {
+
+
+        $data = json_decode($request->getContent(), true);
+
+        // Check if JSON decoding was successful
+        if (json_last_error() !== JSON_ERROR_NONE) {
             return $this->json([
                 'success' => false,
-                'message' => 'User not authenticated.'
-            ], 401);
+                'message' => 'Invalid JSON data: ' . json_last_error_msg()
+            ], 400);
         }
 
-        $oldReason = $application->getRejectionReason();
-        $application->setRejectionReason($rejectionReason);
+        $applicationId = $data['applicationId'] ?? null;
+        $rejectionReason = $data['rejectionReason'] ?? null;
+        $csrfToken = $data['_token'] ?? null;
 
-        // Log the action
-        $logMessage = sprintf(
-            "Rejection reason updated from '%s' to '%s' by %s",
-            $oldReason ?? 'Empty',
-            $rejectionReason ?? 'Empty',
-            $user->getUserIdentifier()
-        );
+        // Validate required fields
+        if (!$applicationId) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Missing application ID.'
+            ], 400);
+        }
 
-        $applicationLogger->log(
-            $application,
-            'rejection_reason_updated',
-            $logMessage,
-            $user
-        );
+        // Validate CSRF token
+        if (!$this->isCsrfTokenValid('edit_rejection_reason', $csrfToken)) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Invalid CSRF token.'
+            ], 400);
+        }
 
-        $entityManager->flush();
+        // Rest of your existing code remains the same...
+        try {
+            $application = $applicationRepository->find($applicationId);
 
-        return $this->json([
-            'success' => true,
-            'message' => 'Rejection reason updated successfully.'
-        ]);
+            if (!$application) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Application not found.'
+                ], 404);
+            }
 
-    } catch (\Exception $e) {
-        return $this->json([
-            'success' => false,
-            'message' => 'Error updating rejection reason: ' . $e->getMessage()
-        ], 500);
+            // Check if application is actually rejected
+            $currentStatus = $application->getStatus();
+            if (!$currentStatus || $currentStatus->getName() !== 'rejected') {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Can only edit rejection reason for rejected applications.'
+                ], 400);
+            }
+
+            // Get current user
+            $user = $this->getUser();
+            if (!$user) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'User not authenticated.'
+                ], 401);
+            }
+
+            $oldReason = $application->getRejectionReason();
+            $application->setRejectionReason($rejectionReason);
+
+            // Log the action
+            $logMessage = sprintf(
+                "Rejection reason updated from '%s' to '%s' by %s",
+                $oldReason ?? 'Empty',
+                $rejectionReason ?? 'Empty',
+                $user->getUserIdentifier()
+            );
+
+            $applicationLogger->log(
+                $application,
+                'rejection_reason_updated',
+                $logMessage,
+                $user
+            );
+
+            $entityManager->flush();
+
+            return $this->json([
+                'success' => true,
+                'message' => 'Rejection reason updated successfully.'
+            ]);
+
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Error updating rejection reason: ' . $e->getMessage()
+            ], 500);
+        }
     }
-}
 
     #[Route('/accountSettings', name: 'app_employer_account_settings')]
     public function accountSettings(
@@ -2630,6 +2633,231 @@ public function editRejectionReason(
             'statusForm' => $statusForm,
         ]);
     }
+
+
+
+    #[Route('/application/{uuid}/assessment/result', name: 'app_assessment_result')]
+    public function result(KaabaApplication $application): Response
+    {
+        return $this->render('admin/assessment_result.html.twig', [
+            'application' => $application,
+            'assessment' => $application->getAssessment(),
+        ]);
+    }
+
+  #[Route('/application/{uuid}/assessment', name: 'app_assessment')]
+public function assess(
+    KaabaApplication $application,
+    Request $request,
+    EntityManagerInterface $em
+): Response {
+
+    // Load or create assessment
+    $assessment = $application->getAssessment();
+
+    if (!$assessment) {
+        $assessment = new KaabaAssessment();
+        $assessment->setApplication($application);
+        $em->persist($assessment);
+    }
+
+    // Create form with the ENTITY — not arrays
+    $form = $this->createForm(KaabaAssessmentType::class, $assessment);
+
+    $form->handleRequest($request);
+
+    if ($form->isSubmitted() && $form->isValid()) {
+
+        $data = $form->getData(); // this returns ENTITY + mapped:false fields
+
+        // Extract values manually from $request because fields are mapped:false
+        $motivationData = [
+            'employment_status'        => $form->get('employment_status')->getData(),
+            'training_enrolment'       => $form->get('training_enrolment')->getData(),
+            'reason_for_applying'      => $form->get('reason_for_applying')->getData(),
+            'career_aspirations'       => $form->get('career_aspirations')->getData(),
+            'community_participation'  => $form->get('community_participation')->getData(),
+        ];
+
+        $householdData = [
+            'housing_situation'        => $form->get('housing_situation')->getData(),
+            'household_members'        => $form->get('household_members')->getData(),
+            'decision_maker'           => $form->get('decision_maker')->getData(),
+            'dependency_ratio'         => $form->get('dependency_ratio')->getData(),
+            'household_circumstances'  => $form->get('household_circumstances')->getData(),
+        ];
+
+        $incomeData = [
+            'breadwinner_occupation'   => $form->get('breadwinner_occupation')->getData(),
+            'income_sources'           => $form->get('income_sources')->getData(),
+            'monthly_income'           => $form->get('monthly_income')->getData(),
+            'household_savings'        => $form->get('household_savings')->getData(),
+            'financial_vulnerability'  => $form->get('financial_vulnerability')->getData(),
+        ];
+
+        // Save into entity
+        $assessment->setMotivation($motivationData);
+        $assessment->setHousehold($householdData);
+        $assessment->setIncome($incomeData);
+
+        // SCORE CALCULATION
+        $totalScore =
+            array_sum($motivationData) +
+            array_sum($householdData) +
+            array_sum($incomeData);
+
+        $assessment->setTotalScore($totalScore);
+
+        if ($totalScore >= 60) {
+            $assessment->setRecommendedStatus("APPROVED");
+        } elseif ($totalScore >= 30) {
+            $assessment->setRecommendedStatus("WAITLIST");
+        } else {
+            $assessment->setRecommendedStatus("SHORTLIST");
+        }
+
+        $em->flush();
+        $this->addFlash('success', 'Assessment created successfully.');
+
+        return $this->redirectToRoute('app_admin_kaaba_applications');
+    }
+
+    return $this->render('admin/assessment_form.html.twig', [
+        'application' => $application,
+        'form' => $form->createView(),
+        'assessment' => $assessment
+    ]);
+}
+
+
+    #[Route('/application/{uuid}/assessment/edit', name: 'app_assessment_edit')]
+    public function editAssessment(
+        KaabaApplication $application,
+        Request $request,
+        EntityManagerInterface $em
+    ): Response {
+
+        $assessment = $application->getAssessment();
+
+        if (!$assessment) {
+            $assessment = new KaabaAssessment();
+            $assessment->setApplication($application);
+            $em->persist($assessment);
+        }
+
+        // Create form
+        $form = $this->createForm(KaabaAssessmentType::class, $assessment);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            // dd($form->getData());
+            /**
+             * Extract submitted values (mapped = false)
+             */
+            $submittedMotivation = [
+                'employment_status' => $form->get('employment_status')->getData(),
+                'training_enrolment' => $form->get('training_enrolment')->getData(),
+                'reason_for_applying' => $form->get('reason_for_applying')->getData(),
+                'career_aspirations' => $form->get('career_aspirations')->getData(),
+                'community_participation' => $form->get('community_participation')->getData(),
+            ];
+
+            $submittedHousehold = [
+                'housing_situation' => $form->get('housing_situation')->getData(),
+                'household_members' => $form->get('household_members')->getData(),
+                'decision_maker' => $form->get('decision_maker')->getData(),
+                'dependency_ratio' => $form->get('dependency_ratio')->getData(),
+                'household_circumstances' => $form->get('household_circumstances')->getData(),
+            ];
+
+            $submittedIncome = [
+                'breadwinner_occupation' => $form->get('breadwinner_occupation')->getData(),
+                'income_sources' => $form->get('income_sources')->getData(),
+                'monthly_income' => $form->get('monthly_income')->getData(),
+                'household_savings' => $form->get('household_savings')->getData(),
+                'financial_vulnerability' => $form->get('financial_vulnerability')->getData(),
+            ];
+
+            /**
+             * LOG CHANGES BEFORE SAVING
+             */
+            $changes = [];
+
+            // Compare motivation
+            foreach ($submittedMotivation as $key => $value) {
+                $old = $assessment->getMotivation()[$key] ?? null;
+                if ($old !== $value) {
+                    $changes[] = "$key changed from $old to $value";
+                }
+            }
+
+            // Compare household
+            foreach ($submittedHousehold as $key => $value) {
+                $old = $assessment->getHousehold()[$key] ?? null;
+                if ($old !== $value) {
+                    $changes[] = "$key changed from $old to $value";
+                }
+            }
+
+            // Compare income
+            foreach ($submittedIncome as $key => $value) {
+                $old = $assessment->getIncome()[$key] ?? null;
+                if ($old !== $value) {
+                    $changes[] = "$key changed from $old to $value";
+                }
+            }
+
+            if ($assessment->getInterviewerName() !== $form->get('interviewerName')->getData()) {
+                $old = $assessment->getInterviewerName();
+                $new = $form->get('interviewerName')->getData();
+                $changes[] = "interviewerName changed from \"$old\" to \"$new\"";
+            }
+
+            if (!empty($changes)) {
+                $log = new KaabaAssessmentLog();
+                $log->setAssessment($assessment);
+                $log->setAction("Assessment Updated");
+                $log->setNote(implode("\n", $changes));
+                $log->setUser($this->getUser());
+
+                $assessment->addAssessmentLog($log);
+                $em->persist($log);
+            }
+
+            // Save new values
+            $assessment->setMotivation($submittedMotivation);
+            $assessment->setHousehold($submittedHousehold);
+            $assessment->setIncome($submittedIncome);
+
+            // Recalculate
+            $assessment->calculateTotalScore();
+
+            if ($assessment->getTotalScore() >= 60) {
+                $assessment->setRecommendedStatus('APPROVED');
+            } elseif ($assessment->getTotalScore() >= 30) {
+                $assessment->setRecommendedStatus('WAITLIST');
+            } else {
+                $assessment->setRecommendedStatus('SHORTLIST');
+            }
+
+            $em->flush();
+$this->addFlash('success', 'Assessment updated successfully.');
+            return $this->redirectToRoute('app_assessment_edit', [
+                'uuid' => $application->getUuid()
+            ]);
+        }
+
+        return $this->render('admin/assessment_edit.html.twig', [
+            'application' => $application,
+            'form' => $form->createView(),
+        ]);
+    }
+
+
+
+
+
 
 }
 

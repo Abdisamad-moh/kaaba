@@ -53,7 +53,7 @@ public function findByFullNameAndPhone(string $fullName, string $phone): array
         ->getResult();
 }
 
-public function filterApplications(
+public function filterApplicationsQuery(
     ?KaabaApplicationStatus $status = null,
     ?\DateTimeInterface $fromDate = null,
     ?\DateTimeInterface $toDate = null,
@@ -66,7 +66,7 @@ public function filterApplications(
     ?KaabaInstitute $institute = null,
     ?KaabaCourse $course = null,
     ?User $user = null
-): array {
+): \Doctrine\ORM\Query {
     $qb = $this->createQueryBuilder('a')
         ->leftJoin('a.status', 's')
         ->leftJoin('a.region', 'r')
@@ -129,19 +129,17 @@ public function filterApplications(
             ->setParameter('scholarship', $scholarship);
     }
 
-    // Add institute filter
     if ($institute) {
         $qb->andWhere('a.institute = :institute')
             ->setParameter('institute', $institute);
     }
 
-    // Add course filter - check if course exists and has ID
     if ($course && $course->getId()) {
         $qb->andWhere('a.course = :course')
             ->setParameter('course', $course);
     }
 
-    return $qb->getQuery()->getResult();
+    return $qb->getQuery();
 }
 
 

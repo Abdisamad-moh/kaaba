@@ -1,0 +1,342 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Assessment Interview Form{% endblock %}
+
+{% block body %}
+
+<!-- Custom Inline Styles -->
+<style>
+    body { font-family: "Inter", sans-serif; }
+    .question-bg { background-color: #f2f2f2; padding: 20px; border-radius: 10px; }
+    .tab-btn.active { transform: scale(1.05); box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .progress-bar-container { height: 6px; background: #e5e7eb; border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; background: #4f46e5; width: 20%; transition: width .4s ease; }
+
+    .score-indicator { height: 10px; border-radius: 5px;
+        background: linear-gradient(to right, #ef4444, #f59e0b, #10b981); }
+    .score-fill { background:#4f46e5; height: 10px; border-radius: 5px; width: 0%; transition: width .4s ease; }
+
+    .section-score { padding:8px 12px; border-radius:6px; text-align:center; font-weight:600; }
+    .score-low { background:#fef2f2; color:#dc2626; }
+    .score-medium { background:#fffbeb; color:#d97706; }
+    .score-high { background:#f0fdf4; color:#16a34a; }
+
+    .status-approved { background:#dcfce7 !important; border:1px solid #bbf7d0; color:#166534; }
+    .status-waitlist { background:#fef9c3 !important; border:1px solid #fef08a; color:#854d0e; }
+    .status-shortlist { background:#fee2e2 !important; border:1px solid #fecaca; color:#991b1b; }
+</style>
+
+
+<div class="container py-5">
+
+    <div class="card shadow-lg p-4 p-md-5">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold text-dark">Assessment Interview Form</h2>
+            <p class="text-muted">Please complete all sections.</p>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="mx-auto" style="max-width: 400px;">
+            <div class="progress-bar-container mb-2">
+                <div id="progressFill" class="progress-fill"></div>
+            </div>
+            <p id="progressText" class="text-center text-muted small">Section 1 of 5</p>
+        </div>
+
+
+        <!-- Tabs -->
+        <div class="d-flex flex-wrap gap-2 justify-content-center mb-4">
+            <button type="button" class="btn btn-primary tab-btn" onclick="showTab('personal')">Personal Info</button>
+            <button type="button" class="btn btn-success tab-btn" onclick="showTab('motivation')">Motivation</button>
+            <button type="button" class="btn btn-warning tab-btn" onclick="showTab('household')">Household</button>
+            <button type="button" class="btn btn-danger tab-btn" onclick="showTab('income')">Income</button>
+            <button type="button" class="btn btn-secondary tab-btn" onclick="showTab('assessment')">Final</button>
+        </div>
+
+
+        {{ form_start(form, { attr: { id: 'assessmentForm' } }) }}
+
+        <div class="tabs-content">
+
+            <!-- SECTION A — PERSONAL INFO -->
+            <div id="personal" class="tab-section">
+
+                <fieldset class="question-bg">
+                    <legend class="fw-bold mb-3">Section A: Personal Information</legend>
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label class="form-label">Student ID</label>
+                            <input type="text" class="form-control" value="{{ application.id }}" readonly>
+                        </div>
+
+                        <div class="col-md-6">
+    {{ form_label(form.interviewerName) }}
+    {{ form_widget(form.interviewerName) }}
+</div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-control" value="{{ application.fullName }}" readonly>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Gender</label>
+                            <input type="text" class="form-control"
+                                   value="{{ application.gender.name }}" readonly>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Phone</label>
+                            <input type="text" class="form-control" value="{{ application.phone }}" readonly>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            <input type="text" class="form-control" value="{{ application.email }}" readonly>
+                        </div>
+
+                    </div>
+                </fieldset>
+
+                <div class="text-end mt-3">
+                    <button type="button" class="btn btn-success" onclick="showTab('motivation')">Next</button>
+                </div>
+            </div>
+
+
+
+
+            <!-- SECTION B — MOTIVATION -->
+            <div id="motivation" class="tab-section d-none">
+
+                <fieldset class="question-bg">
+                    <legend class="fw-bold mb-3">Section B: Motivation (20 Points)</legend>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            {{ form_row(form.employment_status) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_row(form.training_enrolment) }}
+                        </div>
+
+                        <div class="col-md-12">
+                            {{ form_row(form.reason_for_applying) }}
+                        </div>
+
+                        <div class="col-md-12">
+                            {{ form_row(form.career_aspirations) }}
+                        </div>
+
+                        <div class="col-md-12">
+                            {{ form_row(form.community_participation) }}
+                        </div>
+                    </div>
+                </fieldset>
+
+                <div class="d-flex justify-content-between mt-3">
+                    <button type="button" class="btn btn-primary" onclick="showTab('personal')">Previous</button>
+                    <button type="button" class="btn btn-warning" onclick="showTab('household')">Next</button>
+                </div>
+            </div>
+
+
+
+
+            <!-- SECTION C — HOUSEHOLD -->
+            <div id="household" class="tab-section d-none">
+
+                <fieldset class="question-bg">
+                    <legend class="fw-bold mb-3">Section C: Household Information (40 Points)</legend>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">{{ form_row(form.housing_situation) }}</div>
+                        <div class="col-md-6">{{ form_row(form.household_members) }}</div>
+                        <div class="col-md-6">{{ form_row(form.decision_maker) }}</div>
+                        <div class="col-md-6">{{ form_row(form.dependency_ratio) }}</div>
+                        <div class="col-md-12">{{ form_row(form.household_circumstances) }}</div>
+                    </div>
+                </fieldset>
+
+                <div class="d-flex justify-content-between mt-3">
+                    <button type="button" class="btn btn-success" onclick="showTab('motivation')">Previous</button>
+                    <button type="button" class="btn btn-danger" onclick="showTab('income')">Next</button>
+                </div>
+            </div>
+
+
+
+
+            <!-- SECTION D — INCOME -->
+            <div id="income" class="tab-section d-none">
+
+                <fieldset class="question-bg">
+                    <legend class="fw-bold mb-3">Section D: Income (40 Points)</legend>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">{{ form_row(form.breadwinner_occupation) }}</div>
+                        <div class="col-md-6">{{ form_row(form.income_sources) }}</div>
+                        <div class="col-md-6">{{ form_row(form.monthly_income) }}</div>
+                        <div class="col-md-6">{{ form_row(form.household_savings) }}</div>
+                        <div class="col-md-12">{{ form_row(form.financial_vulnerability) }}</div>
+                    </div>
+                </fieldset>
+
+                <div class="d-flex justify-content-between mt-3">
+                    <button type="button" class="btn btn-warning" onclick="showTab('household')">Previous</button>
+                    <button type="button" class="btn btn-secondary" onclick="showTab('assessment')">Next</button>
+                </div>
+            </div>
+
+
+
+
+            <!-- SECTION E — FINAL ASSESSMENT -->
+            <div id="assessment" class="tab-section d-none">
+
+                <fieldset class="question-bg">
+                    <legend class="fw-bold mb-3">Final Assessment (Auto Calculated)</legend>
+
+                    <div class="border p-3 rounded mb-4">
+                        <h4 class="fw-bold mb-3">Total Score</h4>
+
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between">
+                                <span>Overall Score</span>
+                                <strong id="overallScoreDisplay">0/100</strong>
+                            </div>
+                            <div class="score-indicator mt-2">
+                                <div id="scoreFill" class="score-fill"></div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 text-center">
+                            <div class="col-md-4">
+                                <div id="motivationScore" class="section-score score-low">0/20</div>
+                                <small>Motivation</small>
+                            </div>
+                            <div class="col-md-4">
+                                <div id="householdScore" class="section-score score-low">0/40</div>
+                                <small>Household</small>
+                            </div>
+                            <div class="col-md-4">
+                                <div id="incomeScore" class="section-score score-low">0/40</div>
+                                <small>Income</small>
+                            </div>
+                        </div>
+
+                        <div id="recommendationBox" class="p-3 rounded mt-4 bg-light">
+                            <h5 class="fw-bold mb-2">Recommendation</h5>
+                            <span id="recommendedStatus">Not Calculated</span> –
+                            <small id="statusDescription" class="text-muted">Complete the form to see assessment</small>
+                        </div>
+                    </div>
+
+                </fieldset>
+
+                <div class="d-flex justify-content-between mt-3">
+                    <button type="button" class="btn btn-danger" onclick="showTab('income')">Previous</button>
+                    <button type="submit" class="btn btn-primary">Submit Assessment</button>
+                </div>
+
+            </div>
+
+        </div>
+
+        {{ form_end(form) }}
+    </div>
+</div>
+
+
+
+<!-- Custom JavaScript -->
+<script>
+
+function showTab(tabId) {
+    document.querySelectorAll('.tab-section').forEach(s => s.classList.add('d-none'));
+    document.getElementById(tabId).classList.remove('d-none');
+
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+
+    updateProgressBar(tabId);
+
+    if (tabId === 'assessment') calculateAssessment();
+}
+
+
+function updateProgressBar(tabId) {
+    const progress = { personal:20, motivation:40, household:60, income:80, assessment:100 };
+    const text = { personal:'Personal Info', motivation:'Motivation', household:'Household Info', income:'Income Assessment', assessment:'Final Assessment' };
+
+    document.getElementById('progressFill').style.width = progress[tabId] + '%';
+    document.getElementById('progressText').innerText = 'Section: ' + text[tabId];
+}
+
+
+function calculateAssessment() {
+    const sections = [
+        { id:'motivation', max:20 },
+        { id:'household', max:40 },
+        { id:'income', max:40 }
+    ];
+
+    let grandTotal = 0;
+
+    sections.forEach(section => {
+
+        // Select all selects with data-section="motivation" etc.
+        const selects = document.querySelectorAll('select[data-section="' + section.id + '"]');
+
+        let total = 0;
+
+        selects.forEach(sel => {
+            const val = parseFloat(sel.value);
+            if (!isNaN(val)) total += val;
+        });
+
+        document.getElementById(section.id + 'Score').innerText = `${total}/${section.max}`;
+
+        grandTotal += total;
+    });
+
+    const overallPerc = Math.round((grandTotal));
+
+    document.getElementById('overallScoreDisplay').innerText = `${grandTotal}/100`;
+    document.getElementById('scoreFill').style.width = overallPerc + '%';
+
+    updateRecommendation(grandTotal);
+}
+
+
+function updateRecommendation(total) {
+    const status = document.getElementById('recommendedStatus');
+    const desc = document.getElementById('statusDescription');
+    const box = document.getElementById('recommendationBox');
+
+    if (total >= 60) {
+        status.innerText = 'APPROVED';
+        desc.innerText = 'High priority candidate';
+        box.className = 'p-3 rounded status-approved';
+    }
+    else if (total >= 30) {
+        status.innerText = 'WAITLIST';
+        desc.innerText = 'Medium priority candidate';
+        box.className = 'p-3 rounded status-waitlist';
+    }
+    else {
+        status.innerText = 'SHORTLIST';
+        desc.innerText = 'Low priority candidate';
+        box.className = 'p-3 rounded status-shortlist';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.tab-btn')[0].classList.add('active');
+    updateProgressBar('personal');
+});
+</script>
+
+{% endblock %}

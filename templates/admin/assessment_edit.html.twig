@@ -1,0 +1,224 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Edit Assessment - {{ application.fullName }}{% endblock %}
+
+{% block body %}
+
+<style>
+    body { font-family: "Inter", sans-serif; }
+    .question-bg { background: #f2f2f2; padding: 20px; border-radius: 10px; }
+    .section-title { font-weight: 700; font-size: 1.2rem; }
+    .score-indicator { height: 10px; border-radius: 5px;
+        background: linear-gradient(to right, #ef4444, #f59e0b, #10b981); }
+    .score-fill { background:#4f46e5; height: 10px; border-radius: 5px; width: 0%; transition: width .4s ease; }
+
+    .section-score { padding:8px 12px; border-radius:6px; text-align:center; font-weight:600; }
+    .score-low { background:#fef2f2; color:#dc2626; }
+    .score-medium { background:#fffbeb; color:#d97706; }
+    .score-high { background:#f0fdf4; color:#16a34a; }
+
+    .status-approved { background:#dcfce7; border:1px solid #bbf7d0; color:#166534; }
+    .status-waitlist { background:#fef9c3; border:1px solid #fef08a; color:#854d0e; }
+    .status-shortlist { background:#fee2e2; border:1px solid #fecaca; color:#991b1b; }
+</style>
+
+<div class="container py-5">
+    <div class="card shadow-lg p-4 p-md-5">
+
+        <h2 class="fw-bold mb-4">Edit Assessment – {{ application.fullName }}</h2>
+
+        {{ form_start(form, { attr: { id: 'assessmentForm' } }) }}
+
+        <!-- SECTION A — PERSONAL -->
+        <fieldset class="question-bg mb-4">
+            <legend class="section-title mb-3">Section A: Personal Information</legend>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label">Student ID</label>
+                    <input type="text" class="form-control" value="{{ application.id }}" readonly>
+                </div>
+                <div class="col-md-6">
+    {{ form_label(form.interviewerName) }}
+    {{ form_widget(form.interviewerName) }}
+</div>
+                <div class="col-md-6">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-control" value="{{ application.fullName }}" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Gender</label>
+                    <input type="text" class="form-control" value="{{ application.gender.name }}" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Phone</label>
+                    <input type="text" class="form-control" value="{{ application.phone }}" readonly>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">Email</label>
+                    <input type="text" class="form-control" value="{{ application.email }}" readonly>
+                </div>
+            </div>
+        </fieldset>
+
+
+        <!-- SECTION B — MOTIVATION -->
+        <fieldset class="question-bg mb-4">
+            <legend class="section-title mb-3">Section B: Motivation (20 pts)</legend>
+
+            <div class="row g-3">
+                <div class="col-md-6">{{ form_row(form.employment_status) }}</div>
+                <div class="col-md-6">{{ form_row(form.training_enrolment) }}</div>
+                <div class="col-md-12">{{ form_row(form.reason_for_applying) }}</div>
+                <div class="col-md-12">{{ form_row(form.career_aspirations) }}</div>
+                <div class="col-md-12">{{ form_row(form.community_participation) }}</div>
+            </div>
+        </fieldset>
+
+
+        <!-- SECTION C — HOUSEHOLD -->
+        <fieldset class="question-bg mb-4">
+            <legend class="section-title mb-3">Section C: Household (40 pts)</legend>
+
+            <div class="row g-3">
+                <div class="col-md-6">{{ form_row(form.housing_situation) }}</div>
+                <div class="col-md-6">{{ form_row(form.household_members) }}</div>
+                <div class="col-md-6">{{ form_row(form.decision_maker) }}</div>
+                <div class="col-md-6">{{ form_row(form.dependency_ratio) }}</div>
+                <div class="col-md-12">{{ form_row(form.household_circumstances) }}</div>
+            </div>
+        </fieldset>
+
+
+        <!-- SECTION D — INCOME -->
+        <fieldset class="question-bg mb-4">
+            <legend class="section-title mb-3">Section D: Income (40 pts)</legend>
+
+            <div class="row g-3">
+                <div class="col-md-6">{{ form_row(form.breadwinner_occupation) }}</div>
+                <div class="col-md-6">{{ form_row(form.income_sources) }}</div>
+                <div class="col-md-6">{{ form_row(form.monthly_income) }}</div>
+                <div class="col-md-6">{{ form_row(form.household_savings) }}</div>
+                <div class="col-md-12">{{ form_row(form.financial_vulnerability) }}</div>
+            </div>
+        </fieldset>
+
+
+        <!-- SECTION E — FINAL SCORE CALC -->
+        <fieldset class="question-bg mb-4">
+            <legend class="section-title mb-3">Final Assessment</legend>
+
+            <div class="mb-4">
+                <div class="d-flex justify-content-between">
+                    <span class="fw-bold">Total Score</span>
+                    <strong id="totalScoreDisplay">0/100</strong>
+                </div>
+                <div class="score-indicator mt-2">
+                    <div id="scoreFill" class="score-fill"></div>
+                </div>
+            </div>
+
+            <div class="row text-center g-3 mb-3">
+                <div class="col-md-4">
+                    <div id="motivationScore" class="section-score score-low">0/20</div>
+                    <small>Motivation</small>
+                </div>
+                <div class="col-md-4">
+                    <div id="householdScore" class="section-score score-low">0/40</div>
+                    <small>Household</small>
+                </div>
+                <div class="col-md-4">
+                    <div id="incomeScore" class="section-score score-low">0/40</div>
+                    <small>Income</small>
+                </div>
+            </div>
+
+            <div id="recommendationBox" class="p-3 rounded bg-light text-center">
+                <h5 class="fw-bold">Recommendation</h5>
+                <span id="recommendedStatus">Not Calculated</span><br>
+                <small id="statusDescription" class="text-muted">Adjust fields above to see result</small>
+            </div>
+        </fieldset>
+
+
+        <div class="d-flex justify-content-between mt-4">
+            <a href="{{ path('app_assessment_result', {uuid: application.uuid}) }}"
+               class="btn btn-outline-secondary">Back</a>
+
+            <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+        </div>
+
+        {{ form_end(form) }}
+
+    </div>
+</div>
+
+
+<!-- JavaScript -->
+<script>
+function calculateAssessment() {
+
+    const sections = [
+        { id: 'motivation', max: 20 },
+        { id: 'household', max: 40 },
+        { id: 'income', max: 40 }
+    ];
+
+    let total = 0;
+
+    sections.forEach(section => {
+        const selects = document.querySelectorAll(`select[data-section="${section.id}"]`);
+        let subtotal = 0;
+
+        selects.forEach(sel => {
+            const val = Number(sel.value);
+            if (!isNaN(val)) subtotal += val;
+        });
+
+        total += subtotal;
+
+        let colorClass =
+            subtotal < section.max * 0.33 ? 'score-low' :
+            subtotal < section.max * 0.66 ? 'score-medium' :
+            'score-high';
+
+        const box = document.getElementById(section.id + 'Score');
+        box.className = `section-score ${colorClass}`;
+        box.textContent = `${subtotal}/${section.max}`;
+    });
+
+    document.getElementById('totalScoreDisplay').textContent = `${total}/100`;
+    document.getElementById('scoreFill').style.width = total + '%';
+
+    updateRecommendation(total);
+}
+
+function updateRecommendation(total) {
+    const status = document.getElementById('recommendedStatus');
+    const desc = document.getElementById('statusDescription');
+    const box = document.getElementById('recommendationBox');
+
+    if (total >= 60) {
+        status.textContent = 'APPROVED';
+        desc.textContent = 'High priority candidate';
+        box.className = 'p-3 rounded status-approved text-center';
+    } else if (total >= 30) {
+        status.textContent = 'WAITLIST';
+        desc.textContent = 'Medium priority candidate';
+        box.className = 'p-3 rounded status-waitlist text-center';
+    } else {
+        status.textContent = 'SHORTLIST';
+        desc.textContent = 'Low priority candidate';
+        box.className = 'p-3 rounded status-shortlist text-center';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    calculateAssessment();
+    document.querySelectorAll('select').forEach(sel => {
+        sel.addEventListener('change', calculateAssessment);
+    });
+});
+</script>
+
+{% endblock %}
