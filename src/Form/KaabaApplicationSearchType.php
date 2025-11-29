@@ -39,10 +39,6 @@ class KaabaApplicationSearchType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        // ---------------------------------------------------------------
-        // FIRST: Add all NON-dynamic fields
-        // ---------------------------------------------------------------
-
         $builder
             ->add('status', EntityType::class, [
                 'class' => KaabaApplicationStatus::class,
@@ -141,10 +137,6 @@ class KaabaApplicationSearchType extends AbstractType
                 'choices' => ['25' => 25, '50' => 50, '100' => 100, '200' => 200, '500' => 500],
                 'attr' => ['class' => 'form-control', 'col_class' => 'col-md-2']
             ]);
-
-        // ---------------------------------------------------------------
-        // EVENT LISTENER — POPULATE COURSES ON FIRST LOAD
-        // ---------------------------------------------------------------
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($options) {
 
             $form = $event->getForm();
@@ -168,10 +160,6 @@ class KaabaApplicationSearchType extends AbstractType
                 'attr' => ['class' => 'form-control course-select', 'col_class' => 'col-md-3'],
             ]);
         });
-
-        // ---------------------------------------------------------------
-        // EVENT LISTENER — POPULATE COURSES ON SUBMISSION
-        // ---------------------------------------------------------------
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
 
             $data = $event->getData();

@@ -409,6 +409,18 @@
 
 	 <script>
 	    document.addEventListener('DOMContentLoaded', function() {
+
+            const instituteSelect = document.querySelector('select[name$="[institute]"]');
+
+    if (instituteSelect) {
+        instituteSelect.addEventListener('change', function() {
+            // submit closest form
+            const form = this.closest('form');
+            if (form) {
+                form.submit();
+            }
+        });
+    }
 	
 	        // Update Status functionality with shortlist reason
 	        document.querySelectorAll('.update-status').forEach(button => {

@@ -1525,7 +1525,6 @@ public function kaabaApplications(
         $institutes = $instituteRepository->findAll();
     }
 
-    // Build the search form using the new FormType
     $form = $this->createForm(KaabaApplicationSearchType::class, null, [
         'method' => 'GET',
         'institutes' => $institutes,
@@ -1534,7 +1533,6 @@ public function kaabaApplications(
 
     $form->handleRequest($request);
 
-    // Build filters
     $filters = [];
     foreach ($form as $key => $field) {
         $filters[$key] = $field->getData();
