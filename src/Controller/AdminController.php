@@ -50,12 +50,14 @@ use App\Entity\KaabaApplicationLog;
 use App\Form\EmailTemplateFormType;
 use App\Form\SettingsBasicInfoType;
 use Symfony\UX\Chartjs\Model\Chart;
+use App\Entity\KaabaApplicationExam;
 use App\Service\NotificationService;
 use App\Service\SubscriptionService;
 use App\Form\EmployerDetailsFormType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
 use App\Entity\KaabaApplicationStatus;
+use App\Form\KaabaApplicationExamType;
 use App\Form\ProductAutoCompleteField;
 use Symfony\Component\Form\FormEvents;
 use App\Form\EmployerAutoCompleteField;
@@ -106,6 +108,7 @@ use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -2849,6 +2852,52 @@ $this->addFlash('success', 'Assessment updated successfully.');
         }
 
         return $this->render('admin/assessment_edit.html.twig', [
+            'application' => $application,
+            'form' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/application/{uuid}/exam', name: 'app_application_exam')]
+    public function exam(
+        KaabaApplication $application,
+        Request $request,
+        FileUploader $fileUploader,
+        EntityManagerInterface $em
+    ) {
+        $exam = $application->getExam();
+
+        if (!$exam) {
+            $exam = new KaabaApplicationExam();
+            $exam->setApplication($application);
+            $em->persist($exam);
+        }
+
+        $form = $this->createForm(KaabaApplicationExamType::class, $exam);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            /** @var UploadedFile|null $attachment */
+            $attachment = $form->get('attachment')->getData();
+
+            if ($attachment) {
+                $fileName = $fileUploader->upload(
+                    $attachment,
+                    $this->getParameter('application_exam_attachments')
+                );
+                $exam->setAttachment($fileName);
+            }
+
+            $em->flush();
+
+            $this->addFlash('success', 'Exam result saved successfully.');
+
+            return $this->redirectToRoute('app_application_exam', [
+                'uuid' => $application->getUuid()
+            ]);
+        }
+
+        return $this->render('admin/application_exam_form.html.twig', [
             'application' => $application,
             'form' => $form->createView(),
         ]);

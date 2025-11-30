@@ -186,6 +186,9 @@ private ?bool $is_duplicate = null;
 #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'kaabaApplications')]
 private ?self $duplicate_parent = null;
 
+#[ORM\OneToOne(mappedBy: 'application', targetEntity: KaabaApplicationExam::class, cascade: ['persist', 'remove'])]
+private ?KaabaApplicationExam $exam = null;
+
 /**
  * @var Collection<int, self>
  */
@@ -207,6 +210,17 @@ private ?KaabaAssessment $assessment = null;
 
     }
 
+public function getExam(): ?KaabaApplicationExam
+{
+    return $this->exam;
+}
+
+public function setExam(?KaabaApplicationExam $exam): static
+{
+    $this->exam = $exam;
+    return $this;
+}
+
     public function getAssessment(): ?KaabaAssessment
 {
     return $this->assessment;
@@ -217,6 +231,56 @@ public function setAssessment(?KaabaAssessment $assessment): static
     $this->assessment = $assessment;
     return $this;
 }
+
+public function getInterviewScore(): ?int
+{
+    $assessment = $this->getAssessment();
+    if (!$assessment) {
+        return null;
+    }
+
+    $motivation = $assessment->getMotivation() ?? [];
+    $household = $assessment->getHousehold() ?? [];
+    $income = $assessment->getIncome() ?? [];
+
+    return array_sum($motivation) + array_sum($household) + array_sum($income);
+}
+public function getInterviewResult(): array
+{
+    $score = $this->getInterviewScore();
+
+    if ($score === null) {
+        return [
+            'score' => null,
+            'label' => 'No Assessment',
+            'class' => 'bg-danger'
+        ];
+    }
+
+    if ($score < 60) {
+        return [
+            'score' => $score,
+            'label' => 'Rejected (Failed Interview)',
+            'class' => 'bg-danger'
+        ];
+    }
+
+    if ($score < 75) {
+        return [
+            'score' => $score,
+            'label' => 'Passed Interview (Exam)',
+            'class' => 'bg-warning text-dark'
+        ];
+    }
+
+    return [
+        'score' => $score,
+        'label' => 'Approved (Passed Interview)',
+        'class' => 'bg-success'
+    ];
+}
+
+
 
     public function getId(): ?int
     {

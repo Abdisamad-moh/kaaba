@@ -291,11 +291,11 @@
 											<p>
 												{% if application.literacylevel %}
 													<span class="badge literacy-badge
-															                                {% if application.literacylevel == 'no_skills' %}bg-danger
-															                                {% elseif application.literacylevel == 'limited' %}bg-warning text-dark
-															                                {% elseif application.literacylevel == 'moderate' %}bg-info
-															                                {% elseif application.literacylevel == 'proficient' %}bg-success
-															                                {% else %}bg-secondary{% endif %}">
+																																													                                {% if application.literacylevel == 'no_skills' %}bg-danger
+																																													                                {% elseif application.literacylevel == 'limited' %}bg-warning text-dark
+																																													                                {% elseif application.literacylevel == 'moderate' %}bg-info
+																																													                                {% elseif application.literacylevel == 'proficient' %}bg-success
+																																													                                {% else %}bg-secondary{% endif %}">
 														{% if application.literacylevel == 'no_skills' %}
 															{{ 'I do not possess reading or writing skills'|trans }}
 														{% elseif application.literacylevel == 'limited' %}
@@ -322,11 +322,11 @@
 											<p>
 												{% if application.numeracylevel %}
 													<span class="badge literacy-badge
-															                                {% if application.numeracylevel == 'no_skills' %}bg-danger
-															                                {% elseif application.numeracylevel == 'limited' %}bg-warning text-dark
-															                                {% elseif application.numeracylevel == 'moderate' %}bg-info
-															                                {% elseif application.numeracylevel == 'proficient' %}bg-success
-															                                {% else %}bg-secondary{% endif %}">
+																																													                                {% if application.numeracylevel == 'no_skills' %}bg-danger
+																																													                                {% elseif application.numeracylevel == 'limited' %}bg-warning text-dark
+																																													                                {% elseif application.numeracylevel == 'moderate' %}bg-info
+																																													                                {% elseif application.numeracylevel == 'proficient' %}bg-success
+																																													                                {% else %}bg-secondary{% endif %}">
 														{% if application.numeracylevel == 'no_skills' %}
 															{{ 'I do not possess basic numeracy skills'|trans }}
 														{% elseif application.numeracylevel == 'limited' %}
@@ -526,12 +526,12 @@
 									<div class="d-flex align-items-center mb-3">
 										<strong class="me-3">Current Status:</strong>
 										<span class="status-badge badge
-												                    {% if application.status.name == 'accepted' or application.status.name == 'approved' %}bg-success
-												                    {% elseif application.status.name == 'rejected' %}bg-danger
-												                    {% elseif application.status.name == 'applied' %}bg-primary
-												                    {% elseif application.status.name == 'shortlisted' %}bg-info text-white
-												                    {% elseif application.status.name == 'waitlisted' %}bg-warning text-white
-												                    {% else %}bg-secondary{% endif %}">
+																																				                    {% if application.status.name == 'accepted' or application.status.name == 'approved' %}bg-success
+																																				                    {% elseif application.status.name == 'rejected' %}bg-danger
+																																				                    {% elseif application.status.name == 'applied' %}bg-primary
+																																				                    {% elseif application.status.name == 'shortlisted' %}bg-info text-white
+																																				                    {% elseif application.status.name == 'waitlisted' %}bg-warning text-white
+																																				                    {% else %}bg-secondary{% endif %}">
 											{% if application.status.name == 'accepted' %}approved
 											{% else %}
 												{{ application.status.name }}
@@ -567,72 +567,111 @@
 							</div>
 						</div>
 
-                        {# ====================== ASSESSMENT RESULT SECTION ====================== #}
+						{# ====================== ASSESSMENT RESULT SECTION ====================== #}
 
-{% if application.assessment %}
-<div class="card-body mt-4">
-    <h5 class="card-title mb-0">Assessment Result</h5>
-</div>
-<hr class="m-0" />
+						{% if application.assessment %}
+							<div class="card-body mt-4">
+								<h5 class="card-title mb-0">Assessment Result</h5>
+							</div>
+							<hr class="m-0"/>
 
-<div class="card-body">
+							<div class="card-body">
 
-    {% set assess = application.assessment %}
+								{% set assess = application.assessment %}
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <div>
-            <h5 class="mb-1">Final Score:
-                <span class="badge bg-primary">{{ assess.totalScore }}/100</span>
-            </h5>
+								<div class="d-flex justify-content-between align-items-center mb-3">
+									<div>
+										<h5 class="mb-1">Final Score:
+											<span class="badge bg-primary">{{ assess.totalScore }}/100</span>
+										</h5>
 
-            <span class="badge 
-                {% if assess.recommendedStatus == 'APPROVED' %} bg-success
-                {% elseif assess.recommendedStatus == 'WAITLIST' %} bg-warning text-dark
-                {% else %} bg-danger
-                {% endif %}
-            ">
-                {{ assess.recommendedStatus }}
-            </span>
-        </div>
+										<span class="badge
+																								                {% if assess.recommendedStatus == 'APPROVED' %} bg-success
+																								                {% elseif assess.recommendedStatus == 'WAITLIST' %} bg-warning text-dark
+																								                {% else %} bg-danger
+																								                {% endif %}
+																								            ">
+											{{ assess.recommendedStatus }}
+										</span>
+									</div>
 
-        <a href="{{ path('app_assessment_result', { uuid: application.uuid }) }}" target="_blank"
-           class="btn btn-outline-primary btn-sm">
-            <i class="ti ti-file-description me-1"></i>
-            View Full Assessment
-        </a>
-    </div>
+									<a href="{{ path('app_assessment_result', { uuid: application.uuid }) }}" target="_blank" class="btn btn-outline-primary btn-sm">
+										<i class="ti ti-file-description me-1"></i>
+										View Full Assessment
+									</a>
+								</div>
 
-    <!-- Score Breakdown -->
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Section</th>
-                <th>Score</th>
-                <th>Max</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Motivation</td>
-                <td>{{ assess.getSectionScore('motivation') }}</td>
-                <td>20</td>
-            </tr>
-            <tr>
-                <td>Household</td>
-                <td>{{ assess.getSectionScore('household') }}</td>
-                <td>40</td>
-            </tr>
-            <tr>
-                <td>Income</td>
-                <td>{{ assess.getSectionScore('income') }}</td>
-                <td>40</td>
-            </tr>
-        </tbody>
-    </table>
+								<!-- Score Breakdown -->
+								<table class="table table-bordered">
+									<thead>
+										<tr>
+											<th>Section</th>
+											<th>Score</th>
+											<th>Max</th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr>
+											<td>Motivation</td>
+											<td>{{ assess.getSectionScore('motivation') }}</td>
+											<td>20</td>
+										</tr>
+										<tr>
+											<td>Household</td>
+											<td>{{ assess.getSectionScore('household') }}</td>
+											<td>40</td>
+										</tr>
+										<tr>
+											<td>Income</td>
+											<td>{{ assess.getSectionScore('income') }}</td>
+											<td>40</td>
+										</tr>
+									</tbody>
+								</table>
 
-</div>
-{% endif %}
+							</div>
+						{% endif %}
 
+						{% if application.exam %}
+							<div class="card-body mt-4">
+								<h5 class="card-title mb-0">Exam Result</h5>
+							</div>
+							<hr class="m-0"/>
+
+							<div class="card-body">
+
+								<h5>
+									Score:
+									<span class="badge bg-dark">{{ application.exam.score }}/100</span>
+								</h5>
+
+								{% if application.exam.description %}
+									<p class="mt-2">{{ application.exam.description }}</p>
+								{% endif %}
+
+								{% if application.exam.attachment %}
+									<a href="{{ path('app_application_attachments', { filename: application.exam.attachment }) }}" target="_blank" class="btn btn-outline-primary btn-sm mt-2">
+										<i class="ti ti-file-text"></i>
+										View Exam File
+									</a>
+								{% endif %}
+
+								<div class="mt-3">
+									<a href="{{ path('app_application_exam', { uuid: application.uuid }) }}" class="btn btn-primary btn-sm">
+										<i class="ti ti-edit"></i>
+										Edit Exam
+									</a>
+								</div>
+
+							</div>
+						{% else %}
+							<div class="card-body mt-4">
+								<a href="{{ path('app_application_exam', { uuid: application.uuid }) }}" class="btn btn-primary btn-sm">
+									<i class="ti ti-plus"></i>
+									Add Exam Result
+								</a>
+							</div>
+						{% endif %}
 
 
 					</div>
@@ -662,206 +701,206 @@
  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 	 <script>
-	document.addEventListener('DOMContentLoaded', function() {
-	    // Edit rejection reason functionality
-	    document.querySelectorAll('.edit-rejection-reason').forEach(button => {
-	        button.addEventListener('click', function(e) {
-	            e.preventDefault();
-	            
-	            const applicationId = this.getAttribute('data-application-id');
-	            const currentReason = this.getAttribute('data-current-reason');
-	            const applicantName = this.getAttribute('data-applicant-name');
-	            
-	            // Show SweetAlert with textarea for editing rejection reason
-	            Swal.fire({
-	                title: 'Edit Rejection Reason',
-	                html: `
-	                    <p>Editing rejection reason for <strong>${applicantName}</strong>:</p>
-	                    <div class="mt-3">
-	                        <label for="editRejectionReason" class="form-label">Rejection Reason:</label>
-	                        <textarea id="editRejectionReason" class="form-control" rows="4" placeholder="Enter rejection reason...">${currentReason}</textarea>
-	                    </div>
-	                `,
-	                icon: 'warning',
-	                showCancelButton: true,
-	                confirmButtonColor: '#3085d6',
-	                cancelButtonColor: '#6c757d',
-	                confirmButtonText: 'Update Reason',
-	                cancelButtonText: 'Cancel',
-	                showLoaderOnConfirm: true,
-	                preConfirm: () => {
-	                    const newReason = document.getElementById('editRejectionReason').value;
-	                    
-	                    return fetch('{{ path("app_admin_kaaba_application_edit_rejection_reason") }}', {
-	                        method: 'POST',
-	                        headers: {
-	                            'Content-Type': 'application/json',
-	                            'X-Requested-With': 'XMLHttpRequest'
-	                        },
-	                        body: JSON.stringify({
-	                            applicationId: applicationId,
-	                            rejectionReason: newReason,
-	                            _token: '{{ csrf_token("edit_rejection_reason") }}'
-	                        })
-	                    })
-	               // Temporarily add this to see the actual response
-	.then(response => {
-	    console.log('Response status:', response.status);
-	    console.log('Response headers:', response.headers);
-	    return response.text().then(text => {
-	        console.log('Response text:', text.substring(0, 500));
-	        // Then try to parse as JSON if possible
-	        try {
-	            return JSON.parse(text);
-	        } catch (e) {
-	            throw new Error('Got HTML response: ' + text.substring(0, 200));
-	        }
-	    });
-	})
-	                    .then(data => {
-	                        if (data.success) {
-	                            // Update the rejection reason text on the page
-	                            const reasonText = document.getElementById('rejection-reason-text');
-	                            if (reasonText) {
-	                                reasonText.textContent = newReason || 'No reason provided';
-	                            }
-	                            return data;
-	                        } else {
-	                            throw new Error(data.message || 'Failed to update rejection reason');
-	                        }
-	                    })
-	                    .catch(error => {
-	                        console.error('Edit rejection reason error:', error);
-	                        Swal.showValidationMessage(
-	                            `Request failed: ${error.message}`
-	                        );
-	                    });
-	                },
-	                allowOutsideClick: () => !Swal.isLoading()
-	            }).then((result) => {
-	                if (result.isConfirmed && result.value) {
-	                    Swal.fire({
-	                        title: 'Success!',
-	                        text: result.value.message,
-	                        icon: 'success',
-	                        confirmButtonText: 'OK'
-	                    });
-	                }
-	            });
-	        });
-	    });
-	
-	    // Your existing update status functionality...
-	    document.querySelectorAll('.update-status-btn').forEach(button => {
-	        button.addEventListener('click', function (e) {
-	            e.preventDefault();
-	
-	            const applicationId = this.getAttribute('data-application-id');
-	            const statusAction = this.getAttribute('data-status-action');
-	            const applicantName = this.getAttribute('data-applicant-name');
-	
-	            // Define dynamic SweetAlert titles and colors
-	            let actionText = '';
-	            let title = '';
-	            let icon = 'question';
-	            let confirmColor = '#3085d6';
-	
-	            switch(statusAction) {
-	                case 'shortlisted':
-	                    actionText = 'shortlist';
-	                    title = 'Shortlist Application';
-	                    icon = 'info';
-	                    confirmColor = '#198754'; // green
-	                    break;
-	                case 'rejected':
-	                    actionText = 'reject';
-	                    title = 'Reject Application';
-	                    icon = 'warning';
-	                    confirmColor = '#d33'; // red
-	                    break;
-	            }
-	
-	            Swal.fire({
-	                title: title,
-	                html: `Are you sure you want to <strong>${actionText}</strong> the application for <strong>${applicantName}</strong>?`,
-	                icon: icon,
-	                showCancelButton: true,
-	                confirmButtonColor: confirmColor,
-	                cancelButtonColor: '#6c757d',
-	                confirmButtonText: 'Yes, update it!',
-	                cancelButtonText: 'Cancel',
-	                showLoaderOnConfirm: true,
-	         preConfirm: () => {
-	    const newReason = document.getElementById('editRejectionReason').value;
-	    
-	    // Get CSRF token - try multiple methods
-	    let csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-	    if (!csrfToken) {
-	        csrfToken = document.querySelector('#csrf-token-edit-reason')?.value;
-	    }
-	    if (!csrfToken) {
-	        csrfToken = '{{ csrf_token("edit_rejection_reason") }}';
-	    }
-	    
-	    return fetch('{{ path("app_admin_kaaba_application_edit_rejection_reason") }}', {
-	        method: 'POST',
-	        headers: {
-	            'Content-Type': 'application/json',
-	            'X-Requested-With': 'XMLHttpRequest'
-	        },
-	        credentials: 'include', // Important for sending cookies/session
-	        body: JSON.stringify({
-	            applicationId: applicationId,
-	            rejectionReason: newReason,
-	            _token: csrfToken
-	        })
-	    })
-	    .then(response => {
-	        // Check if we got HTML instead of JSON
-	        const contentType = response.headers.get('content-type');
-	        if (contentType && contentType.includes('text/html')) {
-	            return response.text().then(html => {
-	                // Check if this is a login page redirect
-	                if (html.includes('login') || html.includes('signin') || html.includes('form-signin')) {
-	                    throw new Error('Authentication required. Please log in again.');
-	                }
-	                throw new Error('Server returned HTML instead of JSON. This might be an authentication or server error.');
-	            });
-	        }
-	        
-	        if (!response.ok) {
-	            // Try to parse as JSON first, if that fails, throw generic error
-	            return response.text().then(errorText => {
-	                try {
-	                    const errorData = JSON.parse(errorText);
-	                    throw new Error(errorData.message || errorData.debug || `HTTP error! status: ${response.status}`);
-	                } catch (e) {
-	                    throw new Error(`HTTP error! status: ${response.status}. Response: ${errorText.substring(0, 100)}`);
-	                }
-	            });
-	        }
-	        return response.json();
-	    })
-	    .then(data => {
-	        if (data.success) {
-	            const reasonText = document.getElementById('rejection-reason-text');
-	            if (reasonText) {
-	                reasonText.textContent = newReason || 'No reason provided';
-	            }
-	            return data;
-	        } else {
-	            throw new Error(data.message || 'Failed to update rejection reason');
-	        }
-	    })
-	    .catch(error => {
-	        console.error('Edit rejection reason error:', error);
-	        Swal.showValidationMessage(`Request failed: ${error.message}`);
-	    });
-	},
-	                allowOutsideClick: () => !Swal.isLoading()
-	            });
-	        });
-	    });
-	});
-	</script>
+			document.addEventListener('DOMContentLoaded', function() {
+			    // Edit rejection reason functionality
+			    document.querySelectorAll('.edit-rejection-reason').forEach(button => {
+			        button.addEventListener('click', function(e) {
+			            e.preventDefault();
+			            
+			            const applicationId = this.getAttribute('data-application-id');
+			            const currentReason = this.getAttribute('data-current-reason');
+			            const applicantName = this.getAttribute('data-applicant-name');
+			            
+			            // Show SweetAlert with textarea for editing rejection reason
+			            Swal.fire({
+			                title: 'Edit Rejection Reason',
+			                html: `
+			                    <p>Editing rejection reason for <strong>${applicantName}</strong>:</p>
+			                    <div class="mt-3">
+			                        <label for="editRejectionReason" class="form-label">Rejection Reason:</label>
+			                        <textarea id="editRejectionReason" class="form-control" rows="4" placeholder="Enter rejection reason...">${currentReason}</textarea>
+			                    </div>
+			                `,
+			                icon: 'warning',
+			                showCancelButton: true,
+			                confirmButtonColor: '#3085d6',
+			                cancelButtonColor: '#6c757d',
+			                confirmButtonText: 'Update Reason',
+			                cancelButtonText: 'Cancel',
+			                showLoaderOnConfirm: true,
+			                preConfirm: () => {
+			                    const newReason = document.getElementById('editRejectionReason').value;
+			                    
+			                    return fetch('{{ path("app_admin_kaaba_application_edit_rejection_reason") }}', {
+			                        method: 'POST',
+			                        headers: {
+			                            'Content-Type': 'application/json',
+			                            'X-Requested-With': 'XMLHttpRequest'
+			                        },
+			                        body: JSON.stringify({
+			                            applicationId: applicationId,
+			                            rejectionReason: newReason,
+			                            _token: '{{ csrf_token("edit_rejection_reason") }}'
+			                        })
+			                    })
+			               // Temporarily add this to see the actual response
+			.then(response => {
+			    console.log('Response status:', response.status);
+			    console.log('Response headers:', response.headers);
+			    return response.text().then(text => {
+			        console.log('Response text:', text.substring(0, 500));
+			        // Then try to parse as JSON if possible
+			        try {
+			            return JSON.parse(text);
+			        } catch (e) {
+			            throw new Error('Got HTML response: ' + text.substring(0, 200));
+			        }
+			    });
+			})
+			                    .then(data => {
+			                        if (data.success) {
+			                            // Update the rejection reason text on the page
+			                            const reasonText = document.getElementById('rejection-reason-text');
+			                            if (reasonText) {
+			                                reasonText.textContent = newReason || 'No reason provided';
+			                            }
+			                            return data;
+			                        } else {
+			                            throw new Error(data.message || 'Failed to update rejection reason');
+			                        }
+			                    })
+			                    .catch(error => {
+			                        console.error('Edit rejection reason error:', error);
+			                        Swal.showValidationMessage(
+			                            `Request failed: ${error.message}`
+			                        );
+			                    });
+			                },
+			                allowOutsideClick: () => !Swal.isLoading()
+			            }).then((result) => {
+			                if (result.isConfirmed && result.value) {
+			                    Swal.fire({
+			                        title: 'Success!',
+			                        text: result.value.message,
+			                        icon: 'success',
+			                        confirmButtonText: 'OK'
+			                    });
+			                }
+			            });
+			        });
+			    });
+			
+			    // Your existing update status functionality...
+			    document.querySelectorAll('.update-status-btn').forEach(button => {
+			        button.addEventListener('click', function (e) {
+			            e.preventDefault();
+			
+			            const applicationId = this.getAttribute('data-application-id');
+			            const statusAction = this.getAttribute('data-status-action');
+			            const applicantName = this.getAttribute('data-applicant-name');
+			
+			            // Define dynamic SweetAlert titles and colors
+			            let actionText = '';
+			            let title = '';
+			            let icon = 'question';
+			            let confirmColor = '#3085d6';
+			
+			            switch(statusAction) {
+			                case 'shortlisted':
+			                    actionText = 'shortlist';
+			                    title = 'Shortlist Application';
+			                    icon = 'info';
+			                    confirmColor = '#198754'; // green
+			                    break;
+			                case 'rejected':
+			                    actionText = 'reject';
+			                    title = 'Reject Application';
+			                    icon = 'warning';
+			                    confirmColor = '#d33'; // red
+			                    break;
+			            }
+			
+			            Swal.fire({
+			                title: title,
+			                html: `Are you sure you want to <strong>${actionText}</strong> the application for <strong>${applicantName}</strong>?`,
+			                icon: icon,
+			                showCancelButton: true,
+			                confirmButtonColor: confirmColor,
+			                cancelButtonColor: '#6c757d',
+			                confirmButtonText: 'Yes, update it!',
+			                cancelButtonText: 'Cancel',
+			                showLoaderOnConfirm: true,
+			         preConfirm: () => {
+			    const newReason = document.getElementById('editRejectionReason').value;
+			    
+			    // Get CSRF token - try multiple methods
+			    let csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+			    if (!csrfToken) {
+			        csrfToken = document.querySelector('#csrf-token-edit-reason')?.value;
+			    }
+			    if (!csrfToken) {
+			        csrfToken = '{{ csrf_token("edit_rejection_reason") }}';
+			    }
+			    
+			    return fetch('{{ path("app_admin_kaaba_application_edit_rejection_reason") }}', {
+			        method: 'POST',
+			        headers: {
+			            'Content-Type': 'application/json',
+			            'X-Requested-With': 'XMLHttpRequest'
+			        },
+			        credentials: 'include', // Important for sending cookies/session
+			        body: JSON.stringify({
+			            applicationId: applicationId,
+			            rejectionReason: newReason,
+			            _token: csrfToken
+			        })
+			    })
+			    .then(response => {
+			        // Check if we got HTML instead of JSON
+			        const contentType = response.headers.get('content-type');
+			        if (contentType && contentType.includes('text/html')) {
+			            return response.text().then(html => {
+			                // Check if this is a login page redirect
+			                if (html.includes('login') || html.includes('signin') || html.includes('form-signin')) {
+			                    throw new Error('Authentication required. Please log in again.');
+			                }
+			                throw new Error('Server returned HTML instead of JSON. This might be an authentication or server error.');
+			            });
+			        }
+			        
+			        if (!response.ok) {
+			            // Try to parse as JSON first, if that fails, throw generic error
+			            return response.text().then(errorText => {
+			                try {
+			                    const errorData = JSON.parse(errorText);
+			                    throw new Error(errorData.message || errorData.debug || `HTTP error! status: ${response.status}`);
+			                } catch (e) {
+			                    throw new Error(`HTTP error! status: ${response.status}. Response: ${errorText.substring(0, 100)}`);
+			                }
+			            });
+			        }
+			        return response.json();
+			    })
+			    .then(data => {
+			        if (data.success) {
+			            const reasonText = document.getElementById('rejection-reason-text');
+			            if (reasonText) {
+			                reasonText.textContent = newReason || 'No reason provided';
+			            }
+			            return data;
+			        } else {
+			            throw new Error(data.message || 'Failed to update rejection reason');
+			        }
+			    })
+			    .catch(error => {
+			        console.error('Edit rejection reason error:', error);
+			        Swal.showValidationMessage(`Request failed: ${error.message}`);
+			    });
+			},
+			                allowOutsideClick: () => !Swal.isLoading()
+			            });
+			        });
+			    });
+			});
+			</script>
 {% endblock %}

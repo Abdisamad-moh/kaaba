@@ -14,6 +14,7 @@ parameters:
     product_images_directory: '%kernel.project_dir%/var/products'
     ps_report_directory: '%kernel.project_dir%/var/psychometric_reports'
     tender_application_attachments: '%kernel.project_dir%/var/tender_application_attachments'
+    application_exam_attachments: '%kernel.project_dir%/var/uploads/application_exams'
     recaptcha.site_key: '%env(RECAPTCHA3_KEY)%'
     sometelSMSAPI: '%env(sometelSMSAPI)%'
   
