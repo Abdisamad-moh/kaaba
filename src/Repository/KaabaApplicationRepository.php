@@ -54,17 +54,18 @@ public function findByFullNameAndPhone(string $fullName, string $phone): array
 }
 
 public function filterApplicationsQuery(
-    ?KaabaApplicationStatus $status = null,
+ ?KaabaApplicationStatus $status = null,
     ?\DateTimeInterface $fromDate = null,
     ?\DateTimeInterface $toDate = null,
     ?string $phone = null,
     ?KaabaRegion $region = null,
     ?KaabaDistrict $district = null,
     ?KaabaQualification $qualification = null,
-    ?KaabaGender $gender = null,
     ?KaabaScholarship $scholarship = null,
     ?KaabaInstitute $institute = null,
     ?KaabaCourse $course = null,
+    ?string $examResult = null,
+    ?string $assesmentResult = null,
     ?User $user = null
 ): \Doctrine\ORM\Query {
     $qb = $this->createQueryBuilder('a')
@@ -72,7 +73,6 @@ public function filterApplicationsQuery(
         ->leftJoin('a.region', 'r')
         ->leftJoin('a.district', 'd')
         ->leftJoin('a.highest_qualification', 'q')
-        ->leftJoin('a.gender', 'g')
         ->leftJoin('a.scholarship', 'sch')
         ->leftJoin('a.institute', 'i')
         ->leftJoin('a.course', 'c')
@@ -119,10 +119,16 @@ public function filterApplicationsQuery(
             ->setParameter('qualification', $qualification);
     }
 
-    if ($gender) {
-        $qb->andWhere('a.gender = :gender')
-            ->setParameter('gender', $gender);
-    }
+  if ($examResult) {
+    $qb->andWhere('a.exam_result = :examResult')
+       ->setParameter('examResult', $examResult);
+}
+
+if ($assesmentResult) {
+    $qb->andWhere('a.assesment_result = :assesmentResult')
+       ->setParameter('assesmentResult', $assesmentResult);
+}
+
 
     if ($scholarship) {
         $qb->andWhere('a.scholarship = :scholarship')

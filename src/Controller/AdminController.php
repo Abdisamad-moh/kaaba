@@ -1545,19 +1545,20 @@ class AdminController extends AbstractController
 
         // Get the query instead of results
         $query = $applicationsRepository->filterApplicationsQuery(
-            $filters['status'] ?? null,
-            $filters['from_date'] ?? null,
-            $filters['to_date'] ?? null,
-            $filters['phone'] ?? null,
-            $filters['region'] ?? null,
-            $filters['district'] ?? null,
-            $filters['qualification'] ?? null,
-            $filters['gender'] ?? null,
-            $filters['scholarship'] ?? null,
-            $filters['institute'] ?? null,
-            $filters['course'] ?? null,
-            $user
-        );
+    $filters['status'] ?? null,
+    $filters['from_date'] ?? null,
+    $filters['to_date'] ?? null,
+    $filters['phone'] ?? null,
+    $filters['region'] ?? null,
+    $filters['district'] ?? null,
+    $filters['qualification'] ?? null,
+    $filters['scholarship'] ?? null,
+    $filters['institute'] ?? null,
+    $filters['course'] ?? null,
+    $filters['exam_result'] ?? null,
+    $filters['assesment_result'] ?? null,
+    $user
+);
 
         $limit = $filters['limit'] ?? 100;
 
@@ -2648,89 +2649,97 @@ class AdminController extends AbstractController
         ]);
     }
 
-  #[Route('/application/{uuid}/assessment', name: 'app_assessment')]
-public function assess(
-    KaabaApplication $application,
-    Request $request,
-    EntityManagerInterface $em
-): Response {
+    #[Route('/application/{uuid}/assessment', name: 'app_assessment')]
+    public function assess(
+        KaabaApplication $application,
+        Request $request,
+        EntityManagerInterface $em
+    ): Response {
 
-    // Load or create assessment
-    $assessment = $application->getAssessment();
+        // Load or create assessment
+        $assessment = $application->getAssessment();
 
-    if (!$assessment) {
-        $assessment = new KaabaAssessment();
-        $assessment->setApplication($application);
-        $em->persist($assessment);
-    }
-
-    // Create form with the ENTITY — not arrays
-    $form = $this->createForm(KaabaAssessmentType::class, $assessment);
-
-    $form->handleRequest($request);
-
-    if ($form->isSubmitted() && $form->isValid()) {
-
-        $data = $form->getData(); // this returns ENTITY + mapped:false fields
-
-        // Extract values manually from $request because fields are mapped:false
-        $motivationData = [
-            'employment_status'        => $form->get('employment_status')->getData(),
-            'training_enrolment'       => $form->get('training_enrolment')->getData(),
-            'reason_for_applying'      => $form->get('reason_for_applying')->getData(),
-            'career_aspirations'       => $form->get('career_aspirations')->getData(),
-            'community_participation'  => $form->get('community_participation')->getData(),
-        ];
-
-        $householdData = [
-            'housing_situation'        => $form->get('housing_situation')->getData(),
-            'household_members'        => $form->get('household_members')->getData(),
-            'decision_maker'           => $form->get('decision_maker')->getData(),
-            'dependency_ratio'         => $form->get('dependency_ratio')->getData(),
-            'household_circumstances'  => $form->get('household_circumstances')->getData(),
-        ];
-
-        $incomeData = [
-            'breadwinner_occupation'   => $form->get('breadwinner_occupation')->getData(),
-            'income_sources'           => $form->get('income_sources')->getData(),
-            'monthly_income'           => $form->get('monthly_income')->getData(),
-            'household_savings'        => $form->get('household_savings')->getData(),
-            'financial_vulnerability'  => $form->get('financial_vulnerability')->getData(),
-        ];
-
-        // Save into entity
-        $assessment->setMotivation($motivationData);
-        $assessment->setHousehold($householdData);
-        $assessment->setIncome($incomeData);
-
-        // SCORE CALCULATION
-        $totalScore =
-            array_sum($motivationData) +
-            array_sum($householdData) +
-            array_sum($incomeData);
-
-        $assessment->setTotalScore($totalScore);
-
-        if ($totalScore >= 60) {
-            $assessment->setRecommendedStatus("APPROVED");
-        } elseif ($totalScore >= 30) {
-            $assessment->setRecommendedStatus("WAITLIST");
-        } else {
-            $assessment->setRecommendedStatus("SHORTLIST");
+        if (!$assessment) {
+            $assessment = new KaabaAssessment();
+            $assessment->setApplication($application);
+            $em->persist($assessment);
         }
 
-        $em->flush();
-        $this->addFlash('success', 'Assessment created successfully.');
+        // Create form with the ENTITY — not arrays
+        $form = $this->createForm(KaabaAssessmentType::class, $assessment);
 
-        return $this->redirectToRoute('app_admin_kaaba_applications');
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $data = $form->getData(); // this returns ENTITY + mapped:false fields
+
+            // Extract values manually from $request because fields are mapped:false
+            $motivationData = [
+                'employment_status' => $form->get('employment_status')->getData(),
+                'training_enrolment' => $form->get('training_enrolment')->getData(),
+                'reason_for_applying' => $form->get('reason_for_applying')->getData(),
+                'career_aspirations' => $form->get('career_aspirations')->getData(),
+                'community_participation' => $form->get('community_participation')->getData(),
+            ];
+
+            $householdData = [
+                'housing_situation' => $form->get('housing_situation')->getData(),
+                'household_members' => $form->get('household_members')->getData(),
+                'decision_maker' => $form->get('decision_maker')->getData(),
+                'dependency_ratio' => $form->get('dependency_ratio')->getData(),
+                'household_circumstances' => $form->get('household_circumstances')->getData(),
+            ];
+
+            $incomeData = [
+                'breadwinner_occupation' => $form->get('breadwinner_occupation')->getData(),
+                'income_sources' => $form->get('income_sources')->getData(),
+                'monthly_income' => $form->get('monthly_income')->getData(),
+                'household_savings' => $form->get('household_savings')->getData(),
+                'financial_vulnerability' => $form->get('financial_vulnerability')->getData(),
+            ];
+
+            // Save into entity
+            $assessment->setMotivation($motivationData);
+            $assessment->setHousehold($householdData);
+            $assessment->setIncome($incomeData);
+
+            // SCORE CALCULATION
+            $totalScore =
+                array_sum($motivationData) +
+                array_sum($householdData) +
+                array_sum($incomeData);
+
+            $assessment->setTotalScore($totalScore);
+
+            if ($totalScore >= 60) {
+                $assessment->setRecommendedStatus("APPROVED");
+            } elseif ($totalScore >= 30) {
+                $assessment->setRecommendedStatus("WAITLIST");
+            } else {
+                $assessment->setRecommendedStatus("SHORTLIST");
+            }
+
+             if ($assessment->getTotalScore() < 60) {
+                $application->setAssesmentResult('Rejection (Failed Interview)');
+            } elseif ($assessment->getTotalScore() >= 60) {
+                 $application->setAssesmentResult('Passed Interview (Exam)');
+            } else {
+                 $application->setAssesmentResult('Approved (Passed Interview)');
+            }
+
+            $em->flush();
+            $this->addFlash('success', 'Assessment created successfully.');
+
+            return $this->redirectToRoute('app_admin_kaaba_applications');
+        }
+
+        return $this->render('admin/assessment_form.html.twig', [
+            'application' => $application,
+            'form' => $form->createView(),
+            'assessment' => $assessment
+        ]);
     }
-
-    return $this->render('admin/assessment_form.html.twig', [
-        'application' => $application,
-        'form' => $form->createView(),
-        'assessment' => $assessment
-    ]);
-}
 
 
     #[Route('/application/{uuid}/assessment/edit', name: 'app_assessment_edit')]
@@ -2843,9 +2852,16 @@ public function assess(
             } else {
                 $assessment->setRecommendedStatus('SHORTLIST');
             }
+            if ($assessment->getTotalScore() < 60) {
+                $application->setAssesmentResult('Rejection (Failed Interview)');
+            } elseif ($assessment->getTotalScore() >= 60) {
+                 $application->setAssesmentResult('Passed Interview (Exam)');
+            } else {
+                 $application->setAssesmentResult('Approved (Passed Interview)');
+            }
 
             $em->flush();
-$this->addFlash('success', 'Assessment updated successfully.');
+            $this->addFlash('success', 'Assessment updated successfully.');
             return $this->redirectToRoute('app_assessment_edit', [
                 'uuid' => $application->getUuid()
             ]);
@@ -2879,6 +2895,10 @@ $this->addFlash('success', 'Assessment updated successfully.');
 
             /** @var UploadedFile|null $attachment */
             $attachment = $form->get('attachment')->getData();
+
+
+            $examResult = $form->get('examResult')->getData();
+            $application->setExamResult($examResult);
 
             if ($attachment) {
                 $fileName = $fileUploader->upload(

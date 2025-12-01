@@ -153,7 +153,7 @@ private ?string $disability_type = null;
 
 
  #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-                                              private ?\DateTimeInterface $applied_date = null;
+                                                                private ?\DateTimeInterface $applied_date = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $shortlisted_date = null;
@@ -198,6 +198,15 @@ private Collection $kaabaApplications;
 #[ORM\OneToOne(mappedBy: 'application', targetEntity: KaabaAssessment::class, cascade: ['persist', 'remove'])]
 private ?KaabaAssessment $assessment = null;
 
+#[ORM\Column(length: 255, nullable: true)]
+private ?string $exam_result = null;
+
+#[ORM\Column(length: 255, nullable: true)]
+private ?string $assesment_result = null;
+
+#[ORM\Column(type: Types::TEXT, nullable: true)]
+private ?string $approved_reason = null;
+
     public function __construct()
     {
         $this->created_at = new \DateTime();        
@@ -209,6 +218,19 @@ private ?KaabaAssessment $assessment = null;
 
 
     }
+
+    public function getApprovedReason(): ?string
+{
+    return $this->approved_reason;
+}
+
+public function setApprovedReason(?string $approved_reason): static
+{
+    $this->approved_reason = $approved_reason;
+
+    return $this;
+}
+
 
 public function getExam(): ?KaabaApplicationExam
 {
@@ -971,6 +993,30 @@ public function removeKaabaApplication(self $kaabaApplication): static
             $kaabaApplication->setDuplicateParent(null);
         }
     }
+
+    return $this;
+}
+
+public function getExamResult(): ?string
+{
+    return $this->exam_result;
+}
+
+public function setExamResult(?string $exam_result): static
+{
+    $this->exam_result = $exam_result;
+
+    return $this;
+}
+
+public function getAssesmentResult(): ?string
+{
+    return $this->assesment_result;
+}
+
+public function setAssesmentResult(?string $assesment_result): static
+{
+    $this->assesment_result = $assesment_result;
 
     return $this;
 }

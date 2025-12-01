@@ -4,21 +4,26 @@ namespace App\Form;
 
 use App\Entity\KaabaApplicationExam;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\Form\Extension\Core\Type\TextareaType;
-use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 
 class KaabaApplicationExamType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('score', NumberType::class, [
-                'scale' => 2,
+           ->add('examResult', ChoiceType::class, [
+                'choices' => [
+                    'Choose Result' => null,
+                    'Passed' => 'passed',
+                    'Failed' => 'failed',
+                ],
                 'required' => true,
-                'label' => 'Exam Score',
+                'label' => 'Exam Result'
             ])
             ->add('description', TextareaType::class, [
                 'required' => false,

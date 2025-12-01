@@ -23,8 +23,8 @@ class KaabaApplicationExam
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $attachment = null;
 
-    #[ORM\Column(type: "decimal", precision: 5, scale: 2, nullable: true)]
-    private ?string $score = null;
+#[ORM\Column(length: 20, nullable: true)]
+private ?string $examResult = null;
 
     #[ORM\Column(type: "text", nullable: true)]
     private ?string $description = null;
@@ -70,16 +70,17 @@ class KaabaApplicationExam
         return $this;
     }
 
-    public function getScore(): ?string
-    {
-        return $this->score;
-    }
+   public function getExamResult(): ?string
+{
+    return $this->examResult;
+}
 
-    public function setScore(?string $score): static
-    {
-        $this->score = $score;
-        return $this;
-    }
+public function setExamResult(?string $examResult): static
+{
+    $this->examResult = $examResult;
+    return $this;
+}
+
 
     public function getDescription(): ?string
     {

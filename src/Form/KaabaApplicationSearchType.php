@@ -123,14 +123,28 @@ class KaabaApplicationSearchType extends AbstractType
                 'placeholder' => 'Select qualification',
                 'attr' => ['class' => 'form-control', 'col_class' => 'col-md-3']
             ])
-            ->add('gender', EntityType::class, [
-                'class' => KaabaGender::class,
-                'choice_label' => 'name',
-                'required' => false,
-                'mapped' => false,
-                'placeholder' => 'Select gender',
-                'attr' => ['class' => 'form-control', 'col_class' => 'col-md-3']
-            ])
+            ->add('exam_result', ChoiceType::class, [
+    'required' => false,
+    'mapped' => false,
+    'placeholder' => 'Filter by Exam Result',
+    'choices' => [
+        'Passed' => 'passed',
+        'Failed' => 'failed',
+    ],
+    'attr' => ['class' => 'form-control', 'col_class' => 'col-md-3']
+])
+->add('assesment_result', ChoiceType::class, [
+    'required' => false,
+    'mapped' => false,
+    'placeholder' => 'Filter by Assessment Result',
+    'choices' => [
+        'Rejection (Failed Interview)' => 'Rejection (Failed Interview)',
+        'Passed Interview (Exam)' => 'Passed Interview (Exam)',
+        'Approved (Passed Interview)' => 'Approved (Passed Interview)',
+    ],
+    'attr' => ['class' => 'form-control', 'col_class' => 'col-md-3']
+])
+
             ->add('limit', ChoiceType::class, [
                 'required' => false,
                 'mapped' => false,
