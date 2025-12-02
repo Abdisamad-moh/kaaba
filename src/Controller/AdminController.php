@@ -1702,6 +1702,7 @@ class AdminController extends AbstractController
         $applicationId = $data['applicationId'] ?? null;
         $statusAction = $data['statusAction'] ?? null;
         $shortlistReason = $data['shortlistReason'] ?? null; // Add this line
+        $approveReason = $data['approveReason'] ?? null;
         $csrfToken = $data['_token'] ?? null;
 
         // Validate CSRF token
@@ -1814,6 +1815,7 @@ class AdminController extends AbstractController
                 case 'approved':
                     $application->setAcceptedDate($now);
                     $application->setShortlistReason(null); // Clear shortlist reason
+                    $application->setApprovedReason($approveReason);
                     break;
                 case 'rejected':
                     $application->setRejectedDate($now);
@@ -1828,6 +1830,7 @@ class AdminController extends AbstractController
             }
             if ($statusAction !== 'approved') {
                 $application->setAcceptedDate(null);
+                $application->setApprovedReason(null); // Clear approved reason
             }
 
             // Update application status
@@ -1840,6 +1843,12 @@ class AdminController extends AbstractController
             if ($statusAction === 'shortlisted' && !empty($shortlistReason)) {
                 $logMessage .= ". Shortlist reason: " . $shortlistReason;
             }
+
+ 
+        if ($statusAction === 'approved' && !empty($approveReason)) {
+            $logMessage .= ". Approval reason: " . $approveReason;
+        }
+
 
             $logMessage .= " by " . $user->getUserIdentifier();
 
@@ -2462,115 +2471,268 @@ class AdminController extends AbstractController
         return $response;
     }
 
-
-    #[Route('/kaaba-applications/edit-rejection-reason', name: 'app_admin_kaaba_application_edit_rejection_reason', methods: ['POST'])]
-    public function editRejectionReason(
-        Request $request,
-        KaabaApplicationRepository $applicationRepository,
-        EntityManagerInterface $entityManager,
-        ApplicationLogger $applicationLogger
-    ): JsonResponse {
-        // Check if request is AJAX
-        if (!$request->isXmlHttpRequest()) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Invalid request type.'
-            ], 400);
-        }
-
-
-
-        $data = json_decode($request->getContent(), true);
-
-        // Check if JSON decoding was successful
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Invalid JSON data: ' . json_last_error_msg()
-            ], 400);
-        }
-
-        $applicationId = $data['applicationId'] ?? null;
-        $rejectionReason = $data['rejectionReason'] ?? null;
-        $csrfToken = $data['_token'] ?? null;
-
-        // Validate required fields
-        if (!$applicationId) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Missing application ID.'
-            ], 400);
-        }
-
-        // Validate CSRF token
-        if (!$this->isCsrfTokenValid('edit_rejection_reason', $csrfToken)) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Invalid CSRF token.'
-            ], 400);
-        }
-
-        // Rest of your existing code remains the same...
-        try {
-            $application = $applicationRepository->find($applicationId);
-
-            if (!$application) {
-                return $this->json([
-                    'success' => false,
-                    'message' => 'Application not found.'
-                ], 404);
-            }
-
-            // Check if application is actually rejected
-            $currentStatus = $application->getStatus();
-            if (!$currentStatus || $currentStatus->getName() !== 'rejected') {
-                return $this->json([
-                    'success' => false,
-                    'message' => 'Can only edit rejection reason for rejected applications.'
-                ], 400);
-            }
-
-            // Get current user
-            $user = $this->getUser();
-            if (!$user) {
-                return $this->json([
-                    'success' => false,
-                    'message' => 'User not authenticated.'
-                ], 401);
-            }
-
-            $oldReason = $application->getRejectionReason();
-            $application->setRejectionReason($rejectionReason);
-
-            // Log the action
-            $logMessage = sprintf(
-                "Rejection reason updated from '%s' to '%s' by %s",
-                $oldReason ?? 'Empty',
-                $rejectionReason ?? 'Empty',
-                $user->getUserIdentifier()
-            );
-
-            $applicationLogger->log(
-                $application,
-                'rejection_reason_updated',
-                $logMessage,
-                $user
-            );
-
-            $entityManager->flush();
-
-            return $this->json([
-                'success' => true,
-                'message' => 'Rejection reason updated successfully.'
-            ]);
-
-        } catch (\Exception $e) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Error updating rejection reason: ' . $e->getMessage()
-            ], 500);
-        }
+#[Route('/kaaba-applications/edit-status-reason', name: 'app_admin_kaaba_application_edit_status_reason', methods: ['POST'])]
+public function editStatusReason(
+    Request $request,
+    KaabaApplicationRepository $applicationRepository,
+    EntityManagerInterface $entityManager,
+    ApplicationLogger $applicationLogger
+): JsonResponse {
+    // Check if request is AJAX
+    if (!$request->isXmlHttpRequest()) {
+        return $this->json([
+            'success' => false,
+            'message' => 'Invalid request type.'
+        ], 400);
     }
+
+    $data = json_decode($request->getContent(), true);
+
+    // Check if JSON decoding was successful
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        return $this->json([
+            'success' => false,
+            'message' => 'Invalid JSON data: ' . json_last_error_msg()
+        ], 400);
+    }
+
+    $applicationId = $data['applicationId'] ?? null;
+    $reasonType = $data['reasonType'] ?? null; // 'shortlist', 'approve', or 'reject'
+    $reason = $data['reason'] ?? null;
+    $csrfToken = $data['_token'] ?? null;
+
+    // Validate required fields
+    if (!$applicationId || !$reasonType) {
+        return $this->json([
+            'success' => false,
+            'message' => 'Missing required parameters.'
+        ], 400);
+    }
+
+    // Validate CSRF token
+    if (!$this->isCsrfTokenValid('edit_status_reason', $csrfToken)) {
+        return $this->json([
+            'success' => false,
+            'message' => 'Invalid CSRF token.'
+        ], 400);
+    }
+
+    // Validate reason type
+    $validReasonTypes = ['shortlist', 'approve', 'reject'];
+    if (!in_array($reasonType, $validReasonTypes)) {
+        return $this->json([
+            'success' => false,
+            'message' => 'Invalid reason type.'
+        ], 400);
+    }
+
+    try {
+        $application = $applicationRepository->find($applicationId);
+
+        if (!$application) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Application not found.'
+            ], 404);
+        }
+
+        // Check if application has the correct status for the reason type
+        $currentStatus = $application->getStatus();
+        if (!$currentStatus) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Application has no status.'
+            ], 400);
+        }
+
+        $currentStatusName = strtolower($currentStatus->getName());
+        
+        // Map reason types to expected status names (using your actual DB values)
+        $statusMap = [
+            'shortlist' => 'shortlisted',
+            'approve' => 'approved',  // Changed from 'accepted' to 'approved'
+            'reject' => 'rejected'
+        ];
+
+        // Debug: log the status check
+        // error_log("Current status: $currentStatusName, Expected: " . $statusMap[$reasonType]);
+
+        if ($currentStatusName !== $statusMap[$reasonType]) {
+            return $this->json([
+                'success' => false,
+                'message' => "Can only edit {$reasonType} reason for {$statusMap[$reasonType]} applications. Current status is: {$currentStatusName}"
+            ], 400);
+        }
+
+        // Get current user
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->json([
+                'success' => false,
+                'message' => 'User not authenticated.'
+            ], 401);
+        }
+
+        // Update the appropriate reason field
+        $oldReason = null;
+        $logAction = '';
+        
+        switch ($reasonType) {
+            case 'shortlist':
+                $oldReason = $application->getShortlistReason();
+                $application->setShortlistReason($reason);
+                $logAction = 'shortlist_reason_updated';
+                break;
+            case 'approve':
+                $oldReason = $application->getApprovedReason();
+                $application->setApprovedReason($reason);
+                $logAction = 'approval_reason_updated';
+                break;
+            case 'reject':
+                $oldReason = $application->getRejectionReason();
+                $application->setRejectionReason($reason);
+                $logAction = 'rejection_reason_updated';
+                break;
+        }
+
+        // Log the action
+        $logMessage = sprintf(
+            "%s reason updated from '%s' to '%s' by %s",
+            ucfirst($reasonType),
+            $oldReason ?? 'Empty',
+            $reason ?? 'Empty',
+            $user->getUserIdentifier()
+        );
+
+        $applicationLogger->log(
+            $application,
+            $logAction,
+            $logMessage,
+            $user
+        );
+
+        $entityManager->flush();
+
+        return $this->json([
+            'success' => true,
+            'message' => ucfirst($reasonType) . ' reason updated successfully.'
+        ]);
+
+    } catch (\Exception $e) {
+        return $this->json([
+            'success' => false,
+            'message' => 'Error updating ' . $reasonType . ' reason: ' . $e->getMessage()
+        ], 500);
+    }
+}
+    // #[Route('/kaaba-applications/edit-rejection-reason', name: 'app_admin_kaaba_application_edit_rejection_reason', methods: ['POST'])]
+    // public function editRejectionReason(
+    //     Request $request,
+    //     KaabaApplicationRepository $applicationRepository,
+    //     EntityManagerInterface $entityManager,
+    //     ApplicationLogger $applicationLogger
+    // ): JsonResponse {
+    //     // Check if request is AJAX
+    //     if (!$request->isXmlHttpRequest()) {
+    //         return $this->json([
+    //             'success' => false,
+    //             'message' => 'Invalid request type.'
+    //         ], 400);
+    //     }
+
+
+
+    //     $data = json_decode($request->getContent(), true);
+
+    //     // Check if JSON decoding was successful
+    //     if (json_last_error() !== JSON_ERROR_NONE) {
+    //         return $this->json([
+    //             'success' => false,
+    //             'message' => 'Invalid JSON data: ' . json_last_error_msg()
+    //         ], 400);
+    //     }
+
+    //     $applicationId = $data['applicationId'] ?? null;
+    //     $rejectionReason = $data['rejectionReason'] ?? null;
+    //     $csrfToken = $data['_token'] ?? null;
+
+    //     // Validate required fields
+    //     if (!$applicationId) {
+    //         return $this->json([
+    //             'success' => false,
+    //             'message' => 'Missing application ID.'
+    //         ], 400);
+    //     }
+
+    //     // Validate CSRF token
+    //     if (!$this->isCsrfTokenValid('edit_rejection_reason', $csrfToken)) {
+    //         return $this->json([
+    //             'success' => false,
+    //             'message' => 'Invalid CSRF token.'
+    //         ], 400);
+    //     }
+
+    //     // Rest of your existing code remains the same...
+    //     try {
+    //         $application = $applicationRepository->find($applicationId);
+
+    //         if (!$application) {
+    //             return $this->json([
+    //                 'success' => false,
+    //                 'message' => 'Application not found.'
+    //             ], 404);
+    //         }
+
+    //         // Check if application is actually rejected
+    //         $currentStatus = $application->getStatus();
+    //         if (!$currentStatus || $currentStatus->getName() !== 'rejected') {
+    //             return $this->json([
+    //                 'success' => false,
+    //                 'message' => 'Can only edit rejection reason for rejected applications.'
+    //             ], 400);
+    //         }
+
+    //         // Get current user
+    //         $user = $this->getUser();
+    //         if (!$user) {
+    //             return $this->json([
+    //                 'success' => false,
+    //                 'message' => 'User not authenticated.'
+    //             ], 401);
+    //         }
+
+    //         $oldReason = $application->getRejectionReason();
+    //         $application->setRejectionReason($rejectionReason);
+
+    //         // Log the action
+    //         $logMessage = sprintf(
+    //             "Rejection reason updated from '%s' to '%s' by %s",
+    //             $oldReason ?? 'Empty',
+    //             $rejectionReason ?? 'Empty',
+    //             $user->getUserIdentifier()
+    //         );
+
+    //         $applicationLogger->log(
+    //             $application,
+    //             'rejection_reason_updated',
+    //             $logMessage,
+    //             $user
+    //         );
+
+    //         $entityManager->flush();
+
+    //         return $this->json([
+    //             'success' => true,
+    //             'message' => 'Rejection reason updated successfully.'
+    //         ]);
+
+    //     } catch (\Exception $e) {
+    //         return $this->json([
+    //             'success' => false,
+    //             'message' => 'Error updating rejection reason: ' . $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
 
     #[Route('/accountSettings', name: 'app_employer_account_settings')]
     public function accountSettings(
