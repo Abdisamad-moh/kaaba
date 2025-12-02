@@ -57,7 +57,7 @@ public function filterApplicationsQuery(
  ?KaabaApplicationStatus $status = null,
     ?\DateTimeInterface $fromDate = null,
     ?\DateTimeInterface $toDate = null,
-    ?string $phone = null,
+    $applicant = null,
     ?KaabaRegion $region = null,
     ?KaabaDistrict $district = null,
     ?KaabaQualification $qualification = null,
@@ -99,9 +99,9 @@ public function filterApplicationsQuery(
             ->setParameter('toDate', $toDate);
     }
 
-    if ($phone) {
-        $qb->andWhere('a.phone LIKE :phone')
-            ->setParameter('phone', '%' . $phone . '%');
+    if ($applicant) {
+        $qb->andWhere('a.id LIKE :applicant')
+            ->setParameter('applicant', '%' . $applicant->getId() . '%');
     }
 
     if ($region) {

@@ -90,14 +90,10 @@ class KaabaApplicationSearchType extends AbstractType
                 'widget' => 'single_text',
                 'attr' => ['class' => 'form-control', 'col_class' => 'col-md-3']
             ])
-            ->add('phone', TextType::class, [
+            ->add('phone', ApplicantAutoCompleteField::class, [
                 'required' => false,
                 'mapped' => false,
-                'attr' => [
-                    'class' => 'form-control',
-                    'placeholder' => 'Phone number',
-                    'col_class' => 'col-md-3'
-                ]
+                'attr' => ['class' => 'form-control', 'col_class' => 'col-md-3']
             ])
             ->add('region', EntityType::class, [
                 'class' => KaabaRegion::class,
