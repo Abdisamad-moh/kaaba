@@ -227,7 +227,6 @@ class KaabaAssessmentType extends AbstractType
                     '$300 – $500' => 6,
                     '$150 – $300' => 7,
                     '$65 – $150' => 8,
-                    'Less than $65' => 9,
                 ],
                 'placeholder' => 'Select...',
                 'attr' => ['class' => 'form-control', 'data-section' => 'income'],
