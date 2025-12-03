@@ -188,7 +188,7 @@ class KaabaAssessmentType extends AbstractType
          ----------------------------------------------------- */
         $builder
             ->add('breadwinner_occupation', ChoiceType::class, [
-                'label' => 'Breadwinner Occupation',
+                'label' => 'Breadwinner',
                 'mapped' => false,
                 'data' => $income['breadwinner_occupation'] ?? null,
                 'choices' => [
