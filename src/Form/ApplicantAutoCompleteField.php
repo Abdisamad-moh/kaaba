@@ -18,18 +18,19 @@ class ApplicantAutoCompleteField extends AbstractType
     {
         $resolver->setDefaults([
             'class' => KaabaApplication::class,
-            'placeholder' => 'Find Applicant by Name or Phone',
+            'placeholder' => 'Search by applicant id, name or phone',
             'choice_label' => function (KaabaApplication $customer) {
-                return sprintf('%s - %s', $customer->getFullName(), $customer->getPhone());
+                return sprintf('%s - %s - %s', 
+                    str_pad($customer->getId(), 5, '0', STR_PAD_LEFT), 
+                    $customer->getFullName(), 
+                    $customer->getPhone()
+                );
             },
             'required' => false,
-            // choose which fields to use in the search
-            // if not passed, *all* fields are used
-            'searchable_fields' => ['full_name', 'phone'],
+            'searchable_fields' => ['id', 'full_name', 'phone'],
             'query_builder' => function (KaabaApplicationRepository $repo) {
                 return $repo->createQueryBuilder('c');
             },
-            // 'security' => 'ROLE_SOMETHING',
         ]);
     }
 

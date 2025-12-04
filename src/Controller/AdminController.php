@@ -1548,7 +1548,7 @@ class AdminController extends AbstractController
     $filters['status'] ?? null,
     $filters['from_date'] ?? null,
     $filters['to_date'] ?? null,
-    $filters['phone'] ?? null,
+     $filters['applicant'] ?? null,
     $filters['region'] ?? null,
     $filters['district'] ?? null,
     $filters['qualification'] ?? null,
@@ -1557,6 +1557,7 @@ class AdminController extends AbstractController
     $filters['course'] ?? null,
     $filters['exam_result'] ?? null,
     $filters['assesment_result'] ?? null,
+ $filters['disability'] ?? null,
     $user
 );
 

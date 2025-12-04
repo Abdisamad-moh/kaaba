@@ -665,6 +665,15 @@ console.error('Error fetching routes:', error);
 getRoutes();
 
 			</script>
+
+<script>
+// Clear Filters functionality - AJAX version
+document.getElementById('clear-filters')?.addEventListener('click', function() {
+    // Clear all URL parameters and redirect to same page without filters
+    const currentUrl = window.location.href.split('?')[0];
+    window.location.href = currentUrl;
+});
+</script>
 		</body>
 
 	</html>  

@@ -90,11 +90,13 @@ class KaabaApplicationSearchType extends AbstractType
                 'widget' => 'single_text',
                 'attr' => ['class' => 'form-control', 'col_class' => 'col-md-3']
             ])
-            ->add('phone', ApplicantAutoCompleteField::class, [
-                'required' => false,
-                'mapped' => false,
-                'attr' => ['class' => 'form-control', 'col_class' => 'col-md-3']
-            ])
+         ->add('applicant', ApplicantAutoCompleteField::class, [
+    'required' => false,
+    'mapped' => false,
+    'label' => 'Applicant Search',
+    'placeholder' => 'Search by applicant id, name or phone',
+    'attr' => ['class' => 'form-control', 'col_class' => 'col-md-3']
+])
             ->add('region', EntityType::class, [
                 'class' => KaabaRegion::class,
                 'choice_label' => 'name',
@@ -117,6 +119,16 @@ class KaabaApplicationSearchType extends AbstractType
                 'required' => false,
                 'mapped' => false,
                 'placeholder' => 'Select qualification',
+                'attr' => ['class' => 'form-control', 'col_class' => 'col-md-3']
+            ])   ->add('disability', ChoiceType::class, [  
+                'required' => false,
+                'mapped' => false,
+                'placeholder' => 'Filter by Disability',
+                'choices' => [
+                    'Yes' => 'Yes',
+                    'No' => 'No',
+                    'Prefer not to say' => 'Prefer not to say',
+                ],
                 'attr' => ['class' => 'form-control', 'col_class' => 'col-md-3']
             ])
             ->add('exam_result', ChoiceType::class, [

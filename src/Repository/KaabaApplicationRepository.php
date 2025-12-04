@@ -57,7 +57,7 @@ public function filterApplicationsQuery(
  ?KaabaApplicationStatus $status = null,
     ?\DateTimeInterface $fromDate = null,
     ?\DateTimeInterface $toDate = null,
-    $applicant = null,
+     ?KaabaApplication $applicant = null,
     ?KaabaRegion $region = null,
     ?KaabaDistrict $district = null,
     ?KaabaQualification $qualification = null,
@@ -66,6 +66,7 @@ public function filterApplicationsQuery(
     ?KaabaCourse $course = null,
     ?string $examResult = null,
     ?string $assesmentResult = null,
+   ?string $disability = null,
     ?User $user = null
 ): \Doctrine\ORM\Query {
     $qb = $this->createQueryBuilder('a')
@@ -100,8 +101,9 @@ public function filterApplicationsQuery(
     }
 
     if ($applicant) {
-        $qb->andWhere('a.id LIKE :applicant')
-            ->setParameter('applicant', '%' . $applicant->getId() . '%');
+        // Match by ID (exact match, not LIKE)
+        $qb->andWhere('a.id = :applicantId')
+            ->setParameter('applicantId', $applicant->getId());
     }
 
     if ($region) {
@@ -129,6 +131,10 @@ if ($assesmentResult) {
        ->setParameter('assesmentResult', $assesmentResult);
 }
 
+  if ($disability) { 
+        $qb->andWhere('a.disability = :disability')
+           ->setParameter('disability', $disability);
+    }
 
     if ($scholarship) {
         $qb->andWhere('a.scholarship = :scholarship')

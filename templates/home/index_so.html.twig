@@ -1,6 +1,408 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Mashruuca Rajo Kaaba{% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+
+<style>
+    :root {
+        --yellow: #FFC107;
+        --yellow-light: #FFF3CD;
+        --yellow-dark: #E6AC00;
+        --green: #28A745;
+        --green-light: #D4EDDA;
+        --green-dark: #1E7E34;
+        --red: #DC3545;
+        --red-light: #F8D7DA;
+        --red-dark: #C82333;
+        --gray: #6C757D;
+        --gray-light: #F8F9FA;
+        --gray-dark: #343A40;
+        --border-radius: 16px;
+        --shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Updated header styling */
+    #eligibility h1 {
+        font-size: 3rem !important;
+        font-weight: 800 !important;
+        background: linear-gradient(90deg, var(--yellow), var(--green), var(--red)) !important;
+        -webkit-background-clip: text !important;
+        background-clip: text !important;
+        color: transparent !important;
+        margin-bottom: 15px !important;
+        letter-spacing: -0.5px !important;
+        position: relative !important;
+        display: inline-block !important;
+        padding-bottom: 15px !important;
+    }
+
+    #eligibility h1::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 150px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--yellow), var(--green), var(--red));
+        border-radius: 2px;
+    }
+
+    #eligibility .subtitle {
+        font-size: 1.2rem !important;
+        color: var(--gray) !important;
+        max-width: 700px !important;
+        margin: 25px auto 0 !important;
+        font-weight: 400 !important;
+        line-height: 1.6 !important;
+    }
+
+    /* Components container spacing */
+    #eligibility .components-container {
+        margin-top: 30px !important;
+        margin-bottom: 40px !important;
+    }
+
+    /* Component Card Styles - Updated borders */
+    .component-card {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        transition: var(--transition);
+        height: 100%;
+        position: relative;
+    }
+
+    /* Different border colors for each card */
+    .component-card:first-of-type {
+        border-top: 5px solid var(--yellow) !important;
+    }
+
+    .component-card:nth-of-type(2) {
+        border-top: 5px solid var(--green) !important;
+    }
+
+    .component-card:nth-of-type(3) {
+        border-top: 5px solid var(--red) !important;
+    }
+
+    .component-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Card header adjustments */
+    .card-header {
+        padding: 25px 30px 20px 30px !important;
+        background: white;
+        position: relative;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .card-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+        font-size: 1.8rem;
+        color: white;
+    }
+
+    /* Icon colors */
+    .component-card:first-of-type .card-icon {
+        background: linear-gradient(135deg, var(--yellow), var(--yellow-dark)) !important;
+    }
+
+    .component-card:nth-of-type(2) .card-icon {
+        background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+    }
+
+    .component-card:nth-of-type(3) .card-icon {
+        background: linear-gradient(135deg, var(--red), var(--red-dark)) !important;
+    }
+
+    .card-title {
+        font-size: 1.6rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    /* Title colors */
+    .component-card:first-of-type .card-title {
+        color: var(--yellow-dark) !important;
+    }
+
+    .component-card:nth-of-type(2) .card-title {
+        color: var(--green-dark) !important;
+    }
+
+    .component-card:nth-of-type(3) .card-title {
+        color: var(--red-dark) !important;
+    }
+
+    .card-subtitle {
+        font-size: 1rem;
+        line-height: 1.5;
+        color: var(--gray) !important;
+    }
+
+    .card-body {
+        padding: 25px 30px 30px 30px !important;
+    }
+
+    /* Tag Styles - Updated */
+    .tag-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 20px !important;
+    }
+
+    .tag {
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 2px solid transparent;
+        background: var(--yellow-light) !important;
+        color: var(--yellow-dark) !important;
+white-space: nowrap !important;
+    }
+
+    .tag.bg-green-light,
+    .tag:nth-child(2) {
+        background: var(--green-light) !important;
+        color: var(--green-dark) !important;
+        border-color: var(--green) !important;
+    }
+
+    .tag.bg-red-light,
+    .tag:nth-child(3) {
+        background: var(--red-light) !important;
+        color: var(--red-dark) !important;
+        border-color: var(--red) !important;
+    }
+
+    /* Requirement Item Styles */
+    .requirements-list {
+        margin-bottom: 20px !important;
+    }
+
+    .requirement-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 15px !important;
+        padding: 15px;
+        border-radius: 10px;
+        transition: var(--transition);
+        background: var(--gray-light) !important;
+    }
+
+    .requirement-item:hover {
+        background: rgba(0, 0, 0, 0.02);
+        transform: translateX(5px);
+    }
+
+    .requirement-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+        flex-shrink: 0;
+        color: white;
+        font-size: 1rem;
+        font-weight: bold;
+    }
+
+    /* Icon color classes */
+    .requirement-icon.bg-yellow-gradient,
+    .requirement-icon:nth-child(1) {
+        background: linear-gradient(135deg, var(--yellow), var(--yellow-dark)) !important;
+    }
+
+    .requirement-icon.bg-green-gradient {
+        background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+    }
+
+    .requirement-icon.bg-red-gradient {
+        background: linear-gradient(135deg, var(--red), var(--red-dark)) !important;
+    }
+
+    /* Note Box Styles - Updated */
+    .note-box {
+        padding: 20px !important;
+        border-radius: 12px;
+        margin-top: 20px !important;
+        border-left: 4px solid var(--yellow) !important;
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, #fff9e6, #fff3cd) !important;
+    }
+
+    /* Specific note box colors */
+    .component-card:nth-of-type(2) .note-box {
+        border-left-color: var(--green) !important;
+        background: linear-gradient(135deg, #d4edda, #c3e6cb) !important;
+    }
+
+    .component-card:nth-of-type(3) .note-box {
+        border-left-color: var(--red) !important;
+        background: linear-gradient(135deg, #f8d7da, #f5c6cb) !important;
+    }
+
+    .note-title {
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.1rem;
+        color: #856404 !important;
+        font-weight: 700 !important;
+    }
+
+    /* Note title colors */
+    .component-card:nth-of-type(2) .note-title {
+        color: var(--green-dark) !important;
+    }
+
+    .component-card:nth-of-type(3) .note-title {
+        color: var(--red-dark) !important;
+    }
+
+    .note-text {
+        font-size: 0.95rem;
+        line-height: 1.5;
+        color: #856404 !important;
+    }
+
+    /* Note text colors */
+    .component-card:nth-of-type(2) .note-text {
+        color: var(--green-dark) !important;
+    }
+
+    .component-card:nth-of-type(3) .note-text {
+        color: var(--red-dark) !important;
+    }
+
+    /* Track Card Styles */
+    .track-container {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+        gap: 15px !important;
+        margin-top: 20px !important;
+        margin-bottom: 20px !important;
+    }
+
+    .track-card {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        border: 2px solid var(--yellow-light);
+        transition: var(--transition);
+    }
+
+    .track-card:hover {
+        border-color: var(--yellow);
+        transform: translateY(-3px);
+    }
+
+    .track-title {
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--yellow-dark) !important;
+        font-weight: 600 !important;
+    }
+
+    .track-card:nth-child(2) .track-title {
+        color: var(--red-dark) !important;
+    }
+
+    .track-desc {
+        font-size: 0.9rem;
+        line-height: 1.5;
+        color: var(--gray) !important;
+    }
+
+    /* Shimmer animation for note boxes */
+    .note-box::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+        transform: translateX(-100%);
+    }
+
+    .note-box:hover::before {
+        animation: shimmer 1.5s infinite;
+    }
+
+    @keyframes shimmer {
+        100% {
+            transform: translateX(100%);
+        }
+    }
+
+    /* Add footer styling */
+    #eligibility + footer {
+        text-align: center;
+        padding: 30px 0 !important;
+        color: var(--gray);
+        font-size: 0.9rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.08);
+        margin-top: 30px;
+    }
+
+    #eligibility + footer .footer-highlight {
+        color: var(--yellow-dark);
+        font-weight: 600;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        #eligibility h1 {
+            font-size: 2.2rem !important;
+        }
+        
+        #eligibility .subtitle {
+            font-size: 1.1rem !important;
+            padding: 0 15px !important;
+        }
+        
+        .card-header, .card-body {
+            padding: 20px !important;
+        }
+        
+        .tag-container {
+            justify-content: center;
+        }
+        
+        .track-container {
+            grid-template-columns: 1fr !important;
+        }
+        
+        #eligibility .components-container {
+            margin-top: 20px !important;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block body %}
 	<!-- start banner -->
@@ -106,39 +508,327 @@
 		</section>
 		<!-- end section -->
 
+<!-- Eligibility section start-->
+<section class="bg-white" id="eligibility">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 text-center mb-5" data-anime='{ "el": "childs", "translateY": [50, 0], "opacity": [0,1], "duration": 600, "delay": 0, "staggervalue": 300, "easing": "easeOutQuad" }'>
+                <h1 class="fw-800 ls-minus-1px">Booska Shuruudaha Deeq-bixinta</h1>
+                <p class="subtitle mx-auto">
+                    Diiwaangeli shuruudaha gelitaanka ee barnaamijyada waxbarashada Somaliland. Dhammaan codsatayaasha waa inay soo gudbiyaan caddaymo dheeraad ah ka hor inta aan la ansixin deeq-bixinta.
+                </p>
+            </div>
+        </div>
 
-		<!-- Eligibility section start-->
-		<section class="bg-white" id="eligibility">
-			<div class="container">
-				<div class="row align-items-center justify-content-center">
-					<div class="col-xl-5 col-lg-6 md-mb-50px sm-mb-20px" data-anime='{ "el": "childs", "translateY": [50, 0], "opacity": [0,1], "duration": 600, "delay": 0, "staggervalue": 300, "easing": "easeOutQuad" }'>
+        <div class="components-container row g-4 justify-content-center">
+            <!-- Component 1: Foundational Education -->
+            <div class="col-xl-4 col-lg-6 col-md-6" data-anime='{ "el": "childs", "translateY": [50, 0], "opacity": [0,1], "duration": 600, "delay": 200, "staggervalue": 300, "easing": "easeOutQuad" }'>
+                <div class="component-card h-100">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-book-open fs-4"></i>
+                        </div>
+                        <h3 class="card-title">Aqoonta Aasaasiga Ah</h3>
+                        <p class="card-subtitle">
+                            Akhris-qorista, xisaabinta, xirfadaha dareen-bulsho, xirfadaha nolosha, iyo tababarka shaqo ee dumarka aqoon yar leh.
+                        </p>
+                    </div>
+                    <div class="card-body">
+                        <div class="tag-container">
+                            <span class="tag">
+                                <i class="fas fa-id-card me-2"></i>Aqoonsi Qaran ee Somaliland
+                            </span>
+                            <span class="tag">
+                                <i class="fas fa-map-marker-alt me-2"></i>Marodi-Jeex / Togdheer
+                            </span>
+                            <span class="tag">
+                                <i class="fas fa-user-female me-2"></i>Dumar 15-35 sano
+                            </span>
+                        </div>
+                        
+                        <div class="requirements-list">
+                            <div class="requirement-item">
+                                <div class="requirement-icon">
+                                    <i class="fas fa-user-graduate"></i>
+                                </div>
+                                <div class="requirement-content">
+                                    <div class="requirement-title fw-600">Heerka Aqoonta Aasaasiga Ah</div>
+                                    <div class="requirement-desc">
+                                        Aqoon akhris-qoris iyo xisaabeed aan buuxa ama ku yar (ka hooseeya heerka 4aad)
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="requirement-item">
+                                <div class="requirement-icon bg-green-gradient">
+                                    <i class="fas fa-hand-holding-usd"></i>
+                                </div>
+                                <div class="requirement-content">
+                                    <div class="requirement-title fw-600">Baahida Dhaqaale</div>
+                                    <div class="requirement-desc">
+                                        Waa inuu muujiyaa baahida dhaqaale ee cad iyo sida uu ugu dadaalayo dhammaystirka barnaamijka
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="requirement-item">
+                                <div class="requirement-icon bg-green-gradient">
+                                    <i class="fas fa-calendar-check"></i>
+                                </div>
+                                <div class="requirement-content">
+                                    <div class="requirement-title fw-600">Ku Dheehid Dhamaystiran</div>
+                                    <div class="requirement-desc">
+                                    Diyaar u ah inuu is-qorto oo dhammaystiro Barnaamijka Tababarka oo dhan
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="requirement-item">
+                                <div class="requirement-icon bg-red-gradient">
+                                    <i class="fas fa-ban"></i>
+                                </div>
+                                <div class="requirement-content">
+                                    <div class="requirement-title fw-600">Qorista Kaliya</div>
+                                    <div class="requirement-desc">
+                                        Ma qorin barnaamij kale oo tababaro ah
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="note-box">
+                            <div class="note-title">
+                                <i class="fas fa-exclamation-triangle me-2"></i>Caddaymo Loo Baahan Yahay
+                            </div>
+                            <div class="note-text">
+                                Caddaymo dheeraad ah oo ku saabsan shuruudaha kor ku xusan ayaa loo baahan yahay ka hor inta aan la helin deeq-bixinta.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-						<h3 class="text-dark-gray fw-600 ls-minus-1px mb-20px">Shuruudaha Gelitaanka</h3>
+            <!-- Component 2: TVET Program -->
+            <div class="col-xl-4 col-lg-6 col-md-6" data-anime='{ "el": "childs", "translateY": [50, 0], "opacity": [0,1], "duration": 600, "delay": 300, "staggervalue": 300, "easing": "easeOutQuad" }'>
+                <div class="component-card h-100">
+                    <div class="card-header">
+                        <div class="card-icon" style="background:var(--green-dark) !important;">
+                            <i class="fas fa-tools fs-4" style="color:white !important;"></i>
+                        </div>
+                        <h3 class="card-title" style="color:var(--green-dark) !important;">Barnaamijka TVET</h3>
+                        <p class="card-subtitle">
+                            Waxbarashada iyo Tababarka Sare ee Farsamo (TVET) ee horumarinta xirfadaha lagu xiriiro shaqada.
+                        </p>
+                    </div>
+                    <div class="card-body">
+                        <div class="tag-container">
+                            <span class="tag">
+                                <i class="fas fa-id-card me-2"></i>Aqoonsi Qaran ee Somaliland
+                            </span>
+                            <span class="tag">
+                                <i class="fas fa-map-marker-alt me-2"></i>Marodi-Jeex / Togdheer
+                            </span>
+                            <span class="tag">
+                                <i class="fas fa-user-female me-2"></i>Dumar 15-35 sano
+                            </span>
+                        </div>
+                        
+                        <div class="requirements-list">
+                            <div class="requirement-item">
+                                <div class="requirement-icon">
+                                    <i class="fas fa-language"></i>
+                                </div>
+                                <div class="requirement-content">
+                                    <div class="requirement-title fw-600">Aqoonta Luqadda</div>
+                                    <div class="requirement-desc">
+                                        Karayo inuu akhriyo oo qoro af Soomaali/Ingiriisiga si fiican
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="requirement-item">
+                                <div class="requirement-icon bg-green-gradient">
+                                    <i class="fas fa-hand-holding-usd"></i>
+                                </div>
+                                <div class="requirement-content">
+                                    <div class="requirement-title fw-600">Baahida Dhaqaale</div>
+                                    <div class="requirement-desc">
+                                        Waa inuu muujiyaa baahida dhaqaale ee cad iyo sida uu ugu dadaalayo dhammaystirka barnaamijka
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="requirement-item">
+                                <div class="requirement-icon bg-green-gradient">
+                                    <i class="fas fa-briefcase"></i>
+                                </div>
+                                <div class="requirement-content">
+                                    <div class="requirement-title fw-600">Diiradda Shaqada</div>
+                                    <div class="requirement-desc">
+                                    Dhaqangelin dhab ah oo ku saabsan TVET si uu uga helo shaqo
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="requirement-item">
+                                <div class="requirement-icon bg-green-gradient">
+                                    <i class="fas fa-calendar-check"></i>
+                                </div>
+                                <div class="requirement-content">
+                                    <div class="requirement-title fw-600">Ku Dheehidka Barnaamijka</div>
+                                    <div class="requirement-desc">
+                                        Ku dheehid is-qorteed iyo dhammaystirka Barnaamijka Tababarka
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="requirement-item">
+                                <div class="requirement-icon bg-red-gradient">
+                                    <i class="fas fa-ban"></i>
+                                </div>
+                                <div class="requirement-content">
+                                    <div class="requirement-title fw-600">Qorista Kaliya</div>
+                                    <div class="requirement-desc">
+                                        Ma qorin barnaamij kale oo tababaro ah
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="note-box">
+                            <div class="note-title">
+                                <i class="fas fa-bullseye me-2"></i>Ujeeddada Barnaamijka
+                            </div>
+                            <div class="note-text">
+                                Ujeeddo weyn waa inuu helo shaqo dhowaan iyo dheer markuu dhammaystiro tababarka.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-						<ul class="list-style-04 text-dark-gray fw-500">
-							<li>Inaad tahay muwaadin reer Somaliland ah.</li>
-							<li>Dumarka da’doodu tahay 15–35.</li>
-							<li>Aqoonsi qaran oo ansax ah.</li>
-							<li>Buuxinta heerarka aqooneed (tusaale, GPA ugu yar/heer darajo), haddii khuseeya.</li>
-							<li>Inaad caddeyso baahida dhaqaale.</li>
-							<li>Inaad codsatay hay’ad/barnaamij la aqoonsan yahay (oo ay ku jiraan Akhris-Qoris & Xisaab, TVET, Kalkaaliso, iyo Umuliso).</li>
-						</ul>
-					</div>
-					<!-- <div class="col-xl-6 col-lg-6  position-relative md-mb-50px">
-						<div class="d-flex flex-column align-items-center gap-4">
-							<div class="w-80 md-w-75">
-								<img src="{{ asset('assets/images/national-id.png') }}" alt="National ID" class="border-radius-5px w-100">
-							</div>
-							<div class="w-80 md-w-75">
-								<img src="{{ asset('assets/images/eligiblity-1.png') }}" alt="Eligibility" class="border-radius-5px box-shadow-quadruple-large w-100">
-							</div>
-						</div>
-					</div> -->
+            <!-- Component 3: Higher Education -->
+            <div class="col-xl-4 col-lg-6 col-md-6" data-anime='{ "el": "childs", "translateY": [50, 0], "opacity": [0,1], "duration": 600, "delay": 400, "staggervalue": 300, "easing": "easeOutQuad" }'>
+                <div class="component-card h-100">
+                    <div class="card-header">
+                        <div class="card-icon"  style="background:var(--red-dark) !important;">
+                            <i class="fas fa-university fs-4" style="color:white !important;"></i>
+                        </div>
+                        <h3 class="card-title" style="color:var(--red-dark) !important;">Deeq-bixinta Waxbarashada Sare</h3>
+                        <p class="card-subtitle">
+                            Horumarinta hogaanka dumarka ee xirfadaha barashada, kaalmariyada, iyo kalkaalista.
+                        </p>
+                    </div>
+                    <div class="card-body">
+                        <div class="tag-container">
+                            <span class="tag">
+                                <i class="fas fa-id-card me-2"></i>Aqoonsi Qaran ee Somaliland
+                            </span>
+                            <span class="tag">
+                                <i class="fas fa-globe-africa me-2"></i>Dhamaan dalka (Somaliland)
+                            </span>
+                            <span class="tag">
+                                <i class="fas fa-user-female me-2"></i>Dumar 15-35 sano
+                            </span>
+                        </div>
+                        
+                        <div class="requirements-list">
+                            <div class="requirement-item">
+                                <div class="requirement-icon">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                                <div class="requirement-content">
+                                    <div class="requirement-title fw-600">Heerka Aqooneed</div>
+                                    <div class="requirement-desc">
+                                        Shahaadada dugsiyeed (darajooyinka A*-C) ama diploma/digrii waxbarasho sare
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="requirement-item">
+                                <div class="requirement-icon bg-green-gradient">
+                                    <i class="fas fa-hand-holding-usd"></i>
+                                </div>
+                                <div class="requirement-content">
+                                    <div class="requirement-title fw-600">Baahida Dhaqaale</div>
+                                    <div class="requirement-desc">
+                                        Waa inuu muujiyaa baahida dhaqaale ee cad iyo sida uu ugu dadaalayo dhammaystirka barnaamijka
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="requirement-item">
+                                <div class="requirement-icon bg-green-gradient">
+                                    <i class="fas fa-star"></i>
+                                </div>
+                                <div class="requirement-content">
+                                    <div class="requirement-title fw-600">Awoodda Hogaanka</div>
+                                    <div class="requirement-desc">
+                                        Muujin xirfadaha ama awoodda hogaanka iyadoo la adeegsanayo waxqabadyada ama doorarka
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="requirement-item">
+                                <div class="requirement-icon bg-green-gradient">
+                                    <i class="fas fa-user-check"></i>
+                                </div>
+                                <div class="requirement-content">
+                                    <div class="requirement-title fw-600">Taariikhda Disipliiniga</div>
+                                    <div class="requirement-desc">
+                                        Taariikh wanaagsan oo disipliin ah oo loo muujin karo iyadoo la tixraacayo
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="requirement-item">
+                                <div class="requirement-icon bg-red-gradient">
+                                    <i class="fas fa-ban"></i>
+                                </div>
+                                <div class="requirement-content">
+                                    <div class="requirement-title fw-600">Qorista Kaliya</div>
+                                    <div class="requirement-desc">
+                                        Ma qorin barnaamij kale oo tababaro ah
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="track-container">
+                            <div class="track-card">
+                                <div class="track-title">
+                                    <i class="fas fa-chalkboard-teacher me-2"></i>Xirfadaha Barashada
+                                </div>
+                                <div class="track-desc">
+                                    Xiisad ku leh barashada lagu muujiyo khibrad, shaqo iskaash ah, ama qoraal ujeeddo
+                                </div>
+                            </div>
+                            <div class="track-card">
+                                <div class="track-title">
+                                    <i class="fas fa-heartbeat me-2"></i>Xirfadaha Caafimaadka
+                                </div>
+                                <div class="track-desc">
+                                    Xiisad ku leh kaalmariyada/kalkaalista lagu muujiyo khibrad caafimaad ama qoraal
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="note-box">
+                            <div class="note-title">
+                                <i class="fas fa-file-contract me-2"></i>Waraaqooyin Loo Baahan Yahay
+                            </div>
+                            <div class="note-text">
+                                Caddaymo dheeraad ah oo ku saabsan dhammaan shuruudaha kor ku xusan ayaa loo baahan yahay ka hor inta aan la helin deeq-bixinta.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Eligibility section end-->
 
-				</div>
-			</div>
-		</section>
-		<!-- Eligibility section end-->
 
 		<!-- start section -->
 		<section class="bg-light-gray required-documents-section" id="required-documents">
