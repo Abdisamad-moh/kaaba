@@ -74,6 +74,8 @@ use App\Repository\KaabaCourseRepository;
 use App\Repository\KaabaGenderRepository;
 use App\Repository\KaabaRegionRepository;
 use App\Repository\MetierOrderRepository;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use App\Repository\EmployerJobsRepository;
 use App\Repository\KaabaDistrictRepository;
 use App\Repository\MetierJobTypeRepository;
@@ -107,6 +109,7 @@ use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
@@ -1545,21 +1548,21 @@ class AdminController extends AbstractController
 
         // Get the query instead of results
         $query = $applicationsRepository->filterApplicationsQuery(
-    $filters['status'] ?? null,
-    $filters['from_date'] ?? null,
-    $filters['to_date'] ?? null,
-     $filters['applicant'] ?? null,
-    $filters['region'] ?? null,
-    $filters['district'] ?? null,
-    $filters['qualification'] ?? null,
-    $filters['scholarship'] ?? null,
-    $filters['institute'] ?? null,
-    $filters['course'] ?? null,
-    $filters['exam_result'] ?? null,
-    $filters['assesment_result'] ?? null,
- $filters['disability'] ?? null,
-    $user
-);
+            $filters['status'] ?? null,
+            $filters['from_date'] ?? null,
+            $filters['to_date'] ?? null,
+            $filters['applicant'] ?? null,
+            $filters['region'] ?? null,
+            $filters['district'] ?? null,
+            $filters['qualification'] ?? null,
+            $filters['scholarship'] ?? null,
+            $filters['institute'] ?? null,
+            $filters['course'] ?? null,
+            $filters['exam_result'] ?? null,
+            $filters['assesment_result'] ?? null,
+            $filters['disability'] ?? null,
+            $user
+        );
 
         $limit = $filters['limit'] ?? 100;
 
@@ -1578,6 +1581,227 @@ class AdminController extends AbstractController
         ]);
     }
 
+    #[Route('/kaaba-applications/export', name: 'app_admin_kaaba_applications_export')]
+public function exportApplications(
+    Request $request,
+    KaabaApplicationRepository $applicationsRepository,
+    KaabaApplicationStatusRepository $statusRepository,
+    KaabaRegionRepository $regionRepository,
+    KaabaDistrictRepository $districtRepository,
+    KaabaQualificationRepository $qualificationRepository,
+    KaabaScholarshipRepository $scholarshipRepository,
+    KaabaInstituteRepository $instituteRepository,
+    KaabaCourseRepository $courseRepository,
+): Response {
+
+    $user = $this->getUser();
+
+    //--------------------------------------------------------------------
+    // 1) Get filters from request (Symfony form values)
+    //--------------------------------------------------------------------
+
+    $filters = $request->query->all('kaaba_application_search') ?? [];
+
+    //--------------------------------------------------------------------
+    // 2) Convert filters to Entities (as repository expects)
+    //--------------------------------------------------------------------
+
+    $status = !empty($filters['status']) ? $statusRepository->find($filters['status']) : null;
+
+    $region = !empty($filters['region']) ? $regionRepository->find($filters['region']) : null;
+
+    $district = !empty($filters['district']) ? $districtRepository->find($filters['district']) : null;
+
+    $qualification = !empty($filters['qualification']) ? $qualificationRepository->find($filters['qualification']) : null;
+
+    $scholarship = !empty($filters['scholarship']) ? $scholarshipRepository->find($filters['scholarship']) : null;
+
+    $institute = !empty($filters['institute']) ? $instituteRepository->find($filters['institute']) : null;
+
+    $course = !empty($filters['course']) ? $courseRepository->find($filters['course']) : null;
+
+    //--------------------------------------------------------------------
+    // 3) Applicant search — only exact ID supported in repo
+    //--------------------------------------------------------------------
+
+    $applicantEntity = null;
+
+    if (!empty($filters['phone']) && ctype_digit($filters['phone'])) {
+        $applicantEntity = $applicationsRepository->find($filters['phone']);
+    }
+
+    //--------------------------------------------------------------------
+    // 4) Date conversion
+    //--------------------------------------------------------------------
+
+    $fromDate = null;
+    if (!empty($filters['from_date'])) {
+        $fromDate = new \DateTime($filters['from_date']);
+    }
+
+    $toDate = null;
+    if (!empty($filters['to_date'])) {
+        $toDate = new \DateTime($filters['to_date']);
+    }
+
+    //--------------------------------------------------------------------
+    // 5) Build query using correct parameter order
+    //--------------------------------------------------------------------
+
+    $query = $applicationsRepository->filterApplicationsQuery(
+        $status,                                // 1
+        $fromDate,                              // 2
+        $toDate,                                // 3
+        $applicantEntity,                       // 4
+        $region,                                // 5
+        $district,                              // 6
+        $qualification,                         // 7
+        $scholarship,                           // 8
+        $institute,                             // 9
+        $course,                                // 10
+        $filters['exam_result'] ?? null,        // 11
+        $filters['assesment_result'] ?? null,   // 12
+        $filters['disability'] ?? null,         // 13
+        $user                                   // 14
+    );
+
+    //--------------------------------------------------------------------
+    // 6) Fetch ALL matching results (no pagination)
+    //--------------------------------------------------------------------
+
+    $applications = $query->getResult();
+
+    //--------------------------------------------------------------------
+    // 7) Generate Excel sheet
+    //--------------------------------------------------------------------
+
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+
+    // Column headers
+    $headers = [
+        'No',
+        'Portal ID',
+        'Full Name',
+        'Date of Birth',
+        'Telephone',
+        'Email',
+        'Region',
+        'District',
+        'Family Members',
+        'Monthly Income',
+        'High School Name',
+    ];
+
+    $col = 'A';
+    foreach ($headers as $header) {
+        $sheet->setCellValue("{$col}1", $header);
+        $sheet->getStyle("{$col}1")->getFont()->setBold(true);
+        $col++;
+    }
+
+    //--------------------------------------------------------------------
+    // 8) Populate data rows
+    //--------------------------------------------------------------------
+
+    $row = 2;
+    $counter = 1;
+
+    foreach ($applications as $application) {
+
+        $sheet->setCellValue("A{$row}", $counter);
+        $sheet->setCellValue("B{$row}", $application->getId());
+        $sheet->setCellValue("C{$row}", $application->getFullName());
+
+        $dob = $application->getDateOfBirth();
+        $sheet->setCellValue("D{$row}", $dob ? $dob->format('Y-m-d') : '');
+
+        $sheet->setCellValue("E{$row}", $application->getPhone());
+        $sheet->setCellValue("F{$row}", $application->getEmail());
+
+        $sheet->setCellValue("G{$row}", $application->getRegion()?->getName() ?? '');
+        $sheet->setCellValue("H{$row}", $application->getDistrict()?->getName() ?? '');
+
+        //----------------------------------------------------------------
+        // Decode assessment JSON fields into readable text
+        //----------------------------------------------------------------
+
+        $assessment = $application->getAssessment();
+        $familyMembers = '';
+        $monthlyIncome = '';
+
+        if ($assessment) {
+
+            // household members
+            $household = $assessment->getHousehold() ?? [];
+            if (!empty($household['household_members'])) {
+                $familyMembers = match ($household['household_members']) {
+                    1 => 'Less than 2',
+                    2 => '2',
+                    3 => '3–5',
+                    4 => '6',
+                    5 => '7–9',
+                    6 => '10',
+                    7 => '11–12',
+                    8 => 'More than 12',
+                    default => '',
+                };
+            }
+
+            // monthly income
+            $income = $assessment->getIncome() ?? [];
+            if (!empty($income['monthly_income'])) {
+                $monthlyIncome = match ($income['monthly_income']) {
+                    1 => 'More than $2000',
+                    2 => '$1500 – $2000',
+                    3 => '$1200 – $1500',
+                    4 => '$1000 – $1200',
+                    5 => '$500 – $1000',
+                    6 => '$300 – $500',
+                    7 => '$150 – $300',
+                    8 => '$65 – $150',
+                    default => '',
+                };
+            }
+        }
+
+        $sheet->setCellValue("I{$row}", $familyMembers);
+        $sheet->setCellValue("J{$row}", $monthlyIncome);
+
+        //----------------------------------------------------------------
+        // High school name
+        //----------------------------------------------------------------
+
+        $sheet->setCellValue("K{$row}", $application->getSecondarySchool());
+
+        $row++;
+        $counter++;
+    }
+
+    //--------------------------------------------------------------------
+    // 9) Auto-size columns
+    //--------------------------------------------------------------------
+
+    foreach (range('A', $sheet->getHighestColumn()) as $col) {
+        $sheet->getColumnDimension($col)->setAutoSize(true);
+    }
+
+    //--------------------------------------------------------------------
+    // 10) Return file as downloadable response
+    //--------------------------------------------------------------------
+
+    $filename = "scholarship_export_" . date('Y-m-d_H-i-s') . ".xlsx";
+    $writer = new Xlsx($spreadsheet);
+
+    $response = new StreamedResponse(function () use ($writer) {
+        $writer->save('php://output');
+    });
+
+    $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    $response->headers->set('Content-Disposition', "attachment; filename=\"{$filename}\"");
+
+    return $response;
+}
 
     #[Route('/kaaba-applications/get-courses', name: 'app_admin_kaaba_applications_get_courses')]
     public function getCoursesByyInstitute(
@@ -1845,10 +2069,10 @@ class AdminController extends AbstractController
                 $logMessage .= ". Shortlist reason: " . $shortlistReason;
             }
 
- 
-        if ($statusAction === 'approved' && !empty($approveReason)) {
-            $logMessage .= ". Approval reason: " . $approveReason;
-        }
+
+            if ($statusAction === 'approved' && !empty($approveReason)) {
+                $logMessage .= ". Approval reason: " . $approveReason;
+            }
 
 
             $logMessage .= " by " . $user->getUserIdentifier();
@@ -2472,160 +2696,160 @@ class AdminController extends AbstractController
         return $response;
     }
 
-#[Route('/kaaba-applications/edit-status-reason', name: 'app_admin_kaaba_application_edit_status_reason', methods: ['POST'])]
-public function editStatusReason(
-    Request $request,
-    KaabaApplicationRepository $applicationRepository,
-    EntityManagerInterface $entityManager,
-    ApplicationLogger $applicationLogger
-): JsonResponse {
-    // Check if request is AJAX
-    if (!$request->isXmlHttpRequest()) {
-        return $this->json([
-            'success' => false,
-            'message' => 'Invalid request type.'
-        ], 400);
-    }
-
-    $data = json_decode($request->getContent(), true);
-
-    // Check if JSON decoding was successful
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        return $this->json([
-            'success' => false,
-            'message' => 'Invalid JSON data: ' . json_last_error_msg()
-        ], 400);
-    }
-
-    $applicationId = $data['applicationId'] ?? null;
-    $reasonType = $data['reasonType'] ?? null; // 'shortlist', 'approve', or 'reject'
-    $reason = $data['reason'] ?? null;
-    $csrfToken = $data['_token'] ?? null;
-
-    // Validate required fields
-    if (!$applicationId || !$reasonType) {
-        return $this->json([
-            'success' => false,
-            'message' => 'Missing required parameters.'
-        ], 400);
-    }
-
-    // Validate CSRF token
-    if (!$this->isCsrfTokenValid('edit_status_reason', $csrfToken)) {
-        return $this->json([
-            'success' => false,
-            'message' => 'Invalid CSRF token.'
-        ], 400);
-    }
-
-    // Validate reason type
-    $validReasonTypes = ['shortlist', 'approve', 'reject'];
-    if (!in_array($reasonType, $validReasonTypes)) {
-        return $this->json([
-            'success' => false,
-            'message' => 'Invalid reason type.'
-        ], 400);
-    }
-
-    try {
-        $application = $applicationRepository->find($applicationId);
-
-        if (!$application) {
+    #[Route('/kaaba-applications/edit-status-reason', name: 'app_admin_kaaba_application_edit_status_reason', methods: ['POST'])]
+    public function editStatusReason(
+        Request $request,
+        KaabaApplicationRepository $applicationRepository,
+        EntityManagerInterface $entityManager,
+        ApplicationLogger $applicationLogger
+    ): JsonResponse {
+        // Check if request is AJAX
+        if (!$request->isXmlHttpRequest()) {
             return $this->json([
                 'success' => false,
-                'message' => 'Application not found.'
-            ], 404);
-        }
-
-        // Check if application has the correct status for the reason type
-        $currentStatus = $application->getStatus();
-        if (!$currentStatus) {
-            return $this->json([
-                'success' => false,
-                'message' => 'Application has no status.'
+                'message' => 'Invalid request type.'
             ], 400);
         }
 
-        $currentStatusName = strtolower($currentStatus->getName());
-        
-        // Map reason types to expected status names (using your actual DB values)
-        $statusMap = [
-            'shortlist' => 'shortlisted',
-            'approve' => 'approved',  // Changed from 'accepted' to 'approved'
-            'reject' => 'rejected'
-        ];
+        $data = json_decode($request->getContent(), true);
 
-        // Debug: log the status check
-        // error_log("Current status: $currentStatusName, Expected: " . $statusMap[$reasonType]);
-
-        if ($currentStatusName !== $statusMap[$reasonType]) {
+        // Check if JSON decoding was successful
+        if (json_last_error() !== JSON_ERROR_NONE) {
             return $this->json([
                 'success' => false,
-                'message' => "Can only edit {$reasonType} reason for {$statusMap[$reasonType]} applications. Current status is: {$currentStatusName}"
+                'message' => 'Invalid JSON data: ' . json_last_error_msg()
             ], 400);
         }
 
-        // Get current user
-        $user = $this->getUser();
-        if (!$user) {
+        $applicationId = $data['applicationId'] ?? null;
+        $reasonType = $data['reasonType'] ?? null; // 'shortlist', 'approve', or 'reject'
+        $reason = $data['reason'] ?? null;
+        $csrfToken = $data['_token'] ?? null;
+
+        // Validate required fields
+        if (!$applicationId || !$reasonType) {
             return $this->json([
                 'success' => false,
-                'message' => 'User not authenticated.'
-            ], 401);
+                'message' => 'Missing required parameters.'
+            ], 400);
         }
 
-        // Update the appropriate reason field
-        $oldReason = null;
-        $logAction = '';
-        
-        switch ($reasonType) {
-            case 'shortlist':
-                $oldReason = $application->getShortlistReason();
-                $application->setShortlistReason($reason);
-                $logAction = 'shortlist_reason_updated';
-                break;
-            case 'approve':
-                $oldReason = $application->getApprovedReason();
-                $application->setApprovedReason($reason);
-                $logAction = 'approval_reason_updated';
-                break;
-            case 'reject':
-                $oldReason = $application->getRejectionReason();
-                $application->setRejectionReason($reason);
-                $logAction = 'rejection_reason_updated';
-                break;
+        // Validate CSRF token
+        if (!$this->isCsrfTokenValid('edit_status_reason', $csrfToken)) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Invalid CSRF token.'
+            ], 400);
         }
 
-        // Log the action
-        $logMessage = sprintf(
-            "%s reason updated from '%s' to '%s' by %s",
-            ucfirst($reasonType),
-            $oldReason ?? 'Empty',
-            $reason ?? 'Empty',
-            $user->getUserIdentifier()
-        );
+        // Validate reason type
+        $validReasonTypes = ['shortlist', 'approve', 'reject'];
+        if (!in_array($reasonType, $validReasonTypes)) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Invalid reason type.'
+            ], 400);
+        }
 
-        $applicationLogger->log(
-            $application,
-            $logAction,
-            $logMessage,
-            $user
-        );
+        try {
+            $application = $applicationRepository->find($applicationId);
 
-        $entityManager->flush();
+            if (!$application) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Application not found.'
+                ], 404);
+            }
 
-        return $this->json([
-            'success' => true,
-            'message' => ucfirst($reasonType) . ' reason updated successfully.'
-        ]);
+            // Check if application has the correct status for the reason type
+            $currentStatus = $application->getStatus();
+            if (!$currentStatus) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Application has no status.'
+                ], 400);
+            }
 
-    } catch (\Exception $e) {
-        return $this->json([
-            'success' => false,
-            'message' => 'Error updating ' . $reasonType . ' reason: ' . $e->getMessage()
-        ], 500);
+            $currentStatusName = strtolower($currentStatus->getName());
+
+            // Map reason types to expected status names (using your actual DB values)
+            $statusMap = [
+                'shortlist' => 'shortlisted',
+                'approve' => 'approved',  // Changed from 'accepted' to 'approved'
+                'reject' => 'rejected'
+            ];
+
+            // Debug: log the status check
+            // error_log("Current status: $currentStatusName, Expected: " . $statusMap[$reasonType]);
+
+            if ($currentStatusName !== $statusMap[$reasonType]) {
+                return $this->json([
+                    'success' => false,
+                    'message' => "Can only edit {$reasonType} reason for {$statusMap[$reasonType]} applications. Current status is: {$currentStatusName}"
+                ], 400);
+            }
+
+            // Get current user
+            $user = $this->getUser();
+            if (!$user) {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'User not authenticated.'
+                ], 401);
+            }
+
+            // Update the appropriate reason field
+            $oldReason = null;
+            $logAction = '';
+
+            switch ($reasonType) {
+                case 'shortlist':
+                    $oldReason = $application->getShortlistReason();
+                    $application->setShortlistReason($reason);
+                    $logAction = 'shortlist_reason_updated';
+                    break;
+                case 'approve':
+                    $oldReason = $application->getApprovedReason();
+                    $application->setApprovedReason($reason);
+                    $logAction = 'approval_reason_updated';
+                    break;
+                case 'reject':
+                    $oldReason = $application->getRejectionReason();
+                    $application->setRejectionReason($reason);
+                    $logAction = 'rejection_reason_updated';
+                    break;
+            }
+
+            // Log the action
+            $logMessage = sprintf(
+                "%s reason updated from '%s' to '%s' by %s",
+                ucfirst($reasonType),
+                $oldReason ?? 'Empty',
+                $reason ?? 'Empty',
+                $user->getUserIdentifier()
+            );
+
+            $applicationLogger->log(
+                $application,
+                $logAction,
+                $logMessage,
+                $user
+            );
+
+            $entityManager->flush();
+
+            return $this->json([
+                'success' => true,
+                'message' => ucfirst($reasonType) . ' reason updated successfully.'
+            ]);
+
+        } catch (\Exception $e) {
+            return $this->json([
+                'success' => false,
+                'message' => 'Error updating ' . $reasonType . ' reason: ' . $e->getMessage()
+            ], 500);
+        }
     }
-}
     // #[Route('/kaaba-applications/edit-rejection-reason', name: 'app_admin_kaaba_application_edit_rejection_reason', methods: ['POST'])]
     // public function editRejectionReason(
     //     Request $request,
@@ -2883,12 +3107,12 @@ public function editStatusReason(
                 $assessment->setRecommendedStatus("SHORTLIST");
             }
 
-             if ($assessment->getTotalScore() < 60) {
+            if ($assessment->getTotalScore() < 60) {
                 $application->setAssesmentResult('Rejection (Failed Interview)');
             } elseif ($assessment->getTotalScore() >= 60) {
-                 $application->setAssesmentResult('Passed Interview (Exam)');
+                $application->setAssesmentResult('Passed Interview (Exam)');
             } else {
-                 $application->setAssesmentResult('Approved (Passed Interview)');
+                $application->setAssesmentResult('Approved (Passed Interview)');
             }
 
             $em->flush();
@@ -3018,9 +3242,9 @@ public function editStatusReason(
             if ($assessment->getTotalScore() < 60) {
                 $application->setAssesmentResult('Rejection (Failed Interview)');
             } elseif ($assessment->getTotalScore() >= 60) {
-                 $application->setAssesmentResult('Passed Interview (Exam)');
+                $application->setAssesmentResult('Passed Interview (Exam)');
             } else {
-                 $application->setAssesmentResult('Approved (Passed Interview)');
+                $application->setAssesmentResult('Approved (Passed Interview)');
             }
 
             $em->flush();

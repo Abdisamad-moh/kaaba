@@ -38,7 +38,12 @@
 						<div class="card-body">
 							{{ macros.render_search_form(searchForm, 'Filter Applications') }}
 
-
+<div class="mb-3 text-end">
+								<a href="{{ path('app_admin_kaaba_applications_export', app.request.query.all) }}" class="btn btn-success">
+									<i class="ti ti-download"></i>
+									Export Excel
+								</a>
+							</div>
 							<div class="table-responsive">
 								<table id="file_exports" class="table w-100 table-striped table-bordered display text-nowrap" width="100%" data-controller="general">
 									<thead>
