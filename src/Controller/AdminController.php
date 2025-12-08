@@ -45,6 +45,7 @@ use App\Entity\KaabaQualification;
 use App\Form\CustomerAutoComplete;
 use App\Repository\UserRepository;
 use App\Service\ApplicationLogger;
+use App\Service\TelesomSmsService;
 use App\Entity\EmployerJobQuestion;
 use App\Entity\KaabaApplicationLog;
 use App\Form\EmailTemplateFormType;
@@ -121,6 +122,7 @@ use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\HttpClient\Exception\TimeoutException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Validator\Constraints\GreaterThanOrEqual;
@@ -1825,6 +1827,64 @@ public function exportApplications(
         }
 
         return new JsonResponse($courseArray);
+    }
+
+    #[Route('/application/{id}/send-sms', name: 'app_admin_send_sms')]
+    public function sendSms(
+        int $id,
+        EntityManagerInterface $em,
+        TelesomSmsService $smsService
+    ): JsonResponse {
+
+        /** @var KaabaApplication|null $application */
+        $application = $em->getRepository(KaabaApplication::class)->find($id);
+
+        if (!$application) {
+            return new JsonResponse([
+                'error' => 'Application not found'
+            ], 404);
+        }
+
+        $phones = $application->getPhone();
+        $fullName = $application->getFullName() ?: 'Applicant';
+
+        if (!$phones) {
+            return new JsonResponse([
+                'application' => $id,
+                'error' => 'No phone number found'
+            ], 400);
+        }
+
+        // Customize your text message here
+        $message = sprintf(
+            "Hello %s, your scholarship application has been received. Thank you.",
+            $fullName
+        );
+
+        try {
+            $result = $smsService->sendBulk($phones, $message);
+
+            return new JsonResponse([
+                'application' => $id,
+                'phones' => $result
+            ]);
+
+        } catch (TimeoutException $e) {
+
+            return new JsonResponse([
+                'application' => $id,
+                'phones' => [],
+                'error' => 'Gateway timeout'
+            ], 504);
+
+        } catch (\Throwable $e) {
+
+            return new JsonResponse([
+                'application' => $id,
+                'phones' => [],
+                'error' => 'Internal error: '.$e->getMessage()
+            ], 500);
+        }
     }
 
     // Add this new route for AJAX course loading
