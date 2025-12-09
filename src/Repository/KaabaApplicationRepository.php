@@ -54,10 +54,7 @@ public function findByFullNameAndPhone(string $fullName, string $phone): array
 }
 
 public function filterApplicationsQuery(
- ?KaabaApplicationStatus $status = null,
-    ?\DateTimeInterface $fromDate = null,
-    ?\DateTimeInterface $toDate = null,
-     ?KaabaApplication $applicant = null,
+    ?KaabaApplication $applicant = null,
     ?KaabaRegion $region = null,
     ?KaabaDistrict $district = null,
     ?KaabaQualification $qualification = null,
@@ -66,7 +63,8 @@ public function filterApplicationsQuery(
     ?KaabaCourse $course = null,
     ?string $examResult = null,
     ?string $assesmentResult = null,
-   ?string $disability = null,
+    ?string $disability = null,
+    ?KaabaApplicationStatus $status = null,
     ?User $user = null
 ): \Doctrine\ORM\Query {
     $qb = $this->createQueryBuilder('a')
@@ -85,21 +83,7 @@ public function filterApplicationsQuery(
            ->setParameter('user', $user);
     }
 
-    if ($status) {
-        $qb->andWhere('a.status = :status')
-            ->setParameter('status', $status);
-    }
-
-    if ($fromDate) {
-        $qb->andWhere('a.application_date >= :fromDate')
-            ->setParameter('fromDate', $fromDate);
-    }
-
-    if ($toDate) {
-        $qb->andWhere('a.application_date <= :toDate')
-            ->setParameter('toDate', $toDate);
-    }
-
+    // Applicant ID filter - FIRST as requested
     if ($applicant) {
         // Match by ID (exact match, not LIKE)
         $qb->andWhere('a.id = :applicantId')
@@ -121,17 +105,17 @@ public function filterApplicationsQuery(
             ->setParameter('qualification', $qualification);
     }
 
-  if ($examResult) {
-    $qb->andWhere('a.exam_result = :examResult')
-       ->setParameter('examResult', $examResult);
-}
+    if ($examResult) {
+        $qb->andWhere('a.exam_result = :examResult')
+           ->setParameter('examResult', $examResult);
+    }
 
-if ($assesmentResult) {
-    $qb->andWhere('a.assesment_result = :assesmentResult')
-       ->setParameter('assesmentResult', $assesmentResult);
-}
+    if ($assesmentResult) {
+        $qb->andWhere('a.assesment_result = :assesmentResult')
+           ->setParameter('assesmentResult', $assesmentResult);
+    }
 
-  if ($disability) { 
+    if ($disability) { 
         $qb->andWhere('a.disability = :disability')
            ->setParameter('disability', $disability);
     }
@@ -149,6 +133,12 @@ if ($assesmentResult) {
     if ($course && $course->getId()) {
         $qb->andWhere('a.course = :course')
             ->setParameter('course', $course);
+    }
+
+    // Status filter - LAST as requested
+    if ($status) {
+        $qb->andWhere('a.status = :status')
+            ->setParameter('status', $status);
     }
 
     return $qb->getQuery();

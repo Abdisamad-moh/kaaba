@@ -10,6 +10,7 @@ use App\Entity\KaabaRegion;
 use App\Entity\KaabaDistrict;
 use App\Entity\KaabaQualification;
 use App\Entity\KaabaGender;
+use App\Entity\KaabaApplication;
 
 use App\Repository\KaabaCourseRepository;
 use App\Repository\KaabaInstituteRepository;
@@ -40,12 +41,36 @@ class KaabaApplicationSearchType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('status', EntityType::class, [
-                'class' => KaabaApplicationStatus::class,
+            // Applicant search - FIRST field as requested
+            ->add('applicant', ApplicantAutoCompleteField::class, [
+                'required' => false,
+                'mapped' => false,
+                'label' => 'Applicant Search',
+                'placeholder' => 'Search by applicant id, name or phone',
+                'attr' => ['class' => 'form-control', 'col_class' => 'col-md-3']
+            ])
+            ->add('region', EntityType::class, [
+                'class' => KaabaRegion::class,
                 'choice_label' => 'name',
                 'required' => false,
                 'mapped' => false,
-                'placeholder' => 'Filter by status',
+                'placeholder' => 'Select region',
+                'attr' => ['class' => 'form-control', 'col_class' => 'col-md-3']
+            ])
+            ->add('district', EntityType::class, [
+                'class' => KaabaDistrict::class,
+                'choice_label' => 'name',
+                'required' => false,
+                'mapped' => false,
+                'placeholder' => 'Select district',
+                'attr' => ['class' => 'form-control', 'col_class' => 'col-md-3']
+            ])
+            ->add('qualification', EntityType::class, [
+                'class' => KaabaQualification::class,
+                'choice_label' => 'name',
+                'required' => false,
+                'mapped' => false,
+                'placeholder' => 'Select qualification',
                 'attr' => ['class' => 'form-control', 'col_class' => 'col-md-3']
             ])
             ->add('scholarship', EntityType::class, [
@@ -78,49 +103,28 @@ class KaabaApplicationSearchType extends AbstractType
                     'col_class' => 'col-md-3'
                 ],
             ])
-            ->add('from_date', DateType::class, [
+            ->add('exam_result', ChoiceType::class, [
                 'required' => false,
                 'mapped' => false,
-                'widget' => 'single_text',
+                'placeholder' => 'Filter by Exam Result',
+                'choices' => [
+                    'Passed' => 'passed',
+                    'Failed' => 'failed',
+                ],
                 'attr' => ['class' => 'form-control', 'col_class' => 'col-md-3']
             ])
-            ->add('to_date', DateType::class, [
+            ->add('assesment_result', ChoiceType::class, [
                 'required' => false,
                 'mapped' => false,
-                'widget' => 'single_text',
+                'placeholder' => 'Filter by Assessment Result',
+                'choices' => [
+                    'Rejection (Failed Interview)' => 'Rejection (Failed Interview)',
+                    'Passed Interview (Exam)' => 'Passed Interview (Exam)',
+                    'Approved (Passed Interview)' => 'Approved (Passed Interview)',
+                ],
                 'attr' => ['class' => 'form-control', 'col_class' => 'col-md-3']
             ])
-         ->add('applicant', ApplicantAutoCompleteField::class, [
-    'required' => false,
-    'mapped' => false,
-    'label' => 'Applicant Search',
-    'placeholder' => 'Search by applicant id, name or phone',
-    'attr' => ['class' => 'form-control', 'col_class' => 'col-md-3']
-])
-            ->add('region', EntityType::class, [
-                'class' => KaabaRegion::class,
-                'choice_label' => 'name',
-                'required' => false,
-                'mapped' => false,
-                'placeholder' => 'Select region',
-                'attr' => ['class' => 'form-control', 'col_class' => 'col-md-3']
-            ])
-            ->add('district', EntityType::class, [
-                'class' => KaabaDistrict::class,
-                'choice_label' => 'name',
-                'required' => false,
-                'mapped' => false,
-                'placeholder' => 'Select district',
-                'attr' => ['class' => 'form-control', 'col_class' => 'col-md-3']
-            ])
-            ->add('qualification', EntityType::class, [
-                'class' => KaabaQualification::class,
-                'choice_label' => 'name',
-                'required' => false,
-                'mapped' => false,
-                'placeholder' => 'Select qualification',
-                'attr' => ['class' => 'form-control', 'col_class' => 'col-md-3']
-            ])   ->add('disability', ChoiceType::class, [  
+            ->add('disability', ChoiceType::class, [  
                 'required' => false,
                 'mapped' => false,
                 'placeholder' => 'Filter by Disability',
@@ -131,34 +135,24 @@ class KaabaApplicationSearchType extends AbstractType
                 ],
                 'attr' => ['class' => 'form-control', 'col_class' => 'col-md-3']
             ])
-            ->add('exam_result', ChoiceType::class, [
-    'required' => false,
-    'mapped' => false,
-    'placeholder' => 'Filter by Exam Result',
-    'choices' => [
-        'Passed' => 'passed',
-        'Failed' => 'failed',
-    ],
-    'attr' => ['class' => 'form-control', 'col_class' => 'col-md-3']
-])
-->add('assesment_result', ChoiceType::class, [
-    'required' => false,
-    'mapped' => false,
-    'placeholder' => 'Filter by Assessment Result',
-    'choices' => [
-        'Rejection (Failed Interview)' => 'Rejection (Failed Interview)',
-        'Passed Interview (Exam)' => 'Passed Interview (Exam)',
-        'Approved (Passed Interview)' => 'Approved (Passed Interview)',
-    ],
-    'attr' => ['class' => 'form-control', 'col_class' => 'col-md-3']
-])
-
+            // Status filter - LAST field as requested
+            ->add('status', EntityType::class, [
+                'class' => KaabaApplicationStatus::class,
+                'choice_label' => 'name',
+                'required' => false,
+                'mapped' => false,
+                'placeholder' => 'Filter by status',
+                'attr' => ['class' => 'form-control', 'col_class' => 'col-md-3']
+            ])
             ->add('limit', ChoiceType::class, [
                 'required' => false,
                 'mapped' => false,
                 'choices' => ['25' => 25, '50' => 50, '100' => 100, '200' => 200, '500' => 500],
                 'attr' => ['class' => 'form-control', 'col_class' => 'col-md-2']
             ]);
+        
+        // REMOVED date field related code since they're no longer in the form
+        
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) use ($options) {
 
             $form = $event->getForm();
@@ -182,6 +176,7 @@ class KaabaApplicationSearchType extends AbstractType
                 'attr' => ['class' => 'form-control course-select', 'col_class' => 'col-md-3'],
             ]);
         });
+        
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
 
             $data = $event->getData();

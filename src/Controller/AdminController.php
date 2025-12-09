@@ -1518,72 +1518,73 @@ class AdminController extends AbstractController
         ]);
     }
 
-    #[Route('/kaaba-applications', name: 'app_admin_kaaba_applications')]
-    public function kaabaApplications(
-        Request $request,
-        KaabaApplicationRepository $applicationsRepository,
-        KaabaInstituteRepository $instituteRepository,
-        PaginatorInterface $paginator,
-        KaabaCourseRepository $courseRepository,
-    ): Response {
-        $user = $this->getUser();
+#[Route('/kaaba-applications', name: 'app_admin_kaaba_applications')]
+public function kaabaApplications(
+    Request $request,
+    KaabaApplicationRepository $applicationsRepository,
+    KaabaInstituteRepository $instituteRepository,
+    PaginatorInterface $paginator,
+    KaabaCourseRepository $courseRepository,
+): Response {
+    $user = $this->getUser();
 
-        // Institutes by role
-        if ($user && in_array('ROLE_USER', $user->getRoles()) && !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
-            $institutes = $instituteRepository->findBy(['manager' => $user]);
-        } else {
-            $institutes = $instituteRepository->findAll();
-        }
-
-        $form = $this->createForm(KaabaApplicationSearchType::class, null, [
-            'method' => 'GET',
-            'institutes' => $institutes,
-            'request' => $request
-        ]);
-
-        $form->handleRequest($request);
-
-        $filters = [];
-        foreach ($form as $key => $field) {
-            $filters[$key] = $field->getData();
-        }
-
-        // Get the query instead of results
-        $query = $applicationsRepository->filterApplicationsQuery(
-            $filters['status'] ?? null,
-            $filters['from_date'] ?? null,
-            $filters['to_date'] ?? null,
-            $filters['applicant'] ?? null,
-            $filters['region'] ?? null,
-            $filters['district'] ?? null,
-            $filters['qualification'] ?? null,
-            $filters['scholarship'] ?? null,
-            $filters['institute'] ?? null,
-            $filters['course'] ?? null,
-            $filters['exam_result'] ?? null,
-            $filters['assesment_result'] ?? null,
-            $filters['disability'] ?? null,
-            $user
-        );
-
-        $limit = $filters['limit'] ?? 100;
-
-        // Paginate the query directly (this is more efficient)
-        $applications = $paginator->paginate(
-            $query, // Pass the Query object instead of array
-            $request->query->getInt('page', 1),
-            $limit
-        );
-
-        return $this->render('admin/kaaba_applications.html.twig', [
-            'applications' => $applications,
-            'searchForm' => $form->createView(),
-            'total_count' => $applications->getTotalItemCount(), // Get count from paginator
-            'current_limit' => $limit,
-        ]);
+    // Institutes by role
+    if ($user && in_array('ROLE_USER', $user->getRoles()) && !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+        $institutes = $instituteRepository->findBy(['manager' => $user]);
+    } else {
+        $institutes = $instituteRepository->findAll();
     }
 
-    #[Route('/kaaba-applications/export', name: 'app_admin_kaaba_applications_export')]
+    $form = $this->createForm(KaabaApplicationSearchType::class, null, [
+        'method' => 'GET',
+        'institutes' => $institutes,
+        'request' => $request
+    ]);
+
+    $form->handleRequest($request);
+
+    $filters = [];
+    foreach ($form as $key => $field) {
+        $filters[$key] = $field->getData();
+    }
+
+    // Get the query with updated parameter order
+    $query = $applicationsRepository->filterApplicationsQuery(
+        $filters['applicant'] ?? null,
+        $filters['region'] ?? null,
+        $filters['district'] ?? null,
+        $filters['qualification'] ?? null,
+        $filters['scholarship'] ?? null,
+        $filters['institute'] ?? null,
+        $filters['course'] ?? null,
+        $filters['exam_result'] ?? null,
+        $filters['assesment_result'] ?? null,
+        $filters['disability'] ?? null,
+        $filters['status'] ?? null,
+        $user
+    );
+
+    $limit = $filters['limit'] ?? 100;
+
+    // Paginate the query directly (this is more efficient)
+    $applications = $paginator->paginate(
+        $query, // Pass the Query object instead of array
+        $request->query->getInt('page', 1),
+        $limit
+    );
+
+    return $this->render('admin/kaaba_applications.html.twig', [
+        'applications' => $applications,
+        'searchForm' => $form->createView(),
+        'total_count' => $applications->getTotalItemCount(), // Get count from paginator
+        'current_limit' => $limit,
+    ]);
+}
+
+
+
+
+#[Route('/kaaba-applications/export', name: 'app_admin_kaaba_applications_export')]
 public function exportApplications(
     Request $request,
     KaabaApplicationRepository $applicationsRepository,
@@ -1633,54 +1634,38 @@ public function exportApplications(
     }
 
     //--------------------------------------------------------------------
-    // 4) Date conversion
-    //--------------------------------------------------------------------
-
-    $fromDate = null;
-    if (!empty($filters['from_date'])) {
-        $fromDate = new \DateTime($filters['from_date']);
-    }
-
-    $toDate = null;
-    if (!empty($filters['to_date'])) {
-        $toDate = new \DateTime($filters['to_date']);
-    }
-
-    //--------------------------------------------------------------------
-    // 5) Build query using correct parameter order
+    // 4) Build query using updated parameter order (no date parameters)
     //--------------------------------------------------------------------
 
     $query = $applicationsRepository->filterApplicationsQuery(
-        $status,                                // 1
-        $fromDate,                              // 2
-        $toDate,                                // 3
-        $applicantEntity,                       // 4
-        $region,                                // 5
-        $district,                              // 6
-        $qualification,                         // 7
-        $scholarship,                           // 8
-        $institute,                             // 9
-        $course,                                // 10
-        $filters['exam_result'] ?? null,        // 11
-        $filters['assesment_result'] ?? null,   // 12
-        $filters['disability'] ?? null,         // 13
-        $user                                   // 14
+        $applicantEntity,                       // 1 - applicant (first)
+        $region,                                // 2 - region
+        $district,                              // 3 - district
+        $qualification,                         // 4 - qualification
+        $scholarship,                           // 5 - scholarship
+        $institute,                             // 6 - institute
+        $course,                                // 7 - course
+        $filters['exam_result'] ?? null,        // 8 - exam_result
+        $filters['assesment_result'] ?? null,   // 9 - assesment_result
+        $filters['disability'] ?? null,         // 10 - disability
+        $status,                                // 11 - status (last)
+        $user                                   // 12 - user
     );
 
     //--------------------------------------------------------------------
-    // 6) Fetch ALL matching results (no pagination)
+    // 5) Fetch ALL matching results (no pagination)
     //--------------------------------------------------------------------
 
     $applications = $query->getResult();
 
     //--------------------------------------------------------------------
-    // 7) Generate Excel sheet
+    // 6) Generate Excel sheet
     //--------------------------------------------------------------------
 
     $spreadsheet = new Spreadsheet();
     $sheet = $spreadsheet->getActiveSheet();
 
-    // Column headers
+    // Column headers - Added Highschool Grade column
     $headers = [
         'No',
         'Portal ID',
@@ -1693,6 +1678,7 @@ public function exportApplications(
         'Family Members',
         'Monthly Income',
         'High School Name',
+        'Highschool Grade', // New column
     ];
 
     $col = 'A';
@@ -1703,7 +1689,7 @@ public function exportApplications(
     }
 
     //--------------------------------------------------------------------
-    // 8) Populate data rows
+    // 7) Populate data rows
     //--------------------------------------------------------------------
 
     $row = 2;
@@ -1776,12 +1762,18 @@ public function exportApplications(
 
         $sheet->setCellValue("K{$row}", $application->getSecondarySchool());
 
+        //----------------------------------------------------------------
+        // Highschool Grade - NEW COLUMN
+        //----------------------------------------------------------------
+
+        $sheet->setCellValue("L{$row}", $application->getSecondaryGrade() ?? '');
+
         $row++;
         $counter++;
     }
 
     //--------------------------------------------------------------------
-    // 9) Auto-size columns
+    // 8) Auto-size columns
     //--------------------------------------------------------------------
 
     foreach (range('A', $sheet->getHighestColumn()) as $col) {
@@ -1789,7 +1781,7 @@ public function exportApplications(
     }
 
     //--------------------------------------------------------------------
-    // 10) Return file as downloadable response
+    // 9) Return file as downloadable response
     //--------------------------------------------------------------------
 
     $filename = "scholarship_export_" . date('Y-m-d_H-i-s') . ".xlsx";
@@ -1804,6 +1796,10 @@ public function exportApplications(
 
     return $response;
 }
+
+
+
+
 
     #[Route('/kaaba-applications/get-courses', name: 'app_admin_kaaba_applications_get_courses')]
     public function getCoursesByyInstitute(
