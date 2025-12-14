@@ -1,0 +1,61 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Bulk SMS Sender{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Send Bulk SMS to Applicants</h5>
+        </div>
+
+        <div class="card-body">
+
+            <form method="POST">
+
+                <!-- Status -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Filter by Status</label>
+                    <select name="status[]" class="form-select" multiple size="6">
+                        {% for s in statuses %}
+                            <option value="{{ s.id }}"
+                                {% if selectedStatuses is defined and s.id in selectedStatuses %} selected {% endif %}
+                            >
+                                {{ s.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Institutes -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Filter by Institute</label>
+                    <select name="institute[]" class="form-select" multiple size="6">
+                        {% for i in institutes %}
+                            <option value="{{ i.id }}"
+                                {% if selectedInstitutes is defined and i.id in selectedInstitutes %} selected {% endif %}
+                            >
+                                {{ i.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Message -->
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Message</label>
+                    <textarea name="message" class="form-control" rows="5"
+                        placeholder="Write your message... Use {{ '{{name}}' }}"
+                    >{{ prefillMessage|default('') }}</textarea>
+
+                    <small class="text-muted">Use <strong>{{ '{{name}}' }}</strong> to insert each applicant's name.</small>
+                </div>
+
+                <button class="btn btn-success btn-lg px-4">Continue</button>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

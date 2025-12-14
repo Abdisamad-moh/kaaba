@@ -130,11 +130,23 @@
               </div>
 
               <div class="mt-auto">
-                {% if scholarship.status %}
-                  <a href="{{ path('app_scholarship_application', { uuid: scholarship.uuid }) }}" class="btn btn-primary w-100 mb-2">Hadda Codso</a>
-                {% else %}
-                  <button class="btn btn-secondary w-100 mb-2" disabled>Hada Diyaar Maaha</button>
-                {% endif %}
+              {% set isExpired = scholarship.closingDate < date() %}
+
+{% if scholarship.status and not isExpired %}
+  <a href="{{ path('app_scholarship_application', { uuid: scholarship.uuid }) }}"
+     class="btn btn-primary w-100 mb-2">
+    Hadda Codso
+  </a>
+{% elseif isExpired %}
+  <button class="btn btn-secondary w-100 mb-2" disabled>
+    Codsigu Wuu Xidhmay
+  </button>
+{% else %}
+  <button class="btn btn-secondary w-100 mb-2" disabled>
+    Hada Diyaar Maaha
+  </button>
+{% endif %}
+
 
                 <small class="text-muted d-block mt-1">
                   Taariikhda xidhitaanka: <strong>{{ scholarship.closingDate|date('d M Y') }}</strong>
@@ -190,11 +202,23 @@
               </div>
 
               <div class="mt-auto">
-                {% if scholarship.status %}
-                  <a href="{{ path('app_scholarship_application', { uuid: scholarship.uuid }) }}" class="btn btn-primary w-100 mb-2">Apply Now</a>
-                {% else %}
-                  <button class="btn btn-secondary w-100 mb-2" disabled>Not Available</button>
-                {% endif %}
+              {% set isExpired = scholarship.closingDate < date() %}
+
+{% if scholarship.status and not isExpired %}
+  <a href="{{ path('app_scholarship_application', { uuid: scholarship.uuid }) }}"
+     class="btn btn-primary w-100 mb-2">
+    Apply Now
+  </a>
+{% elseif isExpired %}
+  <button class="btn btn-secondary w-100 mb-2" disabled>
+    Applications Closed
+  </button>
+{% else %}
+  <button class="btn btn-secondary w-100 mb-2" disabled>
+    Not Available
+  </button>
+{% endif %}
+
 
                 <small class="text-muted d-block mt-1">
                   Closing Date: <strong>{{ scholarship.closingDate|date('d M Y') }}</strong>

@@ -14,6 +14,7 @@ use App\Form\BlogFormType;
 use App\Entity\KaabaCourse;
 use App\Entity\KaabaGender;
 use App\Entity\KaabaRegion;
+use App\Entity\KaabaSmsLog;
 use App\Entity\MetierOrder;
 use App\Form\OrderFormType;
 use App\Entity\EmployerJobs;
@@ -1518,284 +1519,288 @@ class AdminController extends AbstractController
         ]);
     }
 
-#[Route('/kaaba-applications', name: 'app_admin_kaaba_applications')]
-public function kaabaApplications(
-    Request $request,
-    KaabaApplicationRepository $applicationsRepository,
-    KaabaInstituteRepository $instituteRepository,
-    PaginatorInterface $paginator,
-    KaabaCourseRepository $courseRepository,
-): Response {
-    $user = $this->getUser();
+    #[Route('/kaaba-applications', name: 'app_admin_kaaba_applications')]
+    public function kaabaApplications(
+        Request $request,
+        KaabaApplicationRepository $applicationsRepository,
+        KaabaInstituteRepository $instituteRepository,
+        PaginatorInterface $paginator,
+        KaabaCourseRepository $courseRepository,
+    ): Response {
+        $user = $this->getUser();
 
-    // Institutes by role
-    if ($user && in_array('ROLE_USER', $user->getRoles()) && !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
-        $institutes = $instituteRepository->findBy(['manager' => $user]);
-    } else {
-        $institutes = $instituteRepository->findAll();
-    }
-
-    $form = $this->createForm(KaabaApplicationSearchType::class, null, [
-        'method' => 'GET',
-        'institutes' => $institutes,
-        'request' => $request
-    ]);
-
-    $form->handleRequest($request);
-
-    $filters = [];
-    foreach ($form as $key => $field) {
-        $filters[$key] = $field->getData();
-    }
-
-    // Get the query with updated parameter order
-    $query = $applicationsRepository->filterApplicationsQuery(
-        $filters['applicant'] ?? null,
-        $filters['region'] ?? null,
-        $filters['district'] ?? null,
-        $filters['qualification'] ?? null,
-        $filters['scholarship'] ?? null,
-        $filters['institute'] ?? null,
-        $filters['course'] ?? null,
-        $filters['exam_result'] ?? null,
-        $filters['assesment_result'] ?? null,
-        $filters['disability'] ?? null,
-        $filters['status'] ?? null,
-        $user
-    );
-
-    $limit = $filters['limit'] ?? 100;
-
-    // Paginate the query directly (this is more efficient)
-    $applications = $paginator->paginate(
-        $query, // Pass the Query object instead of array
-        $request->query->getInt('page', 1),
-        $limit
-    );
-
-    return $this->render('admin/kaaba_applications.html.twig', [
-        'applications' => $applications,
-        'searchForm' => $form->createView(),
-        'total_count' => $applications->getTotalItemCount(), // Get count from paginator
-        'current_limit' => $limit,
-    ]);
-}
-
-
-
-
-#[Route('/kaaba-applications/export', name: 'app_admin_kaaba_applications_export')]
-public function exportApplications(
-    Request $request,
-    KaabaApplicationRepository $applicationsRepository,
-    KaabaApplicationStatusRepository $statusRepository,
-    KaabaRegionRepository $regionRepository,
-    KaabaDistrictRepository $districtRepository,
-    KaabaQualificationRepository $qualificationRepository,
-    KaabaScholarshipRepository $scholarshipRepository,
-    KaabaInstituteRepository $instituteRepository,
-    KaabaCourseRepository $courseRepository,
-): Response {
-
-    $user = $this->getUser();
-
-    //--------------------------------------------------------------------
-    // 1) Get filters from request (Symfony form values)
-    //--------------------------------------------------------------------
-
-    $filters = $request->query->all('kaaba_application_search') ?? [];
-
-    //--------------------------------------------------------------------
-    // 2) Convert filters to Entities (as repository expects)
-    //--------------------------------------------------------------------
-
-    $status = !empty($filters['status']) ? $statusRepository->find($filters['status']) : null;
-
-    $region = !empty($filters['region']) ? $regionRepository->find($filters['region']) : null;
-
-    $district = !empty($filters['district']) ? $districtRepository->find($filters['district']) : null;
-
-    $qualification = !empty($filters['qualification']) ? $qualificationRepository->find($filters['qualification']) : null;
-
-    $scholarship = !empty($filters['scholarship']) ? $scholarshipRepository->find($filters['scholarship']) : null;
-
-    $institute = !empty($filters['institute']) ? $instituteRepository->find($filters['institute']) : null;
-
-    $course = !empty($filters['course']) ? $courseRepository->find($filters['course']) : null;
-
-    //--------------------------------------------------------------------
-    // 3) Applicant search — only exact ID supported in repo
-    //--------------------------------------------------------------------
-
-    $applicantEntity = null;
-
-    if (!empty($filters['phone']) && ctype_digit($filters['phone'])) {
-        $applicantEntity = $applicationsRepository->find($filters['phone']);
-    }
-
-    //--------------------------------------------------------------------
-    // 4) Build query using updated parameter order (no date parameters)
-    //--------------------------------------------------------------------
-
-    $query = $applicationsRepository->filterApplicationsQuery(
-        $applicantEntity,                       // 1 - applicant (first)
-        $region,                                // 2 - region
-        $district,                              // 3 - district
-        $qualification,                         // 4 - qualification
-        $scholarship,                           // 5 - scholarship
-        $institute,                             // 6 - institute
-        $course,                                // 7 - course
-        $filters['exam_result'] ?? null,        // 8 - exam_result
-        $filters['assesment_result'] ?? null,   // 9 - assesment_result
-        $filters['disability'] ?? null,         // 10 - disability
-        $status,                                // 11 - status (last)
-        $user                                   // 12 - user
-    );
-
-    //--------------------------------------------------------------------
-    // 5) Fetch ALL matching results (no pagination)
-    //--------------------------------------------------------------------
-
-    $applications = $query->getResult();
-
-    //--------------------------------------------------------------------
-    // 6) Generate Excel sheet
-    //--------------------------------------------------------------------
-
-    $spreadsheet = new Spreadsheet();
-    $sheet = $spreadsheet->getActiveSheet();
-
-    // Column headers - Added Highschool Grade column
-    $headers = [
-        'No',
-        'Portal ID',
-        'Full Name',
-        'Date of Birth',
-        'Telephone',
-        'Email',
-        'Region',
-        'District',
-        'Family Members',
-        'Monthly Income',
-        'High School Name',
-        'Highschool Grade', // New column
-    ];
-
-    $col = 'A';
-    foreach ($headers as $header) {
-        $sheet->setCellValue("{$col}1", $header);
-        $sheet->getStyle("{$col}1")->getFont()->setBold(true);
-        $col++;
-    }
-
-    //--------------------------------------------------------------------
-    // 7) Populate data rows
-    //--------------------------------------------------------------------
-
-    $row = 2;
-    $counter = 1;
-
-    foreach ($applications as $application) {
-
-        $sheet->setCellValue("A{$row}", $counter);
-        $sheet->setCellValue("B{$row}", $application->getId());
-        $sheet->setCellValue("C{$row}", $application->getFullName());
-
-        $dob = $application->getDateOfBirth();
-        $sheet->setCellValue("D{$row}", $dob ? $dob->format('Y-m-d') : '');
-
-        $sheet->setCellValue("E{$row}", $application->getPhone());
-        $sheet->setCellValue("F{$row}", $application->getEmail());
-
-        $sheet->setCellValue("G{$row}", $application->getRegion()?->getName() ?? '');
-        $sheet->setCellValue("H{$row}", $application->getDistrict()?->getName() ?? '');
-
-        //----------------------------------------------------------------
-        // Decode assessment JSON fields into readable text
-        //----------------------------------------------------------------
-
-        $assessment = $application->getAssessment();
-        $familyMembers = '';
-        $monthlyIncome = '';
-
-        if ($assessment) {
-
-            // household members
-            $household = $assessment->getHousehold() ?? [];
-            if (!empty($household['household_members'])) {
-                $familyMembers = match ($household['household_members']) {
-                    1 => 'Less than 2',
-                    2 => '2',
-                    3 => '3–5',
-                    4 => '6',
-                    5 => '7–9',
-                    6 => '10',
-                    7 => '11–12',
-                    8 => 'More than 12',
-                    default => '',
-                };
-            }
-
-            // monthly income
-            $income = $assessment->getIncome() ?? [];
-            if (!empty($income['monthly_income'])) {
-                $monthlyIncome = match ($income['monthly_income']) {
-                    1 => 'More than $2000',
-                    2 => '$1500 – $2000',
-                    3 => '$1200 – $1500',
-                    4 => '$1000 – $1200',
-                    5 => '$500 – $1000',
-                    6 => '$300 – $500',
-                    7 => '$150 – $300',
-                    8 => '$65 – $150',
-                    default => '',
-                };
-            }
+        // Institutes by role
+        if ($user && in_array('ROLE_USER', $user->getRoles()) && !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+            $institutes = $instituteRepository->findBy(['manager' => $user]);
+        } else {
+            $institutes = $instituteRepository->findAll();
         }
 
-        $sheet->setCellValue("I{$row}", $familyMembers);
-        $sheet->setCellValue("J{$row}", $monthlyIncome);
+        $form = $this->createForm(KaabaApplicationSearchType::class, null, [
+            'method' => 'GET',
+            'institutes' => $institutes,
+            'request' => $request
+        ]);
 
-        //----------------------------------------------------------------
-        // High school name
-        //----------------------------------------------------------------
+        $form->handleRequest($request);
 
-        $sheet->setCellValue("K{$row}", $application->getSecondarySchool());
+        $filters = [];
+        foreach ($form as $key => $field) {
+            $filters[$key] = $field->getData();
+        }
 
-        //----------------------------------------------------------------
-        // Highschool Grade - NEW COLUMN
-        //----------------------------------------------------------------
+        // Get the query with updated parameter order
+        $query = $applicationsRepository->filterApplicationsQuery(
+            $filters['applicant'] ?? null,
+            $filters['region'] ?? null,
+            $filters['district'] ?? null,
+            $filters['qualification'] ?? null,
+            $filters['scholarship'] ?? null,
+            $filters['institute'] ?? null,
+            $filters['course'] ?? null,
+            $filters['exam_result'] ?? null,
+            $filters['assesment_result'] ?? null,
+            $filters['disability'] ?? null,
+            $filters['status'] ?? null,
+            $user
+        );
 
-        $sheet->setCellValue("L{$row}", $application->getSecondaryGrade() ?? '');
+        $limit = $filters['limit'] ?? 100;
 
-        $row++;
-        $counter++;
+        // Paginate the query directly (this is more efficient)
+        $applications = $paginator->paginate(
+            $query, // Pass the Query object instead of array
+            $request->query->getInt('page', 1),
+            $limit
+        );
+
+        return $this->render('admin/kaaba_applications.html.twig', [
+            'applications' => $applications,
+            'searchForm' => $form->createView(),
+            'total_count' => $applications->getTotalItemCount(), // Get count from paginator
+            'current_limit' => $limit,
+        ]);
     }
 
-    //--------------------------------------------------------------------
-    // 8) Auto-size columns
-    //--------------------------------------------------------------------
 
-    foreach (range('A', $sheet->getHighestColumn()) as $col) {
-        $sheet->getColumnDimension($col)->setAutoSize(true);
+
+
+    #[Route('/kaaba-applications/export', name: 'app_admin_kaaba_applications_export')]
+    public function exportApplications(
+        Request $request,
+        KaabaApplicationRepository $applicationsRepository,
+        KaabaApplicationStatusRepository $statusRepository,
+        KaabaRegionRepository $regionRepository,
+        KaabaDistrictRepository $districtRepository,
+        KaabaQualificationRepository $qualificationRepository,
+        KaabaScholarshipRepository $scholarshipRepository,
+        KaabaInstituteRepository $instituteRepository,
+        KaabaCourseRepository $courseRepository,
+    ): Response {
+
+        $user = $this->getUser();
+
+        //--------------------------------------------------------------------
+        // 1) Get filters from request (Symfony form values)
+        //--------------------------------------------------------------------
+
+        $filters = $request->query->all('kaaba_application_search') ?? [];
+
+        //--------------------------------------------------------------------
+        // 2) Convert filters to Entities (as repository expects)
+        //--------------------------------------------------------------------
+
+        $status = !empty($filters['status']) ? $statusRepository->find($filters['status']) : null;
+
+        $region = !empty($filters['region']) ? $regionRepository->find($filters['region']) : null;
+
+        $district = !empty($filters['district']) ? $districtRepository->find($filters['district']) : null;
+
+        $qualification = !empty($filters['qualification']) ? $qualificationRepository->find($filters['qualification']) : null;
+
+        $scholarship = !empty($filters['scholarship']) ? $scholarshipRepository->find($filters['scholarship']) : null;
+
+        $institute = !empty($filters['institute']) ? $instituteRepository->find($filters['institute']) : null;
+
+        $course = !empty($filters['course']) ? $courseRepository->find($filters['course']) : null;
+
+        //--------------------------------------------------------------------
+        // 3) Applicant search — only exact ID supported in repo
+        //--------------------------------------------------------------------
+
+        $applicantEntity = null;
+
+        if (!empty($filters['phone']) && ctype_digit($filters['phone'])) {
+            $applicantEntity = $applicationsRepository->find($filters['phone']);
+        }
+
+        //--------------------------------------------------------------------
+        // 4) Build query using updated parameter order (no date parameters)
+        //--------------------------------------------------------------------
+
+        $query = $applicationsRepository->filterApplicationsQuery(
+            $applicantEntity,                       // 1 - applicant (first)
+            $region,                                // 2 - region
+            $district,                              // 3 - district
+            $qualification,                         // 4 - qualification
+            $scholarship,                           // 5 - scholarship
+            $institute,                             // 6 - institute
+            $course,                                // 7 - course
+            $filters['exam_result'] ?? null,        // 8 - exam_result
+            $filters['assesment_result'] ?? null,   // 9 - assesment_result
+            $filters['disability'] ?? null,         // 10 - disability
+            $status,                                // 11 - status (last)
+            $user                                   // 12 - user
+        );
+
+        //--------------------------------------------------------------------
+        // 5) Fetch ALL matching results (no pagination)
+        //--------------------------------------------------------------------
+
+        $applications = $query->getResult();
+
+        //--------------------------------------------------------------------
+        // 6) Generate Excel sheet
+        //--------------------------------------------------------------------
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Column headers - Added Highschool Grade column
+        $headers = [
+            'No',
+            'Portal ID',
+            'Full Name',
+            'Date of Birth',
+            'Telephone',
+            'Email',
+            'Region',
+            'District',
+            'Family Members',
+            'Monthly Income',
+            'High School Name',
+            'Highschool Grade', // New column
+            'Graduation Year', // New column
+        ];
+
+        $col = 'A';
+        foreach ($headers as $header) {
+            $sheet->setCellValue("{$col}1", $header);
+            $sheet->getStyle("{$col}1")->getFont()->setBold(true);
+            $col++;
+        }
+
+        //--------------------------------------------------------------------
+        // 7) Populate data rows
+        //--------------------------------------------------------------------
+
+        $row = 2;
+        $counter = 1;
+
+        foreach ($applications as $application) {
+
+            $sheet->setCellValue("A{$row}", $counter);
+            $sheet->setCellValue("B{$row}", $application->getId());
+            $sheet->setCellValue("C{$row}", $application->getFullName());
+
+            $dob = $application->getDateOfBirth();
+            $sheet->setCellValue("D{$row}", $dob ? $dob->format('Y-m-d') : '');
+
+            $sheet->setCellValue("E{$row}", $application->getPhone());
+            $sheet->setCellValue("F{$row}", $application->getEmail());
+
+            $sheet->setCellValue("G{$row}", $application->getRegion()?->getName() ?? '');
+            $sheet->setCellValue("H{$row}", $application->getDistrict()?->getName() ?? '');
+
+            //----------------------------------------------------------------
+            // Decode assessment JSON fields into readable text
+            //----------------------------------------------------------------
+
+            $assessment = $application->getAssessment();
+            $familyMembers = '';
+            $monthlyIncome = '';
+
+            if ($assessment) {
+
+                // household members
+                $household = $assessment->getHousehold() ?? [];
+                if (!empty($household['household_members'])) {
+                    $familyMembers = match ($household['household_members']) {
+                        1 => 'Less than 2',
+                        2 => '2',
+                        3 => '3–5',
+                        4 => '6',
+                        5 => '7–9',
+                        6 => '10',
+                        7 => '11–12',
+                        8 => 'More than 12',
+                        default => '',
+                    };
+                }
+
+                // monthly income
+                $income = $assessment->getIncome() ?? [];
+                if (!empty($income['monthly_income'])) {
+                    $monthlyIncome = match ($income['monthly_income']) {
+                        1 => 'More than $2000',
+                        2 => '$1500 – $2000',
+                        3 => '$1200 – $1500',
+                        4 => '$1000 – $1200',
+                        5 => '$500 – $1000',
+                        6 => '$300 – $500',
+                        7 => '$150 – $300',
+                        8 => '$65 – $150',
+                        default => '',
+                    };
+                }
+            }
+
+            $sheet->setCellValue("I{$row}", $familyMembers);
+            $sheet->setCellValue("J{$row}", $monthlyIncome);
+
+            //----------------------------------------------------------------
+            // High school name
+            //----------------------------------------------------------------
+
+            $sheet->setCellValue("K{$row}", $application->getSecondarySchool());
+
+            //----------------------------------------------------------------
+            // Highschool Grade - NEW COLUMN
+            //----------------------------------------------------------------
+
+            $sheet->setCellValue("L{$row}", $application->getSecondaryGrade() ?? '');
+            $sheet->setCellValue("M{$row}", $application->getSecondaryGraduationYear() ?? '');
+
+            $row++;
+            $counter++;
+        }
+
+        //--------------------------------------------------------------------
+        // 8) Auto-size columns
+        //--------------------------------------------------------------------
+
+        foreach (range('A', $sheet->getHighestColumn()) as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        //--------------------------------------------------------------------
+        // 9) Return file as downloadable response
+        //--------------------------------------------------------------------
+
+        $filename = "scholarship_export_" . date('Y-m-d_H-i-s') . ".xlsx";
+        $writer = new Xlsx($spreadsheet);
+
+        $response = new StreamedResponse(function () use ($writer) {
+            $writer->save('php://output');
+        });
+
+        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $response->headers->set('Content-Disposition', "attachment; filename=\"{$filename}\"");
+
+        return $response;
     }
 
-    //--------------------------------------------------------------------
-    // 9) Return file as downloadable response
-    //--------------------------------------------------------------------
 
-    $filename = "scholarship_export_" . date('Y-m-d_H-i-s') . ".xlsx";
-    $writer = new Xlsx($spreadsheet);
-
-    $response = new StreamedResponse(function () use ($writer) {
-        $writer->save('php://output');
-    });
-
-    $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    $response->headers->set('Content-Disposition', "attachment; filename=\"{$filename}\"");
-
-    return $response;
-}
 
 
 
@@ -1878,7 +1883,7 @@ public function exportApplications(
             return new JsonResponse([
                 'application' => $id,
                 'phones' => [],
-                'error' => 'Internal error: '.$e->getMessage()
+                'error' => 'Internal error: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -3365,6 +3370,140 @@ public function exportApplications(
             'form' => $form->createView(),
         ]);
     }
+
+    #[Route('/bulk-sms', name: 'app_admin_bulk_sms', methods: ['GET', 'POST'])]
+    public function bulkSmsForm(
+        Request $request,
+        EntityManagerInterface $em
+    ): Response {
+
+        $statuses = $em->getRepository(KaabaApplicationStatus::class)->findAll();
+        $institutes = $em->getRepository(KaabaInstitute::class)->findAll();
+
+        // PRE-FILL SUPPORT FROM "EDIT" BUTTON
+        $prefillStatuses = $request->query->get('s') ? json_decode($request->query->get('s'), true) : [];
+        $prefillInstitutes = $request->query->get('i') ? json_decode($request->query->get('i'), true) : [];
+        $prefillMessage = $request->query->get('m') ?? '';
+
+        // HANDLE SUBMISSION → GO TO CONFIRM PAGE
+        if ($request->isMethod('POST')) {
+
+            $statusIds = $request->request->all('status');
+            $instituteIds = $request->request->all('institute');
+            $message = $request->request->get('message');
+
+            // Build count
+            $qb = $em->getRepository(KaabaApplication::class)->createQueryBuilder('a');
+
+            if (!empty($statusIds)) {
+                $qb->andWhere('a.status IN (:st)')->setParameter('st', $statusIds);
+            }
+
+            if (!empty($instituteIds)) {
+                $qb->andWhere('a.institute IN (:ins)')->setParameter('ins', $instituteIds);
+            }
+
+            $apps = $qb->getQuery()->getResult();
+
+            return $this->render('admin/bulk_sms_confirm.html.twig', [
+                'count' => count($apps),
+                'message' => $message,
+                'statuses' => $statusIds,
+                'institutes' => $instituteIds,
+            ]);
+        }
+
+        // RENDER FORM (with possibly pre-filled data)
+        return $this->render('admin/bulk_sms_form.html.twig', [
+            'statuses' => $statuses,
+            'institutes' => $institutes,
+            'selectedStatuses' => $prefillStatuses,
+            'selectedInstitutes' => $prefillInstitutes,
+            'prefillMessage' => $prefillMessage,
+        ]);
+    }
+
+
+    #[Route('/bulk-sms/send', name: 'app_admin_bulk_sms_send', methods: ['POST'])]
+public function sendBulkSms(
+    Request $request,
+    EntityManagerInterface $em,
+    TelesomSmsService $smsService
+): Response {
+
+    $statusIds = json_decode($request->request->get('statuses'), true);
+    $instituteIds = json_decode($request->request->get('institutes'), true);
+    $messageTemplate = $request->request->get('message');
+
+    $qb = $em->getRepository(KaabaApplication::class)->createQueryBuilder('a');
+
+    if (!empty($statusIds)) {
+        $qb->andWhere('a.status IN (:st)')->setParameter('st', $statusIds);
+    }
+
+    if (!empty($instituteIds)) {
+        $qb->andWhere('a.institute IN (:ins)')->setParameter('ins', $instituteIds);
+    }
+
+    $apps = $qb->getQuery()->getResult();
+    $sentCount = 0;
+
+    foreach ($apps as $app) {
+
+        $name = $app->getFullName() ?? "Applicant";
+        $phone = $app->getPhone();
+
+        if (!$phone) {
+            continue;
+        }
+
+        $message = str_replace('{{name}}', $name, $messageTemplate);
+        usleep(400000); // prevent Telesom gateway block
+
+        $sendResults = $smsService->sendBulk($phone, $message);
+        $status = $sendResults[0]['status'] ?? 'unknown';
+        $response = $sendResults[0]['body'] ?? 'no response';
+
+        // Save SMS Log
+        $log = new KaabaSmsLog();
+        $log->setApplication($app);
+        $log->setReceiverName($name);
+        $log->setPhoneNumber($phone);
+        $log->setMessage($message);
+        $log->setFilteredStatuses($statusIds);
+        $log->setFilteredInstitutes($instituteIds);
+        $log->setMessageStatus($status);
+        $log->setGatewayResponse($response);
+
+        $em->persist($log);
+        $sentCount++;
+    }
+
+    $em->flush();
+
+    // SUCCESS FLASH
+    $this->addFlash('success', sprintf(
+        "%d SMS messages have been successfully sent and logged.",
+        $sentCount
+    ));
+
+    // REDIRECT DIRECTLY TO LOGS PAGE
+    return $this->redirectToRoute('app_admin_sms_logs');
+}
+
+
+    #[Route('/sms-logs', name: 'app_admin_sms_logs')]
+    public function smsLogs(EntityManagerInterface $em): Response
+    {
+        $logs = $em->getRepository(KaabaSmsLog::class)
+            ->findBy([], ['id' => 'DESC']);
+
+        return $this->render('admin/sms_logs.html.twig', [
+            'logs' => $logs
+        ]);
+    }
+
+
 
 
 

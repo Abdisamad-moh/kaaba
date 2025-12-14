@@ -260,7 +260,7 @@ public function scholarshipApplication(
     // Check if scholarship is active and not expired
     if (!$scholarship->isStatus() || $scholarship->getClosingDate() < new \DateTime()) {
         $this->addFlash('error', 'This scholarship is no longer available for applications.');
-        return $this->redirectToRoute('app_scholarships_list');
+        return $this->redirectToRoute('app_home');
     }
 
     // Get scholarship type

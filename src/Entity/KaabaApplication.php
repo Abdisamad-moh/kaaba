@@ -207,6 +207,9 @@ private ?string $assesment_result = null;
 #[ORM\Column(type: Types::TEXT, nullable: true)]
 private ?string $approved_reason = null;
 
+#[ORM\OneToMany(mappedBy: 'application', targetEntity: KaabaSmsLog::class, cascade: ['persist', 'remove'])]
+private Collection $smsLogs;
+
     public function __construct()
     {
         $this->created_at = new \DateTime();        
@@ -215,9 +218,40 @@ private ?string $approved_reason = null;
         $this->applied_date = new \DateTime(); 
     $this->logs = new ArrayCollection();
     $this->kaabaApplications = new ArrayCollection();
+$this->smsLogs = new ArrayCollection();
 
 
     }
+
+    /**
+ * @return Collection<int, KaabaSmsLog>
+ */
+public function getSmsLogs(): Collection
+{
+    return $this->smsLogs;
+}
+
+public function addSmsLog(KaabaSmsLog $log): static
+{
+    if (!$this->smsLogs->contains($log)) {
+        $this->smsLogs->add($log);
+        $log->setApplication($this);
+    }
+
+    return $this;
+}
+
+public function removeSmsLog(KaabaSmsLog $log): static
+{
+    if ($this->smsLogs->removeElement($log)) {
+        if ($log->getApplication() === $this) {
+            $log->setApplication(null);
+        }
+    }
+
+    return $this;
+}
+
 
     public function getApprovedReason(): ?string
 {
