@@ -25,168 +25,8 @@
         --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Updated header styling */
-    #eligibility h1 {
-        font-size: 3rem !important;
-        font-weight: 800 !important;
-        background: linear-gradient(90deg, var(--green), var(--red)) !important;
-        -webkit-background-clip: text !important;
-        background-clip: text !important;
-        color: transparent !important;
-        margin-bottom: 15px !important;
-        letter-spacing: -0.5px !important;
-        position: relative !important;
-        display: inline-block !important;
-        padding-bottom: 15px !important;
-    }
-
-    #eligibility h1::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 150px;
-        height: 4px;
-        background: linear-gradient(90deg, var(--yellow), var(--green), var(--red));
-        border-radius: 2px;
-    }
-
-    #eligibility .subtitle {
-        font-size: 1.2rem !important;
-        color: var(--gray) !important;
-        max-width: 700px !important;
-        margin: 25px auto 0 !important;
-        font-weight: 400 !important;
-        line-height: 1.6 !important;
-    }
-
-    /* Components container spacing */
-    #eligibility .components-container {
-        margin-top: 30px !important;
-        margin-bottom: 40px !important;
-    }
-
-    /* Component Card Styles - Updated borders */
-    .component-card {
-        background: white;
-        border-radius: var(--border-radius);
-        box-shadow: var(--shadow);
-        overflow: hidden;
-        transition: var(--transition);
-        height: 100%;
-        position: relative;
-    }
-
-    /* Different border colors for each card */
-    .component-card {
-        border-top: 5px solid var(--green-dark) !important;
-    }
 
    
-
-    .component-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
-    }
-
-    /* Card header adjustments */
-    .card-header {
-        padding: 25px 30px 20px 30px !important;
-        background: white;
-        position: relative;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    }
-
-    .card-icon {
-        width: 60px;
-        height: 60px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 20px;
-        font-size: 1.8rem;
-        color: white;
-    }
-
-    /* Icon colors */
-    .component-card:first-of-type .card-icon {
-        background: linear-gradient(135deg, var(--yellow), var(--yellow-dark)) !important;
-    }
-
-    .component-card:nth-of-type(2) .card-icon {
-        background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
-    }
-
-    .component-card:nth-of-type(3) .card-icon {
-        background: linear-gradient(135deg, var(--red), var(--red-dark)) !important;
-    }
-
-    .card-title {
-        font-size: 1.6rem;
-        font-weight: 700;
-        margin-bottom: 0px;
-    }
-
-    /* Title colors */
-    .component-card:first-of-type .card-title {
-        color: var(--yellow-dark) !important;
-    }
-
-    .component-card:nth-of-type(2) .card-title {
-        color: var(--green-dark) !important;
-    }
-
-    .component-card:nth-of-type(3) .card-title {
-        color: var(--red-dark) !important;
-    }
-
-    .card-subtitle {
-        font-size: 1rem;
-        line-height: 1;
-        color: var(--gray) !important;
-    }
-
-    .card-body {
-        padding: 25px 30px 30px 30px !important;
-    }
-
-    /* Tag Styles - Updated */
-    .tag-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-bottom: 20px !important;
-    }
-
-    .tag {
-        padding: 8px 16px;
-        border-radius: 50px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        border: 2px solid transparent;
-        background: var(--yellow-light) !important;
-        color: var(--yellow-dark) !important;
-        white-space: nowrap !important;
-    }
-
-    .tag.bg-green-light,
-    .tag:nth-child(2) {
-        background: var(--green-light) !important;
-        color: var(--green-dark) !important;
-        border-color: var(--green) !important;
-    }
-
-    .tag.bg-red-light,
-    .tag:nth-child(3) {
-        background: var(--red-light) !important;
-        color: var(--red-dark) !important;
-        border-color: var(--red) !important;
-    }
 
     /* Requirement Item Styles */
     .requirements-list {
@@ -529,6 +369,114 @@
             padding: 15px;
         }
     }
+
+
+.eligibility-card {
+    border: 2px solid #000;
+    border-radius: 14px;
+    padding: 25px;
+    background: #fff;
+    text-align: center;
+}
+
+.eligibility-header {
+    margin-bottom: 15px;
+}
+
+.icon-circle {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    font-size: 26px;
+}
+
+.icon-circle i {
+font-size: 30px;
+color:black !important;
+}
+
+.eligibility-header h4 {
+    font-weight: 700;
+    margin-bottom: 1px;
+color:black !important;
+
+}
+
+.eligibility-card .req{
+display: flex;
+justify-content: start !important;
+color: #000;
+}
+
+.eligibility-header .subtitle {
+    font-weight: 600;
+    font-size: 16px;
+color:black !important;
+margin-bottom: 15px !important;
+}
+
+.small-description {
+    font-size: 16px;
+    margin-bottom: 15px;
+font-weight: 500;
+color:black !important;
+
+}
+
+.eligibility-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+}
+
+.eligibility-list li {
+    position: relative;
+    padding: 8px 0 8px 30px; /* space for icon */
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: black !important;
+    border-bottom: 1px solid #000; /* underline / divider */
+}
+
+/* Remove line from last item */
+.eligibility-list li:last-child {
+    border-bottom: none;
+}
+
+.eligibility-list li::before {
+    content: "✔";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    border: 2px solid #000; /* black border */
+    border-radius: 50%;
+    color: #fff;            /* white check */
+    background: #000;       /* black fill */
+    font-size: 11px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.region-badge {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 6px 14px;
+    background: #000;
+    color: #fff;
+    font-size: 13px;
+    border-radius: 8px;
+}
+
 </style>
 {% endblock %}
 {% block body %}
@@ -1050,98 +998,131 @@
 
 
 
-<section class="bg-white" id="eligibility">
+<section class="bg-white py-5" id="eligibility">
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-12 text-center mb-5" data-anime='{ "el": "childs", "translateY": [50, 0], "opacity": [0,1], "duration": 600, "delay": 0, "staggervalue": 300, "easing": "easeOutQuad" }'>
-                <h1 class="fw-800 ls-minus-1px">Rajo Kaaba Scholarships – Eligibility</h1>
-             
+
+        <!-- Section Heading -->
+        <div class="row justify-content-center mb-0">
+            <div class="col-12 text-center">
+                <h3 class="fw-700 text-dark-gray">Rajo Kaaba Eligibility</h3>
             </div>
         </div>
 
-        <div class="components-container row g-4 justify-content-center">
-            <div class="col-12 col-md-6 col-lg-6" data-anime='{ "el": "childs", "translateY": [50, 0], "opacity": [0,1], "duration": 600, "delay": 200, "staggervalue": 300, "easing": "easeOutQuad" }'>
-                <div class="component-card h-100">
-                    <div class="card-header">
-                      
-                        <h4 class="card-title" style="color: var(--green-dark) !important;">Component 1 – Foundational Education & Skills Development</h4>
-                        <span class="card-subtitle fw-500 text-black mt-1" style="margin-bottom: 0px !important; padding-bottom: 0px !important;">
-                            Literacy, numeracy, socio-emotional skills, life skills, and vocational training.
-                        </span>
-                    </div>
-                    <div class="card-body">
-                      
-                        
-                        <div class="requirements-list">
-                <ul class="text-dark-gray fw-500 mb-25px ps-0" style="list-style:none !important;">
-                    <li class="d-flex"><span class="icon-check me-2">✓</span> Somaliland National ID or official Attestation.</li>
-                    <li class="d-flex"><span class="icon-check me-2">✓</span> Must reside in Marodi-Jeex or Togdheer regions.</li>
-                    <li class="d-flex"><span class="icon-check me-2">✓</span> Girl or woman aged 15–35.</li>
-                    <li class="d-flex"><span class="icon-check me-2">✓</span> Limited functional literacy/numeracy (below level 4).</li>
-                    <li class="d-flex"><span class="icon-check me-2">✓</span> Must demonstrate financial need and commitment to complete the programme.</li>
-                    <li class="d-flex"><span class="icon-check me-2">✓</span> Must not be enrolled in any other training programme.</li>
-                </ul>
+        <!-- Cards -->
+        <div class="row g-4 justify-content-center">
 
-                <!-- TVET subsection -->
-                <div class="text-dark-gray fw-600 mb-8px text-underline" style="font-size: 20px !important;">Technical and Vocational Education and Training (TVET)</div>
+            <!-- COMPONENT 1 -->
+            <div class="col-lg-4 col-md-6">
+                <div class="eligibility-card h-100">
+                    <div class="eligibility-header">
+                      <div class="icon-circle">
+    <i class="fa-solid fa-book-open"></i>
+</div>
 
-                <ul class="text-dark-gray fw-500 mb-25px ps-0" style="list-style:none !important;">
-                    <li class="d-flex"><span class="icon-check me-2">✓</span> Somaliland National ID or official Attestation.</li>
-                    <li class="d-flex"><span class="icon-check me-2">✓</span> Resident of Marodi-Jeex or Togdheer regions.</li>
-                    <li class="d-flex"><span class="icon-check me-2">✓</span> Girl or woman aged 15–35.</li>
-                    <li class="d-flex"><span class="icon-check me-2">✓</span> Able to read and write Somali/English proficiently.</li>
-                    <li class="d-flex"><span class="icon-check me-2">✓</span> Must show willingness, financial need, and commitment to completing the training.</li>
-                    <li class="d-flex"><span class="icon-check me-2">✓</span> Must show genuine interest in pursuing TVET professionally.</li>
-                    <li class="d-flex"><span class="icon-check me-2">✓</span> Must not be enrolled in any other training programme.</li>
-                </ul>
-                        </div>
-                        
-                      
+                        <h4>Component 1</h4>
+                        <p class="subtitle">
+                            Foundational Education & Skills
+                        </p>
                     </div>
 
-                </div>
-            </div>
-
-
-<!-- 2ND COMPONENT -->
-
-  <div class="col-12 col-md-6 col-lg-6" data-anime='{ "el": "childs", "translateY": [50, 0], "opacity": [0,1], "duration": 600, "delay": 200, "staggervalue": 300, "easing": "easeOutQuad" }'>
-                <div class="component-card h-100" style="border-top: 5px solid var(--red-dark) !important;
-">
-                    <div class="card-header">
-                       
-                        <h4 class="card-title"  style="color: var(--red-dark) !important;">Component 2 – Higher Education Women’s Leadership Scholarships</h4>
-                        
-                    </div>
-                    <div class="card-body">
-                      
-                        <div class="requirements-list">
-                 <ul class="text-dark-gray fw-500 mb-30px ps-0" style="list-style:none !important;">
-                    <li class="d-flex"><span class="icon-check me-2">✓</span>Nationality Requirement: Somaliland National ID or official Attestation.</li>
-                    <li class="d-flex"><span class="icon-check me-2">✓</span>The applicant must be in Somaliland (target region is national).</li>
-                    <li class="d-flex"><span class="icon-check me-2">✓</span>Focus demography: The applicant must be a girl or woman aged 15–35.</li>
-                    <li class="d-flex"><span class="icon-check me-2">✓</span>The applicant must hold a secondary school graduate certificate (at grades A*-C). Ahigher education diploma ordegree certificate depending on course requirements.</li>
-                    <li class="d-flex"><span class="icon-check me-2">✓</span>Applicants must demonstrate a clear financial need, willingness and commitment to enrolment and completion of the Training Programme.</li>
-                    <li class="d-flex"><span class="icon-check me-2">✓</span>Leadership Experience: The applicant should be able to demonstrate leadership skills or potential, which could be through extracurricular activities, community service, or other leadership roles.</li>
-                    <li class="d-flex"><span class="icon-check me-2">✓</span>Commitment to Discipline: The applicant should demonstrate interest in teaching profession, which could be shown through previous teaching experience, volunteer work in education, or a clear statement of purpose. OR. If applying for Healthcare: The applicant should demonstrate interest in midwifery or nursing, which could be shown through previous healthcare experience, volunteer work in medical settings, or a clear statement of purpose.</li>
-                    <li class="d-flex"><span class="icon-check me-2">✓</span>The applicant should have a discipline record (demonstratable via reference/s).</li>
-                    <li class="d-flex"><span class="icon-check me-2">✓</span>Applicants must not be enrolled in any other Training programme/s.</li>
-                </ul>
-                        </div>
-                        
-                      
-                    </div>
-                </div>
-            </div>
- <!-- Important Note -->
-                <div class="rounded-3 text-center mt-4">
-                    <ul class="text-dark-gray fw-700 fs-22">
-                        <li><strong>Important Note:</strong> Proof of all listed criteria will be required prior to scholarship approval.</li>
+                    <p class="small-description">
+                        Literacy, numeracy, socio-emotional skills, life skills, and vocational training.
+                    </p>
+   <span class="fw-800 req">
+                        Eligibility Requirements:
+                    </span>
+                    <ul class="eligibility-list">
+                        <li>Somaliland National ID / Attestation</li>
+                        <li>Resident in Marodi-Jeex or Togdheer</li>
+                        <li>Girl/Woman aged 15–35</li>
+                        <li>Limited literacy/numeracy (below level 4)</li>
+                        <li>Financial need & commitment</li>
+                        <li>Not enrolled in other training</li>
                     </ul>
+
+                    <span class="region-badge">Target Regions: Marodi-Jeex, Togdheer</span>
                 </div>
+            </div>
+
+            <!-- COMPONENT 2 (TVET) -->
+            <div class="col-lg-4 col-md-6">
+                <div class="eligibility-card h-100">
+                    <div class="eligibility-header">
+                        <div class="icon-circle">
+                      <i class="fa-solid fa-screwdriver-wrench"></i>
+
+                        </div>
+                        <h4>Component 2</h4>
+                        <p class="subtitle">
+                            Technical & Vocational Training (TVET)
+                        </p>
+                    </div>
+
+                    <p class="small-description">
+                        Employment-focused technical and vocational skills development.
+                    </p>
+  <span class="fw-800 req">
+                        Eligibility Requirements:
+                    </span>
+                    <ul class="eligibility-list">
+                        <li>Somaliland National ID / Attestation</li>
+                        <li>Resident in Marodi-Jeex or Togdheer</li>
+                        <li>Girl/Woman aged 15–35</li>
+                        <li>Proficient in Somali/English</li>
+                        <li>Interest in TVET employment</li>
+                        <li>Financial need & commitment</li>
+                        <li>Not enrolled in other training</li>
+                    </ul>
+
+                    <span class="region-badge">Target Regions: Marodi-Jeex, Togdheer</span>
+                </div>
+            </div>
+
+            <!-- COMPONENT 3 -->
+            <div class="col-lg-4 col-md-6">
+                <div class="eligibility-card h-100">
+                    <div class="eligibility-header">
+                        <div class="icon-circle">
+<i class="fa-solid fa-graduation-cap"></i>
+                        </div>
+                        <h4>Component 3</h4>
+                        <p class="subtitle">
+                            Higher Education Scholarships
+                        </p>
+                    </div>
+
+                    <p class="small-description">
+                        Nursing, Midwifery & Teacher Education scholarships.
+                    </p>
+  <span class="fw-800 req">
+                        Eligibility Requirements:
+                    </span>
+                    <ul class="eligibility-list">
+                        <li>Somaliland National ID / Attestation</li>
+                        <li>Resident in Somaliland (Nationwide)</li>
+                        <li>Girl/Woman aged 15–35</li>
+                        <li>Secondary certificate (A*–C)</li>
+                        <li>Leadership skills demonstrated</li>
+                        <li>Commitment to teaching or healthcare</li>
+                        <li>Not enrolled in other training</li>
+                    </ul>
+
+                    <span class="region-badge">Target Region: Nationwide</span>
+                </div>
+            </div>
+
         </div>
+
+        <!-- Important Note -->
+        <div class="row mt-5">
+            <div class="col-12 text-center">
+                <strong>Important Note:</strong> Proof of all listed criteria will be required prior to scholarship approval.
+            </div>
+        </div>
+
     </div>
-</section> 
+</section>
+
 
 
 <!-- start section -->

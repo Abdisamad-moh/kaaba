@@ -23,174 +23,8 @@
         --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Updated header styling */
-    #eligibility h1 {
-        font-size: 3rem !important;
-        font-weight: 800 !important;
-        background: linear-gradient(90deg, var(--yellow), var(--green), var(--red)) !important;
-        -webkit-background-clip: text !important;
-        background-clip: text !important;
-        color: transparent !important;
-        margin-bottom: 15px !important;
-        letter-spacing: -0.5px !important;
-        position: relative !important;
-        display: inline-block !important;
-        padding-bottom: 15px !important;
-    }
 
-    #eligibility h1::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 150px;
-        height: 4px;
-        background: linear-gradient(90deg, var(--yellow), var(--green), var(--red));
-        border-radius: 2px;
-    }
-
-    #eligibility .subtitle {
-        font-size: 1.2rem !important;
-        color: var(--gray) !important;
-        max-width: 700px !important;
-        margin: 25px auto 0 !important;
-        font-weight: 400 !important;
-        line-height: 1.6 !important;
-    }
-
-    /* Components container spacing */
-    #eligibility .components-container {
-        margin-top: 30px !important;
-        margin-bottom: 40px !important;
-    }
-
-    /* Component Card Styles - Updated borders */
-    .component-card {
-        background: white;
-        border-radius: var(--border-radius);
-        box-shadow: var(--shadow);
-        overflow: hidden;
-        transition: var(--transition);
-        height: 100%;
-        position: relative;
-    }
-
-    /* Different border colors for each card */
-    .component-card:first-of-type {
-        border-top: 5px solid var(--yellow) !important;
-    }
-
-    .component-card:nth-of-type(2) {
-        border-top: 5px solid var(--green) !important;
-    }
-
-    .component-card:nth-of-type(3) {
-        border-top: 5px solid var(--red) !important;
-    }
-
-    .component-card:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
-    }
-
-    /* Card header adjustments */
-    .card-header {
-        padding: 25px 30px 20px 30px !important;
-        background: white;
-        position: relative;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    }
-
-    .card-icon {
-        width: 60px;
-        height: 60px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 20px;
-        font-size: 1.8rem;
-        color: white;
-    }
-
-    /* Icon colors */
-    .component-card:first-of-type .card-icon {
-        background: linear-gradient(135deg, var(--yellow), var(--yellow-dark)) !important;
-    }
-
-    .component-card:nth-of-type(2) .card-icon {
-        background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
-    }
-
-    .component-card:nth-of-type(3) .card-icon {
-        background: linear-gradient(135deg, var(--red), var(--red-dark)) !important;
-    }
-
-    .card-title {
-        font-size: 1.6rem;
-        font-weight: 700;
-        margin-bottom: 8px;
-    }
-
-    /* Title colors */
-    .component-card:first-of-type .card-title {
-        color: var(--yellow-dark) !important;
-    }
-
-    .component-card:nth-of-type(2) .card-title {
-        color: var(--green-dark) !important;
-    }
-
-    .component-card:nth-of-type(3) .card-title {
-        color: var(--red-dark) !important;
-    }
-
-    .card-subtitle {
-        font-size: 1rem;
-        line-height: 1.5;
-        color: var(--gray) !important;
-    }
-
-    .card-body {
-        padding: 25px 30px 30px 30px !important;
-    }
-
-    /* Tag Styles - Updated */
-    .tag-container {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-        margin-bottom: 20px !important;
-    }
-
-    .tag {
-        padding: 8px 16px;
-        border-radius: 50px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        border: 2px solid transparent;
-        background: var(--yellow-light) !important;
-        color: var(--yellow-dark) !important;
-white-space: nowrap !important;
-    }
-
-    .tag.bg-green-light,
-    .tag:nth-child(2) {
-        background: var(--green-light) !important;
-        color: var(--green-dark) !important;
-        border-color: var(--green) !important;
-    }
-
-    .tag.bg-red-light,
-    .tag:nth-child(3) {
-        background: var(--red-light) !important;
-        color: var(--red-dark) !important;
-        border-color: var(--red) !important;
-    }
+   
 
     /* Requirement Item Styles */
     .requirements-list {
@@ -360,7 +194,7 @@ white-space: nowrap !important;
     }
 
     /* Add footer styling */
-    #eligibility + footer {
+    #eligibility+footer {
         text-align: center;
         padding: 30px 0 !important;
         color: var(--gray);
@@ -369,7 +203,7 @@ white-space: nowrap !important;
         margin-top: 30px;
     }
 
-    #eligibility + footer .footer-highlight {
+    #eligibility+footer .footer-highlight {
         color: var(--yellow-dark);
         font-weight: 600;
     }
@@ -379,86 +213,268 @@ white-space: nowrap !important;
         #eligibility h1 {
             font-size: 2.2rem !important;
         }
-        
+
         #eligibility .subtitle {
             font-size: 1.1rem !important;
             padding: 0 15px !important;
         }
-        
-        .card-header, .card-body {
+
+        .card-header,
+        .card-body {
             padding: 20px !important;
         }
-        
+
         .tag-container {
             justify-content: center;
         }
-        
+
         .track-container {
             grid-template-columns: 1fr !important;
         }
-        
+
         #eligibility .components-container {
             margin-top: 20px !important;
         }
     }
 
+    .icon-check {
+        color: #000000;
+        font-weight: bold;
+        margin-right: 10px;
+    }
+
+    .sub-list {
+        list-style-type: none;
+    }
+
+    .sub-list li {
+        margin-bottom: 5px;
+    }
+
+    .important-note {
+        background-color: rgba(13, 110, 253, 0.05);
+        border-left-color: #0d6efd !important;
+    }
 
 
-.icon-check {
-    color: #000000;
+    /* Remove default bullet points from all lists in this section */
+    .required-documents-section ul {
+        list-style-type: none;
+        padding-left: 0;
+    }
+
+    /* Optional: Add specific styling for sub-list if you want some indentation */
+    .required-documents-section .sub-list {
+        padding-left: 1.5rem;
+    }
+
+    .icon-check {
+        color: #000;
+        font-weight: bold;
+        margin-right: 10px;
+    }
+
+    .important-note {
+        background-color: rgba(13, 110, 253, 0.05);
+        border-left: 4px solid #fd0d21;
+        border-radius: 0.375rem;
+        padding: 1rem;
+    }
+
+    /* Remove bullets from main list */
+    .list-style-04 {
+        list-style-type: none;
+        padding-left: 0;
+    }
+
+    /* Remove bullets from nested list */
+    .sub-list {
+        list-style-type: none;
+        padding-left: 1.5rem;
+    }
+
+
+
+    /* New Eligibility Section Styles */
+    .eligibility-card {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: 30px;
+        transition: var(--transition);
+        border-top: 4px solid var(--yellow);
+    }
+
+    .eligibility-card:nth-of-type(2) {
+        border-top-color: var(--red) !important;
+    }
+
+    .eligibility-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .requirements-list li {
+        display: flex;
+        align-items: flex-start;
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .requirements-list li:last-child {
+        border-bottom: none;
+    }
+
+    .tvet-section {
+        background: rgba(40, 167, 69, 0.03);
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+    }
+
+    .sub-list {
+        list-style: none !important;
+        padding-left: 1rem !important;
+    }
+
+    .sub-list li {
+        border-bottom: none !important;
+        padding: 5px 0 !important;
+    }
+
+    .note-box {
+        background: rgba(255, 193, 7, 0.1);
+        border-left: 4px solid var(--yellow);
+        padding: 20px;
+        border-radius: 8px;
+    }
+
+    .eligibility-card:nth-of-type(2) .note-box {
+        background: rgba(220, 53, 69, 0.1) !important;
+        border-left-color: var(--red) !important;
+    }
+
+    @media (max-width: 768px) {
+        .eligibility-card {
+            padding: 20px;
+        }
+
+        .section-header h2 {
+            font-size: 1.5rem !important;
+        }
+
+        .tvet-section {
+            padding: 15px;
+        }
+    }
+
+
+.eligibility-card {
+    border: 2px solid #000;
+    border-radius: 14px;
+    padding: 25px;
+    background: #fff;
+    text-align: center;
+}
+
+.eligibility-header {
+    margin-bottom: 15px;
+}
+
+.icon-circle {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    font-size: 26px;
+}
+
+.icon-circle i {
+font-size: 30px;
+color:black !important;
+}
+
+.eligibility-header h4 {
+    font-weight: 700;
+    margin-bottom: 1px;
+color:black !important;
+
+}
+
+.eligibility-card .req{
+display: flex;
+justify-content: start !important;
+color: #000;
+}
+
+.eligibility-header .subtitle {
+    font-weight: 600;
+    font-size: 16px;
+color:black !important;
+margin-bottom: 15px !important;
+}
+
+.small-description {
+    font-size: 16px;
+    margin-bottom: 15px;
+font-weight: 500;
+color:black !important;
+
+}
+
+.eligibility-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: left;
+}
+
+.eligibility-list li {
+    position: relative;
+    padding: 8px 0 8px 30px; /* space for icon */
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: black !important;
+    border-bottom: 1px solid #000; /* underline / divider */
+}
+
+/* Remove line from last item */
+.eligibility-list li:last-child {
+    border-bottom: none;
+}
+
+.eligibility-list li::before {
+    content: "✔";
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    border: 2px solid #000; /* black border */
+    border-radius: 50%;
+    color: #fff;            /* white check */
+    background: #000;       /* black fill */
+    font-size: 11px;
     font-weight: bold;
-    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.sub-list {
-    list-style-type: none;
+.region-badge {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 6px 14px;
+    background: #000;
+    color: #fff;
+    font-size: 13px;
+    border-radius: 8px;
 }
 
-.sub-list li {
-    margin-bottom: 5px;
-}
-
-.important-note {
-    background-color: rgba(13, 110, 253, 0.05);
-    border-left-color: #0d6efd !important;
-}
-
-
-/* Remove default bullet points from all lists in this section */
-.required-documents-section ul {
-    list-style-type: none;
-    padding-left: 0;
-}
-
-/* Optional: Add specific styling for sub-list if you want some indentation */
-.required-documents-section .sub-list {
-    padding-left: 1.5rem;
-}
-
-.icon-check {
-    color: #000;
-    font-weight: bold;
-    margin-right: 10px;
-}
-
-.important-note {
-    background-color: rgba(13, 110, 253, 0.05);
-    border-left: 4px solid #fd0d21;
-    border-radius: 0.375rem;
-    padding: 1rem;
-}
-
-/* Remove bullets from main list */
-.list-style-04 {
-    list-style-type: none;
-    padding-left: 0;
-}
-
-/* Remove bullets from nested list */
-.sub-list {
-    list-style-type: none;
-    padding-left: 1.5rem;
-}
 </style>
 {% endblock %}
 
@@ -947,97 +963,146 @@ white-space: nowrap !important;
 </section> -->
 <!-- end section -->
 
-<section class="bg-white" id="eligibility">
+<section class="bg-white py-5" id="eligibility">
     <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-12 text-center mb-5" data-anime='{ "el": "childs", "translateY": [50, 0], "opacity": [0,1], "duration": 600, "delay": 0, "staggervalue": 300, "easing": "easeOutQuad" }'>
-                <h1 class="fw-800 ls-minus-1px">
+
+        <!-- Section Heading -->
+        <div class="row justify-content-center mb-0">
+            <div class="col-12 text-center">
+                <h3 class="fw-700 text-dark-gray">
                     Rajo Kaaba Deeqaha Waxbarasho – Shuruudaha U-Qalmitaanka
-                </h1>
+                </h3>
             </div>
         </div>
 
-        <div class="components-container row g-4 justify-content-center">
+        <!-- Cards -->
+        <div class="row g-4 justify-content-center">
 
             <!-- COMPONENT 1 -->
-            <div class="col-12 col-md-6 col-lg-6" data-anime='{ "el": "childs", "translateY": [50, 0], "opacity": [0,1], "duration": 600, "delay": 200, "staggervalue": 300, "easing": "easeOutQuad" }'>
-                <div class="component-card h-100">
-                    <div class="card-header">
-                        <h4 class="card-title" style="color: var(--green-dark) !important;">
-                            Qaybta 1 – Waxbarashada Aasaasiga iyo Korinta Xirfadaha
-                        </h4>
-                        <span class="card-subtitle fw-500 text-black mt-1">
-                            Aqoonta ugu-horeysa, xisaabta, xirfadaha dareenka-bulshada, xirfadaha nolosha, iyo tababarrada xirfadeed.
-                        </span>
-                    </div>
-
-                    <div class="card-body">
-                        <div class="requirements-list">
-                            <ul class="text-dark-gray fw-500 mb-25px ps-0" style="list-style:none !important;">
-                                <li class="d-flex"><span class="icon-check me-2">✓</span> Kaarka Aqoonsiga Qaranka ee Somaliland ama Caddeyn Rasmiga ah.</li>
-                                <li class="d-flex"><span class="icon-check me-2">✓</span> Waa inuu degan yahay gobollada Marodi-Jeex ama Togdheer.</li>
-                                <li class="d-flex"><span class="icon-check me-2">✓</span> Gabar ama haweeney ah oo da'du u dhexayso 15–35.</li>
-                                <li class="d-flex"><span class="icon-check me-2">✓</span> Aqoon akhris-qoris iyo xisaab hooseysa (ka hooseeya heerka 4).</li>
-                                <li class="d-flex"><span class="icon-check me-2">✓</span> Waa inuu muujiyaa baahi dhaqaale iyo dadaal uu ku dhammaystirayo barnaamijka.</li>
-                                <li class="d-flex"><span class="icon-check me-2">✓</span> Waa inaanu ku jirin barnaamij kale oo tababar ah.</li>
-                            </ul>
-
-                            <!-- TVET -->
-                            <div class="text-dark-gray fw-600 mb-8px text-underline" style="font-size: 20px !important;">
-                                Tababarka Waxbarashada Farsamada iyo Xirfadaha (TVET)
-                            </div>
-
-                            <ul class="text-dark-gray fw-500 mb-25px ps-0" style="list-style:none !important;">
-                                <li class="d-flex"><span class="icon-check me-2">✓</span> Kaarka Aqoonsiga Qaranka ee Somaliland ama Caddeyn Rasmiga ah.</li>
-                                <li class="d-flex"><span class="icon-check me-2">✓</span> Waa inuu degan yahay gobollada Marodi-Jeex ama Togdheer.</li>
-                                <li class="d-flex"><span class="icon-check me-2">✓</span> Gabar ama haweeney ah oo da'du u dhexayso 15–35.</li>
-                                <li class="d-flex"><span class="icon-check me-2">✓</span> Waa inuu si fiican u akhriyi oo u qori karaa Af-Soomaali ama Ingiriisi.</li>
-                                <li class="d-flex"><span class="icon-check me-2">✓</span> Waa inuu muujiyaa doonis, baahi dhaqaale, iyo dadaal uu ku dhammaystirayo tababarka.</li>
-                                <li class="d-flex"><span class="icon-check me-2">✓</span> Waa inuu muujiyaa dan dhab ah oo uu u qabo inuu xirfad ahaan u barto TVET.</li>
-                                <li class="d-flex"><span class="icon-check me-2">✓</span> Waa inaanu ku jirin barnaamij kale oo tababar ah.</li>
-                            </ul>
+            <div class="col-lg-4 col-md-6">
+                <div class="eligibility-card h-100">
+                    <div class="eligibility-header">
+                        <div class="icon-circle">
+                            <i class="fa-solid fa-book-open"></i>
                         </div>
+
+                        <h4>Qaybta 1</h4>
+                        <p class="subtitle">
+                            Waxbarashada Aasaasiga iyo Korinta Xirfadaha
+                        </p>
                     </div>
+
+                    <p class="small-description">
+                        Aqoonta ugu-horeysa, xisaabta, xirfadaha dareenka-bulshada, xirfadaha nolosha, iyo tababarrada xirfadeed.
+                    </p>
+
+                    <span class="fw-800 req">
+                        Shuruudaha U-Qalmitaanka:
+                    </span>
+
+                    <ul class="eligibility-list">
+                        <li>Kaarka Aqoonsiga Qaranka ee Somaliland ama Caddeyn Rasmiga ah</li>
+                        <li>Waa inuu degan yahay gobollada Marodi-Jeex ama Togdheer</li>
+                        <li>Gabar ama haweeney ah oo da'du u dhexayso 15–35</li>
+                        <li>Aqoon akhris-qoris iyo xisaab hooseysa (ka hooseeya heerka 4)</li>
+                        <li>Waa inuu muujiyaa baahi dhaqaale iyo dadaal uu ku dhammaystirayo barnaamijka</li>
+                        <li>Waa inaanu ku jirin barnaamij kale oo tababar ah</li>
+                    </ul>
+
+                    <span class="region-badge">
+                        Gobollada Bartilmaameedka: Marodi-Jeex, Togdheer
+                    </span>
                 </div>
             </div>
 
             <!-- COMPONENT 2 -->
-            <div class="col-12 col-md-6 col-lg-6" data-anime='{ "el": "childs", "translateY": [50, 0], "opacity": [0,1], "duration": 600, "delay": 200, "staggervalue": 300, "easing": "easeOutQuad" }'>
-                <div class="component-card h-100" style="border-top: 5px solid var(--red-dark) !important;">
-                    <div class="card-header">
-                        <h4 class="card-title" style="color: var(--red-dark) !important;">
-                            Qaybta 2 – Waxbarashada Sare ee Hogaaminta Dumarka
-                        </h4>
+            <div class="col-lg-4 col-md-6">
+                <div class="eligibility-card h-100">
+                    <div class="eligibility-header">
+                        <div class="icon-circle">
+                            <i class="fa-solid fa-screwdriver-wrench"></i>
+                        </div>
+
+                        <h4>Qaybta 2</h4>
+                        <p class="subtitle">
+                            Tababarka Waxbarashada Farsamada iyo Xirfadaha (TVET)
+                        </p>
                     </div>
 
-                    <div class="card-body">
-                        <div class="requirements-list">
-                            <ul class="text-dark-gray fw-500 mb-30px ps-0" style="list-style:none !important;">
-                                <li class="d-flex"><span class="icon-check me-2">✓</span> Shuruudaha Qarannimo: Kaarka Aqoonsiga Qaranka ee Somaliland ama Caddeyn Rasmiga ah.</li>
-                                <li class="d-flex"><span class="icon-check me-2">✓</span> Codsaduhu waa inuu ku nool yahay Somaliland (bartilmaameedku waa heer qaran).</li>
-                                <li class="d-flex"><span class="icon-check me-2">✓</span> Codsaduhu waa inuu noqdaa gabar ama haweeney da'du u dhexayso 15–35.</li>
-                                <li class="d-flex"><span class="icon-check me-2">✓</span> Waa inuu haystaa shahaadada dugsiga sare (A*–C) ama diploma/shahaado waxbarasho sare sida ay koorsadu u baahan tahay.</li>
-                                <li class="d-flex"><span class="icon-check me-2">✓</span> Waa inuu muujiyaa baahi dhaqaale, doonis, iyo dadaal ku aaddan qorista iyo dhammaystirka tababarka.</li>
-                                <li class="d-flex"><span class="icon-check me-2">✓</span> Khibrad Hogaamineed: Waa inuu muujin karaa karti ama xirfad hogaamineed (hawlo bulsho, dugsi, ama door hogaamineed).</li>
-                                <li class="d-flex"><span class="icon-check me-2">✓</span> Dan Xirfadeed: Waa inuu muujiyo xiise waxbarid (ama kalkaalinnimo/dhalmo-caawin haddii caafimaad la codsanayo).</li>
-                                <li class="d-flex"><span class="icon-check me-2">✓</span> Waa inuu lahaadaa anshax wanaagsan (lagu caddeyn karo tixraacyo).</li>
-                                <li class="d-flex"><span class="icon-check me-2">✓</span> Waa inaanu ku jirin barnaamij kale oo tababar ah.</li>
-                            </ul>
-                        </div>
-                    </div>
+                    <p class="small-description">
+                        Tababarro xirfadeed iyo farsamo oo diiradda saaraya shaqo helid iyo horumar xirfadeed.
+                    </p>
+
+                    <span class="fw-800 req">
+                        Shuruudaha U-Qalmitaanka:
+                    </span>
+
+                    <ul class="eligibility-list">
+                        <li>Kaarka Aqoonsiga Qaranka ee Somaliland ama Caddeyn Rasmiga ah</li>
+                        <li>Waa inuu degan yahay gobollada Marodi-Jeex ama Togdheer</li>
+                        <li>Gabar ama haweeney ah oo da'du u dhexayso 15–35</li>
+                        <li>Waa inuu si fiican u akhriyi oo u qori karaa Af-Soomaali ama Ingiriisi</li>
+                        <li>Waa inuu muujiyaa doonis, baahi dhaqaale, iyo dadaal uu ku dhammaystirayo tababarka</li>
+                        <li>Waa inuu muujiyaa dan dhab ah oo uu u qabo inuu xirfad ahaan u barto TVET</li>
+                        <li>Waa inaanu ku jirin barnaamij kale oo tababar ah</li>
+                    </ul>
+
+                    <span class="region-badge">
+                        Gobollada Bartilmaameedka: Marodi-Jeex, Togdheer
+                    </span>
                 </div>
             </div>
 
-            <!-- IMPORTANT NOTE -->
-            <div class="rounded-3 text-center mt-4">
-                <ul class="text-dark-gray fw-700 fs-22">
-                    <li>
-                        <strong>Digniin Muhiim ah:</strong> Caddaynta dhammaan shuruudaha la xusay waa in la keenaa ka hor ansixinta deeqda waxbarasho.
-                    </li>
-                </ul>
+            <!-- COMPONENT 3 -->
+            <div class="col-lg-4 col-md-6">
+                <div class="eligibility-card h-100">
+                    <div class="eligibility-header">
+                        <div class="icon-circle">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                        </div>
+
+                        <h4>Qaybta 3</h4>
+                        <p class="subtitle">
+                            Waxbarashada Sare ee Hogaaminta Dumarka
+                        </p>
+                    </div>
+
+                    <p class="small-description">
+                        Deeqo waxbarasho oo loogu talagalay waxbarid, kalkaalinnimo, iyo dhalmo-caawin.
+                    </p>
+
+                    <span class="fw-800 req">
+                        Shuruudaha U-Qalmitaanka:
+                    </span>
+
+                    <ul class="eligibility-list">
+                        <li>Kaarka Aqoonsiga Qaranka ee Somaliland ama Caddeyn Rasmiga ah</li>
+                        <li>Codsaduhu waa inuu ku nool yahay Somaliland (heer qaran)</li>
+                        <li>Gabar ama haweeney ah oo da'du u dhexayso 15–35</li>
+                        <li>Shahaadada dugsiga sare (A*–C) ama shahaado waxbarasho sare sida ay koorsadu u baahan tahay</li>
+                        <li>Waa inuu muujiyaa baahi dhaqaale, doonis, iyo dadaal</li>
+                        <li>Waa inuu muujin karaa xirfado ama karti hoggaamineed</li>
+                        <li>Waa inuu muujiyo dan waxbarid ama caafimaad</li>
+                        <li>Waa inuu lahaadaa anshax wanaagsan</li>
+                        <li>Waa inaanu ku jirin barnaamij kale oo tababar ah</li>
+                    </ul>
+
+                    <span class="region-badge">
+                        Gobolka Bartilmaameedka: Guud ahaan Somaliland
+                    </span>
+                </div>
             </div>
 
         </div>
+
+        <!-- Important Note -->
+        <div class="row mt-5">
+            <div class="col-12 text-center">
+                <strong>Digniin Muhiim ah:</strong>
+                Caddaynta dhammaan shuruudaha la xusay waa in la keenaa ka hor ansixinta deeqda waxbarasho.
+            </div>
+        </div>
+
     </div>
 </section>
 
