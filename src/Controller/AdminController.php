@@ -1554,7 +1554,7 @@ class AdminController extends AbstractController
             $filters['applicant'] ?? null,
             $filters['region'] ?? null,
             $filters['district'] ?? null,
-            $filters['qualification'] ?? null,
+             null,
             $filters['scholarship'] ?? null,
             $filters['institute'] ?? null,
             $filters['course'] ?? null,

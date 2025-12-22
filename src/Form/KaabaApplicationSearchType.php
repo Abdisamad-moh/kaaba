@@ -65,14 +65,14 @@ class KaabaApplicationSearchType extends AbstractType
                 'placeholder' => 'Select district',
                 'attr' => ['class' => 'form-control', 'col_class' => 'col-md-3']
             ])
-            ->add('qualification', EntityType::class, [
-                'class' => KaabaQualification::class,
-                'choice_label' => 'name',
-                'required' => false,
-                'mapped' => false,
-                'placeholder' => 'Select qualification',
-                'attr' => ['class' => 'form-control', 'col_class' => 'col-md-3']
-            ])
+            // ->add('qualification', EntityType::class, [
+            //     'class' => KaabaQualification::class,
+            //     'choice_label' => 'name',
+            //     'required' => false,
+            //     'mapped' => false,
+            //     'placeholder' => 'Select qualification',
+            //     'attr' => ['class' => 'form-control', 'col_class' => 'col-md-3']
+            // ])
             ->add('scholarship', EntityType::class, [
                 'class' => KaabaScholarship::class,
                 'choice_label' => 'title',
