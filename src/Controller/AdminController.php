@@ -3423,6 +3423,74 @@ class AdminController extends AbstractController
         ]);
     }
 
+    #[Route('/bulk-sms/test', name: 'app_admin_bulk_sms_test', methods: ['GET', 'POST'])]
+public function testBulkSms(
+    Request $request,
+    TelesomSmsService $smsService,
+    EntityManagerInterface $em
+): Response {
+
+    if ($request->isMethod('POST')) {
+
+        $phonesRaw = $request->request->get('phones');
+        $messageTemplate = $request->request->get('message');
+
+        $phones = array_filter(array_map('trim', explode(',', $phonesRaw)));
+
+        $results = [];
+        $sentCount = 0;
+
+        foreach ($phones as $index => $phone) {
+
+            if (!$phone) {
+                continue;
+            }
+
+            // Fake name for testing
+            $name = 'Test User ' . ($index + 1);
+
+            $message = str_replace('{{name}}', $name, $messageTemplate);
+
+            usleep(400000); // prevent gateway blocking
+
+            $sendResults = $smsService->sendBulk($phone, $message);
+
+            $status = $sendResults[0]['status'] ?? 'unknown';
+            $response = $sendResults[0]['body'] ?? 'no response';
+
+            $results[] = [
+                'phone' => $phone,
+                'name' => $name,
+                'status' => $status,
+                'response' => $response,
+            ];
+
+            // OPTIONAL: Log it
+            $log = new KaabaSmsLog();
+            $log->setReceiverName($name);
+            $log->setPhoneNumber($phone);
+            $log->setMessage($message);
+            $log->setMessageStatus($status);
+            $log->setGatewayResponse($response);
+            $log->setFilteredStatuses([]);
+            $log->setFilteredInstitutes([]);
+
+            $em->persist($log);
+
+            $sentCount++;
+        }
+
+        $em->flush();
+
+        return $this->render('admin/bulk_sms_test_result.html.twig', [
+            'results' => $results,
+            'sentCount' => $sentCount,
+        ]);
+    }
+
+    return $this->render('admin/bulk_sms_test_form.html.twig');
+}
+
 
     #[Route('/bulk-sms/send', name: 'app_admin_bulk_sms_send', methods: ['POST'])]
 public function sendBulkSms(

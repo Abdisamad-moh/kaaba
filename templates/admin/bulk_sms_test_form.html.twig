@@ -1,0 +1,41 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Test SMS Sender{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0">Test Bulk SMS</h5>
+        </div>
+
+        <div class="card-body">
+            <form method="POST">
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Phone Numbers</label>
+                    <textarea name="phones" class="form-control" rows="3"
+                        placeholder="25261xxxxxx, 25263xxxxxx"></textarea>
+                    <small class="text-muted">
+                        Separate multiple numbers using comma (,)
+                    </small>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Message</label>
+                    <textarea name="message" class="form-control" rows="5"
+                        placeholder="this is a test SMS."></textarea>
+                    <small class="text-muted">
+                        You can use <strong>{{ '{{name}}' }}</strong> placeholder.
+                    </small>
+                </div>
+
+                <button class="btn btn-success btn-lg">
+                    Send Test SMS
+                </button>
+
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
