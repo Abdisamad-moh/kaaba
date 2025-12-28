@@ -3423,8 +3423,8 @@ class AdminController extends AbstractController
         ]);
     }
 
-    #[Route('/bulk-sms/test', name: 'app_admin_bulk_sms_test', methods: ['GET', 'POST'])]
-public function testBulkSms(
+    #[Route('/bulk-sms/individual', name: 'app_admin_bulk_sms_individual', methods: ['GET', 'POST'])]
+public function individual_sms(
     Request $request,
     TelesomSmsService $smsService,
     EntityManagerInterface $em
