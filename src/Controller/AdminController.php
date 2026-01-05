@@ -1554,7 +1554,7 @@ class AdminController extends AbstractController
             $filters['applicant'] ?? null,
             $filters['region'] ?? null,
             $filters['district'] ?? null,
-             null,
+            null,
             $filters['scholarship'] ?? null,
             $filters['institute'] ?? null,
             $filters['course'] ?? null,
@@ -3377,30 +3377,84 @@ class AdminController extends AbstractController
         EntityManagerInterface $em
     ): Response {
 
-        $statuses = $em->getRepository(KaabaApplicationStatus::class)->findAll();
-        $institutes = $em->getRepository(KaabaInstitute::class)->findAll();
+        $user = $this->getUser();
 
-        // PRE-FILL SUPPORT FROM "EDIT" BUTTON
-        $prefillStatuses = $request->query->get('s') ? json_decode($request->query->get('s'), true) : [];
-        $prefillInstitutes = $request->query->get('i') ? json_decode($request->query->get('i'), true) : [];
+        // =========================
+        // INSTITUTES BY ROLE
+        // =========================
+        if (
+            $user
+            && in_array('ROLE_USER', $user->getRoles(), true)
+            && !in_array('ROLE_SUPER_ADMIN', $user->getRoles(), true)
+        ) {
+            // Only institutes managed by this user
+            $institutes = $em->getRepository(KaabaInstitute::class)
+                ->findBy(['manager' => $user]);
+        } else {
+            // Admin / Super admin
+            $institutes = $em->getRepository(KaabaInstitute::class)->findAll();
+        }
+
+        $statuses = $em->getRepository(KaabaApplicationStatus::class)->findAll();
+
+        // =========================
+        // PREFILL (EDIT SUPPORT)
+        // =========================
+        $prefillStatuses = $request->query->get('s')
+            ? json_decode($request->query->get('s'), true)
+            : [];
+
+        $prefillInstitutes = $request->query->get('i')
+            ? json_decode($request->query->get('i'), true)
+            : [];
+
         $prefillMessage = $request->query->get('m') ?? '';
 
-        // HANDLE SUBMISSION → GO TO CONFIRM PAGE
+        // =========================
+        // HANDLE POST
+        // =========================
         if ($request->isMethod('POST')) {
 
             $statusIds = $request->request->all('status');
             $instituteIds = $request->request->all('institute');
             $message = $request->request->get('message');
 
-            // Build count
-            $qb = $em->getRepository(KaabaApplication::class)->createQueryBuilder('a');
+            $qb = $em->getRepository(KaabaApplication::class)
+                ->createQueryBuilder('a')
+                ->join('a.institute', 'i');
 
+            // ---- STATUS FILTER
             if (!empty($statusIds)) {
-                $qb->andWhere('a.status IN (:st)')->setParameter('st', $statusIds);
+                $qb->andWhere('a.status IN (:st)')
+                    ->setParameter('st', $statusIds);
             }
 
+            // ---- INSTITUTE FILTER (ROLE-AWARE)
             if (!empty($instituteIds)) {
-                $qb->andWhere('a.institute IN (:ins)')->setParameter('ins', $instituteIds);
+                // User selected institutes → trust but still safe
+                $qb->andWhere('i.id IN (:ins)')
+                    ->setParameter('ins', $instituteIds);
+            } else {
+                // No institute selected
+                // If ROLE_USER → restrict to managed institutes
+                if (
+                    $user
+                    && in_array('ROLE_USER', $user->getRoles(), true)
+                    && !in_array('ROLE_SUPER_ADMIN', $user->getRoles(), true)
+                ) {
+                    $managedInstituteIds = array_map(
+                        fn($inst) => $inst->getId(),
+                        $institutes
+                    );
+
+                    // Safety: if user manages nothing, return empty
+                    if (empty($managedInstituteIds)) {
+                        $apps = [];
+                    } else {
+                        $qb->andWhere('i.id IN (:managedIns)')
+                            ->setParameter('managedIns', $managedInstituteIds);
+                    }
+                }
             }
 
             $apps = $qb->getQuery()->getResult();
@@ -3413,7 +3467,9 @@ class AdminController extends AbstractController
             ]);
         }
 
-        // RENDER FORM (with possibly pre-filled data)
+        // =========================
+        // RENDER FORM
+        // =========================
         return $this->render('admin/bulk_sms_form.html.twig', [
             'statuses' => $statuses,
             'institutes' => $institutes,
@@ -3423,141 +3479,142 @@ class AdminController extends AbstractController
         ]);
     }
 
+
     #[Route('/bulk-sms/individual', name: 'app_admin_bulk_sms_individual', methods: ['GET', 'POST'])]
-public function individual_sms(
-    Request $request,
-    TelesomSmsService $smsService,
-    EntityManagerInterface $em
-): Response {
+    public function individual_sms(
+        Request $request,
+        TelesomSmsService $smsService,
+        EntityManagerInterface $em
+    ): Response {
 
-    if ($request->isMethod('POST')) {
+        if ($request->isMethod('POST')) {
 
-        $phonesRaw = $request->request->get('phones');
+            $phonesRaw = $request->request->get('phones');
+            $messageTemplate = $request->request->get('message');
+
+            $phones = array_filter(array_map('trim', explode(',', $phonesRaw)));
+
+            $results = [];
+            $sentCount = 0;
+
+            foreach ($phones as $index => $phone) {
+
+                if (!$phone) {
+                    continue;
+                }
+
+                // Fake name for testing
+                $name = 'Test User ' . ($index + 1);
+
+                $message = str_replace('{{name}}', $name, $messageTemplate);
+
+                usleep(400000); // prevent gateway blocking
+
+                $sendResults = $smsService->sendBulk($phone, $message);
+
+                $status = $sendResults[0]['status'] ?? 'unknown';
+                $response = $sendResults[0]['body'] ?? 'no response';
+
+                $results[] = [
+                    'phone' => $phone,
+                    'name' => $name,
+                    'status' => $status,
+                    'response' => $response,
+                ];
+
+                // OPTIONAL: Log it
+                $log = new KaabaSmsLog();
+                $log->setReceiverName($name);
+                $log->setPhoneNumber($phone);
+                $log->setMessage($message);
+                $log->setMessageStatus($status);
+                $log->setGatewayResponse($response);
+                $log->setFilteredStatuses([]);
+                $log->setFilteredInstitutes([]);
+
+                $em->persist($log);
+
+                $sentCount++;
+            }
+
+            $em->flush();
+
+            return $this->render('admin/bulk_sms_test_result.html.twig', [
+                'results' => $results,
+                'sentCount' => $sentCount,
+            ]);
+        }
+
+        return $this->render('admin/bulk_sms_test_form.html.twig');
+    }
+
+
+    #[Route('/bulk-sms/send', name: 'app_admin_bulk_sms_send', methods: ['POST'])]
+    public function sendBulkSms(
+        Request $request,
+        EntityManagerInterface $em,
+        TelesomSmsService $smsService
+    ): Response {
+
+        $statusIds = json_decode($request->request->get('statuses'), true);
+        $instituteIds = json_decode($request->request->get('institutes'), true);
         $messageTemplate = $request->request->get('message');
 
-        $phones = array_filter(array_map('trim', explode(',', $phonesRaw)));
+        $qb = $em->getRepository(KaabaApplication::class)->createQueryBuilder('a');
 
-        $results = [];
+        if (!empty($statusIds)) {
+            $qb->andWhere('a.status IN (:st)')->setParameter('st', $statusIds);
+        }
+
+        if (!empty($instituteIds)) {
+            $qb->andWhere('a.institute IN (:ins)')->setParameter('ins', $instituteIds);
+        }
+
+        $apps = $qb->getQuery()->getResult();
         $sentCount = 0;
 
-        foreach ($phones as $index => $phone) {
+        foreach ($apps as $app) {
+
+            $name = $app->getFullName() ?? "Applicant";
+            $phone = $app->getPhone();
 
             if (!$phone) {
                 continue;
             }
 
-            // Fake name for testing
-            $name = 'Test User ' . ($index + 1);
-
             $message = str_replace('{{name}}', $name, $messageTemplate);
-
-            usleep(400000); // prevent gateway blocking
+            usleep(400000); // prevent Telesom gateway block
 
             $sendResults = $smsService->sendBulk($phone, $message);
-
             $status = $sendResults[0]['status'] ?? 'unknown';
             $response = $sendResults[0]['body'] ?? 'no response';
 
-            $results[] = [
-                'phone' => $phone,
-                'name' => $name,
-                'status' => $status,
-                'response' => $response,
-            ];
-
-            // OPTIONAL: Log it
+            // Save SMS Log
             $log = new KaabaSmsLog();
+            $log->setApplication($app);
             $log->setReceiverName($name);
             $log->setPhoneNumber($phone);
             $log->setMessage($message);
+            $log->setFilteredStatuses($statusIds);
+            $log->setFilteredInstitutes($instituteIds);
             $log->setMessageStatus($status);
             $log->setGatewayResponse($response);
-            $log->setFilteredStatuses([]);
-            $log->setFilteredInstitutes([]);
 
             $em->persist($log);
-
             $sentCount++;
         }
 
         $em->flush();
 
-        return $this->render('admin/bulk_sms_test_result.html.twig', [
-            'results' => $results,
-            'sentCount' => $sentCount,
-        ]);
+        // SUCCESS FLASH
+        $this->addFlash('success', sprintf(
+            "%d SMS messages have been successfully sent and logged.",
+            $sentCount
+        ));
+
+        // REDIRECT DIRECTLY TO LOGS PAGE
+        return $this->redirectToRoute('app_admin_sms_logs');
     }
-
-    return $this->render('admin/bulk_sms_test_form.html.twig');
-}
-
-
-    #[Route('/bulk-sms/send', name: 'app_admin_bulk_sms_send', methods: ['POST'])]
-public function sendBulkSms(
-    Request $request,
-    EntityManagerInterface $em,
-    TelesomSmsService $smsService
-): Response {
-
-    $statusIds = json_decode($request->request->get('statuses'), true);
-    $instituteIds = json_decode($request->request->get('institutes'), true);
-    $messageTemplate = $request->request->get('message');
-
-    $qb = $em->getRepository(KaabaApplication::class)->createQueryBuilder('a');
-
-    if (!empty($statusIds)) {
-        $qb->andWhere('a.status IN (:st)')->setParameter('st', $statusIds);
-    }
-
-    if (!empty($instituteIds)) {
-        $qb->andWhere('a.institute IN (:ins)')->setParameter('ins', $instituteIds);
-    }
-
-    $apps = $qb->getQuery()->getResult();
-    $sentCount = 0;
-
-    foreach ($apps as $app) {
-
-        $name = $app->getFullName() ?? "Applicant";
-        $phone = $app->getPhone();
-
-        if (!$phone) {
-            continue;
-        }
-
-        $message = str_replace('{{name}}', $name, $messageTemplate);
-        usleep(400000); // prevent Telesom gateway block
-
-        $sendResults = $smsService->sendBulk($phone, $message);
-        $status = $sendResults[0]['status'] ?? 'unknown';
-        $response = $sendResults[0]['body'] ?? 'no response';
-
-        // Save SMS Log
-        $log = new KaabaSmsLog();
-        $log->setApplication($app);
-        $log->setReceiverName($name);
-        $log->setPhoneNumber($phone);
-        $log->setMessage($message);
-        $log->setFilteredStatuses($statusIds);
-        $log->setFilteredInstitutes($instituteIds);
-        $log->setMessageStatus($status);
-        $log->setGatewayResponse($response);
-
-        $em->persist($log);
-        $sentCount++;
-    }
-
-    $em->flush();
-
-    // SUCCESS FLASH
-    $this->addFlash('success', sprintf(
-        "%d SMS messages have been successfully sent and logged.",
-        $sentCount
-    ));
-
-    // REDIRECT DIRECTLY TO LOGS PAGE
-    return $this->redirectToRoute('app_admin_sms_logs');
-}
 
 
     #[Route('/sms-logs', name: 'app_admin_sms_logs')]

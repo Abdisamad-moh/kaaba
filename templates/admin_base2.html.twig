@@ -254,18 +254,7 @@
                                 </a>
                             </li>
                         {% endif %}
-
-                        <!-- Kaaba Identity Settings - Hide for ROLE_USER -->
-                        {% if is_granted('ROLE_SUPER_ADMIN') %}
-                            <li class="sidebar-item">
-                                <a href="{{ path('app_admin_kaaba_identity_types') }}" class="sidebar-link">
-                                    <div class="round-16 d-flex align-items-center justify-content-center">
-                                        <i class="ti ti-id"></i>
-                                    </div>
-                                    <span class="hide-menu">Identity Types</span>
-                                </a>
-                            </li>
-							<li class="sidebar-item">
+<li class="sidebar-item">
         <a class="sidebar-link" href="{{ path('app_admin_bulk_sms_individual') }}">
             <i class="ti ti-message-circle"></i>
             <span class="hide-menu">Individual SMS</span>
@@ -278,6 +267,17 @@
             <span class="hide-menu">Bulk SMS</span>
         </a>
     </li>
+                        <!-- Kaaba Identity Settings - Hide for ROLE_USER -->
+                        {% if is_granted('ROLE_SUPER_ADMIN') %}
+                            <li class="sidebar-item">
+                                <a href="{{ path('app_admin_kaaba_identity_types') }}" class="sidebar-link">
+                                    <div class="round-16 d-flex align-items-center justify-content-center">
+                                        <i class="ti ti-id"></i>
+                                    </div>
+                                    <span class="hide-menu">Identity Types</span>
+                                </a>
+                            </li>
+							
                         {% endif %}
                 
               </ul>
