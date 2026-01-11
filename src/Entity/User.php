@@ -117,10 +117,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: KaabaInstitute::class, mappedBy: 'manager')]
     private Collection $kaabaInstitutes;
 
+    /**
+     * @var Collection<int, KaabaSmsLog>
+     */
+    #[ORM\OneToMany(targetEntity: KaabaSmsLog::class, mappedBy: 'created_by')]
+    private Collection $kaabaSmsLogs;
+
 
     public function __construct()
     {
         $this->kaabaInstitutes = new ArrayCollection();
+        $this->kaabaSmsLogs = new ArrayCollection();
     }
 
     
@@ -435,6 +442,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($kaabaInstitute->getManager() === $this) {
                 $kaabaInstitute->setManager(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, KaabaSmsLog>
+     */
+    public function getKaabaSmsLogs(): Collection
+    {
+        return $this->kaabaSmsLogs;
+    }
+
+    public function addKaabaSmsLog(KaabaSmsLog $kaabaSmsLog): static
+    {
+        if (!$this->kaabaSmsLogs->contains($kaabaSmsLog)) {
+            $this->kaabaSmsLogs->add($kaabaSmsLog);
+            $kaabaSmsLog->setCreatedBy($this);
+        }
+
+        return $this;
+    }
+
+    public function removeKaabaSmsLog(KaabaSmsLog $kaabaSmsLog): static
+    {
+        if ($this->kaabaSmsLogs->removeElement($kaabaSmsLog)) {
+            // set the owning side to null (unless already changed)
+            if ($kaabaSmsLog->getCreatedBy() === $this) {
+                $kaabaSmsLog->setCreatedBy(null);
             }
         }
 

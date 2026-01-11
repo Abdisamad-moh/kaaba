@@ -41,6 +41,9 @@ class KaabaSmsLog
     #[ORM\Column(type: 'datetime')]
     private \DateTimeInterface $createdAt;
 
+    #[ORM\ManyToOne(inversedBy: 'kaabaSmsLogs')]
+    private ?User $created_by = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTime();
@@ -73,4 +76,16 @@ class KaabaSmsLog
     public function setGatewayResponse(?string $r): static { $this->gatewayResponse = $r; return $this; }
 
     public function getCreatedAt(): \DateTimeInterface { return $this->createdAt; }
+
+    public function getCreatedBy(): ?User
+    {
+        return $this->created_by;
+    }
+
+    public function setCreatedBy(?User $created_by): static
+    {
+        $this->created_by = $created_by;
+
+        return $this;
+    }
 }

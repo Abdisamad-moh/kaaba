@@ -3525,6 +3525,7 @@ class AdminController extends AbstractController
                 // OPTIONAL: Log it
                 $log = new KaabaSmsLog();
                 $log->setReceiverName($name);
+                $log->setCreatedBy($this->getUser());
                 $log->setPhoneNumber($phone);
                 $log->setMessage($message);
                 $log->setMessageStatus($status);
@@ -3591,6 +3592,7 @@ class AdminController extends AbstractController
 
             // Save SMS Log
             $log = new KaabaSmsLog();
+             $log->setCreatedBy($this->getUser());
             $log->setApplication($app);
             $log->setReceiverName($name);
             $log->setPhoneNumber($phone);
