@@ -3495,8 +3495,7 @@ class AdminController extends AbstractController
             && !in_array('ROLE_SUPER_ADMIN', $user->getRoles(), true)
         ) {
             // Only institutes managed by this user
-            $institutes = $em->getRepository(KaabaInstitute::class)
-                ->findBy(['manager' => $user]);
+            $institutes = $user->getKaabaInstitutes()->toArray();
         } else {
             // Admin / Super admin
             $institutes = $em->getRepository(KaabaInstitute::class)->findAll();
@@ -3526,42 +3525,37 @@ class AdminController extends AbstractController
             $instituteIds = $request->request->all('institute');
             $message = $request->request->get('message');
 
+            // ================================================
+            // 🔐 FORCE OWNERSHIP FOR ROLE_USER
+            // ================================================
+            if (
+                $user
+                && in_array('ROLE_USER', $user->getRoles(), true)
+                && !in_array('ROLE_SUPER_ADMIN', $user->getRoles(), true)
+            ) {
+                // Always force the institutes the user manages
+                $instituteIds = $user->getKaabaInstitutes()
+                    ->map(fn($i) => $i->getId())
+                    ->toArray();
+            }
+
+            // =========================
+            // BUILD QUERY (NOW SAFE)
+            // =========================
             $qb = $em->getRepository(KaabaApplication::class)
                 ->createQueryBuilder('a')
                 ->join('a.institute', 'i');
 
-            // ---- STATUS FILTER
+            // STATUS FILTER
             if (!empty($statusIds)) {
                 $qb->andWhere('a.status IN (:st)')
                     ->setParameter('st', $statusIds);
             }
 
-            // ---- INSTITUTE FILTER (ROLE-AWARE)
+            // INSTITUTE FILTER (ALWAYS SAFE)
             if (!empty($instituteIds)) {
-                // User selected institutes → trust but still safe
                 $qb->andWhere('i.id IN (:ins)')
                     ->setParameter('ins', $instituteIds);
-            } else {
-                // No institute selected
-                // If ROLE_USER → restrict to managed institutes
-                if (
-                    $user
-                    && in_array('ROLE_USER', $user->getRoles(), true)
-                    && !in_array('ROLE_SUPER_ADMIN', $user->getRoles(), true)
-                ) {
-                    $managedInstituteIds = array_map(
-                        fn($inst) => $inst->getId(),
-                        $institutes
-                    );
-
-                    // Safety: if user manages nothing, return empty
-                    if (empty($managedInstituteIds)) {
-                        $apps = [];
-                    } else {
-                        $qb->andWhere('i.id IN (:managedIns)')
-                            ->setParameter('managedIns', $managedInstituteIds);
-                    }
-                }
             }
 
             $apps = $qb->getQuery()->getResult();
@@ -3585,6 +3579,7 @@ class AdminController extends AbstractController
             'prefillMessage' => $prefillMessage,
         ]);
     }
+
 
 
     #[Route('/bulk-sms/individual', name: 'app_admin_bulk_sms_individual', methods: ['GET', 'POST'])]
@@ -3664,19 +3659,45 @@ class AdminController extends AbstractController
         TelesomSmsService $smsService
     ): Response {
 
-        dd("Debugging point");
+        dd("Debug route called");
+        $user = $this->getUser();
+
         $statusIds = json_decode($request->request->get('statuses'), true);
-        $instituteIds = json_decode($request->request->get('institutes'), true);
+        $postedInstituteIds = json_decode($request->request->get('institutes'), true);
         $messageTemplate = $request->request->get('message');
 
-        $qb = $em->getRepository(KaabaApplication::class)->createQueryBuilder('a');
+        // =====================================
+        // 🔐 FORCE OWNERSHIP (CRITICAL SECURITY)
+        // =====================================
+        if (
+            $user
+            && in_array('ROLE_USER', $user->getRoles(), true)
+            && !in_array('ROLE_SUPER_ADMIN', $user->getRoles(), true)
+        ) {
+            // ROLE_USER → always use institutes they manage
+            $instituteIds = $user->getKaabaInstitutes()
+                ->map(fn($i) => $i->getId())
+                ->toArray();
+        } else {
+            // Admin → trust what was selected
+            $instituteIds = $postedInstituteIds;
+        }
+
+        // =========================
+        // BUILD QUERY (SAFE)
+        // =========================
+        $qb = $em->getRepository(KaabaApplication::class)
+            ->createQueryBuilder('a')
+            ->join('a.institute', 'i');
 
         if (!empty($statusIds)) {
-            $qb->andWhere('a.status IN (:st)')->setParameter('st', $statusIds);
+            $qb->andWhere('a.status IN (:st)')
+                ->setParameter('st', $statusIds);
         }
 
         if (!empty($instituteIds)) {
-            $qb->andWhere('a.institute IN (:ins)')->setParameter('ins', $instituteIds);
+            $qb->andWhere('i.id IN (:ins)')
+                ->setParameter('ins', $instituteIds);
         }
 
         $apps = $qb->getQuery()->getResult();
@@ -3692,21 +3713,23 @@ class AdminController extends AbstractController
             }
 
             $message = str_replace('{{name}}', $name, $messageTemplate);
-            usleep(400000); // prevent Telesom gateway block
+            usleep(400000); // Telesom throttle protection
 
             $sendResults = $smsService->sendBulk($phone, $message);
             $status = $sendResults[0]['status'] ?? 'unknown';
             $response = $sendResults[0]['body'] ?? 'no response';
 
-            // Save SMS Log
+            // =========================
+            // SAVE AUDIT LOG
+            // =========================
             $log = new KaabaSmsLog();
-             $log->setCreatedBy($this->getUser());
+            $log->setCreatedBy($user);
             $log->setApplication($app);
             $log->setReceiverName($name);
             $log->setPhoneNumber($phone);
             $log->setMessage($message);
             $log->setFilteredStatuses($statusIds);
-            $log->setFilteredInstitutes($instituteIds);
+            $log->setFilteredInstitutes($instituteIds); // forced + safe
             $log->setMessageStatus($status);
             $log->setGatewayResponse($response);
 
@@ -3716,15 +3739,14 @@ class AdminController extends AbstractController
 
         $em->flush();
 
-        // SUCCESS FLASH
         $this->addFlash('success', sprintf(
             "%d SMS messages have been successfully sent and logged.",
             $sentCount
         ));
 
-        // REDIRECT DIRECTLY TO LOGS PAGE
         return $this->redirectToRoute('app_admin_sms_logs');
     }
+
     #[Route('/bulk-sms/send/debug', name: 'app_admin_bulk_sms_send_debug', methods: ['POST'])]
     public function sendBulkSms_debug(
         Request $request,
@@ -3732,21 +3754,48 @@ class AdminController extends AbstractController
         TelesomSmsService $smsService
     ): Response {
 
+        $user = $this->getUser();
+
         $statusIds = json_decode($request->request->get('statuses'), true);
-        $instituteIds = json_decode($request->request->get('institutes'), true);
+        $postedInstituteIds = json_decode($request->request->get('institutes'), true);
         $messageTemplate = $request->request->get('message');
 
-        $qb = $em->getRepository(KaabaApplication::class)->createQueryBuilder('a');
+        // =====================================
+        // 🔐 FORCE OWNERSHIP AGAIN (CRITICAL)
+        // =====================================
+        if (
+            $user
+            && in_array('ROLE_USER', $user->getRoles(), true)
+            && !in_array('ROLE_SUPER_ADMIN', $user->getRoles(), true)
+        ) {
+            // Ignore whatever came from POST
+            $instituteIds = $user->getKaabaInstitutes()
+                ->map(fn($i) => $i->getId())
+                ->toArray();
+        } else {
+            // Admin is allowed to use what was selected
+            $instituteIds = $postedInstituteIds;
+        }
+
+        // =========================
+        // BUILD QUERY (SAFE)
+        // =========================
+        $qb = $em->getRepository(KaabaApplication::class)
+            ->createQueryBuilder('a')
+            ->join('a.institute', 'i');
 
         if (!empty($statusIds)) {
-            $qb->andWhere('a.status IN (:st)')->setParameter('st', $statusIds);
+            $qb->andWhere('a.status IN (:st)')
+                ->setParameter('st', $statusIds);
         }
 
         if (!empty($instituteIds)) {
-            $qb->andWhere('a.institute IN (:ins)')->setParameter('ins', $instituteIds);
+            $qb->andWhere('i.id IN (:ins)')
+                ->setParameter('ins', $instituteIds);
         }
 
         $apps = $qb->getQuery()->getResult();
+
         $sentCount = 0;
 
         foreach ($apps as $app) {
@@ -3759,21 +3808,23 @@ class AdminController extends AbstractController
             }
 
             $message = str_replace('{{name}}', $name, $messageTemplate);
-            usleep(400000); // prevent Telesom gateway block
+            usleep(400000); // Telesom throttle protection
 
-            $sendResults = $smsService->sendBulk('0634407225', $message);
+            $sendResults = $smsService->sendBulk($phone, $message);
             $status = $sendResults[0]['status'] ?? 'unknown';
             $response = $sendResults[0]['body'] ?? 'no response';
 
-            // Save SMS Log
+            // =========================
+            // SAVE AUDIT LOG
+            // =========================
             $log = new KaabaSmsLog();
-             $log->setCreatedBy($this->getUser());
+            $log->setCreatedBy($user);
             $log->setApplication($app);
             $log->setReceiverName($name);
             $log->setPhoneNumber($phone);
             $log->setMessage($message);
             $log->setFilteredStatuses($statusIds);
-            $log->setFilteredInstitutes($instituteIds);
+            $log->setFilteredInstitutes($instituteIds); // forced values
             $log->setMessageStatus($status);
             $log->setGatewayResponse($response);
 
@@ -3783,15 +3834,14 @@ class AdminController extends AbstractController
 
         $em->flush();
 
-        // SUCCESS FLASH
         $this->addFlash('success', sprintf(
             "%d SMS messages have been successfully sent and logged.",
             $sentCount
         ));
 
-        // REDIRECT DIRECTLY TO LOGS PAGE
         return $this->redirectToRoute('app_admin_sms_logs');
     }
+
 
 
     #[Route('/sms-logs', name: 'app_admin_sms_logs')]
@@ -3804,6 +3854,127 @@ class AdminController extends AbstractController
             'logs' => $logs
         ]);
     }
+
+    #[Route('/bulk-sms/apology', name: 'app_admin_bulk_sms_apology', methods: ['GET', 'POST'])]
+public function apologyPreview(
+    Request $request,
+    EntityManagerInterface $em
+): Response {
+
+    $user = $this->getUser();
+
+    // Fixed status = 4
+    $statusId = 4;
+
+    // Get institutes by ownership
+    // if (
+    //     $user
+    //     && in_array('ROLE_USER', $user->getRoles(), true)
+    //     && !in_array('ROLE_SUPER_ADMIN', $user->getRoles(), true)
+    // ) {
+    //     $instituteIds = $user->getKaabaInstitutes()
+    //         ->map(fn($i) => $i->getId())
+    //         ->toArray();
+    // } else {
+    //     $instituteIds = []; // admin = all
+    // }
+
+    $qb = $em->getRepository(KaabaApplication::class)
+        ->createQueryBuilder('a')
+        ->join('a.institute', 'i')
+        ->where('a.status = :st')
+        ->setParameter('st', $statusId);
+
+    // if (!empty($instituteIds)) {
+    //     $qb->andWhere('i.id IN (:ins)')
+    //        ->setParameter('ins', $instituteIds);
+    // }
+
+    $apps = $qb->getQuery()->getResult();
+
+    $message = "Raalli galin. Fariintan idiin soo gashay ee ka timid Mashruuca Rajo Kaaba waxay ku socotay Kulliyadda Tababarka Macallimiinta oo kali ah. Fadlan sidaas ku ogaada.";
+
+    return $this->render('admin/bulk_sms_apology_confirm.html.twig', [
+        'count' => count($apps),
+        'message' => $message,
+    ]);
+}
+
+#[Route('/bulk-sms/apology/send', name: 'app_admin_bulk_sms_apology_send', methods: ['POST'])]
+public function sendApologySms(
+    EntityManagerInterface $em,
+    TelesomSmsService $smsService
+): Response {
+
+    $user = $this->getUser();
+
+    $message = "Raalli galin. Fariintan idiin soo gashay ee ka timid Mashruuca Rajo Kaaba waxay ku socotay Kulliyadda Tababarka Macallimiinta oo kali ah. Fadlan sidaas ku ogaada.";
+
+    // Status fixed = 4
+    $statusId = 4;
+
+    // Enforce ownership
+    // if (
+    //     $user
+    //     && in_array('ROLE_USER', $user->getRoles(), true)
+    //     && !in_array('ROLE_SUPER_ADMIN', $user->getRoles(), true)
+    // ) {
+    //     $instituteIds = $user->getKaabaInstitutes()
+    //         ->map(fn($i) => $i->getId())
+    //         ->toArray();
+    // } else {
+    //     $instituteIds = [];
+    // }
+
+    $qb = $em->getRepository(KaabaApplication::class)
+        ->createQueryBuilder('a')
+        ->join('a.institute', 'i')
+        ->where('a.status = :st')
+        ->setParameter('st', $statusId);
+
+    // if (!empty($instituteIds)) {
+    //     $qb->andWhere('i.id IN (:ins)')
+    //        ->setParameter('ins', $instituteIds);
+    // }
+
+    $apps = $qb->getQuery()->getResult();
+
+    $sent = 0;
+
+    foreach ($apps as $app) {
+        $phone = $app->getPhone();
+        if (!$phone) continue;
+
+        usleep(400000);
+        $send = $smsService->sendBulk($phone, $message);
+
+        $status = $send[0]['status'] ?? 'unknown';
+        $resp   = $send[0]['body'] ?? 'no response';
+
+        // Log
+        $log = new KaabaSmsLog();
+        $log->setCreatedBy($user);
+        $log->setApplication($app);
+        $log->setReceiverName($app->getFullName());
+        $log->setPhoneNumber($phone);
+        $log->setMessage($message);
+        $log->setFilteredStatuses([4]);
+        // $log->setFilteredInstitutes($instituteIds);
+        $log->setMessageStatus($status);
+        $log->setGatewayResponse($resp);
+
+        $em->persist($log);
+        $sent++;
+    }
+
+    $em->flush();
+
+    $this->addFlash('success', "$sent apology SMS messages sent.");
+
+    return $this->redirectToRoute('app_admin_sms_logs');
+}
+
+
 
 
 

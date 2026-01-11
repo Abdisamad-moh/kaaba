@@ -1,0 +1,55 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Confirm Apology SMS{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+
+    <div class="card shadow-sm border-warning">
+        <div class="card-header bg-warning text-dark">
+            <h5 class="mb-0">
+                ⚠️ Confirm Apology SMS
+            </h5>
+        </div>
+
+        <div class="card-body">
+
+            <p class="lead">
+                <strong>{{ count }}</strong> applicants with <b>Status = 4</b> will receive this apology.
+            </p>
+
+            <div class="alert alert-danger">
+                This message will be sent immediately to all matched applicants.  
+                This action cannot be undone.
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Apology Message</label>
+                <div class="border p-3 bg-light" style="white-space: pre-wrap;">
+                    {{ message }}
+                </div>
+            </div>
+
+            <form method="POST" action="{{ path('app_admin_bulk_sms_apology_send') }}">
+                
+                {% if count > 0 %}
+                    <button class="btn btn-danger">
+                        🚨 Send Apology SMS
+                    </button>
+                {% else %}
+                    <div class="alert alert-info">
+                        No applicants found with status 4.
+                    </div>
+                {% endif %}
+
+                <a href="{{ path('app_admin_sms_logs') }}" class="btn btn-secondary ms-2">
+                    Cancel
+                </a>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}
