@@ -3618,6 +3618,73 @@ class AdminController extends AbstractController
         // REDIRECT DIRECTLY TO LOGS PAGE
         return $this->redirectToRoute('app_admin_sms_logs');
     }
+    #[Route('/bulk-sms/send/debug', name: 'app_admin_bulk_sms_send', methods: ['POST'])]
+    public function sendBulkSms_debug(
+        Request $request,
+        EntityManagerInterface $em,
+        TelesomSmsService $smsService
+    ): Response {
+
+        $statusIds = json_decode($request->request->get('statuses'), true);
+        $instituteIds = json_decode($request->request->get('institutes'), true);
+        $messageTemplate = $request->request->get('message');
+
+        $qb = $em->getRepository(KaabaApplication::class)->createQueryBuilder('a');
+
+        if (!empty($statusIds)) {
+            $qb->andWhere('a.status IN (:st)')->setParameter('st', $statusIds);
+        }
+
+        if (!empty($instituteIds)) {
+            $qb->andWhere('a.institute IN (:ins)')->setParameter('ins', $instituteIds);
+        }
+
+        $apps = $qb->getQuery()->getResult();
+        $sentCount = 0;
+
+        foreach ($apps as $app) {
+
+            $name = $app->getFullName() ?? "Applicant";
+            $phone = $app->getPhone();
+
+            if (!$phone) {
+                continue;
+            }
+
+            $message = str_replace('{{name}}', $name, $messageTemplate);
+            usleep(400000); // prevent Telesom gateway block
+
+            $sendResults = $smsService->sendBulk('063407225', $message);
+            $status = $sendResults[0]['status'] ?? 'unknown';
+            $response = $sendResults[0]['body'] ?? 'no response';
+
+            // Save SMS Log
+            $log = new KaabaSmsLog();
+             $log->setCreatedBy($this->getUser());
+            $log->setApplication($app);
+            $log->setReceiverName($name);
+            $log->setPhoneNumber($phone);
+            $log->setMessage($message);
+            $log->setFilteredStatuses($statusIds);
+            $log->setFilteredInstitutes($instituteIds);
+            $log->setMessageStatus($status);
+            $log->setGatewayResponse($response);
+
+            $em->persist($log);
+            $sentCount++;
+        }
+
+        $em->flush();
+
+        // SUCCESS FLASH
+        $this->addFlash('success', sprintf(
+            "%d SMS messages have been successfully sent and logged.",
+            $sentCount
+        ));
+
+        // REDIRECT DIRECTLY TO LOGS PAGE
+        return $this->redirectToRoute('app_admin_sms_logs');
+    }
 
 
     #[Route('/sms-logs', name: 'app_admin_sms_logs')]
