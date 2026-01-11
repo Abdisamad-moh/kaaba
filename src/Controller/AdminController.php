@@ -3478,6 +3478,113 @@ class AdminController extends AbstractController
             'prefillMessage' => $prefillMessage,
         ]);
     }
+    #[Route('/bulk-sms/debug', name: 'app_admin_bulk_sms_debug', methods: ['GET', 'POST'])]
+    public function bulkSmsForm_debug(
+        Request $request,
+        EntityManagerInterface $em
+    ): Response {
+
+        $user = $this->getUser();
+
+        // =========================
+        // INSTITUTES BY ROLE
+        // =========================
+        if (
+            $user
+            && in_array('ROLE_USER', $user->getRoles(), true)
+            && !in_array('ROLE_SUPER_ADMIN', $user->getRoles(), true)
+        ) {
+            // Only institutes managed by this user
+            $institutes = $em->getRepository(KaabaInstitute::class)
+                ->findBy(['manager' => $user]);
+        } else {
+            // Admin / Super admin
+            $institutes = $em->getRepository(KaabaInstitute::class)->findAll();
+        }
+
+        $statuses = $em->getRepository(KaabaApplicationStatus::class)->findAll();
+
+        // =========================
+        // PREFILL (EDIT SUPPORT)
+        // =========================
+        $prefillStatuses = $request->query->get('s')
+            ? json_decode($request->query->get('s'), true)
+            : [];
+
+        $prefillInstitutes = $request->query->get('i')
+            ? json_decode($request->query->get('i'), true)
+            : [];
+
+        $prefillMessage = $request->query->get('m') ?? '';
+
+        // =========================
+        // HANDLE POST
+        // =========================
+        if ($request->isMethod('POST')) {
+
+            $statusIds = $request->request->all('status');
+            $instituteIds = $request->request->all('institute');
+            $message = $request->request->get('message');
+
+            $qb = $em->getRepository(KaabaApplication::class)
+                ->createQueryBuilder('a')
+                ->join('a.institute', 'i');
+
+            // ---- STATUS FILTER
+            if (!empty($statusIds)) {
+                $qb->andWhere('a.status IN (:st)')
+                    ->setParameter('st', $statusIds);
+            }
+
+            // ---- INSTITUTE FILTER (ROLE-AWARE)
+            if (!empty($instituteIds)) {
+                // User selected institutes → trust but still safe
+                $qb->andWhere('i.id IN (:ins)')
+                    ->setParameter('ins', $instituteIds);
+            } else {
+                // No institute selected
+                // If ROLE_USER → restrict to managed institutes
+                if (
+                    $user
+                    && in_array('ROLE_USER', $user->getRoles(), true)
+                    && !in_array('ROLE_SUPER_ADMIN', $user->getRoles(), true)
+                ) {
+                    $managedInstituteIds = array_map(
+                        fn($inst) => $inst->getId(),
+                        $institutes
+                    );
+
+                    // Safety: if user manages nothing, return empty
+                    if (empty($managedInstituteIds)) {
+                        $apps = [];
+                    } else {
+                        $qb->andWhere('i.id IN (:managedIns)')
+                            ->setParameter('managedIns', $managedInstituteIds);
+                    }
+                }
+            }
+
+            $apps = $qb->getQuery()->getResult();
+
+            return $this->render('admin/bulk_sms_confirm_debug.html.twig', [
+                'count' => count($apps),
+                'message' => $message,
+                'statuses' => $statusIds,
+                'institutes' => $instituteIds,
+            ]);
+        }
+
+        // =========================
+        // RENDER FORM
+        // =========================
+        return $this->render('admin/bulk_sms_form.html.twig', [
+            'statuses' => $statuses,
+            'institutes' => $institutes,
+            'selectedStatuses' => $prefillStatuses,
+            'selectedInstitutes' => $prefillInstitutes,
+            'prefillMessage' => $prefillMessage,
+        ]);
+    }
 
 
     #[Route('/bulk-sms/individual', name: 'app_admin_bulk_sms_individual', methods: ['GET', 'POST'])]
@@ -3618,7 +3725,7 @@ class AdminController extends AbstractController
         // REDIRECT DIRECTLY TO LOGS PAGE
         return $this->redirectToRoute('app_admin_sms_logs');
     }
-    #[Route('/bulk-sms/send/debug', name: 'app_admin_bulk_sms_send', methods: ['POST'])]
+    #[Route('/bulk-sms/send/debug', name: 'app_admin_bulk_sms_send_debug', methods: ['POST'])]
     public function sendBulkSms_debug(
         Request $request,
         EntityManagerInterface $em,
@@ -3654,7 +3761,7 @@ class AdminController extends AbstractController
             $message = str_replace('{{name}}', $name, $messageTemplate);
             usleep(400000); // prevent Telesom gateway block
 
-            $sendResults = $smsService->sendBulk('063407225', $message);
+            $sendResults = $smsService->sendBulk('0634407225', $message);
             $status = $sendResults[0]['status'] ?? 'unknown';
             $response = $sendResults[0]['body'] ?? 'no response';
 

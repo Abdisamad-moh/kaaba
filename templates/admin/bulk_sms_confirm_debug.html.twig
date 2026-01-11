@@ -1,0 +1,51 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Confirm Bulk SMS{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-warning">
+            <h5 class="mb-0">Confirm Bulk SMS</h5>
+        </div>
+
+        <div class="card-body">
+            <p class="lead">
+                <strong>{{ count }}</strong> applications matched your filters.
+            </p>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Message Preview</label>
+                <div class="border p-3 bg-light" style="white-space: pre-wrap;">
+                    {{ message }}
+                </div>
+            </div>
+
+            <form method="POST" action="{{ path('app_admin_bulk_sms_send_debug') }}">
+                <input type="hidden" name="message" value="{{ message }}">
+                <input type="hidden" name="statuses" value="{{ statuses|json_encode }}">
+                <input type="hidden" name="institutes" value="{{ institutes|json_encode }}">
+
+                <a href="{{
+    path('app_admin_bulk_sms', {
+        s: statuses|json_encode,
+        i: institutes|json_encode,
+        m: message
+    })
+}}" class="btn btn-secondary">
+    Edit
+</a>
+
+
+{% if count > 0 %}
+     <button class="btn btn-danger">Send SMS</button>
+{% endif %}
+               
+            </form>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}
