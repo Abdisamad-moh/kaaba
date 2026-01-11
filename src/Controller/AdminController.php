@@ -3557,6 +3557,7 @@ class AdminController extends AbstractController
         TelesomSmsService $smsService
     ): Response {
 
+        dd("Debugging point");
         $statusIds = json_decode($request->request->get('statuses'), true);
         $instituteIds = json_decode($request->request->get('institutes'), true);
         $messageTemplate = $request->request->get('message');
