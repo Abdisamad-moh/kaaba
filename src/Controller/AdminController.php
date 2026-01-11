@@ -3856,123 +3856,132 @@ class AdminController extends AbstractController
     }
 
     #[Route('/bulk-sms/apology', name: 'app_admin_bulk_sms_apology', methods: ['GET', 'POST'])]
-public function apologyPreview(
-    Request $request,
-    EntityManagerInterface $em
-): Response {
+    public function apologyPreview(
+        Request $request,
+        EntityManagerInterface $em
+    ): Response {
 
-    $user = $this->getUser();
+        $user = $this->getUser();
 
-    // Fixed status = 4
-    $statusId = 4;
+        // Fixed status = 4
+        $statusId = 4;
 
-    // Get institutes by ownership
-    // if (
-    //     $user
-    //     && in_array('ROLE_USER', $user->getRoles(), true)
-    //     && !in_array('ROLE_SUPER_ADMIN', $user->getRoles(), true)
-    // ) {
-    //     $instituteIds = $user->getKaabaInstitutes()
-    //         ->map(fn($i) => $i->getId())
-    //         ->toArray();
-    // } else {
-    //     $instituteIds = []; // admin = all
-    // }
+        // Get institutes by ownership
+        // if (
+        //     $user
+        //     && in_array('ROLE_USER', $user->getRoles(), true)
+        //     && !in_array('ROLE_SUPER_ADMIN', $user->getRoles(), true)
+        // ) {
+        //     $instituteIds = $user->getKaabaInstitutes()
+        //         ->map(fn($i) => $i->getId())
+        //         ->toArray();
+        // } else {
+        //     $instituteIds = []; // admin = all
+        // }
 
-    $qb = $em->getRepository(KaabaApplication::class)
-        ->createQueryBuilder('a')
-        ->join('a.institute', 'i')
-        ->where('a.status = :st')
-        ->setParameter('st', $statusId);
+       // Institute to EXCLUDE
+        $excludedInstituteId = 3;
 
-    // if (!empty($instituteIds)) {
-    //     $qb->andWhere('i.id IN (:ins)')
-    //        ->setParameter('ins', $instituteIds);
-    // }
+        // =========================
+        // Build target query
+        // =========================
+        $qb = $em->getRepository(KaabaApplication::class)
+            ->createQueryBuilder('a')
+            ->join('a.institute', 'i')
+            ->where('a.status = :st')
+            ->andWhere('i.id != :excludedIns')
+            ->setParameter('st', $statusId)
+            ->setParameter('excludedIns', $excludedInstituteId);
 
-    $apps = $qb->getQuery()->getResult();
+        $apps = $qb->getQuery()->getResult();
 
-    $message = "Raalli galin. Fariintan idiin soo gashay ee ka timid Mashruuca Rajo Kaaba waxay ku socotay Kulliyadda Tababarka Macallimiinta oo kali ah. Fadlan sidaas ku ogaada.";
+        // if (!empty($instituteIds)) {
+        //     $qb->andWhere('i.id IN (:ins)')
+        //        ->setParameter('ins', $instituteIds);
+        // }
 
-    return $this->render('admin/bulk_sms_apology_confirm.html.twig', [
-        'count' => count($apps),
-        'message' => $message,
-    ]);
-}
+        $apps = $qb->getQuery()->getResult();
 
-#[Route('/bulk-sms/apology/send', name: 'app_admin_bulk_sms_apology_send', methods: ['POST'])]
-public function sendApologySms(
-    EntityManagerInterface $em,
-    TelesomSmsService $smsService
-): Response {
+        $message = "Raalli galin. Fariintan idiin soo gashay ee ka timid Mashruuca Rajo Kaaba waxay ku socotay Kulliyadda Tababarka Macallimiinta oo kali ah. Fadlan sidaas ku ogaada.";
 
-    $user = $this->getUser();
-
-    $message = "Raalli galin. Fariintan idiin soo gashay ee ka timid Mashruuca Rajo Kaaba waxay ku socotay Kulliyadda Tababarka Macallimiinta oo kali ah. Fadlan sidaas ku ogaada.";
-
-    // Status fixed = 4
-    $statusId = 4;
-
-    // Enforce ownership
-    // if (
-    //     $user
-    //     && in_array('ROLE_USER', $user->getRoles(), true)
-    //     && !in_array('ROLE_SUPER_ADMIN', $user->getRoles(), true)
-    // ) {
-    //     $instituteIds = $user->getKaabaInstitutes()
-    //         ->map(fn($i) => $i->getId())
-    //         ->toArray();
-    // } else {
-    //     $instituteIds = [];
-    // }
-
-    $qb = $em->getRepository(KaabaApplication::class)
-        ->createQueryBuilder('a')
-        ->join('a.institute', 'i')
-        ->where('a.status = :st')
-        ->setParameter('st', $statusId);
-
-    // if (!empty($instituteIds)) {
-    //     $qb->andWhere('i.id IN (:ins)')
-    //        ->setParameter('ins', $instituteIds);
-    // }
-
-    $apps = $qb->getQuery()->getResult();
-
-    $sent = 0;
-
-    foreach ($apps as $app) {
-        $phone = $app->getPhone();
-        if (!$phone) continue;
-
-        usleep(400000);
-        $send = $smsService->sendBulk($phone, $message);
-
-        $status = $send[0]['status'] ?? 'unknown';
-        $resp   = $send[0]['body'] ?? 'no response';
-
-        // Log
-        $log = new KaabaSmsLog();
-        $log->setCreatedBy($user);
-        $log->setApplication($app);
-        $log->setReceiverName($app->getFullName());
-        $log->setPhoneNumber($phone);
-        $log->setMessage($message);
-        $log->setFilteredStatuses([4]);
-        // $log->setFilteredInstitutes($instituteIds);
-        $log->setMessageStatus($status);
-        $log->setGatewayResponse($resp);
-
-        $em->persist($log);
-        $sent++;
+        return $this->render('admin/bulk_sms_apology_confirm.html.twig', [
+            'count' => count($apps),
+            'message' => $message,
+        ]);
     }
 
-    $em->flush();
+    #[Route('/bulk-sms/apology/send', name: 'app_admin_bulk_sms_apology_send', methods: ['POST'])]
+    public function sendApologySms(
+        EntityManagerInterface $em,
+        TelesomSmsService $smsService
+    ): Response {
 
-    $this->addFlash('success', "$sent apology SMS messages sent.");
+        $user = $this->getUser();
 
-    return $this->redirectToRoute('app_admin_sms_logs');
-}
+        $message = "Raalli galin. Fariintan idiin soo gashay ee ka timid Mashruuca Rajo Kaaba waxay ku socotay Kulliyadda Tababarka Macallimiinta oo kali ah. Fadlan sidaas ku ogaada.";
+
+        // Target status = 4
+        $statusId = 4;
+
+        // Institute to EXCLUDE
+        $excludedInstituteId = 3;
+
+        // =========================
+        // Build target query
+        // =========================
+        $qb = $em->getRepository(KaabaApplication::class)
+            ->createQueryBuilder('a')
+            ->join('a.institute', 'i')
+            ->where('a.status = :st')
+            ->andWhere('i.id != :excludedIns')
+            ->setParameter('st', $statusId)
+            ->setParameter('excludedIns', $excludedInstituteId);
+
+        $apps = $qb->getQuery()->getResult();
+
+        $sent = 0;
+
+        foreach ($apps as $app) {
+
+            $phone = $app->getPhone();
+            if (!$phone) {
+                continue;
+            }
+
+            usleep(400000); // Telesom throttle protection
+
+            $send = $smsService->sendBulk($phone, $message);
+            $status = $send[0]['status'] ?? 'unknown';
+            $resp = $send[0]['body'] ?? 'no response';
+
+            // =========================
+            // Log for audit
+            // =========================
+            $log = new KaabaSmsLog();
+            $log->setCreatedBy($user);
+            $log->setApplication($app);
+            $log->setReceiverName($app->getFullName());
+            $log->setPhoneNumber($phone);
+            $log->setMessage($message);
+            $log->setFilteredStatuses([4]);
+            $log->setFilteredInstitutes(['EXCEPT' => 3]);
+            $log->setMessageStatus($status);
+            $log->setGatewayResponse($resp);
+
+            $em->persist($log);
+            $sent++;
+        }
+
+        $em->flush();
+
+        $this->addFlash('success', sprintf(
+            "%d apology SMS messages sent (excluding Institute ID 3).",
+            $sent
+        ));
+
+        return $this->redirectToRoute('app_admin_sms_logs');
+    }
+
 
 
 
