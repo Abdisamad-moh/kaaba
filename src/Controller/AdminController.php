@@ -5,6 +5,7 @@ namespace App\Controller;
 use DateTime;
 use App\Entity\User;
 use App\Form\CvForm;
+use App\Entity\SmsJob;
 use DateTimeImmutable;
 use App\Entity\MetierAds;
 use App\Form\AdsFormType;
@@ -21,6 +22,7 @@ use App\Entity\EmployerJobs;
 use App\Entity\MetierSkills;
 use App\Model\JobStatusEnum;
 use App\Service\MailService;
+use Psr\Log\LoggerInterface;
 use App\Entity\KaabaDistrict;
 use App\Entity\MetierCareers;
 use App\Event\SendEmailEvent;
@@ -51,6 +53,7 @@ use App\Entity\EmployerJobQuestion;
 use App\Entity\KaabaApplicationLog;
 use App\Form\EmailTemplateFormType;
 use App\Form\SettingsBasicInfoType;
+use App\Service\AsyncCommandRunner;
 use Symfony\UX\Chartjs\Model\Chart;
 use App\Entity\KaabaApplicationExam;
 use App\Service\NotificationService;
@@ -65,6 +68,7 @@ use Symfony\Component\Form\FormEvents;
 use App\Form\EmployerAutoCompleteField;
 use App\Repository\JobReportRepository;
 use App\Repository\MetierAdsRepository;
+use App\Service\SimpleBackgroundRunner;
 use App\Entity\JobSeekerRecommendedJobs;
 use App\Form\JobseekerAutoCompleteField;
 use App\Form\KaabaApplicationSearchType;
@@ -3652,99 +3656,81 @@ class AdminController extends AbstractController
     }
 
 
-    #[Route('/bulk-sms/send', name: 'app_admin_bulk_sms_send', methods: ['POST'])]
-    public function sendBulkSms(
-        Request $request,
-        EntityManagerInterface $em,
-        TelesomSmsService $smsService
-    ): Response {
+   #[Route('/bulk-sms/send', name: 'app_admin_bulk_sms_send', methods: ['POST'])]
+public function sendBulkSms(
+    Request $request,
+    EntityManagerInterface $em,
+    SimpleBackgroundRunner $backgroundRunner,
+    LoggerInterface $logger
+): Response {
+    $user = $this->getUser();
 
-        dd("Debug route called");
-        $user = $this->getUser();
+    $statusIds = json_decode($request->request->get('statuses'), true);
+    $postedInstituteIds = json_decode($request->request->get('institutes'), true);
+    $messageTemplate = $request->request->get('message');
 
-        $statusIds = json_decode($request->request->get('statuses'), true);
-        $postedInstituteIds = json_decode($request->request->get('institutes'), true);
-        $messageTemplate = $request->request->get('message');
+    // Create job tracking
 
-        // =====================================
-        // 🔐 FORCE OWNERSHIP (CRITICAL SECURITY)
-        // =====================================
-        if (
-            $user
-            && in_array('ROLE_USER', $user->getRoles(), true)
-            && !in_array('ROLE_SUPER_ADMIN', $user->getRoles(), true)
-        ) {
-            // ROLE_USER → always use institutes they manage
-            $instituteIds = $user->getKaabaInstitutes()
-                ->map(fn($i) => $i->getId())
-                ->toArray();
+    try {
+        // Run the command using the simple runner
+        $success = $backgroundRunner->runBulkSmsCommand(
+            $user->getId(),
+            $statusIds,
+            $postedInstituteIds,
+            $messageTemplate,
+            (string) 1
+        );
+
+        if ($success) {
+            $em->flush();
+
+            $logger->info('Bulk SMS job started successfully', [
+                
+            ]);
+
+            $this->addFlash('success', sprintf(
+                'Bulk SMS job #%s has been started in the background. You can continue working.', (string) 'AF'
+            ));
         } else {
-            // Admin → trust what was selected
-            $instituteIds = $postedInstituteIds;
+            throw new \RuntimeException('Failed to start background process');
         }
 
-        // =========================
-        // BUILD QUERY (SAFE)
-        // =========================
-        $qb = $em->getRepository(KaabaApplication::class)
-            ->createQueryBuilder('a')
-            ->join('a.institute', 'i');
+    } catch (\Exception $e) {
+       
 
-        if (!empty($statusIds)) {
-            $qb->andWhere('a.status IN (:st)')
-                ->setParameter('st', $statusIds);
+        $logger->error('Failed to start bulk SMS job', [
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ]);
+
+        $this->addFlash('error', 'Failed to start the bulk SMS job. Please try again.');
+    }
+
+    return $this->redirectToRoute('app_admin_kaaba_applications');
+}
+
+    #[Route('/admin/sms/jobs', name: 'app_admin_sms_jobs')]
+    public function smsJobs(EntityManagerInterface $em): Response
+    {
+        $jobs = $em->getRepository(SmsJob::class)
+            ->findBy(['createdBy' => $this->getUser()], ['createdAt' => 'DESC']);
+
+        return $this->render('admin/jobs.html.twig', [
+            'jobs' => $jobs,
+        ]);
+    }
+
+    #[Route('/admin/sms/jobs/{id}', name: 'app_admin_sms_job_detail')]
+    public function smsJobDetail(SmsJob $job): Response
+    {
+        // Check permissions
+        if ($job->getCreatedBy() !== $this->getUser() && !$this->isGranted('ROLE_SUPER_ADMIN')) {
+            throw $this->createAccessDeniedException();
         }
 
-        if (!empty($instituteIds)) {
-            $qb->andWhere('i.id IN (:ins)')
-                ->setParameter('ins', $instituteIds);
-        }
-
-        $apps = $qb->getQuery()->getResult();
-        $sentCount = 0;
-
-        foreach ($apps as $app) {
-
-            $name = $app->getFullName() ?? "Applicant";
-            $phone = $app->getPhone();
-
-            if (!$phone) {
-                continue;
-            }
-
-            $message = str_replace('{{name}}', $name, $messageTemplate);
-            usleep(400000); // Telesom throttle protection
-
-            $sendResults = $smsService->sendBulk($phone, $message);
-            $status = $sendResults[0]['status'] ?? 'unknown';
-            $response = $sendResults[0]['body'] ?? 'no response';
-
-            // =========================
-            // SAVE AUDIT LOG
-            // =========================
-            $log = new KaabaSmsLog();
-            $log->setCreatedBy($user);
-            $log->setApplication($app);
-            $log->setReceiverName($name);
-            $log->setPhoneNumber($phone);
-            $log->setMessage($message);
-            $log->setFilteredStatuses($statusIds);
-            $log->setFilteredInstitutes($instituteIds); // forced + safe
-            $log->setMessageStatus($status);
-            $log->setGatewayResponse($response);
-
-            $em->persist($log);
-            $sentCount++;
-        }
-
-        $em->flush();
-
-        $this->addFlash('success', sprintf(
-            "%d SMS messages have been successfully sent and logged.",
-            $sentCount
-        ));
-
-        return $this->redirectToRoute('app_admin_sms_logs');
+        return $this->render('admin/jobs_detail.html.twig', [
+            'job' => $job,
+        ]);
     }
 
     #[Route('/bulk-sms/send/debug', name: 'app_admin_bulk_sms_send_debug', methods: ['POST'])]
@@ -3879,7 +3865,7 @@ class AdminController extends AbstractController
         //     $instituteIds = []; // admin = all
         // }
 
-       // Institute to EXCLUDE
+        // Institute to EXCLUDE
         $excludedInstituteId = 3;
 
         // =========================

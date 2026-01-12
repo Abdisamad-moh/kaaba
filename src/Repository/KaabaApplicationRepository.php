@@ -375,4 +375,22 @@ public function countApplicationsByStatusId(int $statusId, ?User $user = null): 
 
     return $qb->getQuery()->getSingleScalarResult();
 }
+
+public function findByFilters(array $statusIds = [], array $instituteIds = []): array
+{
+    $qb = $this->createQueryBuilder('a')
+        ->join('a.institute', 'i');
+
+    if (!empty($statusIds)) {
+        $qb->andWhere('a.status IN (:st)')
+            ->setParameter('st', $statusIds);
+    }
+
+    if (!empty($instituteIds)) {
+        $qb->andWhere('i.id IN (:ins)')
+            ->setParameter('ins', $instituteIds);
+    }
+
+    return $qb->getQuery()->getResult();
+}
 }

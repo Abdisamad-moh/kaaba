@@ -80,9 +80,14 @@ services:
     App\Service\OpenAIService:
         arguments:
             $openAIKey: '%env(OPENAI_API_KEY)%'
-                
-
-
+    App\Service\AsyncCommandRunner:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+            $logger: '@logger'
+    App\Service\SimpleBackgroundRunner:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+            $logger: '@logger'
 
     App\Twig\AppExtension:
         tags: ['twig.extension']
