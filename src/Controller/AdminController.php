@@ -1589,221 +1589,238 @@ class AdminController extends AbstractController
 
 
 
-    #[Route('/kaaba-applications/export', name: 'app_admin_kaaba_applications_export')]
-    public function exportApplications(
-        Request $request,
-        KaabaApplicationRepository $applicationsRepository,
-        KaabaApplicationStatusRepository $statusRepository,
-        KaabaRegionRepository $regionRepository,
-        KaabaDistrictRepository $districtRepository,
-        KaabaQualificationRepository $qualificationRepository,
-        KaabaScholarshipRepository $scholarshipRepository,
-        KaabaInstituteRepository $instituteRepository,
-        KaabaCourseRepository $courseRepository,
-    ): Response {
+#[Route('/kaaba-applications/export', name: 'app_admin_kaaba_applications_export')]
+public function exportApplications(
+    Request $request,
+    KaabaApplicationRepository $applicationsRepository,
+    KaabaApplicationStatusRepository $statusRepository,
+    KaabaRegionRepository $regionRepository,
+    KaabaDistrictRepository $districtRepository,
+    KaabaQualificationRepository $qualificationRepository,
+    KaabaScholarshipRepository $scholarshipRepository,
+    KaabaInstituteRepository $instituteRepository,
+    KaabaCourseRepository $courseRepository,
+): Response {
 
-        $user = $this->getUser();
+    $user = $this->getUser();
 
-        //--------------------------------------------------------------------
-        // 1) Get filters from request (Symfony form values)
-        //--------------------------------------------------------------------
+    //--------------------------------------------------------------------
+    // 1) Get filters from request (Symfony form values)
+    //--------------------------------------------------------------------
 
-        $filters = $request->query->all('kaaba_application_search') ?? [];
+    $filters = $request->query->all('kaaba_application_search') ?? [];
 
-        //--------------------------------------------------------------------
-        // 2) Convert filters to Entities (as repository expects)
-        //--------------------------------------------------------------------
+    //--------------------------------------------------------------------
+    // 2) Convert filters to Entities (as repository expects)
+    //--------------------------------------------------------------------
 
-        $status = !empty($filters['status']) ? $statusRepository->find($filters['status']) : null;
+    $status = !empty($filters['status']) ? $statusRepository->find($filters['status']) : null;
 
-        $region = !empty($filters['region']) ? $regionRepository->find($filters['region']) : null;
+    $region = !empty($filters['region']) ? $regionRepository->find($filters['region']) : null;
 
-        $district = !empty($filters['district']) ? $districtRepository->find($filters['district']) : null;
+    $district = !empty($filters['district']) ? $districtRepository->find($filters['district']) : null;
 
-        $qualification = !empty($filters['qualification']) ? $qualificationRepository->find($filters['qualification']) : null;
+    $qualification = !empty($filters['qualification']) ? $qualificationRepository->find($filters['qualification']) : null;
 
-        $scholarship = !empty($filters['scholarship']) ? $scholarshipRepository->find($filters['scholarship']) : null;
+    $scholarship = !empty($filters['scholarship']) ? $scholarshipRepository->find($filters['scholarship']) : null;
 
-        $institute = !empty($filters['institute']) ? $instituteRepository->find($filters['institute']) : null;
+    $institute = !empty($filters['institute']) ? $instituteRepository->find($filters['institute']) : null;
 
-        $course = !empty($filters['course']) ? $courseRepository->find($filters['course']) : null;
+    $course = !empty($filters['course']) ? $courseRepository->find($filters['course']) : null;
 
-        //--------------------------------------------------------------------
-        // 3) Applicant search — only exact ID supported in repo
-        //--------------------------------------------------------------------
+    //--------------------------------------------------------------------
+    // 3) Applicant search — only exact ID supported in repo
+    //--------------------------------------------------------------------
 
-        $applicantEntity = null;
+    $applicantEntity = null;
 
-        if (!empty($filters['phone']) && ctype_digit($filters['phone'])) {
-            $applicantEntity = $applicationsRepository->find($filters['phone']);
-        }
-
-        //--------------------------------------------------------------------
-        // 4) Build query using updated parameter order (no date parameters)
-        //--------------------------------------------------------------------
-
-        $query = $applicationsRepository->filterApplicationsQuery(
-            $applicantEntity,                       // 1 - applicant (first)
-            $region,                                // 2 - region
-            $district,                              // 3 - district
-            $qualification,                         // 4 - qualification
-            $scholarship,                           // 5 - scholarship
-            $institute,                             // 6 - institute
-            $course,                                // 7 - course
-            $filters['exam_result'] ?? null,        // 8 - exam_result
-            $filters['assesment_result'] ?? null,   // 9 - assesment_result
-            $filters['disability'] ?? null,         // 10 - disability
-            $status,                                // 11 - status (last)
-            $user                                   // 12 - user
-        );
-
-        //--------------------------------------------------------------------
-        // 5) Fetch ALL matching results (no pagination)
-        //--------------------------------------------------------------------
-
-        $applications = $query->getResult();
-
-        //--------------------------------------------------------------------
-        // 6) Generate Excel sheet
-        //--------------------------------------------------------------------
-
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-
-        // Column headers - Added Highschool Grade column
-        $headers = [
-            'No',
-            'Portal ID',
-            'Full Name',
-            'Date of Birth',
-            'Telephone',
-            'Email',
-            'Region',
-            'District',
-            'Family Members',
-            'Monthly Income',
-            'High School Name',
-            'Highschool Grade', // New column
-            'Graduation Year', // New column
-        ];
-
-        $col = 'A';
-        foreach ($headers as $header) {
-            $sheet->setCellValue("{$col}1", $header);
-            $sheet->getStyle("{$col}1")->getFont()->setBold(true);
-            $col++;
-        }
-
-        //--------------------------------------------------------------------
-        // 7) Populate data rows
-        //--------------------------------------------------------------------
-
-        $row = 2;
-        $counter = 1;
-
-        foreach ($applications as $application) {
-
-            $sheet->setCellValue("A{$row}", $counter);
-            $sheet->setCellValue("B{$row}", $application->getId());
-            $sheet->setCellValue("C{$row}", $application->getFullName());
-
-            $dob = $application->getDateOfBirth();
-            $sheet->setCellValue("D{$row}", $dob ? $dob->format('Y-m-d') : '');
-
-            $sheet->setCellValue("E{$row}", $application->getPhone());
-            $sheet->setCellValue("F{$row}", $application->getEmail());
-
-            $sheet->setCellValue("G{$row}", $application->getRegion()?->getName() ?? '');
-            $sheet->setCellValue("H{$row}", $application->getDistrict()?->getName() ?? '');
-
-            //----------------------------------------------------------------
-            // Decode assessment JSON fields into readable text
-            //----------------------------------------------------------------
-
-            $assessment = $application->getAssessment();
-            $familyMembers = '';
-            $monthlyIncome = '';
-
-            if ($assessment) {
-
-                // household members
-                $household = $assessment->getHousehold() ?? [];
-                if (!empty($household['household_members'])) {
-                    $familyMembers = match ($household['household_members']) {
-                        1 => 'Less than 2',
-                        2 => '2',
-                        3 => '3–5',
-                        4 => '6',
-                        5 => '7–9',
-                        6 => '10',
-                        7 => '11–12',
-                        8 => 'More than 12',
-                        default => '',
-                    };
-                }
-
-                // monthly income
-                $income = $assessment->getIncome() ?? [];
-                if (!empty($income['monthly_income'])) {
-                    $monthlyIncome = match ($income['monthly_income']) {
-                        1 => 'More than $2000',
-                        2 => '$1500 – $2000',
-                        3 => '$1200 – $1500',
-                        4 => '$1000 – $1200',
-                        5 => '$500 – $1000',
-                        6 => '$300 – $500',
-                        7 => '$150 – $300',
-                        8 => '$65 – $150',
-                        default => '',
-                    };
-                }
-            }
-
-            $sheet->setCellValue("I{$row}", $familyMembers);
-            $sheet->setCellValue("J{$row}", $monthlyIncome);
-
-            //----------------------------------------------------------------
-            // High school name
-            //----------------------------------------------------------------
-
-            $sheet->setCellValue("K{$row}", $application->getSecondarySchool());
-
-            //----------------------------------------------------------------
-            // Highschool Grade - NEW COLUMN
-            //----------------------------------------------------------------
-
-            $sheet->setCellValue("L{$row}", $application->getSecondaryGrade() ?? '');
-            $sheet->setCellValue("M{$row}", $application->getSecondaryGraduationYear() ?? '');
-
-            $row++;
-            $counter++;
-        }
-
-        //--------------------------------------------------------------------
-        // 8) Auto-size columns
-        //--------------------------------------------------------------------
-
-        foreach (range('A', $sheet->getHighestColumn()) as $col) {
-            $sheet->getColumnDimension($col)->setAutoSize(true);
-        }
-
-        //--------------------------------------------------------------------
-        // 9) Return file as downloadable response
-        //--------------------------------------------------------------------
-
-        $filename = "scholarship_export_" . date('Y-m-d_H-i-s') . ".xlsx";
-        $writer = new Xlsx($spreadsheet);
-
-        $response = new StreamedResponse(function () use ($writer) {
-            $writer->save('php://output');
-        });
-
-        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        $response->headers->set('Content-Disposition', "attachment; filename=\"{$filename}\"");
-
-        return $response;
+    if (!empty($filters['phone']) && ctype_digit($filters['phone'])) {
+        $applicantEntity = $applicationsRepository->find($filters['phone']);
     }
 
+    //--------------------------------------------------------------------
+    // 4) Build query using updated parameter order (no date parameters)
+    //--------------------------------------------------------------------
+
+    $query = $applicationsRepository->filterApplicationsQuery(
+        $applicantEntity,                       // 1 - applicant (first)
+        $region,                                // 2 - region
+        $district,                              // 3 - district
+        $qualification,                         // 4 - qualification
+        $scholarship,                           // 5 - scholarship
+        $institute,                             // 6 - institute
+        $course,                                // 7 - course
+        $filters['exam_result'] ?? null,        // 8 - exam_result
+        $filters['assesment_result'] ?? null,   // 9 - assesment_result
+        $filters['disability'] ?? null,         // 10 - disability
+        $status,                                // 11 - status (last)
+        $user                                   // 12 - user
+    );
+
+    //--------------------------------------------------------------------
+    // 5) Fetch ALL matching results (no pagination)
+    //--------------------------------------------------------------------
+
+    $applications = $query->getResult();
+
+    //--------------------------------------------------------------------
+    // 6) Generate Excel sheet
+    //--------------------------------------------------------------------
+
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+
+    // Column headers - Added new columns at the end
+    $headers = [
+        'No',
+        'Portal ID',
+        'Full Name',
+        'Date of Birth',
+        'Telephone',
+        'Email',
+        'Region',
+        'District',
+        'Family Members',
+        'Monthly Income',
+        'High School Name',
+        'Highschool Grade',
+        'Graduation Year',
+        'Course',              // NEW COLUMN
+        'Rejection Reason',    // NEW COLUMN
+        'Approval Reason',     // NEW COLUMN
+    ];
+
+    $col = 'A';
+    foreach ($headers as $header) {
+        $sheet->setCellValue("{$col}1", $header);
+        $sheet->getStyle("{$col}1")->getFont()->setBold(true);
+        $col++;
+    }
+
+    //--------------------------------------------------------------------
+    // 7) Populate data rows
+    //--------------------------------------------------------------------
+
+    $row = 2;
+    $counter = 1;
+
+    foreach ($applications as $application) {
+
+        $sheet->setCellValue("A{$row}", $counter);
+        $sheet->setCellValue("B{$row}", $application->getId());
+        $sheet->setCellValue("C{$row}", $application->getFullName());
+
+        $dob = $application->getDateOfBirth();
+        $sheet->setCellValue("D{$row}", $dob ? $dob->format('Y-m-d') : '');
+
+        $sheet->setCellValue("E{$row}", $application->getPhone());
+        $sheet->setCellValue("F{$row}", $application->getEmail());
+
+        $sheet->setCellValue("G{$row}", $application->getRegion()?->getName() ?? '');
+        $sheet->setCellValue("H{$row}", $application->getDistrict()?->getName() ?? '');
+
+        //----------------------------------------------------------------
+        // Decode assessment JSON fields into readable text
+        //----------------------------------------------------------------
+
+        $assessment = $application->getAssessment();
+        $familyMembers = '';
+        $monthlyIncome = '';
+
+        if ($assessment) {
+
+            // household members
+            $household = $assessment->getHousehold() ?? [];
+            if (!empty($household['household_members'])) {
+                $familyMembers = match ($household['household_members']) {
+                    1 => 'Less than 2',
+                    2 => '2',
+                    3 => '3–5',
+                    4 => '6',
+                    5 => '7–9',
+                    6 => '10',
+                    7 => '11–12',
+                    8 => 'More than 12',
+                    default => '',
+                };
+            }
+
+            // monthly income
+            $income = $assessment->getIncome() ?? [];
+            if (!empty($income['monthly_income'])) {
+                $monthlyIncome = match ($income['monthly_income']) {
+                    1 => 'More than $2000',
+                    2 => '$1500 – $2000',
+                    3 => '$1200 – $1500',
+                    4 => '$1000 – $1200',
+                    5 => '$500 – $1000',
+                    6 => '$300 – $500',
+                    7 => '$150 – $300',
+                    8 => '$65 – $150',
+                    default => '',
+                };
+            }
+        }
+
+        $sheet->setCellValue("I{$row}", $familyMembers);
+        $sheet->setCellValue("J{$row}", $monthlyIncome);
+
+        //----------------------------------------------------------------
+        // High school name
+        //----------------------------------------------------------------
+
+        $sheet->setCellValue("K{$row}", $application->getSecondarySchool());
+
+        //----------------------------------------------------------------
+        // Highschool Grade
+        //----------------------------------------------------------------
+
+        $sheet->setCellValue("L{$row}", $application->getSecondaryGrade() ?? '');
+        $sheet->setCellValue("M{$row}", $application->getSecondaryGraduationYear() ?? '');
+        
+        //----------------------------------------------------------------
+        // NEW: Course column
+        //----------------------------------------------------------------
+        $sheet->setCellValue("N{$row}", $application->getCourse()?->getName() ?? '');
+        
+        //----------------------------------------------------------------
+        // NEW: Rejection Reason column
+        //----------------------------------------------------------------
+        $sheet->setCellValue("O{$row}", $application->getRejectionReason() ?? '');
+        
+        //----------------------------------------------------------------
+        // NEW: Approval Reason column
+        //----------------------------------------------------------------
+        $sheet->setCellValue("P{$row}", $application->getApprovedReason() ?? '');
+
+        $row++;
+        $counter++;
+    }
+
+    //--------------------------------------------------------------------
+    // 8) Auto-size columns
+    //--------------------------------------------------------------------
+
+    foreach (range('A', $sheet->getHighestColumn()) as $col) {
+        $sheet->getColumnDimension($col)->setAutoSize(true);
+    }
+
+    //--------------------------------------------------------------------
+    // 9) Return file as downloadable response
+    //--------------------------------------------------------------------
+
+    $filename = "scholarship_export_" . date('Y-m-d_H-i-s') . ".xlsx";
+    $writer = new Xlsx($spreadsheet);
+
+    $response = new StreamedResponse(function () use ($writer) {
+        $writer->save('php://output');
+    });
+
+    $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    $response->headers->set('Content-Disposition', "attachment; filename=\"{$filename}\"");
+
+    return $response;
+}
 
 
 
