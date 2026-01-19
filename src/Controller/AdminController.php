@@ -1586,9 +1586,6 @@ class AdminController extends AbstractController
         ]);
     }
 
-
-
-
 #[Route('/kaaba-applications/export', name: 'app_admin_kaaba_applications_export')]
 public function exportApplications(
     Request $request,
