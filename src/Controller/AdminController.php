@@ -3757,8 +3757,8 @@ public function sendBulkSms(
 
 
 
-#[Route('/kaaba-applications/export', name: 'app_admin_kaaba_applications_export')]
-public function exportApplications(
+#[Route('/kaaba-applications/export-excel', name: 'app_admin_kaaba_applications_export_excel')]
+public function exportexcelApplications(
     Request $request,
     KaabaApplicationRepository $applicationsRepository,
     KaabaApplicationStatusRepository $statusRepository,
@@ -3854,9 +3854,9 @@ public function exportApplications(
         'High School Name',
         'Highschool Grade',
         'Graduation Year',
-        'Course',              // NEW COLUMN
-        'Rejection Reason',    // NEW COLUMN
-        'Approval Reason',     // NEW COLUMN and this 
+        'Course',              
+        'Rejection Reason',    
+        'Approval Reason',     
     ];
 
     $col = 'A';
