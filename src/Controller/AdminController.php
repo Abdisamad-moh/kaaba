@@ -1599,6 +1599,7 @@ public function exportApplications(
     KaabaCourseRepository $courseRepository,
 ): Response {
 
+    // added this 
     $user = $this->getUser();
 
     //--------------------------------------------------------------------
@@ -1684,7 +1685,7 @@ public function exportApplications(
         'Graduation Year',
         'Course',              // NEW COLUMN
         'Rejection Reason',    // NEW COLUMN
-        'Approval Reason',     // NEW COLUMN
+        'Approval Reason',     // NEW COLUMN and this 
     ];
 
     $col = 'A';
