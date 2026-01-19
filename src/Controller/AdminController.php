@@ -3668,7 +3668,7 @@ public function exportApplications(
 
         return $this->render('admin/bulk_sms_test_form.html.twig');
     }
-
+// bulk sms
 
    #[Route('/bulk-sms/send', name: 'app_admin_bulk_sms_send', methods: ['POST'])]
 public function sendBulkSms(
