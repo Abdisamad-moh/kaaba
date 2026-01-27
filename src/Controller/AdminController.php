@@ -56,8 +56,10 @@ use App\Form\SettingsBasicInfoType;
 use App\Service\AsyncCommandRunner;
 use Symfony\UX\Chartjs\Model\Chart;
 use App\Entity\KaabaApplicationExam;
+use App\Entity\KaabaConfigSchoolDay;
 use App\Service\NotificationService;
 use App\Service\SubscriptionService;
+use App\Entity\KaabaConfigSchoolHour;
 use App\Form\EmployerDetailsFormType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormEvent;
@@ -70,6 +72,7 @@ use App\Repository\JobReportRepository;
 use App\Repository\MetierAdsRepository;
 use App\Service\SimpleBackgroundRunner;
 use App\Entity\JobSeekerRecommendedJobs;
+use App\Entity\KaabaConfigSchoolHoliday;
 use App\Form\JobseekerAutoCompleteField;
 use App\Form\KaabaApplicationSearchType;
 use App\Repository\MetierBlogRepository;
@@ -104,9 +107,12 @@ use App\Repository\KaabaQualificationRepository;
 use App\Repository\MetierSubscriptionRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Validator\Constraints\File;
+use App\Repository\KaabaConfigSchoolDayRepository;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\Range;
+use App\Repository\KaabaConfigSchoolHourRepository;
 use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\Length;
 use App\Repository\KaabaApplicationStatusRepository;
@@ -114,6 +120,7 @@ use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\Callback;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
+use App\Repository\KaabaConfigSchoolHolidayRepository;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -122,8 +129,10 @@ use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\Validator\Constraints\GreaterThan;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -3991,6 +4000,517 @@ public function exportexcelApplications(
     return $response;
 }
 
+
+#[Route('/school-hours', name: 'app_admin_kaaba_school_hours')]
+    public function schoolHours(
+        Request $request,
+        KaabaConfigSchoolHourRepository $schoolHourRepository,
+        KaabaInstituteRepository $instituteRepository,
+        EntityManagerInterface $em,
+    ): Response {
+        // Fetch all school hour configurations for the table
+        $schoolHours = $schoolHourRepository->findAllWithInstitute();
+
+        // Check if editing or creating new
+        $editId = $request->query->get('edit');
+        $showForm = $editId || $request->query->get('create');
+
+        $schoolHour = new KaabaConfigSchoolHour();
+        if ($editId) {
+            $schoolHour = $schoolHourRepository->find($editId);
+            if (!$schoolHour) {
+                throw $this->createNotFoundException('School hour configuration not found.');
+            }
+        }
+
+        // Get institutes for dropdown
+        $institutes = $instituteRepository->findAll();
+
+        // Create the form
+        $form = $this->createFormBuilder($schoolHour)
+            ->add('institute', ChoiceType::class, [
+                'label' => 'Institute',
+                'choices' => array_reduce($institutes, function ($carry, $institute) {
+                    $carry[$institute->getName()] = $institute;
+                    return $carry;
+                }, []),
+                'choice_label' => 'name',
+                'choice_value' => 'id',
+                'attr' => ['class' => 'form-select'],
+                'placeholder' => 'Select an institute',
+                'constraints' => [
+                    new NotNull(['message' => 'Institute is required.'])
+                ]
+            ])
+            ->add('hoursPerDay', IntegerType::class, [
+    'label' => 'Hours Per Day',
+    'attr' => [
+        'class' => 'form-control',
+        'placeholder' => 'e.g., 8',
+        'min' => 1,
+        'max' => 24
+    ],
+    'constraints' => [
+        new NotBlank(['message' => 'Hours per day is required.']),
+        new Range([
+            'min' => 1,
+            'max' => 24,
+            'notInRangeMessage' => 'Hours per day must be between {{ min }} and {{ max }}.'
+        ])
+    ]
+])
+->add('minHoursPerDay', IntegerType::class, [
+    'label' => 'Minimum Hours Per Day (Optional)',
+    'required' => false,
+    'attr' => [
+        'class' => 'form-control',
+        'placeholder' => 'e.g., 6',
+        'min' => 1,
+        'max' => 24
+    ],
+    'constraints' => [
+        new Range([
+            'min' => 1,
+            'max' => 24,
+            'notInRangeMessage' => 'Minimum hours must be between {{ min }} and {{ max }}.'
+        ])
+    ]
+])
+->add('maxHoursPerDay', IntegerType::class, [
+    'label' => 'Maximum Hours Per Day (Optional)',
+    'required' => false,
+    'attr' => [
+        'class' => 'form-control',
+        'placeholder' => 'e.g., 10',
+        'min' => 1,
+        'max' => 24
+    ],
+    'constraints' => [
+        new Range([
+            'min' => 1,
+            'max' => 24,
+            'notInRangeMessage' => 'Maximum hours must be between {{ min }} and {{ max }}.'
+        ])
+    ]
+])
+            ->getForm();
+
+        $form->handleRequest($request);
+
+        // Handle form submission
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Check if institute already has configuration
+            if (!$editId) {
+                $existingConfig = $schoolHourRepository->findOneBy(['institute' => $schoolHour->getInstitute()]);
+                if ($existingConfig) {
+                    $this->addFlash('error', 'This institute already has school hour configuration.');
+                    return $this->redirectToRoute('app_admin_kaaba_school_hours');
+                }
+            }
+
+            // Validate min <= hours <= max
+            $hours = $schoolHour->getHoursPerDay();
+            $min = $schoolHour->getMinHoursPerDay();
+            $max = $schoolHour->getMaxHoursPerDay();
+
+            if ($min && $hours < $min) {
+                $this->addFlash('error', 'Hours per day cannot be less than minimum hours.');
+                return $this->redirectToRoute('app_admin_kaaba_school_hours');
+            }
+
+            if ($max && $hours > $max) {
+                $this->addFlash('error', 'Hours per day cannot exceed maximum hours.');
+                return $this->redirectToRoute('app_admin_kaaba_school_hours');
+            }
+
+            if ($min && $max && $min > $max) {
+                $this->addFlash('error', 'Minimum hours cannot exceed maximum hours.');
+                return $this->redirectToRoute('app_admin_kaaba_school_hours');
+            }
+
+            $em->persist($schoolHour);
+            $em->flush();
+
+            $this->addFlash('success', $editId ? 'School hour configuration updated successfully.' : 'School hour configuration created successfully.');
+            return $this->redirectToRoute('app_admin_kaaba_school_hours');
+        }
+
+        // Handle delete request
+        $deleteId = $request->query->get('delete');
+        if ($deleteId) {
+            $configToDelete = $schoolHourRepository->find($deleteId);
+            if ($configToDelete) {
+                $em->remove($configToDelete);
+                $em->flush();
+
+                $this->addFlash('success', 'School hour configuration deleted successfully.');
+                return $this->redirectToRoute('app_admin_kaaba_school_hours');
+            } else {
+                $this->addFlash('error', 'School hour configuration not found.');
+            }
+        }
+
+        return $this->render('admin/kaaba_config/school_hours.html.twig', [
+            'schoolHours' => $schoolHours,
+            'form' => $form->createView(),
+            'editId' => $editId,
+            'showForm' => $showForm,
+        ]);
+    }
+
+    // ========== SCHOOL DAYS CONFIGURATION ==========
+    
+    #[Route('/school-days', name: 'app_admin_kaaba_school_days')]
+public function schoolDays(
+    Request $request,
+    KaabaConfigSchoolDayRepository $schoolDayRepository,
+    EntityManagerInterface $em,
+): Response {
+    // Fetch all school day configurations
+    $schoolDays = $schoolDayRepository->findAllSorted();
+
+    // Check if editing or creating new
+    $editId = $request->query->get('edit');
+    $createMode = $request->query->get('create');
+    $showForm = $editId || $createMode;
+
+    $schoolDay = new KaabaConfigSchoolDay();
+    if ($editId) {
+        $schoolDay = $schoolDayRepository->find($editId);
+        if (!$schoolDay) {
+            throw $this->createNotFoundException('School day configuration not found.');
+        }
+    }
+
+    // Get existing days to check if we can create new ones
+    $existingDays = $schoolDayRepository->findAll();
+    $existingDayNames = array_map(function($day) {
+        return $day->getDayOfWeek();
+    }, $existingDays);
+    
+    // Check if all 7 days already exist
+    $allDaysExist = count($existingDays) >= 7;
+    
+    // Define all possible days
+    $allDays = [
+        'Monday' => 'Monday',
+        'Tuesday' => 'Tuesday',
+        'Wednesday' => 'Wednesday',
+        'Thursday' => 'Thursday',
+        'Friday' => 'Friday',
+        'Saturday' => 'Saturday',
+        'Sunday' => 'Sunday',
+    ];
+
+    // Filter out days that already exist (only for new entries)
+    $availableDays = $allDays;
+    if (!$editId) {
+        $availableDays = array_diff_key($allDays, array_flip($existingDayNames));
+        
+        // If no days available or trying to create when all days exist
+        if (empty($availableDays) && $createMode) {
+            $this->addFlash('warning', 'All 7 days of the week are already configured. Please edit existing days instead.');
+            return $this->redirectToRoute('app_admin_kaaba_school_days');
+        }
+    }
+
+    // Create the form
+    $formBuilder = $this->createFormBuilder($schoolDay)
+        ->add('dayOfWeek', ChoiceType::class, [
+            'label' => 'Day of Week',
+            'choices' => !$editId ? $availableDays : $allDays,
+            'attr' => ['class' => 'form-select'],
+            'placeholder' => 'Select a day',
+            'disabled' => !$editId && empty($availableDays),
+            'constraints' => [
+                new NotBlank(['message' => 'Day of week is required.'])
+            ]
+        ])
+        ->add('isSchoolDay', CheckboxType::class, [
+            'label' => 'Is School Day?',
+            'required' => false,
+            'attr' => ['class' => 'form-check-input'],
+            'label_attr' => ['class' => 'form-check-label']
+        ])
+        ->add('isHalfDay', CheckboxType::class, [
+            'label' => 'Is Half Day?',
+            'required' => false,
+            'attr' => ['class' => 'form-check-input'],
+            'label_attr' => ['class' => 'form-check-label']
+        ])
+        ->add('dayType', ChoiceType::class, [
+            'label' => 'Day Type',
+            'choices' => [
+                'Normal' => 'normal',
+                'Exam Day' => 'exam',
+                'Event Day' => 'event',
+                'Special' => 'special',
+                'Make-up Day' => 'makeup'
+            ],
+            'attr' => ['class' => 'form-select'],
+            'placeholder' => 'Select day type',
+            'required' => false,
+        ]);
+    
+    // Only add orderIndex field if editing (for new entries, auto-calculate)
+    if ($editId) {
+        $formBuilder->add('orderIndex', IntegerType::class, [
+            'label' => 'Order Index',
+            'required' => false,
+            'attr' => [
+                'class' => 'form-control',
+                'placeholder' => 'e.g., 1',
+                'min' => 1
+            ],
+            'constraints' => [
+                new GreaterThan(['value' => 0, 'message' => 'Order index must be greater than 0.'])
+            ]
+        ]);
+    }
+    
+    $form = $formBuilder->getForm();
+
+    $form->handleRequest($request);
+
+    // Handle form submission
+    if ($form->isSubmitted() && $form->isValid()) {
+        // For new entries, auto-calculate orderIndex based on day of week
+        if (!$editId) {
+            $dayOrderMap = [
+                'Monday' => 1,
+                'Tuesday' => 2,
+                'Wednesday' => 3,
+                'Thursday' => 4,
+                'Friday' => 5,
+                'Saturday' => 6,
+                'Sunday' => 7
+            ];
+            
+            $dayOfWeek = $schoolDay->getDayOfWeek();
+            $schoolDay->setOrderIndex($dayOrderMap[$dayOfWeek] ?? 8);
+        }
+        
+        // Check if day already exists (for new entries only)
+        if (!$editId) {
+            $existingDay = $schoolDayRepository->findOneBy(['dayOfWeek' => $schoolDay->getDayOfWeek()]);
+            if ($existingDay) {
+                $this->addFlash('error', 'Configuration for this day already exists.');
+                return $this->redirectToRoute('app_admin_kaaba_school_days');
+            }
+        }
+
+        $em->persist($schoolDay);
+        $em->flush();
+
+        $this->addFlash('success', $editId ? 'School day configuration updated successfully.' : 'School day configuration created successfully.');
+        return $this->redirectToRoute('app_admin_kaaba_school_days');
+    }
+
+    // Handle delete request with validation
+    $deleteId = $request->query->get('delete');
+    if ($deleteId) {
+        $configToDelete = $schoolDayRepository->find($deleteId);
+        if ($configToDelete) {
+            // Optional: Prevent deletion if you want to always have 7 days
+            // if (count($existingDays) <= 7) {
+            //     $this->addFlash('error', 'Cannot delete day. All 7 days of the week must be configured.');
+            //     return $this->redirectToRoute('app_admin_kaaba_school_days');
+            // }
+            
+            $em->remove($configToDelete);
+            $em->flush();
+
+            $this->addFlash('success', 'School day configuration deleted successfully.');
+            return $this->redirectToRoute('app_admin_kaaba_school_days');
+        } else {
+            $this->addFlash('error', 'School day configuration not found.');
+        }
+    }
+
+    // Handle toggle school day request
+    $toggleId = $request->query->get('toggleSchoolDay');
+    if ($toggleId) {
+        $configToToggle = $schoolDayRepository->find($toggleId);
+        if ($configToToggle) {
+            $configToToggle->setIsSchoolDay(!$configToToggle->isIsSchoolDay());
+            $em->flush();
+
+            $this->addFlash('success', 'School day status toggled successfully.');
+            return $this->redirectToRoute('app_admin_kaaba_school_days');
+        }
+    }
+
+    // Handle toggle half day request
+    $toggleHalfId = $request->query->get('toggleHalfDay');
+    if ($toggleHalfId) {
+        $configToToggle = $schoolDayRepository->find($toggleHalfId);
+        if ($configToToggle) {
+            $configToToggle->setIsHalfDay(!$configToToggle->isIsHalfDay());
+            $em->flush();
+
+            $this->addFlash('success', 'Half day status toggled successfully.');
+            return $this->redirectToRoute('app_admin_kaaba_school_days');
+        }
+    }
+
+    return $this->render('admin/kaaba_config/school_days.html.twig', [
+        'schoolDays' => $schoolDays,
+        'form' => $form->createView(),
+        'editId' => $editId,
+        'showForm' => $showForm,
+        'allDaysExist' => $allDaysExist,
+        'availableDaysCount' => count($availableDays),
+    ]);
+}
+
+    // ========== SCHOOL HOLIDAYS CONFIGURATION ==========
+    
+    #[Route('/school-holidays', name: 'app_admin_kaaba_school_holidays')]
+    public function schoolHolidays(
+        Request $request,
+        KaabaConfigSchoolHolidayRepository $holidayRepository,
+        EntityManagerInterface $em,
+    ): Response {
+        // Fetch all holidays
+        $holidays = $holidayRepository->findAllSorted();
+
+        // Check if editing or creating new
+        $editId = $request->query->get('edit');
+        $showForm = $editId || $request->query->get('create');
+
+        $holiday = new KaabaConfigSchoolHoliday();
+        if ($editId) {
+            $holiday = $holidayRepository->find($editId);
+            if (!$holiday) {
+                throw $this->createNotFoundException('Holiday not found.');
+            }
+        }
+
+        // Create the form
+        $form = $this->createFormBuilder($holiday)
+            ->add('name', TextType::class, [
+                'label' => 'Holiday Name',
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => 'e.g., Eid al-Fitr, Christmas Break, etc.'
+                ],
+                'constraints' => [
+                    new NotBlank(['message' => 'Holiday name is required.']),
+                    new Length([
+                        'max' => 255,
+                        'maxMessage' => 'Holiday name cannot be longer than 255 characters.'
+                    ])
+                ]
+            ])
+            ->add('description', TextareaType::class, [
+                'label' => 'Description',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => 'Optional description or notes',
+                    'rows' => 3
+                ],
+                'constraints' => [
+                    new Length([
+                        'max' => 500,
+                        'maxMessage' => 'Description cannot be longer than 500 characters.'
+                    ])
+                ]
+            ])
+            ->add('date', DateType::class, [
+                'label' => 'Start Date',
+                'widget' => 'single_text',
+                'attr' => ['class' => 'form-control'],
+                'constraints' => [
+                    new NotBlank(['message' => 'Start date is required.'])
+                ]
+            ])
+            ->add('endDate', DateType::class, [
+                'label' => 'End Date (Optional)',
+                'widget' => 'single_text',
+                'required' => false,
+                'attr' => ['class' => 'form-control'],
+            ])
+            ->add('isRecurring', CheckboxType::class, [
+                'label' => 'Recurring Holiday?',
+                'required' => false,
+                'attr' => ['class' => 'form-check-input'],
+                'label_attr' => ['class' => 'form-check-label'],
+                'help' => 'If checked, this holiday will repeat every year'
+            ])
+            ->add('holidayType', ChoiceType::class, [
+                'label' => 'Holiday Type',
+                'choices' => [
+                    'Public Holiday' => 'public',
+                    'Religious Holiday' => 'religious',
+                    'Academic Break' => 'academic',
+                    'National Holiday' => 'national',
+                    'Special Event' => 'special',
+                    'Other' => 'other'
+                ],
+                'attr' => ['class' => 'form-select'],
+                'placeholder' => 'Select holiday type',
+                'constraints' => [
+                    new NotBlank(['message' => 'Holiday type is required.'])
+                ]
+            ])
+            ->getForm();
+
+        $form->handleRequest($request);
+
+        // Handle form submission
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Validate date range
+            $startDate = $holiday->getDate();
+            $endDate = $holiday->getEndDate();
+
+            if ($endDate && $endDate < $startDate) {
+                $this->addFlash('error', 'End date cannot be before start date.');
+                return $this->redirectToRoute('app_admin_kaaba_school_holidays');
+            }
+
+            $em->persist($holiday);
+            $em->flush();
+
+            $this->addFlash('success', $editId ? 'Holiday updated successfully.' : 'Holiday created successfully.');
+            return $this->redirectToRoute('app_admin_kaaba_school_holidays');
+        }
+
+        // Handle delete request
+        $deleteId = $request->query->get('delete');
+        if ($deleteId) {
+            $holidayToDelete = $holidayRepository->find($deleteId);
+            if ($holidayToDelete) {
+                $em->remove($holidayToDelete);
+                $em->flush();
+
+                $this->addFlash('success', 'Holiday deleted successfully.');
+                return $this->redirectToRoute('app_admin_kaaba_school_holidays');
+            } else {
+                $this->addFlash('error', 'Holiday not found.');
+            }
+        }
+
+        // Handle toggle recurring request
+        $toggleId = $request->query->get('toggleRecurring');
+        if ($toggleId) {
+            $holidayToToggle = $holidayRepository->find($toggleId);
+            if ($holidayToToggle) {
+                $holidayToToggle->setIsRecurring(!$holidayToToggle->isIsRecurring());
+                $em->flush();
+
+                $this->addFlash('success', 'Recurring status toggled successfully.');
+                return $this->redirectToRoute('app_admin_kaaba_school_holidays');
+            }
+        }
+
+        return $this->render('admin/kaaba_config/school_holidays.html.twig', [
+            'holidays' => $holidays,
+            'form' => $form->createView(),
+            'editId' => $editId,
+            'showForm' => $showForm,
+        ]);
+    }
 
 
 }

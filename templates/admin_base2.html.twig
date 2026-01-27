@@ -279,6 +279,103 @@
                             </li>
 							
                         {% endif %}
+
+						{% if is_granted('ROLE_SUPER_ADMIN') %}
+    <li class="sidebar-item">
+        <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+            <div class="round-16 d-flex align-items-center justify-content-center">
+                <i class="ti ti-clipboard-check"></i>
+            </div>
+            <span class="hide-menu">Attendance Config</span>
+        </a>
+        <ul aria-expanded="false" class="collapse second-level">
+            <li class="sidebar-item">
+                <a href="{{ path('app_admin_kaaba_school_hours') }}" class="sidebar-link">
+                    <div class="round-16 d-flex align-items-center justify-content-center">
+                        <i class="ti ti-clock"></i>
+                    </div>
+                    <span class="hide-menu">School Hours</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ path('app_admin_kaaba_school_days') }}" class="sidebar-link">
+                    <div class="round-16 d-flex align-items-center justify-content-center">
+                        <i class="ti ti-calendar"></i>
+                    </div>
+                    <span class="hide-menu">School Days</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ path('app_admin_kaaba_school_holidays') }}" class="sidebar-link">
+                    <div class="round-16 d-flex align-items-center justify-content-center">
+                        <i class="ti ti-beach"></i>
+                    </div>
+                    <span class="hide-menu">Holidays</span>
+                </a>
+            </li>
+        </ul>
+    </li>
+{% endif %}
+{% if is_granted('ROLE_SUPER_ADMIN') %}
+    <li class="sidebar-item">
+        <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+            <div class="round-16 d-flex align-items-center justify-content-center">
+                <i class="ti ti-device-desktop-analytics"></i>
+            </div>
+            <span class="hide-menu">BioTime Integration</span>
+        </a>
+        <ul aria-expanded="false" class="collapse second-level">
+            <li class="sidebar-item">
+                <a href="{{ path('app_admin_biotime_api_status') }}" class="sidebar-link">
+                    <div class="round-16 d-flex align-items-center justify-content-center">
+                        <i class="ti ti-api"></i>
+                    </div>
+                    <span class="hide-menu">API Status</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ path('app_admin_biotime_areas') }}" class="sidebar-link">
+                    <div class="round-16 d-flex align-items-center justify-content-center">
+                        <i class="ti ti-map"></i>
+                    </div>
+                    <span class="hide-menu">Areas</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ path('app_admin_biotime_devices') }}" class="sidebar-link">
+                    <div class="round-16 d-flex align-items-center justify-content-center">
+                        <i class="ti ti-device-desktop"></i>
+                    </div>
+                    <span class="hide-menu">Devices</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ path('app_admin_biotime_enrollment') }}" class="sidebar-link">
+                    <div class="round-16 d-flex align-items-center justify-content-center">
+                        <i class="ti ti-user-plus"></i>
+                    </div>
+                    <span class="hide-menu">Student Enrollment</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="{{ path('app_admin_biotime_attendance_sync') }}" class="sidebar-link">
+                    <div class="round-16 d-flex align-items-center justify-content-center">
+                        <i class="ti ti-refresh"></i>
+                    </div>
+                    <span class="hide-menu">Attendance Sync</span>
+                </a>
+            </li>
+        </ul>
+    </li>
+	<li class="sidebar-item">
+    <a href="{{ path('app_admin_biotime_enrolled_students') }}" class="sidebar-link">
+        <div class="round-16 d-flex align-items-center justify-content-center">
+            <i class="ti ti-user-check"></i>
+        </div>
+        <span class="hide-menu">Enrolled Students</span>
+    </a>
+</li>
+{% endif %}
                 
               </ul>
             </li>

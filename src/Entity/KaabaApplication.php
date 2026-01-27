@@ -121,7 +121,6 @@ class KaabaApplication
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $application_date = null;
 
-
     #[ORM\ManyToOne(inversedBy: 'kaabaApplications')]
     #[ORM\JoinColumn(nullable: true)]
     private ?KaabaApplicationStatus $status = null;
@@ -133,8 +132,8 @@ class KaabaApplication
     #[ORM\Column(type: Types::GUID)]
     private ?string $uuid = null;
 
-#[ORM\Column(length: 255, nullable: true)]
-private ?string $disability_type = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $disability_type = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $disability_explanation = null;
@@ -151,9 +150,8 @@ private ?string $disability_type = null;
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $literacy_numeracy_qualification = null;
 
-
- #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-                                                                private ?\DateTimeInterface $applied_date = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $applied_date = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $shortlisted_date = null;
@@ -164,184 +162,299 @@ private ?string $disability_type = null;
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $rejected_date = null;
 
+    #[ORM\OneToMany(mappedBy: 'application', targetEntity: KaabaApplicationLog::class, cascade: ['persist'])]
+    private Collection $logs;
 
-#[ORM\OneToMany(mappedBy: 'application', targetEntity: KaabaApplicationLog::class, cascade: ['persist'])]
-private Collection $logs;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $waitlisted_date = null;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $rejection_reason = null;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $shortlist_reason = null;
 
-#[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-private ?\DateTimeInterface $waitlisted_date = null;
+    #[ORM\Column(nullable: true)]
+    private ?bool $is_duplicate = null;
 
-#[ORM\Column(type: Types::TEXT, nullable: true)]
-private ?string $rejection_reason = null;
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'kaabaApplications')]
+    private ?self $duplicate_parent = null;
 
+    #[ORM\OneToOne(mappedBy: 'application', targetEntity: KaabaApplicationExam::class, cascade: ['persist', 'remove'])]
+    private ?KaabaApplicationExam $exam = null;
 
-#[ORM\Column(type: Types::TEXT, nullable: true)]
-private ?string $shortlist_reason = null;
+    /**
+     * @var Collection<int, self>
+     */
+    #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'duplicate_parent')]
+    private Collection $kaabaApplications;
 
-#[ORM\Column(nullable: true)]
-private ?bool $is_duplicate = null;
+    #[ORM\OneToOne(mappedBy: 'application', targetEntity: KaabaAssessment::class, cascade: ['persist', 'remove'])]
+    private ?KaabaAssessment $assessment = null;
 
-#[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'kaabaApplications')]
-private ?self $duplicate_parent = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $exam_result = null;
 
-#[ORM\OneToOne(mappedBy: 'application', targetEntity: KaabaApplicationExam::class, cascade: ['persist', 'remove'])]
-private ?KaabaApplicationExam $exam = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $assesment_result = null;
 
-/**
- * @var Collection<int, self>
- */
-#[ORM\OneToMany(targetEntity: self::class, mappedBy: 'duplicate_parent')]
-private Collection $kaabaApplications;
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $approved_reason = null;
 
-#[ORM\OneToOne(mappedBy: 'application', targetEntity: KaabaAssessment::class, cascade: ['persist', 'remove'])]
-private ?KaabaAssessment $assessment = null;
+    #[ORM\OneToMany(mappedBy: 'application', targetEntity: KaabaSmsLog::class, cascade: ['persist', 'remove'])]
+    private Collection $smsLogs;
 
-#[ORM\Column(length: 255, nullable: true)]
-private ?string $exam_result = null;
+    #[ORM\OneToOne(mappedBy: 'application', targetEntity: KaabaStudentDevice::class, cascade: ['persist', 'remove'])]
+    private ?KaabaStudentDevice $studentDevice = null;
 
-#[ORM\Column(length: 255, nullable: true)]
-private ?string $assesment_result = null;
+    /**
+     * @var Collection<int, KaabaAttendance>
+     */
+    #[ORM\OneToMany(mappedBy: 'application', targetEntity: KaabaAttendance::class, cascade: ['persist', 'remove'])]
+    private Collection $attendances;
 
-#[ORM\Column(type: Types::TEXT, nullable: true)]
-private ?string $approved_reason = null;
+    #[ORM\Column(nullable: true)]
+    private ?bool $isEnrolledInBioTime = null;
 
-#[ORM\OneToMany(mappedBy: 'application', targetEntity: KaabaSmsLog::class, cascade: ['persist', 'remove'])]
-private Collection $smsLogs;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $biotimeEmployeeCode = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $biotimeEnrollmentDate = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $biotimeEmployeeId = null;
 
     public function __construct()
     {
-        $this->created_at = new \DateTime();        
-        $this->application_date = new \DateTime();  
+        $this->created_at = new \DateTime();
+        $this->application_date = new \DateTime();
         $this->uuid = Uuid::v4();
-        $this->applied_date = new \DateTime(); 
-    $this->logs = new ArrayCollection();
-    $this->kaabaApplications = new ArrayCollection();
-$this->smsLogs = new ArrayCollection();
+        $this->applied_date = new \DateTime();
+        $this->logs = new ArrayCollection();
+        $this->kaabaApplications = new ArrayCollection();
+        $this->smsLogs = new ArrayCollection();
+        $this->attendances = new ArrayCollection();
+    }
 
+    // Add getters and setters for studentDevice
+    public function getStudentDevice(): ?KaabaStudentDevice
+    {
+        return $this->studentDevice;
+    }
 
+    public function setStudentDevice(?KaabaStudentDevice $studentDevice): static
+    {
+        // Unset the owning side of the relation if necessary
+        if ($studentDevice === null && $this->studentDevice !== null) {
+            $this->studentDevice->setApplication(null);
+        }
+
+        // Set the owning side of the relation if necessary
+        if ($studentDevice !== null && $studentDevice->getApplication() !== $this) {
+            $studentDevice->setApplication($this);
+        }
+
+        $this->studentDevice = $studentDevice;
+
+        return $this;
+    }
+
+    public function isEnrolledInBioTime(): ?bool
+    {
+        return $this->isEnrolledInBioTime;
+    }
+
+    public function setIsEnrolledInBioTime(?bool $isEnrolledInBioTime): static
+    {
+        $this->isEnrolledInBioTime = $isEnrolledInBioTime;
+
+        return $this;
+    }
+
+    public function getBiotimeEmployeeCode(): ?string
+    {
+        return $this->biotimeEmployeeCode;
+    }
+
+    public function setBiotimeEmployeeCode(?string $biotimeEmployeeCode): static
+    {
+        $this->biotimeEmployeeCode = $biotimeEmployeeCode;
+
+        return $this;
+    }
+
+    public function getBiotimeEnrollmentDate(): ?\DateTimeInterface
+    {
+        return $this->biotimeEnrollmentDate;
+    }
+
+    public function setBiotimeEnrollmentDate(?\DateTimeInterface $biotimeEnrollmentDate): static
+    {
+        $this->biotimeEnrollmentDate = $biotimeEnrollmentDate;
+
+        return $this;
+    }
+
+    public function getBiotimeEmployeeId(): ?string
+    {
+        return $this->biotimeEmployeeId;
+    }
+
+    public function setBiotimeEmployeeId(?string $biotimeEmployeeId): static
+    {
+        $this->biotimeEmployeeId = $biotimeEmployeeId;
+
+        return $this;
     }
 
     /**
- * @return Collection<int, KaabaSmsLog>
- */
-public function getSmsLogs(): Collection
-{
-    return $this->smsLogs;
-}
-
-public function addSmsLog(KaabaSmsLog $log): static
-{
-    if (!$this->smsLogs->contains($log)) {
-        $this->smsLogs->add($log);
-        $log->setApplication($this);
+     * @return Collection<int, KaabaSmsLog>
+     */
+    public function getSmsLogs(): Collection
+    {
+        return $this->smsLogs;
     }
 
-    return $this;
-}
-
-public function removeSmsLog(KaabaSmsLog $log): static
-{
-    if ($this->smsLogs->removeElement($log)) {
-        if ($log->getApplication() === $this) {
-            $log->setApplication(null);
+    public function addSmsLog(KaabaSmsLog $log): static
+    {
+        if (!$this->smsLogs->contains($log)) {
+            $this->smsLogs->add($log);
+            $log->setApplication($this);
         }
+
+        return $this;
     }
 
-    return $this;
-}
+    public function removeSmsLog(KaabaSmsLog $log): static
+    {
+        if ($this->smsLogs->removeElement($log)) {
+            if ($log->getApplication() === $this) {
+                $log->setApplication(null);
+            }
+        }
 
+        return $this;
+    }
+
+    public function getAttendances(): Collection
+    {
+        return $this->attendances;
+    }
+
+    public function addAttendance(KaabaAttendance $attendance): static
+    {
+        if (!$this->attendances->contains($attendance)) {
+            $this->attendances->add($attendance);
+            $attendance->setApplication($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAttendance(KaabaAttendance $attendance): static
+    {
+        if ($this->attendances->removeElement($attendance)) {
+            // set the owning side to null (unless already changed)
+            if ($attendance->getApplication() === $this) {
+                $attendance->setApplication(null);
+            }
+        }
+
+        return $this;
+    }
+
+    // ... (All the other getters and setters remain the same as your original code)
+    // Just make sure to remove the old studentDevices Collection methods
 
     public function getApprovedReason(): ?string
-{
-    return $this->approved_reason;
-}
+    {
+        return $this->approved_reason;
+    }
 
-public function setApprovedReason(?string $approved_reason): static
-{
-    $this->approved_reason = $approved_reason;
+    public function setApprovedReason(?string $approved_reason): static
+    {
+        $this->approved_reason = $approved_reason;
 
-    return $this;
-}
+        return $this;
+    }
 
+    public function getExam(): ?KaabaApplicationExam
+    {
+        return $this->exam;
+    }
 
-public function getExam(): ?KaabaApplicationExam
-{
-    return $this->exam;
-}
-
-public function setExam(?KaabaApplicationExam $exam): static
-{
-    $this->exam = $exam;
-    return $this;
-}
+    public function setExam(?KaabaApplicationExam $exam): static
+    {
+        $this->exam = $exam;
+        return $this;
+    }
 
     public function getAssessment(): ?KaabaAssessment
-{
-    return $this->assessment;
-}
-
-public function setAssessment(?KaabaAssessment $assessment): static
-{
-    $this->assessment = $assessment;
-    return $this;
-}
-
-public function getInterviewScore(): ?int
-{
-    $assessment = $this->getAssessment();
-    if (!$assessment) {
-        return null;
+    {
+        return $this->assessment;
     }
 
-    $motivation = $assessment->getMotivation() ?? [];
-    $household = $assessment->getHousehold() ?? [];
-    $income = $assessment->getIncome() ?? [];
-
-    return array_sum($motivation) + array_sum($household) + array_sum($income);
-}
-public function getInterviewResult(): array
-{
-    $score = $this->getInterviewScore();
-
-    if ($score === null) {
-        return [
-            'score' => null,
-            'label' => 'No Assessment',
-            'class' => 'bg-danger'
-        ];
+    public function setAssessment(?KaabaAssessment $assessment): static
+    {
+        $this->assessment = $assessment;
+        return $this;
     }
 
-    if ($score < 60) {
+    public function getInterviewScore(): ?int
+    {
+        $assessment = $this->getAssessment();
+        if (!$assessment) {
+            return null;
+        }
+
+        $motivation = $assessment->getMotivation() ?? [];
+        $household = $assessment->getHousehold() ?? [];
+        $income = $assessment->getIncome() ?? [];
+
+        return array_sum($motivation) + array_sum($household) + array_sum($income);
+    }
+
+    public function getInterviewResult(): array
+    {
+        $score = $this->getInterviewScore();
+
+        if ($score === null) {
+            return [
+                'score' => null,
+                'label' => 'No Assessment',
+                'class' => 'bg-danger'
+            ];
+        }
+
+        if ($score < 60) {
+            return [
+                'score' => $score,
+                'label' => 'Rejected (Failed Interview)',
+                'class' => 'bg-danger'
+            ];
+        }
+
+        if ($score < 75) {
+            return [
+                'score' => $score,
+                'label' => 'Passed Interview (Exam)',
+                'class' => 'bg-warning text-dark'
+            ];
+        }
+
         return [
             'score' => $score,
-            'label' => 'Rejected (Failed Interview)',
-            'class' => 'bg-danger'
+            'label' => 'Approved (Passed Interview)',
+            'class' => 'bg-success'
         ];
     }
-
-    if ($score < 75) {
-        return [
-            'score' => $score,
-            'label' => 'Passed Interview (Exam)',
-            'class' => 'bg-warning text-dark'
-        ];
-    }
-
-    return [
-        'score' => $score,
-        'label' => 'Approved (Passed Interview)',
-        'class' => 'bg-success'
-    ];
-}
-
-
 
     public function getId(): ?int
     {
         return $this->id;
     }
+
     public function getUuid(): ?string
     {
         return $this->uuid;
@@ -581,6 +694,7 @@ public function getInterviewResult(): array
 
         return $this;
     }
+
     public function getCourse(): ?KaabaCourse
     {
         return $this->course;
@@ -749,7 +863,6 @@ public function getInterviewResult(): array
         return $this;
     }
 
-
     public function getStatus(): ?KaabaApplicationStatus
     {
         return $this->status;
@@ -834,8 +947,7 @@ public function getInterviewResult(): array
         return $this;
     }
 
-
-   public function getAppliedDate(): ?\DateTimeInterface
+    public function getAppliedDate(): ?\DateTimeInterface
     {
         return $this->applied_date;
     }
@@ -883,62 +995,60 @@ public function getInterviewResult(): array
         return $this;
     }
 
-// Add these methods:
-public function getLogs(): Collection
-{
-    return $this->logs;
-}
-
-public function addLog(KaabaApplicationLog $log): static
-{
-    if (!$this->logs->contains($log)) {
-        $this->logs->add($log);
-        $log->setApplication($this);
+    // Add these methods:
+    public function getLogs(): Collection
+    {
+        return $this->logs;
     }
 
-    return $this;
-}
-
-public function removeLog(KaabaApplicationLog $log): static
-{
-    if ($this->logs->removeElement($log)) {
-        // set the owning side to null (unless already changed)
-        if ($log->getApplication() === $this) {
-            $log->setApplication(null);
+    public function addLog(KaabaApplicationLog $log): static
+    {
+        if (!$this->logs->contains($log)) {
+            $this->logs->add($log);
+            $log->setApplication($this);
         }
+
+        return $this;
     }
 
-    return $this;
-}
+    public function removeLog(KaabaApplicationLog $log): static
+    {
+        if ($this->logs->removeElement($log)) {
+            // set the owning side to null (unless already changed)
+            if ($log->getApplication() === $this) {
+                $log->setApplication(null);
+            }
+        }
 
+        return $this;
+    }
 
-public function getDisabilityType(): ?string
-{
-    return $this->disability_type;
-}
+    public function getDisabilityType(): ?string
+    {
+        return $this->disability_type;
+    }
 
-public function setDisabilityType(?string $disability_type): static
-{
-    $this->disability_type = $disability_type;
+    public function setDisabilityType(?string $disability_type): static
+    {
+        $this->disability_type = $disability_type;
 
-    return $this;
-}
+        return $this;
+    }
 
+    public function getWaitlistedDate(): ?\DateTimeInterface
+    {
+        return $this->waitlisted_date;
+    }
 
-public function getWaitlistedDate(): ?\DateTimeInterface
-{
-    return $this->waitlisted_date;
-}
+    public function setWaitlistedDate(?\DateTimeInterface $waitlisted_date): static
+    {
+        $this->waitlisted_date = $waitlisted_date;
 
-public function setWaitlistedDate(?\DateTimeInterface $waitlisted_date): static
-{
-    $this->waitlisted_date = $waitlisted_date;
+        return $this;
+    }
 
-    return $this;
-}
-
-// In KaabaApplication entity
-public function wasRejectedBy(User $user): bool
+    // In KaabaApplication entity
+    public function wasRejectedBy(User $user): bool
     {
         foreach ($this->logs as $log) {
             if (
@@ -954,104 +1064,105 @@ public function wasRejectedBy(User $user): bool
         return false;
     }
 
-public function getRejectionReason(): ?string
-{
-    return $this->rejection_reason;
-}
-
-public function setRejectionReason(?string $rejection_reason): static
-{
-    $this->rejection_reason = $rejection_reason;
-
-    return $this;
-}
-public function getShortlistReason(): ?string
-{
-    return $this->shortlist_reason;
-}
-
-public function setShortlistReason(?string $shortlist_reason): static
-{
-    $this->shortlist_reason = $shortlist_reason;
-
-    return $this;
-}
-
-public function isDuplicate(): ?bool
-{
-    return $this->is_duplicate;
-}
-
-public function setDuplicate(?bool $is_duplicate): static
-{
-    $this->is_duplicate = $is_duplicate;
-
-    return $this;
-}
-
-public function getDuplicateParent(): ?self
-{
-    return $this->duplicate_parent;
-}
-
-public function setDuplicateParent(?self $duplicate_parent): static
-{
-    $this->duplicate_parent = $duplicate_parent;
-
-    return $this;
-}
-
-/**
- * @return Collection<int, self>
- */
-public function getKaabaApplications(): Collection
-{
-    return $this->kaabaApplications;
-}
-
-public function addKaabaApplication(self $kaabaApplication): static
-{
-    if (!$this->kaabaApplications->contains($kaabaApplication)) {
-        $this->kaabaApplications->add($kaabaApplication);
-        $kaabaApplication->setDuplicateParent($this);
+    public function getRejectionReason(): ?string
+    {
+        return $this->rejection_reason;
     }
 
-    return $this;
-}
+    public function setRejectionReason(?string $rejection_reason): static
+    {
+        $this->rejection_reason = $rejection_reason;
 
-public function removeKaabaApplication(self $kaabaApplication): static
-{
-    if ($this->kaabaApplications->removeElement($kaabaApplication)) {
-        // set the owning side to null (unless already changed)
-        if ($kaabaApplication->getDuplicateParent() === $this) {
-            $kaabaApplication->setDuplicateParent(null);
+        return $this;
+    }
+
+    public function getShortlistReason(): ?string
+    {
+        return $this->shortlist_reason;
+    }
+
+    public function setShortlistReason(?string $shortlist_reason): static
+    {
+        $this->shortlist_reason = $shortlist_reason;
+
+        return $this;
+    }
+
+    public function isDuplicate(): ?bool
+    {
+        return $this->is_duplicate;
+    }
+
+    public function setDuplicate(?bool $is_duplicate): static
+    {
+        $this->is_duplicate = $is_duplicate;
+
+        return $this;
+    }
+
+    public function getDuplicateParent(): ?self
+    {
+        return $this->duplicate_parent;
+    }
+
+    public function setDuplicateParent(?self $duplicate_parent): static
+    {
+        $this->duplicate_parent = $duplicate_parent;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, self>
+     */
+    public function getKaabaApplications(): Collection
+    {
+        return $this->kaabaApplications;
+    }
+
+    public function addKaabaApplication(self $kaabaApplication): static
+    {
+        if (!$this->kaabaApplications->contains($kaabaApplication)) {
+            $this->kaabaApplications->add($kaabaApplication);
+            $kaabaApplication->setDuplicateParent($this);
         }
+
+        return $this;
     }
 
-    return $this;
-}
+    public function removeKaabaApplication(self $kaabaApplication): static
+    {
+        if ($this->kaabaApplications->removeElement($kaabaApplication)) {
+            // set the owning side to null (unless already changed)
+            if ($kaabaApplication->getDuplicateParent() === $this) {
+                $kaabaApplication->setDuplicateParent(null);
+            }
+        }
 
-public function getExamResult(): ?string
-{
-    return $this->exam_result;
-}
+        return $this;
+    }
 
-public function setExamResult(?string $exam_result): static
-{
-    $this->exam_result = $exam_result;
+    public function getExamResult(): ?string
+    {
+        return $this->exam_result;
+    }
 
-    return $this;
-}
+    public function setExamResult(?string $exam_result): static
+    {
+        $this->exam_result = $exam_result;
 
-public function getAssesmentResult(): ?string
-{
-    return $this->assesment_result;
-}
+        return $this;
+    }
 
-public function setAssesmentResult(?string $assesment_result): static
-{
-    $this->assesment_result = $assesment_result;
+    public function getAssesmentResult(): ?string
+    {
+        return $this->assesment_result;
+    }
 
-    return $this;
-}
+    public function setAssesmentResult(?string $assesment_result): static
+    {
+        $this->assesment_result = $assesment_result;
+
+        return $this;
+    }
 }

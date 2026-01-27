@@ -1,0 +1,180 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}BioTime API Status{% endblock %}
+
+{% block body %}
+    <div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+        <div class="card-body px-4 py-3">
+            <div class="row align-items-center">
+                <div class="col-9">
+                    <h4 class="fw-semibold mb-8">BioTime API Status</h4>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a class="text-muted text-decoration-none" href="#">Admin</a>
+                            </li>
+                            <li class="breadcrumb-item" aria-current="page">BioTime</li>
+                            <li class="breadcrumb-item active" aria-current="page">API Status</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">API Connection Status</h5>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title mb-2">API Authentication</h6>
+                                    {% if status.success and status.api_status.success %}
+                                        <div class="mb-3">
+                                            <i class="ti ti-check text-success" style="font-size: 3rem;"></i>
+                                        </div>
+                                        <h5 class="text-success">Connected</h5>
+                                        <p class="text-muted mb-0">{{ status.api_status.message }}</p>
+                                    {% else %}
+                                        <div class="mb-3">
+                                            <i class="ti ti-x text-danger" style="font-size: 3rem;"></i>
+                                        </div>
+                                        <h5 class="text-danger">Disconnected</h5>
+                                        <p class="text-muted mb-0">{{ status.api_status.message|default('Unable to connect') }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title mb-2">Base URL</h6>
+                                    <div class="mb-3">
+                                        <i class="ti ti-link text-primary" style="font-size: 2rem;"></i>
+                                    </div>
+                                    <code class="d-block mb-2">{{ status.api_status.base_url|default('Not configured') }}</code>
+                                    <small class="text-muted">BioTime API Endpoint</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h5 class="card-title mb-4">Local Data Statistics</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title mb-2">Areas</h6>
+                                    <h2 class="text-primary">{{ status.local_data.areas|default(0) }}</h2>
+                                    <p class="text-muted mb-0">BioTime areas configured</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title mb-2">Devices</h6>
+                                    <h2 class="text-warning">{{ status.local_data.devices|default(0) }}</h2>
+                                    <p class="text-muted mb-0">Biometric devices</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title mb-2">Enrolled Students</h6>
+                                    <h2 class="text-success">{{ status.local_data.enrolled_students|default(0) }}</h2>
+                                    <p class="text-muted mb-0">Students in BioTime</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Quick Actions</h5>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="button" class="btn btn-primary" onclick="testConnection()">
+                            <i class="ti ti-refresh me-2"></i>Test Connection
+                        </button>
+                        
+                        <a href="{{ path('app_admin_biotime_areas', {sync: 1}) }}" class="btn btn-info">
+                            <i class="ti ti-refresh-dot me-2"></i>Sync Areas from BioTime
+                        </a>
+                        
+                        <a href="{{ path('app_admin_biotime_devices', {sync: 1}) }}" class="btn btn-warning">
+                            <i class="ti ti-device-desktop me-2"></i>Sync Devices
+                        </a>
+                        
+                        <a href="{{ path('app_admin_biotime_areas', {create: 1}) }}" class="btn btn-success">
+                            <i class="ti ti-plus me-2"></i>Add New Area
+                        </a>
+                        
+                        <a href="{{ path('app_admin_biotime_devices', {create: 1}) }}" class="btn btn-dark">
+                            <i class="ti ti-plus me-2"></i>Add New Device
+                        </a>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h6 class="card-title mb-3">Troubleshooting</h6>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="ti ti-circle-check text-success me-2"></i>
+                                Check API credentials in .env
+                            </li>
+                            <li class="mb-2">
+                                <i class="ti ti-circle-check text-success me-2"></i>
+                                Verify network connectivity
+                            </li>
+                            <li class="mb-2">
+                                <i class="ti ti-circle-check text-success me-2"></i>
+                                Ensure BioTime server is running
+                            </li>
+                            <li>
+                                <i class="ti ti-circle-check text-success me-2"></i>
+                                Check firewall settings
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+function testConnection() {
+    fetch('{{ path("app_admin_biotime_ajax_test_connection") }}')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showToast('success', 'Connection Test', data.message);
+            } else {
+                showToast('error', 'Connection Test Failed', data.message);
+            }
+        })
+        .catch(error => {
+            showToast('error', 'Error', 'Failed to test connection');
+        });
+}
+
+function showToast(type, title, message) {
+    // Implement your toast notification here
+    alert(type.toUpperCase() + ': ' + title + '\n' + message);
+}
+</script>
+{% endblock %}

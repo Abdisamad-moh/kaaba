@@ -20,7 +20,7 @@ class KaabaInstitute
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-     #[ORM\Column(type: Types::GUID)]
+    #[ORM\Column(type: Types::GUID)]
     private ?string $uuid = null;
 
     /**
@@ -36,58 +36,109 @@ class KaabaInstitute
     private Collection $kaabaCourses;
 
 
- #[ORM\ManyToOne(inversedBy: 'institutes')]
-             #[ORM\JoinColumn(nullable: true)] // Institute MUST belong to a scholarship
-             private ?KaabaScholarship $scholarship = null;
+    #[ORM\ManyToOne(inversedBy: 'institutes')]
+    #[ORM\JoinColumn(nullable: true)] // Institute MUST belong to a scholarship
+    private ?KaabaScholarship $scholarship = null;
 
     #[ORM\ManyToOne(inversedBy: 'kaabaInstitutes')]
     private ?User $manager = null;
 
     #[ORM\OneToMany(mappedBy: 'highest_qualification', targetEntity: KaabaApplicationDuplicate::class)]
-private Collection $kaabaApplicationDuplicates;
+    private Collection $kaabaApplicationDuplicates;
+
+    #[ORM\OneToOne(mappedBy: 'institute', targetEntity: KaabaConfigSchoolHour::class, cascade: ['persist', 'remove'])]
+    private ?KaabaConfigSchoolHour $schoolHoursConfig = null;
+
+    #[ORM\OneToOne(mappedBy: 'institute', targetEntity: KaabaBiotimeArea::class, cascade: ['persist', 'remove'])]
+private ?KaabaBiotimeArea $biotimeArea = null;
 
 
     public function __construct()
     {
         $this->kaabaApplications = new ArrayCollection();
-         $this->uuid = Uuid::v4();
-         $this->kaabaCourses = new ArrayCollection();
-             $this->kaabaApplicationDuplicates = new ArrayCollection();
+        $this->uuid = Uuid::v4();
+        $this->kaabaCourses = new ArrayCollection();
+        $this->kaabaApplicationDuplicates = new ArrayCollection();
+    }
+
+    // Add getter and setter methods
+public function getBiotimeArea(): ?KaabaBiotimeArea
+{
+    return $this->biotimeArea;
+}
+
+public function setBiotimeArea(?KaabaBiotimeArea $biotimeArea): static
+{
+    // Unset the owning side of the relation if necessary
+    if ($biotimeArea === null && $this->biotimeArea !== null) {
+        $this->biotimeArea->setInstitute(null);
+    }
+
+    // Set the owning side of the relation if necessary
+    if ($biotimeArea !== null && $biotimeArea->getInstitute() !== $this) {
+        $biotimeArea->setInstitute($this);
+    }
+
+    $this->biotimeArea = $biotimeArea;
+
+    return $this;
+}
+
+     public function getSchoolHoursConfig(): ?KaabaConfigSchoolHour
+    {
+        return $this->schoolHoursConfig;
+    }
+
+    public function setSchoolHoursConfig(?KaabaConfigSchoolHour $schoolHoursConfig): static
+    {
+        // Unset the owning side of the relation if necessary
+        if ($schoolHoursConfig === null && $this->schoolHoursConfig !== null) {
+            $this->schoolHoursConfig->setInstitute(null);
+        }
+
+        // Set the owning side of the relation if necessary
+        if ($schoolHoursConfig !== null && $schoolHoursConfig->getInstitute() !== $this) {
+            $schoolHoursConfig->setInstitute($this);
+        }
+
+        $this->schoolHoursConfig = $schoolHoursConfig;
+
+        return $this;
     }
 
     // Add getters and setters
-public function getKaabaApplicationDuplicates(): Collection
-{
-    return $this->kaabaApplicationDuplicates;
-}
-
-public function addKaabaApplicationDuplicate(KaabaApplicationDuplicate $kaabaApplicationDuplicate): static
-{
-    if (!$this->kaabaApplicationDuplicates->contains($kaabaApplicationDuplicate)) {
-        $this->kaabaApplicationDuplicates->add($kaabaApplicationDuplicate);
-        $kaabaApplicationDuplicate->setHighestQualification($this);
+    public function getKaabaApplicationDuplicates(): Collection
+    {
+        return $this->kaabaApplicationDuplicates;
     }
 
-    return $this;
-}
-
-public function removeKaabaApplicationDuplicate(KaabaApplicationDuplicate $kaabaApplicationDuplicate): static
-{
-    if ($this->kaabaApplicationDuplicates->removeElement($kaabaApplicationDuplicate)) {
-        // set the owning side to null (unless already changed)
-        if ($kaabaApplicationDuplicate->getHighestQualification() === $this) {
-            $kaabaApplicationDuplicate->setHighestQualification(null);
+    public function addKaabaApplicationDuplicate(KaabaApplicationDuplicate $kaabaApplicationDuplicate): static
+    {
+        if (!$this->kaabaApplicationDuplicates->contains($kaabaApplicationDuplicate)) {
+            $this->kaabaApplicationDuplicates->add($kaabaApplicationDuplicate);
+            $kaabaApplicationDuplicate->setHighestQualification($this);
         }
+
+        return $this;
     }
 
-    return $this;
-}
+    public function removeKaabaApplicationDuplicate(KaabaApplicationDuplicate $kaabaApplicationDuplicate): static
+    {
+        if ($this->kaabaApplicationDuplicates->removeElement($kaabaApplicationDuplicate)) {
+            // set the owning side to null (unless already changed)
+            if ($kaabaApplicationDuplicate->getHighestQualification() === $this) {
+                $kaabaApplicationDuplicate->setHighestQualification(null);
+            }
+        }
+
+        return $this;
+    }
     public function getId(): ?int
     {
         return $this->id;
     }
 
-      public function getUuid(): ?string
+    public function getUuid(): ?string
     {
         return $this->uuid;
     }
@@ -172,7 +223,7 @@ public function removeKaabaApplicationDuplicate(KaabaApplicationDuplicate $kaaba
     }
 
 
-  public function getScholarship(): ?KaabaScholarship
+    public function getScholarship(): ?KaabaScholarship
     {
         return $this->scholarship;
     }

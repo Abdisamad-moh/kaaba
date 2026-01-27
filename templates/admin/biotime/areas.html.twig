@@ -1,0 +1,753 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}BioTime Areas{% endblock %}
+
+{% block body %}
+    <!-- Page Header -->
+    <div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+        <div class="card-body px-4 py-3">
+            <div class="row align-items-center">
+                <div class="col-9">
+                    <h4 class="fw-semibold mb-8">BioTime Areas Management</h4>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a class="text-muted text-decoration-none" href="#">Admin</a>
+                            </li>
+                            <li class="breadcrumb-item" aria-current="page">BioTime</li>
+                            <li class="breadcrumb-item active" aria-current="page">Areas</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-3">
+                    <div class="d-flex gap-2 float-end">
+                        <a href="{{ path('app_admin_biotime_areas', { sync: 1 }) }}" 
+                           class="btn btn-info" 
+                           onclick="return confirm('Sync areas from BioTime API? This will update existing areas and add new ones.')">
+                            <i class="ti ti-refresh-dot me-2"></i>
+                            Sync from BioTime
+                        </a>
+                        <a href="{{ path('app_admin_biotime_areas', { create: 1 }) }}" class="btn btn-primary">
+                            <i class="ti ti-plus me-2"></i>
+                            Add New Area
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary-subtle">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="ti ti-map text-primary" style="font-size: 2rem;"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-1">Total Areas</h5>
+                            <p class="card-text fs-3 mb-0">{{ areas|length }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success-subtle">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="ti ti-building text-success" style="font-size: 2rem;"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-1">Assigned Institutes</h5>
+                            <p class="card-text fs-3 mb-0">
+                                {{ areas|filter(a => a.institute is not null)|length }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning-subtle">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="ti ti-clock text-warning" style="font-size: 2rem;"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-1">Hours Configured</h5>
+                            <p class="card-text fs-3 mb-0">
+                                {{ areas|filter(a => a.workingHoursConfig is not null)|length }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info-subtle">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="ti ti-beach text-info" style="font-size: 2rem;"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-1">Holidays Configured</h5>
+                            <p class="card-text fs-3 mb-0">
+                                {{ areas|filter(a => a.holidayConfig is not null)|length }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form for Creating/Editing -->
+    {% if showForm %}
+    <div class="card mb-4">
+        <div class="card-header text-bg-primary">
+            <h5 class="mb-0 text-white">
+                <i class="ti ti-{{ editId ? 'edit' : 'plus' }} me-2"></i>
+                {{ editId ? 'Edit Area' : 'Add New Area' }}
+            </h5>
+        </div>
+        <div class="form-horizontal">
+            <div class="form-body">
+                <div class="card-body">
+                    <h5 class="card-title mb-0">Area Information</h5>
+                </div>
+                <hr class="m-0">
+                <div class="card-body">
+                    {{ form_start(form) }}
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3 col-form-label">
+                                    {{ form_label(form.area_id) }}
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="col-md-9">
+                                    {{ form_widget(form.area_id, { 
+                                        'attr': { 
+                                            'class': 'form-control',
+                                            'placeholder': 'e.g., 1, 2, 3 or area-001'
+                                        } 
+                                    }) }}
+                                    {{ form_errors(form.area_id) }}
+                                    <small class="form-text text-muted">
+                                        BioTime Area ID (must match the ID in BioTime system)
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3 col-form-label">
+                                    {{ form_label(form.area_name) }}
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="col-md-9">
+                                    {{ form_widget(form.area_name, { 
+                                        'attr': { 
+                                            'class': 'form-control',
+                                            'placeholder': 'e.g., Main Campus, Building A, Science Block'
+                                        } 
+                                    }) }}
+                                    {{ form_errors(form.area_name) }}
+                                    <small class="form-text text-muted">
+                                        Display name for this area
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3 col-form-label">
+                                    {{ form_label(form.description) }}
+                                </label>
+                                <div class="col-md-9">
+                                    {{ form_widget(form.description, { 
+                                        'attr': { 
+                                            'class': 'form-control',
+                                            'rows': 3,
+                                            'placeholder': 'Optional description of the area'
+                                        } 
+                                    }) }}
+                                    {{ form_errors(form.description) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3 col-form-label">
+                                    {{ form_label(form.timezone) }}
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="col-md-9">
+                                    {{ form_widget(form.timezone, { 
+                                        'attr': { 
+                                            'class': 'form-select'
+                                        } 
+                                    }) }}
+                                    {{ form_errors(form.timezone) }}
+                                    <small class="form-text text-muted">
+                                        Timezone for attendance calculations
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3 col-form-label">
+                                    {{ form_label(form.institute) }}
+                                </label>
+                                <div class="col-md-9">
+                                    {{ form_widget(form.institute, { 
+                                        'attr': { 
+                                            'class': 'form-select'
+                                        } 
+                                    }) }}
+                                    {{ form_errors(form.institute) }}
+                                    <small class="form-text text-muted">
+                                        Associate this area with an institute (optional)
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3 col-form-label">
+                                    {{ form_label(form.working_hours_config) }}
+                                </label>
+                                <div class="col-md-9">
+                                    {{ form_widget(form.working_hours_config, { 
+                                        'attr': { 
+                                            'class': 'form-select'
+                                        } 
+                                    }) }}
+                                    {{ form_errors(form.working_hours_config) }}
+                                    <small class="form-text text-muted">
+                                        Working hours configuration for this area
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3 col-form-label">
+                                    {{ form_label(form.holiday_config) }}
+                                </label>
+                                <div class="col-md-9">
+                                    {{ form_widget(form.holiday_config, { 
+                                        'attr': { 
+                                            'class': 'form-select'
+                                        } 
+                                    }) }}
+                                    {{ form_errors(form.holiday_config) }}
+                                    <small class="form-text text-muted">
+                                        Holiday configuration for this area
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3 col-form-label">
+                                    {{ form_label(form.biotime_api_key) }}
+                                </label>
+                                <div class="col-md-9">
+                                    <div class="input-group">
+                                        {{ form_widget(form.biotime_api_key, { 
+                                            'attr': { 
+                                                'class': 'form-control',
+                                                'placeholder': 'Optional custom API key'
+                                            } 
+                                        }) }}
+                                        <button class="btn btn-outline-secondary" type="button" onclick="toggleApiKeyVisibility(this)">
+                                            <i class="ti ti-eye"></i>
+                                        </button>
+                                    </div>
+                                    {{ form_errors(form.biotime_api_key) }}
+                                    <small class="form-text text-muted">
+                                        Custom API key for this area (overrides global settings)
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3 col-form-label">
+                                    {{ form_label(form.biotime_server_url) }}
+                                </label>
+                                <div class="col-md-9">
+                                    {{ form_widget(form.biotime_server_url, { 
+                                        'attr': { 
+                                            'class': 'form-control',
+                                            'placeholder': 'e.g., http://192.168.1.100:8001/'
+                                        } 
+                                    }) }}
+                                    {{ form_errors(form.biotime_server_url) }}
+                                    <small class="form-text text-muted">
+                                        Custom BioTime server URL for this area (optional)
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="m-0">
+                    <div class="form-actions border-top">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="col-md-offset-3 col-md-9">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="ti ti-{{ editId ? 'check' : 'plus' }} fs-5 me-2"></i>
+                                                {{ editId ? 'Update Area' : 'Create Area' }}
+                                            </button>
+                                            <a href="{{ path('app_admin_biotime_areas') }}" class="btn bg-danger-subtle text-danger ms-6">
+                                                <i class="ti ti-x me-2"></i>
+                                                Cancel
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6"></div>
+                            </div>
+                        </div>
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- BioTime Connection Status -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title mb-0">BioTime Integration</h5>
+                <div>
+                    <a href="{{ path('app_admin_biotime_api_status') }}" class="btn btn-outline-primary">
+                        <i class="ti ti-api me-2"></i>
+                        API Status
+                    </a>
+                </div>
+            </div>
+            
+            <div class="alert alert-info">
+                <i class="ti ti-info-circle me-2"></i>
+                <strong>Note:</strong> Areas are organizational units in BioTime that group devices. Each institute should have at least one area assigned.
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title mb-3">Sync Instructions</h6>
+                            <ol class="mb-0">
+                                <li class="mb-2">Click "Sync from BioTime" to import areas</li>
+                                <li class="mb-2">Assign areas to institutes</li>
+                                <li class="mb-2">Configure working hours and holidays</li>
+                                <li class="mb-2">Add devices to each area</li>
+                                <li>Enroll students in assigned areas</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title mb-3">Best Practices</h6>
+                            <ul class="mb-0">
+                                <li class="mb-2">
+                                    <i class="ti ti-check text-success me-2"></i>
+                                    One area per physical location
+                                </li>
+                                <li class="mb-2">
+                                    <i class="ti ti-check text-success me-2"></i>
+                                    Match area IDs with BioTime system
+                                </li>
+                                <li class="mb-2">
+                                    <i class="ti ti-check text-success me-2"></i>
+                                    Set appropriate timezone
+                                </li>
+                                <li class="mb-2">
+                                    <i class="ti ti-check text-success me-2"></i>
+                                    Configure working hours for accurate attendance
+                                </li>
+                                <li>
+                                    <i class="ti ti-check text-success me-2"></i>
+                                    Assign holiday configurations
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Table of Existing Areas -->
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title mb-0">BioTime Areas ({{ areas|length }})</h5>
+                <div>
+                    <span class="badge bg-primary me-2">
+                        <i class="ti ti-building me-1"></i>
+                        {{ areas|filter(a => a.institute is not null)|length }} Assigned
+                    </span>
+                    <span class="badge bg-secondary">
+                        <i class="ti ti-map me-1"></i>
+                        {{ areas|filter(a => a.institute is null)|length }} Unassigned
+                    </span>
+                </div>
+            </div>
+            
+            {% if areas|length > 0 %}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th width="50">#</th>
+                            <th width="120">Area ID</th>
+                            <th>Area Name</th>
+                            <th width="150">Institute</th>
+                            <th width="100">Timezone</th>
+                            <th width="120">Devices</th>
+                            <th width="150">Configuration</th>
+                            <th width="250" class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for area in areas %}
+                            {% set deviceCount = area.devices|length %}
+                            <tr>
+                                <td class="text-muted">{{ loop.index }}</td>
+                                <td>
+                                    <code class="text-primary">{{ area.areaId }}</code>
+                                </td>
+                                <td>
+                                    <strong>{{ area.areaName }}</strong>
+                                    {% if area.description %}
+                                        <br><small class="text-muted">{{ area.description|slice(0, 50) }}{% if area.description|length > 50 %}...{% endif %}</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if area.institute %}
+                                        <span class="badge bg-success">
+                                            <i class="ti ti-building me-1"></i>
+                                            {{ area.institute.name }}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">
+                                            <i class="ti ti-question-mark me-1"></i>
+                                            Not Assigned
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <small class="text-muted">{{ area.timezone|replace({'Africa/': '', '_': ' '})|title }}</small>
+                                </td>
+                                <td>
+                                    {% if deviceCount > 0 %}
+                                        <span class="badge bg-primary">
+                                            <i class="ti ti-device-desktop me-1"></i>
+                                            {{ deviceCount }}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-warning">
+                                            <i class="ti ti-alert-circle me-1"></i>
+                                            No Devices
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="d-flex flex-column gap-1">
+                                        {% if area.workingHoursConfig %}
+                                            <span class="badge bg-info" title="Working Hours">
+                                                <i class="ti ti-clock me-1"></i>
+                                                Hours: {{ area.workingHoursConfig.hoursPerDay }}
+                                            </span>
+                                        {% endif %}
+                                        {% if area.holidayConfig %}
+                                            <span class="badge bg-purple" title="Holidays">
+                                                <i class="ti ti-beach me-1"></i>
+                                                {{ area.holidayConfig.name }}
+                                            </span>
+                                        {% endif %}
+                                        {% if not area.workingHoursConfig and not area.holidayConfig %}
+                                            <span class="badge bg-secondary">Not Configured</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a href="{{ path('app_admin_biotime_areas', { edit: area.id }) }}" 
+                                           class="btn btn-warning" 
+                                           title="Edit area">
+                                            <i class="ti ti-edit me-1"></i> Edit
+                                        </a>
+                                        
+                                        <button type="button" class="btn btn-info dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="ti ti-settings me-1"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a class="dropdown-item" href="{{ path('app_admin_biotime_devices') }}?area_filter={{ area.id }}">
+                                                    <i class="ti ti-device-desktop me-2"></i>
+                                                    View Devices ({{ deviceCount }})
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="{{ path('app_admin_biotime_enrollment') }}?area={{ area.id }}">
+                                                    <i class="ti ti-user-plus me-2"></i>
+                                                    Enroll Students
+                                                </a>
+                                            </li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <a class="dropdown-item" href="{{ path('app_admin_biotime_attendance_sync') }}?area={{ area.id }}">
+                                                    <i class="ti ti-refresh me-2"></i>
+                                                    Sync Attendance
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="#" onclick="showAreaDetails({{ area.id }})">
+                                                    <i class="ti ti-info-circle me-2"></i>
+                                                    View Details
+                                                </a>
+                                            </li>
+                                        </ul>
+                                        
+                                        <a href="{{ path('app_admin_biotime_areas', { delete: area.id }) }}" 
+                                           class="btn btn-danger" 
+                                           onclick="return confirm('Are you sure you want to delete area \"{{ area.areaName }}\"? This will also delete all associated devices.')"
+                                           title="Delete area">
+                                            <i class="ti ti-trash me-1"></i> Delete
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="mt-4">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title mb-3">Area Distribution</h6>
+                                <div class="row">
+                                    {% set assignedCount = areas|filter(a => a.institute is not null)|length %}
+                                    {% set unassignedCount = areas|length - assignedCount %}
+                                    
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <h6>Assigned to Institutes</h6>
+                                            <div class="progress" style="height: 20px;">
+                                                <div class="progress-bar bg-success" role="progressbar" 
+                                                     style="width: {{ (assignedCount / areas|length * 100)|round }}%"
+                                                     aria-valuenow="{{ assignedCount }}" 
+                                                     aria-valuemin="0" 
+                                                     aria-valuemax="{{ areas|length }}">
+                                                    {{ assignedCount }} areas
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <h6>Unassigned Areas</h6>
+                                            <div class="progress" style="height: 20px;">
+                                                <div class="progress-bar bg-warning" role="progressbar" 
+                                                     style="width: {{ (unassignedCount / areas|length * 100)|round }}%"
+                                                     aria-valuenow="{{ unassignedCount }}" 
+                                                     aria-valuemin="0" 
+                                                     aria-valuemax="{{ areas|length }}">
+                                                    {{ unassignedCount }} areas
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <h6 class="card-title mb-3">Quick Actions</h6>
+                                <div class="d-grid gap-2">
+                                    <a href="{{ path('app_admin_biotime_areas', { sync: 1 }) }}" class="btn btn-info">
+                                        <i class="ti ti-refresh-dot me-2"></i>
+                                        Sync from BioTime
+                                    </a>
+                                    <a href="{{ path('app_admin_biotime_devices', { create: 1 }) }}" class="btn btn-primary">
+                                        <i class="ti ti-plus me-2"></i>
+                                        Add New Device
+                                    </a>
+                                    <a href="{{ path('app_admin_biotime_enrollment') }}" class="btn btn-success">
+                                        <i class="ti ti-user-plus me-2"></i>
+                                        Enroll Students
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            {% else %}
+            <div class="alert alert-info text-center py-4">
+                <div class="mb-3">
+                    <i class="ti ti-map text-primary" style="font-size: 3rem;"></i>
+                </div>
+                <h5 class="alert-heading">No BioTime Areas Found</h5>
+                <p class="mb-3">You haven't configured any BioTime areas yet. Areas are organizational units that group devices in BioTime.</p>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{{ path('app_admin_biotime_areas', { create: 1 }) }}" class="btn btn-primary">
+                        <i class="ti ti-plus me-2"></i>Create First Area
+                    </a>
+                    <a href="{{ path('app_admin_biotime_areas', { sync: 1 }) }}" class="btn btn-info">
+                        <i class="ti ti-refresh-dot me-2"></i>Sync from BioTime
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+// Toggle API key visibility
+function toggleApiKeyVisibility(button) {
+    const input = button.closest('.input-group').querySelector('input');
+    if (input.type === 'password') {
+        input.type = 'text';
+        button.innerHTML = '<i class="ti ti-eye-off"></i>';
+    } else {
+        input.type = 'password';
+        button.innerHTML = '<i class="ti ti-eye"></i>';
+    }
+}
+
+// Show area details in modal
+function showAreaDetails(areaId) {
+    fetch(`{{ path('app_admin_biotime_ajax_get_area_details', { id: '__ID__' }) }}`.replace('__ID__', areaId))
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const area = data.area;
+                let html = `
+                    <h5>${area.name} <small class="text-muted">(${area.area_id})</small></h5>
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Institute:</strong> ${area.institute ? area.institute.name : 'Not assigned'}</p>
+                            <p><strong>Devices:</strong> ${area.devices_count}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Created:</strong> ${new Date().toLocaleDateString()}</p>
+                            <p><strong>Last Updated:</strong> ${new Date().toLocaleDateString()}</p>
+                        </div>
+                    </div>
+                `;
+                
+                if (area.devices.length > 0) {
+                    html += `
+                        <hr>
+                        <h6>Devices in this Area:</h6>
+                        <ul class="list-group">
+                    `;
+                    area.devices.forEach(device => {
+                        html += `
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                ${device.name}
+                                <span class="badge bg-${device.status === 'active' ? 'success' : device.status === 'maintenance' ? 'warning' : 'secondary'}">
+                                    ${device.status}
+                                </span>
+                            </li>
+                        `;
+                    });
+                    html += '</ul>';
+                }
+                
+                // Show in modal (you need to have Bootstrap modal in your layout)
+                const modal = new bootstrap.Modal(document.getElementById('areaDetailsModal'));
+                document.getElementById('areaDetailsModalBody').innerHTML = html;
+                modal.show();
+            } else {
+                alert('Error loading area details: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to load area details');
+        });
+}
+
+// Initialize tooltips
+document.addEventListener('DOMContentLoaded', function() {
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+});
+</script>
+
+<!-- Modal for area details -->
+<div class="modal fade" id="areaDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Area Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="areaDetailsModalBody">
+                <!-- Content will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="#" class="btn btn-primary" id="editAreaBtn">Edit Area</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

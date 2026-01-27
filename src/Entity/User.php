@@ -123,14 +123,42 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: KaabaSmsLog::class, mappedBy: 'created_by')]
     private Collection $kaabaSmsLogs;
 
+    #[ORM\OneToMany(mappedBy: 'verified_by', targetEntity: KaabaAttendance::class)]
+private Collection $verifiedAttendances;
 
     public function __construct()
     {
         $this->kaabaInstitutes = new ArrayCollection();
         $this->kaabaSmsLogs = new ArrayCollection();
+        $this->verifiedAttendances = new ArrayCollection();
     }
 
-    
+    public function getVerifiedAttendances(): Collection
+{
+    return $this->verifiedAttendances;
+}
+
+public function addVerifiedAttendance(KaabaAttendance $verifiedAttendance): static
+{
+    if (!$this->verifiedAttendances->contains($verifiedAttendance)) {
+        $this->verifiedAttendances->add($verifiedAttendance);
+        $verifiedAttendance->setVerifiedBy($this);
+    }
+
+    return $this;
+}
+
+public function removeVerifiedAttendance(KaabaAttendance $verifiedAttendance): static
+{
+    if ($this->verifiedAttendances->removeElement($verifiedAttendance)) {
+        // set the owning side to null (unless already changed)
+        if ($verifiedAttendance->getVerifiedBy() === $this) {
+            $verifiedAttendance->setVerifiedBy(null);
+        }
+    }
+
+    return $this;
+}
 
    
 

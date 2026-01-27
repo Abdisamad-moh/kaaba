@@ -1,0 +1,823 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}BioTime Student Enrollment{% endblock %}
+
+{% block body %}
+    <!-- Page Header -->
+    <div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+        <div class="card-body px-4 py-3">
+            <div class="row align-items-center">
+                <div class="col-9">
+                    <h4 class="fw-semibold mb-8">BioTime Student Enrollment</h4>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a class="text-muted text-decoration-none" href="#">Admin</a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a class="text-muted text-decoration-none" href="{{ path('app_admin_biotime_areas') }}">BioTime</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">Student Enrollment</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-3">
+                    <a href="{{ path('app_admin_biotime_areas') }}" class="btn btn-primary float-end">
+                        <i class="ti ti-arrow-left me-2"></i>
+                        Back to Areas
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary-subtle">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="ti ti-user-check text-primary" style="font-size: 2rem;"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-1">Accepted Students</h5>
+                            <p class="card-text fs-3 mb-0">{{ applications|length }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success-subtle">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="ti ti-user-plus text-success" style="font-size: 2rem;"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-1">Ready to Enroll</h5>
+                            <p class="card-text fs-3 mb-0">
+                                {{ applications|filter(a => not a.isEnrolledInBioTime)|length }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning-subtle">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="ti ti-user-check text-warning" style="font-size: 2rem;"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-1">Already Enrolled</h5>
+                            <p class="card-text fs-3 mb-0">
+                                {{ applications|filter(a => a.isEnrolledInBioTime)|length }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info-subtle">
+                <div class="card-body">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="ti ti-map text-info" style="font-size: 2rem;"></i>
+                        </div>
+                        <div>
+                            <h5 class="card-title mb-1">Available Areas</h5>
+                            <p class="card-text fs-3 mb-0">{{ areas|filter(a => a.institute is not null)|length }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Enrollment Instructions -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title mb-3">Enrollment Process</h5>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title mb-3">
+                                <i class="ti ti-checklist text-primary me-2"></i>
+                                Step-by-Step Guide
+                            </h6>
+                            <ol class="mb-0">
+                                <li class="mb-2">
+                                    <strong>Select an Area</strong> - Choose the BioTime area where students will be enrolled
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Check Institute</strong> - Area must have an institute assigned
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Review Students</strong> - Check the list of accepted students
+                                </li>
+                                <li class="mb-2">
+                                    <strong>Select Students</strong> - Choose individual students or use bulk enrollment
+                                </li>
+                                <li>
+                                    <strong>Enroll</strong> - Click enroll to add students to BioTime
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title mb-3">
+                                <i class="ti ti-alert-circle text-warning me-2"></i>
+                                Important Notes
+                            </h6>
+                            <ul class="mb-0">
+                                <li class="mb-2">
+                                    <i class="ti ti-check text-success me-2"></i>
+                                    Only students with "Accepted" status can be enrolled
+                                </li>
+                                <li class="mb-2">
+                                    <i class="ti ti-check text-success me-2"></i>
+                                    Only areas with institutes can be selected
+                                </li>
+                                <li class="mb-2">
+                                    <i class="ti ti-check text-success me-2"></i>
+                                    Green badge = Already enrolled in BioTime
+                                </li>
+                                <li class="mb-2">
+                                    <i class="ti ti-check text-success me-2"></i>
+                                    Yellow badge = Ready to enroll
+                                </li>
+                                <li>
+                                    <i class="ti ti-check text-success me-2"></i>
+                                    Students can be enrolled in multiple areas
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Area Selection -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">
+                <i class="ti ti-map me-2"></i>
+                Select BioTime Area for Enrollment
+            </h5>
+        </div>
+        <div class="card-body">
+            {% set areasWithInstitute = areas|filter(a => a.institute is not null) %}
+            
+            {% if areasWithInstitute|length > 0 %}
+            <div class="row">
+                {% for area in areas %}
+                    {% set hasInstitute = area.institute is not null %}
+                    
+                    <div class="col-md-4 mb-3">
+                        <div class="card h-100 {% if not hasInstitute %}bg-light border-dashed{% endif %}">
+                            <div class="card-body">
+                                <h6 class="card-title">
+                                    {{ area.areaName }}
+                                    <span class="badge bg-dark float-end">{{ area.areaId }}</span>
+                                </h6>
+                                
+                                <div class="mb-3">
+                                    {% if hasInstitute %}
+                                        <span class="badge bg-success mb-2">
+                                            <i class="ti ti-building me-1"></i>
+                                            {{ area.institute.name }}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-danger mb-2">
+                                            <i class="ti ti-alert-circle me-1"></i>
+                                            No Institute Assigned
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <small class="text-muted d-block">
+                                        <i class="ti ti-device-desktop me-1"></i>
+                                        Devices: {{ area.devices|length }}
+                                    </small>
+                                    <small class="text-muted d-block">
+                                        <i class="ti ti-clock me-1"></i>
+                                        Timezone: {{ area.timezone|replace({'Africa/': ''})|title }}
+                                    </small>
+                                </div>
+                                
+                                {% if area.workingHoursConfig %}
+                                    <div class="mb-2">
+                                        <small class="text-muted">
+                                            <i class="ti ti-clock text-info me-1"></i>
+                                            {{ area.workingHoursConfig.hoursPerDay }} hours/day
+                                        </small>
+                                    </div>
+                                {% endif %}
+                                
+                                <div class="d-grid gap-2">
+                                    {% if hasInstitute %}
+                                        {% set areaIdString = area.id|default('') %}
+                                        {% set selectedAreaId = app.request.query.get('area')|default('') %}
+                                        
+                                        <a href="?area={{ area.id }}" 
+                                           class="btn {% if selectedAreaId == areaIdString %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                                            <i class="ti ti-user-plus me-2"></i>
+                                            Select Area
+                                        </a>
+                                        
+                                        {% if selectedAreaId == areaIdString %}
+                                            <button type="button" 
+                                                    class="btn btn-success" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#bulkEnrollmentModal"
+                                                    data-area-id="{{ area.id }}"
+                                                    data-area-name="{{ area.areaName }}">
+                                                <i class="ti ti-users me-2"></i>
+                                                Bulk Enroll All
+                                            </button>
+                                        {% endif %}
+                                    {% else %}
+                                        <button type="button" class="btn btn-outline-secondary" disabled>
+                                            <i class="ti ti-ban me-2"></i>
+                                            Assign Institute First
+                                        </button>
+                                        <a href="{{ path('app_admin_biotime_areas') }}" class="btn btn-warning btn-sm">
+                                            <i class="ti ti-edit me-1"></i>
+                                            Assign Institute
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="alert alert-danger text-center">
+                <div class="mb-3">
+                    <i class="ti ti-building-off" style="font-size: 3rem;"></i>
+                </div>
+                <h5 class="alert-heading">No Areas with Institutes Found!</h5>
+                <p class="mb-3">You need to assign an institute to at least one BioTime area before you can enroll students.</p>
+                <a href="{{ path('app_admin_biotime_areas') }}" class="btn btn-primary">
+                    <i class="ti ti-edit me-2"></i>
+                    Manage Areas & Assign Institutes
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Students List - Only show if an area with institute is selected -->
+    {% if app.request.query.get('area') %}
+        {% set selectedArea = areas|filter(a => a.id == app.request.query.get('area')|default(0))|first %}
+        
+        {% if selectedArea and selectedArea.institute is not null %}
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="ti ti-users me-2"></i>
+                        Students for Enrollment - {{ selectedArea.areaName }}
+                        <span class="badge bg-success ms-2">
+                            <i class="ti ti-building me-1"></i>
+                            {{ selectedArea.institute.name }}
+                        </span>
+                    </h5>
+                    <div>
+                        <span class="badge bg-primary me-2">
+                            Ready: {{ applications|filter(a => not a.isEnrolledInBioTime)|length }}
+                        </span>
+                        <span class="badge bg-success me-2">
+                            Enrolled: {{ applications|filter(a => a.isEnrolledInBioTime)|length }}
+                        </span>
+                        <button type="button" 
+                                class="btn btn-success" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#bulkEnrollmentModal"
+                                data-area-id="{{ selectedArea.id }}"
+                                data-area-name="{{ selectedArea.areaName }}">
+                            <i class="ti ti-users me-2"></i>
+                            Bulk Enroll All
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                {% if applications|length > 0 %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th width="50">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="selectAll">
+                                    </div>
+                                </th>
+                                <th width="50">#</th>
+                                <th width="120">Student ID</th>
+                                <th>Full Name</th>
+                                <th width="150">Institute</th>
+                                <th width="120">Phone</th>
+                                <th width="150">BioTime Status</th>
+                                <th width="150" class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for application in applications %}
+                                <tr class="{% if application.isEnrolledInBioTime %}table-success{% endif %}">
+                                    <td>
+                                        <div class="form-check">
+                                            <input class="form-check-input student-checkbox" 
+                                                   type="checkbox" 
+                                                   value="{{ application.id }}"
+                                                   data-student-name="{{ application.fullName }}"
+                                                   {% if application.isEnrolledInBioTime %}disabled{% endif %}>
+                                        </div>
+                                    </td>
+                                    <td class="text-muted">{{ loop.index }}</td>
+                                    <td>
+                                        <small class="text-muted font-monospace">
+                                            {{ application.uuid|slice(0, 8) }}...
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <strong>{{ application.fullName }}</strong>
+                                        {% if application.email %}
+                                            <br><small class="text-muted">{{ application.email }}</small>
+                                        {% endif %}
+                                        {% if application.biotimeEmployeeCode %}
+                                            <br><small class="text-primary">
+                                                <i class="ti ti-id me-1"></i>
+                                                Code: {{ application.biotimeEmployeeCode }}
+                                            </small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if application.institute %}
+                                            <span class="badge bg-dark">
+                                                {{ application.institute.name }}
+                                            </span>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <code>{{ application.phone }}</code>
+                                    </td>
+                                    <td>
+                                        {% if application.isEnrolledInBioTime %}
+                                            <span class="badge bg-success">
+                                                <i class="ti ti-check me-1"></i>
+                                                Enrolled
+                                            </span>
+                                            {% if application.biotimeEnrollmentDate %}
+                                                <br><small class="text-muted">{{ application.biotimeEnrollmentDate|date('Y-m-d') }}</small>
+                                            {% endif %}
+                                            {% if application.biotimeEmployeeId %}
+                                                <br><small class="text-muted">ID: {{ application.biotimeEmployeeId|slice(0, 8) }}...</small>
+                                            {% endif %}
+                                        {% else %}
+                                            <span class="badge bg-warning">
+                                                <i class="ti ti-user-plus me-1"></i>
+                                                Ready to Enroll
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            {% if not application.isEnrolledInBioTime %}
+                                                <a href="?enroll={{ application.id }}&area={{ selectedArea.id }}" 
+                                                   class="btn btn-primary"
+                                                   onclick="return confirm('Enroll {{ application.fullName }} in {{ selectedArea.areaName }}?')">
+                                                    <i class="ti ti-user-plus me-1"></i>
+                                                    Enroll
+                                                </a>
+                                            {% else %}
+                                                <a href="?enroll={{ application.id }}&area={{ selectedArea.id }}" 
+                                                   class="btn btn-info"
+                                                   onclick="return confirm('Re-enroll/Update {{ application.fullName }} in {{ selectedArea.areaName }}? This will update existing BioTime record.')">
+                                                    <i class="ti ti-refresh me-1"></i>
+                                                    Re-enroll
+                                                </a>
+                                            {% endif %}
+                                            
+                                            <button type="button" 
+                                                    class="btn btn-info"
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#studentDetailsModal"
+                                                    data-student-id="{{ application.id }}"
+                                                    data-student-name="{{ application.fullName }}">
+                                                <i class="ti ti-eye me-1"></i>
+                                                View
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Selected Students Actions -->
+                <div class="card mt-4" id="selectedStudentsSection" style="display: none;">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title mb-0">
+                                    <span id="selectedCount">0</span> Student(s) Selected
+                                </h6>
+                                <p class="text-muted mb-0" id="selectedNames"></p>
+                                <small class="text-muted" id="enrollmentNote"></small>
+                            </div>
+                            <div>
+                                <button type="button" 
+                                        class="btn btn-success" 
+                                        id="enrollSelectedBtn"
+                                        data-area-id="{{ selectedArea.id }}"
+                                        data-area-name="{{ selectedArea.areaName }}">
+                                    <i class="ti ti-user-plus me-2"></i>
+                                    Enroll Selected
+                                </button>
+                                <button type="button" class="btn btn-secondary" id="clearSelectionBtn">
+                                    <i class="ti ti-x me-2"></i>
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                {% else %}
+                <div class="alert alert-success text-center py-4">
+                    <div class="mb-3">
+                        <i class="ti ti-check text-success" style="font-size: 3rem;"></i>
+                    </div>
+                    <h5 class="alert-heading">All Students Enrolled!</h5>
+                    <p class="mb-3">All accepted students have been enrolled in BioTime.</p>
+                    <a href="{{ path('app_admin_biotime_areas') }}" class="btn btn-primary">
+                        <i class="ti ti-arrow-left me-2"></i>
+                        Back to Areas
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        {% elseif selectedArea and selectedArea.institute is null %}
+        <div class="alert alert-danger">
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <i class="ti ti-building-off" style="font-size: 2rem;"></i>
+                </div>
+                <div>
+                    <h5 class="alert-heading">Institute Required!</h5>
+                    <p class="mb-0">
+                        The selected area "<strong>{{ selectedArea.areaName }}</strong>" does not have an institute assigned. 
+                        You cannot enroll students in areas without institutes.
+                    </p>
+                </div>
+            </div>
+            <hr>
+            <div class="d-flex justify-content-between">
+                <a href="{{ path('app_admin_biotime_areas') }}" class="btn btn-primary">
+                    <i class="ti ti-edit me-2"></i>
+                    Assign Institute
+                </a>
+                <a href="{{ path('app_admin_biotime_enrollment') }}" class="btn btn-secondary">
+                    <i class="ti ti-arrow-back me-2"></i>
+                    Select Different Area
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    {% elseif areasWithInstitute|length > 0 %}
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <div class="mb-4">
+                    <i class="ti ti-map-pin text-primary" style="font-size: 4rem;"></i>
+                </div>
+                <h4 class="card-title mb-3">Select an Area First</h4>
+                <p class="card-text text-muted mb-4">
+                    Please select a BioTime area from the list above to view and enroll students.
+                </p>
+                <div class="alert alert-info text-start">
+                    <i class="ti ti-info-circle me-2"></i>
+                    <strong>Note:</strong> Only areas with assigned institutes are available for selection.
+                </div>
+                <a href="{{ path('app_admin_biotime_areas') }}" class="btn btn-primary">
+                    <i class="ti ti-map me-2"></i>
+                    Manage Areas
+                </a>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block javascripts %}
+<script>
+// Select/Deselect all checkboxes (only for non-enrolled students)
+document.getElementById('selectAll').addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.student-checkbox:not(:disabled)');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+    });
+    updateSelectedStudents();
+});
+
+// Update selected students count
+function updateSelectedStudents() {
+    const checkboxes = document.querySelectorAll('.student-checkbox:checked');
+    const count = checkboxes.length;
+    const section = document.getElementById('selectedStudentsSection');
+    const countElement = document.getElementById('selectedCount');
+    const namesElement = document.getElementById('selectedNames');
+    const noteElement = document.getElementById('enrollmentNote');
+    
+    if (count > 0) {
+        section.style.display = 'block';
+        countElement.textContent = count;
+        
+        // Show first 3 names
+        const names = Array.from(checkboxes).slice(0, 3).map(cb => cb.dataset.studentName);
+        namesElement.textContent = names.join(', ') + (count > 3 ? ` and ${count - 3} more...` : '');
+        
+        // Show enrollment note
+        noteElement.textContent = 'Already enrolled students are automatically excluded from selection.';
+    } else {
+        section.style.display = 'none';
+    }
+}
+
+// Add event listeners to all checkboxes
+document.querySelectorAll('.student-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', updateSelectedStudents);
+});
+
+// Clear selection
+document.getElementById('clearSelectionBtn').addEventListener('click', function() {
+    document.querySelectorAll('.student-checkbox').forEach(checkbox => {
+        if (!checkbox.disabled) {
+            checkbox.checked = false;
+        }
+    });
+    document.getElementById('selectAll').checked = false;
+    updateSelectedStudents();
+});
+
+// Enroll selected students
+document.getElementById('enrollSelectedBtn').addEventListener('click', function() {
+    const selectedIds = Array.from(document.querySelectorAll('.student-checkbox:checked'))
+        .map(checkbox => checkbox.value);
+    const areaId = this.dataset.areaId;
+    const areaName = this.dataset.areaName;
+    
+    if (selectedIds.length === 0) {
+        alert('Please select at least one student.');
+        return;
+    }
+    
+    if (confirm(`Enroll ${selectedIds.length} student(s) in ${areaName}?`)) {
+        // For single student, redirect directly
+        if (selectedIds.length === 1) {
+            window.location.href = `?enroll=${selectedIds[0]}&area=${areaId}`;
+        } else {
+            // For multiple students, show processing message and process one by one
+            if (confirm(`Bulk enrollment for ${selectedIds.length} students will be processed. This may take several minutes. Continue?`)) {
+                // Create a form to submit multiple student IDs
+                const form = document.createElement('form');
+                form.method = 'GET';
+                form.action = window.location.pathname;
+                
+                const areaInput = document.createElement('input');
+                areaInput.type = 'hidden';
+                areaInput.name = 'bulk_enroll';
+                areaInput.value = '1';
+                form.appendChild(areaInput);
+                
+                const areaIdInput = document.createElement('input');
+                areaIdInput.type = 'hidden';
+                areaIdInput.name = 'bulk_area';
+                areaIdInput.value = areaId;
+                form.appendChild(areaIdInput);
+                
+                // Add student IDs
+                selectedIds.forEach(id => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'student_ids[]';
+                    input.value = id;
+                    form.appendChild(input);
+                });
+                
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+    }
+});
+
+// Bulk enrollment modal
+const bulkEnrollmentModal = document.getElementById('bulkEnrollmentModal');
+if (bulkEnrollmentModal) {
+    bulkEnrollmentModal.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        const areaId = button.getAttribute('data-area-id');
+        const areaName = button.getAttribute('data-area-name');
+        
+        const modalTitle = bulkEnrollmentModal.querySelector('.modal-title');
+        const modalBody = bulkEnrollmentModal.querySelector('.modal-body');
+        const enrollButton = bulkEnrollmentModal.querySelector('#confirmBulkEnroll');
+        
+        // Count non-enrolled students
+        const nonEnrolledCount = {{ applications|filter(a => not a.isEnrolledInBioTime)|length }};
+        const enrolledCount = {{ applications|filter(a => a.isEnrolledInBioTime)|length }};
+        
+        modalTitle.textContent = `Bulk Enrollment - ${areaName}`;
+        modalBody.innerHTML = `
+            <p>You are about to enroll <strong>${nonEnrolledCount} students</strong> in <strong>${areaName}</strong>.</p>
+            ${enrolledCount > 0 ? `
+            <div class="alert alert-info">
+                <i class="ti ti-info-circle me-2"></i>
+                <strong>Note:</strong> ${enrolledCount} students are already enrolled and will be updated.
+            </div>
+            ` : ''}
+            <div class="alert alert-warning">
+                <i class="ti ti-alert-circle me-2"></i>
+                <strong>Note:</strong> This action will:
+                <ul class="mb-0 mt-2">
+                    <li>Create/update BioTime employee records</li>
+                    <li>Assign students to the selected area</li>
+                    <li>Enable attendance tracking</li>
+                    <li>This process may take several minutes</li>
+                </ul>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="includeEnrolled">
+                <label class="form-check-label" for="includeEnrolled">
+                    Include already enrolled students (will update their records)
+                </label>
+            </div>
+        `;
+        
+        enrollButton.onclick = function() {
+            const includeEnrolled = document.getElementById('includeEnrolled').checked;
+            const url = `?bulk_enroll=1&bulk_area=${areaId}${includeEnrolled ? '&include_enrolled=1' : ''}`;
+            window.location.href = url;
+        };
+    });
+}
+
+// Student details modal
+const studentDetailsModal = document.getElementById('studentDetailsModal');
+if (studentDetailsModal) {
+    studentDetailsModal.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        const studentId = button.getAttribute('data-student-id');
+        const studentName = button.getAttribute('data-student-name');
+        
+        const modalTitle = studentDetailsModal.querySelector('.modal-title');
+        const modalBody = studentDetailsModal.querySelector('.modal-body');
+        
+        modalTitle.textContent = `Student: ${studentName}`;
+        modalBody.innerHTML = `
+            <div class="text-center py-4">
+                <i class="ti ti-user-circle text-primary" style="font-size: 4rem;"></i>
+                <h5 class="mt-3">${studentName}</h5>
+                <p class="text-muted">Loading details...</p>
+            </div>
+        `;
+        
+        // AJAX call to fetch student details
+        fetch(`/admin/biotime/ajax/student-details/${studentId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    modalBody.innerHTML = `
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Personal Information</h6>
+                                <p><strong>Phone:</strong> ${data.student.phone || 'N/A'}</p>
+                                <p><strong>Email:</strong> ${data.student.email || 'N/A'}</p>
+                                <p><strong>Gender:</strong> ${data.student.gender || 'N/A'}</p>
+                                <p><strong>Date of Birth:</strong> ${data.student.dob || 'N/A'}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Institute Information</h6>
+                                <p><strong>Institute:</strong> ${data.student.institute || 'N/A'}</p>
+                                <p><strong>Course:</strong> ${data.student.course || 'N/A'}</p>
+                                <p><strong>Status:</strong> <span class="badge bg-success">Accepted</span></p>
+                                ${data.student.biotime_employee_code ? `
+                                <p><strong>BioTime Code:</strong> <code>${data.student.biotime_employee_code}</code></p>
+                                ` : ''}
+                            </div>
+                        </div>
+                        ${data.student.is_enrolled ? `
+                        <div class="alert alert-success mt-3">
+                            <i class="ti ti-check me-2"></i>
+                            <strong>Enrolled in BioTime</strong>
+                            ${data.student.enrollment_date ? `<br>Since: ${data.student.enrollment_date}` : ''}
+                            ${data.student.employee_id ? `<br>Employee ID: ${data.student.employee_id}` : ''}
+                        </div>
+                        ` : `
+                        <div class="alert alert-warning mt-3">
+                            <i class="ti ti-user-plus me-2"></i>
+                            <strong>Not yet enrolled in BioTime</strong>
+                        </div>
+                        `}
+                    `;
+                } else {
+                    modalBody.innerHTML = `
+                        <div class="alert alert-danger">
+                            <i class="ti ti-alert-circle me-2"></i>
+                            Failed to load student details: ${data.message}
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                modalBody.innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="ti ti-alert-circle me-2"></i>
+                        Error loading student details: ${error.message}
+                    </div>
+                `;
+            });
+    });
+}
+
+// Update Select All checkbox based on available checkboxes
+function updateSelectAllCheckbox() {
+    const allCheckboxes = document.querySelectorAll('.student-checkbox:not(:disabled)');
+    const checkedCheckboxes = document.querySelectorAll('.student-checkbox:not(:disabled):checked');
+    const selectAllCheckbox = document.getElementById('selectAll');
+    
+    if (allCheckboxes.length === 0) {
+        selectAllCheckbox.disabled = true;
+        selectAllCheckbox.checked = false;
+    } else {
+        selectAllCheckbox.disabled = false;
+        selectAllCheckbox.checked = allCheckboxes.length === checkedCheckboxes.length;
+    }
+}
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    updateSelectAllCheckbox();
+    updateSelectedStudents();
+});
+</script>
+{% endblock %}
+
+{% block modals %}
+<!-- Bulk Enrollment Modal -->
+<div class="modal fade" id="bulkEnrollmentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Bulk Enrollment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Content will be loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="confirmBulkEnroll">Confirm Bulk Enrollment</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Student Details Modal -->
+<div class="modal fade" id="studentDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Student Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Content will be loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

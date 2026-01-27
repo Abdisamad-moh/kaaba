@@ -1,0 +1,250 @@
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}School Hours Configuration{% endblock %}
+
+{% block body %}
+    <!-- Page Header -->
+    <div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+        <div class="card-body px-4 py-3">
+            <div class="row align-items-center">
+                <div class="col-9">
+                    <h4 class="fw-semibold mb-8">School Hours Configuration</h4>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a class="text-muted text-decoration-none" href="#">Admin</a>
+                            </li>
+                            <li class="breadcrumb-item" aria-current="page">Configuration</li>
+                            <li class="breadcrumb-item active" aria-current="page">School Hours</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-3">
+                    <a href="{{ path('app_admin_kaaba_school_hours', { create: 1 }) }}" class="btn btn-primary float-end">
+                        <i class="ti ti-plus me-2"></i>
+                        Add New Configuration
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form for Creating/Editing -->
+    {% if showForm %}
+    <div class="card">
+        <div class="card-header text-bg-primary">
+            <h5 class="mb-0 text-white">
+                <i class="ti ti-{{ editId ? 'edit' : 'plus' }} me-2"></i>
+                {{ editId ? 'Edit School Hours' : 'Add School Hours Configuration' }}
+            </h5>
+        </div>
+        <div class="form-horizontal">
+            <div class="form-body">
+                <div class="card-body">
+                    <h5 class="card-title mb-0">School Hours Information</h5>
+                </div>
+                <hr class="m-0">
+                <div class="card-body">
+                    {{ form_start(form) }}
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3 col-form-label">
+                                    {{ form_label(form.institute) }}
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="col-md-9">
+                                    {{ form_widget(form.institute, { 
+                                        'attr': { 
+                                            'class': 'form-select',
+                                        } 
+                                    }) }}
+                                    {{ form_errors(form.institute) }}
+                                    <small class="form-text text-muted">
+                                        Select the institute for this configuration
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3 col-form-label">
+                                    {{ form_label(form.hoursPerDay) }}
+                                    <span class="text-danger">*</span>
+                                </label>
+                                <div class="col-md-9">
+                                    {{ form_widget(form.hoursPerDay, { 
+                                        'attr': { 
+                                            'class': 'form-control',
+                                            'placeholder': 'Enter number of hours per day'
+                                        } 
+                                    }) }}
+                                    {{ form_errors(form.hoursPerDay) }}
+                                    <small class="form-text text-muted">
+                                        Standard hours per school day (1-24)
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3 col-form-label">
+                                    {{ form_label(form.minHoursPerDay) }}
+                                </label>
+                                <div class="col-md-9">
+                                    {{ form_widget(form.minHoursPerDay, { 
+                                        'attr': { 
+                                            'class': 'form-control',
+                                            'placeholder': 'Optional minimum hours'
+                                        } 
+                                    }) }}
+                                    {{ form_errors(form.minHoursPerDay) }}
+                                    <small class="form-text text-muted">
+                                        Minimum allowed hours per day (optional)
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <div class="form-group row">
+                                <label class="form-label text-end col-md-3 col-form-label">
+                                    {{ form_label(form.maxHoursPerDay) }}
+                                </label>
+                                <div class="col-md-9">
+                                    {{ form_widget(form.maxHoursPerDay, { 
+                                        'attr': { 
+                                            'class': 'form-control',
+                                            'placeholder': 'Optional maximum hours'
+                                        } 
+                                    }) }}
+                                    {{ form_errors(form.maxHoursPerDay) }}
+                                    <small class="form-text text-muted">
+                                        Maximum allowed hours per day (optional)
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="m-0">
+                    <div class="form-actions border-top">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="col-md-offset-3 col-md-9">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="ti ti-{{ editId ? 'check' : 'plus' }} fs-5 me-2"></i>
+                                                {{ editId ? 'Update Configuration' : 'Create Configuration' }}
+                                            </button>
+                                            <a href="{{ path('app_admin_kaaba_school_hours') }}" class="btn bg-danger-subtle text-danger ms-6">
+                                                <i class="ti ti-x me-2"></i>
+                                                Cancel
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6"></div>
+                            </div>
+                        </div>
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Table of Existing Configurations -->
+    <div class="card mt-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title mb-0">Existing School Hours Configurations</h5>
+                <div>
+                    <span class="badge bg-primary me-2">Total: {{ schoolHours|length }}</span>
+                </div>
+            </div>
+            
+            {% if schoolHours|length > 0 %}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th width="50">#</th>
+                            <th>Institute</th>
+                            <th width="120">Hours/Day</th>
+                            <th width="120">Min Hours</th>
+                            <th width="120">Max Hours</th>
+                            <th width="250" class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for config in schoolHours %}
+                            <tr>
+                                <td class="text-muted">{{ loop.index }}</td>
+                                <td>
+                                    <strong>{{ config.institute.name }}</strong>
+                                    <br><small class="text-muted">{{ config.institute.uuid|slice(0, 8) }}...</small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-primary">{{ config.hoursPerDay }} hrs</span>
+                                </td>
+                                <td>
+                                    {% if config.minHoursPerDay %}
+                                        <span class="badge bg-info">{{ config.minHoursPerDay }} hrs</span>
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if config.maxHoursPerDay %}
+                                        <span class="badge bg-warning">{{ config.maxHoursPerDay }} hrs</span>
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a href="{{ path('app_admin_kaaba_school_hours', { edit: config.id }) }}" 
+                                           class="btn btn-warning" 
+                                           title="Edit configuration">
+                                            <i class="ti ti-edit me-1"></i> Edit
+                                        </a>
+                                        <a href="{{ path('app_admin_kaaba_school_hours', { delete: config.id }) }}" 
+                                           class="btn btn-danger" 
+                                           onclick="return confirm('Are you sure you want to delete school hours configuration for \"{{ config.institute.name }}\"?')"
+                                           title="Delete configuration">
+                                            <i class="ti ti-trash me-1"></i> Delete
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info text-center py-4">
+                <div class="mb-3">
+                    <i class="ti ti-clock text-primary" style="font-size: 3rem;"></i>
+                </div>
+                <h5 class="alert-heading">No School Hours Configurations Found</h5>
+                <p class="mb-3">Configure school hours for each institute to define their daily schedule.</p>
+                <a href="{{ path('app_admin_kaaba_school_hours', { create: 1 }) }}" class="btn btn-primary">
+                    <i class="ti ti-plus me-2"></i>Create First Configuration
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

@@ -39,6 +39,9 @@ services:
             $smsApiUrl: '%env(SOMTEL_SMS_API)%'
             $username: '%env(SOMTEL_SMS_USER)%'
             $password: '%env(SOMTEL_SMS_PASS)%'
+            $bioTimeBaseUrl: '%env(BIOTIME_BASE_URL)%'
+            $bioTimeUsername: '%env(BIOTIME_USERNAME)%'
+            $bioTimePassword: '%env(BIOTIME_PASSWORD)%'
     app.exception_listener:
         class: App\EventListener\ExceptionListener
         arguments:
@@ -49,6 +52,12 @@ services:
     App\Service\TranslationService:
         arguments:
             - '@request_stack'
+    
+    App\Service\BioTimeIntegrationService:
+        arguments:
+            $bioTimeService: '@App\Service\BioTimeService'
+            $entityManager: '@doctrine.orm.entity_manager'
+            $logger: '@logger'
 
     App\Form\KaabaApplicationFormType:
         arguments:
