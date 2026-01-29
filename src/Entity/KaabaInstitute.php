@@ -52,6 +52,12 @@ class KaabaInstitute
     #[ORM\OneToOne(mappedBy: 'institute', targetEntity: KaabaBiotimeArea::class, cascade: ['persist', 'remove'])]
 private ?KaabaBiotimeArea $biotimeArea = null;
 
+    /**
+     * @var Collection<int, KaabaAttendance>
+     */
+    #[ORM\OneToMany(targetEntity: KaabaAttendance::class, mappedBy: 'institute')]
+    private Collection $attendances;
+
 
     public function __construct()
     {
@@ -59,6 +65,7 @@ private ?KaabaBiotimeArea $biotimeArea = null;
         $this->uuid = Uuid::v4();
         $this->kaabaCourses = new ArrayCollection();
         $this->kaabaApplicationDuplicates = new ArrayCollection();
+        $this->attendances = new ArrayCollection();
     }
 
     // Add getter and setter methods
@@ -243,6 +250,36 @@ public function setBiotimeArea(?KaabaBiotimeArea $biotimeArea): static
     public function setManager(?User $manager): static
     {
         $this->manager = $manager;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, KaabaAttendance>
+     */
+    public function getAttendances(): Collection
+    {
+        return $this->attendances;
+    }
+
+    public function addAttendance(KaabaAttendance $attendance): static
+    {
+        if (!$this->attendances->contains($attendance)) {
+            $this->attendances->add($attendance);
+            $attendance->setInstitute($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAttendance(KaabaAttendance $attendance): static
+    {
+        if ($this->attendances->removeElement($attendance)) {
+            // set the owning side to null (unless already changed)
+            if ($attendance->getInstitute() === $this) {
+                $attendance->setInstitute(null);
+            }
+        }
 
         return $this;
     }

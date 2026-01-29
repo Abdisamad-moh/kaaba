@@ -3,8 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\KaabaAttendance;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Entity\KaabaApplication;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 class KaabaAttendanceRepository extends ServiceEntityRepository
 {
@@ -24,6 +25,43 @@ class KaabaAttendanceRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+
+    // In src/Repository/KaabaAttendanceRepository.php
+public function findByApplicationAndDateRange(
+    KaabaApplication $application,
+    \DateTimeInterface $startDate,
+    \DateTimeInterface $endDate
+): array {
+    return $this->createQueryBuilder('a')
+        ->where('a.application = :application')
+        ->andWhere('a.attendance_date BETWEEN :startDate AND :endDate')
+        ->setParameter('application', $application)
+        ->setParameter('startDate', $startDate)
+        ->setParameter('endDate', $endDate)
+        ->orderBy('a.attendance_date', 'ASC')
+        ->addOrderBy('a.check_in_time', 'ASC')
+        ->getQuery()
+        ->getResult();
+}
+// In src/Repository/KaabaAttendanceRepository.php
+public function getDailyAttendanceSummary(\DateTimeInterface $date): array
+{
+    return $this->createQueryBuilder('a')
+        ->select([
+            'a.application',
+            'MIN(a.check_in_time) as first_check_in',
+            'MAX(a.check_in_time) as last_check_in',
+            'MAX(a.check_out_time) as last_check_out',
+            'COUNT(a.id) as transaction_count',
+            'a.attendance_date'
+        ])
+        ->where('a.attendance_date = :date')
+        ->setParameter('date', $date)
+        ->groupBy('a.application')
+        ->addGroupBy('a.attendance_date')
+        ->getQuery()
+        ->getResult();
+}
 
     public function findAttendanceByInstituteAndDateRange($instituteId, $startDate, $endDate)
     {
@@ -62,4 +100,56 @@ class KaabaAttendanceRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleResult();
     }
+
+    public function existsByBiotimeTransactionId(string $transactionId): bool
+{
+    return (bool) $this->createQueryBuilder('a')
+        ->select('COUNT(a.id)')
+        ->andWhere('a.biotime_transaction_id = :tx')
+        ->setParameter('tx', $transactionId)
+        ->getQuery()
+        ->getSingleScalarResult();
+}
+
+
+public function filterAttendanceQuery(
+    ?KaabaApplication $applicant = null,
+    ?KaabaInstitute $institute = null,
+    ?string $status = null,
+    ?\DateTimeInterface $date = null,
+    ?array $managedInstitutes = null
+) {
+    $qb = $this->createQueryBuilder('a')
+        ->join('a.application', 'app')
+        ->leftJoin('a.institute', 'inst')
+        ->orderBy('app.full_name', 'ASC')
+        ->addOrderBy('a.attendance_date', 'DESC');
+
+    if ($applicant) {
+        $qb->andWhere('a.application = :applicant')
+            ->setParameter('applicant', $applicant);
+    }
+
+    if ($institute) {
+        $qb->andWhere('a.institute = :institute')
+            ->setParameter('institute', $institute);
+    } elseif ($managedInstitutes && !empty($managedInstitutes)) {
+        $qb->andWhere('a.institute IN (:institutes)')
+            ->setParameter('institutes', $managedInstitutes);
+    }
+
+    if ($status) {
+        $qb->andWhere('a.status = :status')
+            ->setParameter('status', $status);
+    }
+
+    if ($date) {
+        $qb->andWhere('a.attendance_date = :date')
+            ->setParameter('date', $date);
+    }
+
+    return $qb->getQuery();
+}
+
+
 }

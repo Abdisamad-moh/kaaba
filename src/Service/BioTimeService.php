@@ -46,6 +46,91 @@ class BioTimeService
         $this->logger = $logger;
     }
 
+    public function getTransactions(array $params = []): array
+{
+    // Ensure authentication
+    if (!$this->token && !$this->authenticate()) {
+        throw new \RuntimeException('Unable to authenticate with BioTime API');
+    }
+
+    $url = $this->baseUrl . '/iclock/api/transactions/';
+
+    $options = [
+        'headers' => [
+            'Authorization' => 'JWT ' . $this->token,
+            'Accept' => 'application/json',
+        ],
+        'query' => $params,
+    ];
+
+    $this->logger->info('Fetching BioTime transactions', [
+        'url' => $url,
+        'params' => $params,
+    ]);
+
+    $response = $this->httpClient->request('GET', $url, $options);
+
+    $statusCode = $response->getStatusCode();
+    $content = $response->getContent(false);
+
+    if ($statusCode >= 200 && $statusCode < 300) {
+        return json_decode($content, true) ?? [];
+    }
+
+    $this->logger->error('Failed to fetch transactions', [
+        'status_code' => $statusCode,
+        'response' => $content,
+    ]);
+
+    return [];
+}
+
+public function getAttendanceTransactions(
+    ?string $from = null,
+    ?string $to = null
+): array {
+    $transactions = [];
+    $page = 1;
+    $pageSize = 100;
+
+    do {
+        $params = [
+            'page'      => $page,
+            'page_size' => $pageSize,
+        ];
+
+        if ($from) {
+            $params['start_time'] = $from . ' 00:00:00';
+        }
+
+        if ($to) {
+            $params['end_time'] = $to . ' 23:59:59';
+        }
+
+        $response = $this->getTransactions($params);
+
+        if (!is_array($response) || !isset($response['data'])) {
+            break;
+        }
+
+        $transactions = array_merge($transactions, $response['data']);
+
+        $hasNext = !empty($response['next']);
+        $page++;
+
+    } while ($hasNext);
+
+    $this->logger->info('BioTime attendance transactions fetched', [
+        'count' => count($transactions),
+        'from'  => $from,
+        'to'    => $to,
+    ]);
+
+    return $transactions;
+}
+
+
+
     /**
      * Authenticate with BioTime API and get JWT token
      */

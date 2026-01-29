@@ -2,14 +2,17 @@
 
 namespace App\Controller;
 
+use App\Entity\KaabaAttendance;
 use App\Service\BioTimeService;
 use App\Entity\KaabaBiotimeArea;
 use App\Entity\KaabaBiotimeDevice;
+use App\Entity\KaabaStudentDevice;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\KaabaCourseRepository;
 use App\Service\BioTimeIntegrationService;
 use App\Repository\KaabaInstituteRepository;
 use App\Repository\KaabaAttendanceRepository;
+use App\Service\BioTimeAttendanceSyncService;
 use Symfony\Component\HttpFoundation\Request;
 use App\Repository\KaabaBiotimeAreaRepository;
 use Symfony\Component\HttpFoundation\Response;
@@ -30,6 +33,16 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 #[Route('/admin/biotime')]
 class BioTimeController extends AbstractController
 {
+
+    private EntityManagerInterface $entityManager;
+    private BioTimeService $bioTimeService;
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        BioTimeService $bioTimeService
+    ) {
+        $this->entityManager = $entityManager;
+        $this->bioTimeService = $bioTimeService;
+    }
     // ========== AREAS MANAGEMENT ==========
 
     #[Route('/areas', name: 'app_admin_biotime_areas')]
@@ -506,76 +519,176 @@ class BioTimeController extends AbstractController
         }
     }
 
-  #[Route('/enrolled-students', name: 'app_admin_biotime_enrolled_students')]
-public function enrolledStudents(
-    Request $request,
-    EntityManagerInterface $em,
-    KaabaInstituteRepository $instituteRepository,
-    KaabaCourseRepository $courseRepository,
-    KaabaStudentDeviceRepository $studentDeviceRepository
-): Response {
-    // Get filter parameters
-    $instituteId = $request->query->get('institute');
-    $courseId = $request->query->get('course');
-    $employeeCode = $request->query->get('employee_code');
-    $enrollmentDateFrom = $request->query->get('enrollment_date_from');
-    $enrollmentDateTo = $request->query->get('enrollment_date_to');
+    #[Route('/enrolled-students', name: 'app_admin_biotime_enrolled_students')]
+    public function enrolledStudents(
+        Request $request,
+        EntityManagerInterface $em,
+        KaabaInstituteRepository $instituteRepository,
+        KaabaCourseRepository $courseRepository,
+        KaabaStudentDeviceRepository $studentDeviceRepository
+    ): Response {
+        // Get filter parameters
+        $instituteId = $request->query->get('institute');
+        $courseId = $request->query->get('course');
+        $employeeCode = $request->query->get('employee_code');
+        $enrollmentDateFrom = $request->query->get('enrollment_date_from');
+        $enrollmentDateTo = $request->query->get('enrollment_date_to');
 
-    // dd($studentDeviceRepository->findAll());
-    // Create query builder
-    $qb = $em->createQueryBuilder();
-    $qb->select('sd')
-        ->from('App\Entity\KaabaStudentDevice', 'sd')
-        ->innerJoin('sd.application', 'a')
-        ->where('sd.enrollment_status = :enrollmentStatus')
-        // ->andWhere('a.isEnrolledInBioTime = :enrolled')
-        ->setParameter('enrollmentStatus', 'enrolled')
-        // ->setParameter('enrolled', true)
-        ->orderBy('a.full_name', 'ASC');
+        // dd($studentDeviceRepository->findAll());
+        // Create query builder
+        $qb = $em->createQueryBuilder();
+        $qb->select('sd')
+            ->from('App\Entity\KaabaStudentDevice', 'sd')
+            ->innerJoin('sd.application', 'a')
+            ->where('sd.enrollment_status = :enrollmentStatus')
+            // ->andWhere('a.isEnrolledInBioTime = :enrolled')
+            ->setParameter('enrollmentStatus', 'enrolled')
+            // ->setParameter('enrolled', true)
+            ->orderBy('a.full_name', 'ASC');
 
-    // Apply filters
-    if ($instituteId) {
-        $qb->andWhere('a.institute = :instituteId')
-            ->setParameter('instituteId', $instituteId);
-    }
+        // Apply filters
+        if ($instituteId) {
+            $qb->andWhere('a.institute = :instituteId')
+                ->setParameter('instituteId', $instituteId);
+        }
 
-    if ($courseId) {
-        $qb->andWhere('a.course = :courseId')
-            ->setParameter('courseId', $courseId);
-    }
+        if ($courseId) {
+            $qb->andWhere('a.course = :courseId')
+                ->setParameter('courseId', $courseId);
+        }
 
-    if ($employeeCode) {
-        $qb->andWhere('a.biotimeEmployeeCode LIKE :employeeCode')
-            ->setParameter('employeeCode', '%' . $employeeCode . '%');
-    }
+        if ($employeeCode) {
+            $qb->andWhere('a.biotimeEmployeeCode LIKE :employeeCode')
+                ->setParameter('employeeCode', '%' . $employeeCode . '%');
+        }
 
-    if ($enrollmentDateFrom) {
-        $dateFrom = new \DateTime($enrollmentDateFrom);
-        $qb->andWhere('sd.enrollment_date >= :dateFrom')
-            ->setParameter('dateFrom', $dateFrom);
-    }
+        if ($enrollmentDateFrom) {
+            $dateFrom = new \DateTime($enrollmentDateFrom);
+            $qb->andWhere('sd.enrollment_date >= :dateFrom')
+                ->setParameter('dateFrom', $dateFrom);
+        }
 
-    if ($enrollmentDateTo) {
-        $dateTo = new \DateTime($enrollmentDateTo . ' 23:59:59');
-        $qb->andWhere('sd.enrollment_date <= :dateTo')
-            ->setParameter('dateTo', $dateTo);
-    }
+        if ($enrollmentDateTo) {
+            $dateTo = new \DateTime($enrollmentDateTo . ' 23:59:59');
+            $qb->andWhere('sd.enrollment_date <= :dateTo')
+                ->setParameter('dateTo', $dateTo);
+        }
 
-    // Get the student devices - USE THE QUERY BUILDER!
-    $studentDevices = $qb->getQuery()->getResult();
+        // Get the student devices - USE THE QUERY BUILDER!
+        $studentDevices = $qb->getQuery()->getResult();
 
-    // Debug: Check what we got
-    // dd($studentDevices);
+        // Debug: Check what we got
+        // dd($studentDevices);
 
-    // If no results, show empty state
-    if (count($studentDevices) === 0) {
+        // If no results, show empty state
+        if (count($studentDevices) === 0) {
+            return $this->render('admin/biotime/enrolled_students.html.twig', [
+                'studentDevices' => [],
+                'institutes' => $instituteRepository->findAll(),
+                'courses' => $courseRepository->findAll(),
+                'instituteGroups' => [],
+                'courseGroups' => [],
+                'enrollmentByMonth' => [],
+                'filters' => [
+                    'institute' => $instituteId,
+                    'course' => $courseId,
+                    'employee_code' => $employeeCode,
+                    'enrollment_date_from' => $enrollmentDateFrom,
+                    'enrollment_date_to' => $enrollmentDateTo,
+                ],
+                'statistics' => [
+                    'total_enrolled' => 0,
+                    'total_institutes' => 0,
+                    'total_courses' => 0,
+                    'total_student_devices' => 0,
+                    'total_biotime_employees' => 0,
+                ]
+            ]);
+        }
+
+        // Group data for statistics
+        $instituteGroups = [];
+        $courseGroups = [];
+        $enrollmentByMonth = [];
+
+        foreach ($studentDevices as $studentDevice) {
+            $application = $studentDevice->getApplication();
+            if ($application) {
+                // Institute grouping
+                $institute = $application->getInstitute();
+                $instituteName = $institute ? $institute->getName() : 'No Institute';
+                if (!isset($instituteGroups[$instituteName])) {
+                    $instituteGroups[$instituteName] = 0;
+                }
+                $instituteGroups[$instituteName]++;
+
+                // Course grouping
+                $course = $application->getCourse();
+                $courseName = $course ? $course->getName() : 'No Course';
+                if (!isset($courseGroups[$courseName])) {
+                    $courseGroups[$courseName] = 0;
+                }
+                $courseGroups[$courseName]++;
+
+                // Enrollment month grouping
+                $enrollmentDate = $studentDevice->getEnrollmentDate();
+                if ($enrollmentDate) {
+                    $month = $enrollmentDate->format('Y-m');
+                    if (!isset($enrollmentByMonth[$month])) {
+                        $enrollmentByMonth[$month] = 0;
+                    }
+                    $enrollmentByMonth[$month]++;
+                }
+            }
+        }
+
+        // Sort by month
+        ksort($enrollmentByMonth);
+
+        // Get data for filters
+        $institutes = $instituteRepository->findAll();
+        $courses = $courseRepository->findAll();
+
+        // Calculate statistics
+        $totalEnrolled = count($studentDevices);
+
+        // Extract unique institute and course IDs
+        $instituteIds = [];
+        $courseIds = [];
+
+        foreach ($studentDevices as $studentDevice) {
+            $application = $studentDevice->getApplication();
+            if ($application) {
+                if ($application->getInstitute()) {
+                    $instituteIds[] = $application->getInstitute()->getId();
+                }
+                if ($application->getCourse()) {
+                    $courseIds[] = $application->getCourse()->getId();
+                }
+            }
+        }
+
+        $totalInstitutes = count(array_unique($instituteIds));
+        $totalCourses = count(array_unique($courseIds));
+
+        // Calculate unique BioTime employees
+        $uniqueBioTimeEmployees = [];
+        foreach ($studentDevices as $studentDevice) {
+            $employeeId = $studentDevice->getBiotimeEmployeeId();
+            if ($employeeId) {
+                $uniqueBioTimeEmployees[$employeeId] = true;
+            }
+        }
+
+        $totalBioTimeEmployees = count($uniqueBioTimeEmployees);
+
         return $this->render('admin/biotime/enrolled_students.html.twig', [
-            'studentDevices' => [],
-            'institutes' => $instituteRepository->findAll(),
-            'courses' => $courseRepository->findAll(),
-            'instituteGroups' => [],
-            'courseGroups' => [],
-            'enrollmentByMonth' => [],
+            'studentDevices' => $studentDevices, // Pass student devices
+            'institutes' => $institutes,
+            'courses' => $courses,
+            'instituteGroups' => $instituteGroups,
+            'courseGroups' => $courseGroups,
+            'enrollmentByMonth' => $enrollmentByMonth,
             'filters' => [
                 'institute' => $instituteId,
                 'course' => $courseId,
@@ -584,114 +697,14 @@ public function enrolledStudents(
                 'enrollment_date_to' => $enrollmentDateTo,
             ],
             'statistics' => [
-                'total_enrolled' => 0,
-                'total_institutes' => 0,
-                'total_courses' => 0,
-                'total_student_devices' => 0,
-                'total_biotime_employees' => 0,
+                'total_enrolled' => $totalEnrolled,
+                'total_institutes' => $totalInstitutes,
+                'total_courses' => $totalCourses,
+                'total_student_devices' => $totalEnrolled,
+                'total_biotime_employees' => $totalBioTimeEmployees,
             ]
         ]);
     }
-
-    // Group data for statistics
-    $instituteGroups = [];
-    $courseGroups = [];
-    $enrollmentByMonth = [];
-    
-    foreach ($studentDevices as $studentDevice) {
-        $application = $studentDevice->getApplication();
-        if ($application) {
-            // Institute grouping
-            $institute = $application->getInstitute();
-            $instituteName = $institute ? $institute->getName() : 'No Institute';
-            if (!isset($instituteGroups[$instituteName])) {
-                $instituteGroups[$instituteName] = 0;
-            }
-            $instituteGroups[$instituteName]++;
-            
-            // Course grouping
-            $course = $application->getCourse();
-            $courseName = $course ? $course->getName() : 'No Course';
-            if (!isset($courseGroups[$courseName])) {
-                $courseGroups[$courseName] = 0;
-            }
-            $courseGroups[$courseName]++;
-            
-            // Enrollment month grouping
-            $enrollmentDate = $studentDevice->getEnrollmentDate();
-            if ($enrollmentDate) {
-                $month = $enrollmentDate->format('Y-m');
-                if (!isset($enrollmentByMonth[$month])) {
-                    $enrollmentByMonth[$month] = 0;
-                }
-                $enrollmentByMonth[$month]++;
-            }
-        }
-    }
-
-    // Sort by month
-    ksort($enrollmentByMonth);
-
-    // Get data for filters
-    $institutes = $instituteRepository->findAll();
-    $courses = $courseRepository->findAll();
-
-    // Calculate statistics
-    $totalEnrolled = count($studentDevices);
-    
-    // Extract unique institute and course IDs
-    $instituteIds = [];
-    $courseIds = [];
-    
-    foreach ($studentDevices as $studentDevice) {
-        $application = $studentDevice->getApplication();
-        if ($application) {
-            if ($application->getInstitute()) {
-                $instituteIds[] = $application->getInstitute()->getId();
-            }
-            if ($application->getCourse()) {
-                $courseIds[] = $application->getCourse()->getId();
-            }
-        }
-    }
-    
-    $totalInstitutes = count(array_unique($instituteIds));
-    $totalCourses = count(array_unique($courseIds));
-
-    // Calculate unique BioTime employees
-    $uniqueBioTimeEmployees = [];
-    foreach ($studentDevices as $studentDevice) {
-        $employeeId = $studentDevice->getBiotimeEmployeeId();
-        if ($employeeId) {
-            $uniqueBioTimeEmployees[$employeeId] = true;
-        }
-    }
-
-    $totalBioTimeEmployees = count($uniqueBioTimeEmployees);
-
-    return $this->render('admin/biotime/enrolled_students.html.twig', [
-        'studentDevices' => $studentDevices, // Pass student devices
-        'institutes' => $institutes,
-        'courses' => $courses,
-        'instituteGroups' => $instituteGroups,
-        'courseGroups' => $courseGroups,
-        'enrollmentByMonth' => $enrollmentByMonth,
-        'filters' => [
-            'institute' => $instituteId,
-            'course' => $courseId,
-            'employee_code' => $employeeCode,
-            'enrollment_date_from' => $enrollmentDateFrom,
-            'enrollment_date_to' => $enrollmentDateTo,
-        ],
-        'statistics' => [
-            'total_enrolled' => $totalEnrolled,
-            'total_institutes' => $totalInstitutes,
-            'total_courses' => $totalCourses,
-            'total_student_devices' => $totalEnrolled,
-            'total_biotime_employees' => $totalBioTimeEmployees,
-        ]
-    ]);
-}
 
     #[Route('/ajax/enrolled-student-details/{id}', name: 'app_admin_biotime_ajax_enrolled_student_details')]
     public function ajaxEnrolledStudentDetails(
@@ -968,6 +981,79 @@ public function enrolledStudents(
             return new JsonResponse([
                 'success' => false,
                 'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+   #[Route('/transactions', name: 'app_admin_biotime_transactions', methods: ['GET'])]
+public function transactions(Request $request): JsonResponse
+{
+    try {
+        $params = $request->query->all();
+
+        /**
+         * If ?today=1 is passed, override start_time & end_time
+         */
+        if ($request->query->getBoolean('today')) {
+            $today = new \DateTime('today');
+
+            $params['start_time'] = $today->format('Y-m-d 00:00:00');
+            $params['end_time']   = $today->format('Y-m-d 23:59:59');
+
+            unset($params['today']); // clean API params
+        }
+
+        $transactions = $this->bioTimeService->getTransactions($params);
+
+        return $this->json([
+            'success' => true,
+            'filters' => $params,
+            'count'   => $transactions['count'] ?? 0,
+            'data'    => $transactions['data'] ?? [],
+            'next'    => $transactions['next'] ?? null,
+            'previous'=> $transactions['previous'] ?? null,
+        ]);
+
+    } catch (\Exception $e) {
+        return $this->json([
+            'success' => false,
+            'message' => $e->getMessage(),
+        ], 500);
+    }
+}
+
+#[Route('/attendance/sync-attendance', name: 'app_admin_biotime_sync_attendance', methods: ['POST', 'GET'])]
+    public function syncAttendance(
+        Request $request,
+        BioTimeService $bioTimeService,
+        BioTimeAttendanceSyncService $attendanceSyncService
+    ): JsonResponse {
+        try {
+            // Optional filters
+            $from = $request->query->get('from'); // Y-m-d
+            $to   = $request->query->get('to');   // Y-m-d
+
+            // 1. Fetch transactions from BioTime
+            $transactions = $bioTimeService->getAttendanceTransactions(
+                $from,
+                $to
+            );
+
+            // 2. Sync to local DB
+            $attendanceSyncService->sync($transactions);
+
+            return $this->json([
+                'status' => 'success',
+                'message' => 'BioTime attendance synchronized successfully',
+                'transactions_received' => count($transactions),
+            ]);
+
+        } catch (\Throwable $e) {
+            return $this->json([
+                'status' => 'error',
+                'message' => 'Attendance sync failed',
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

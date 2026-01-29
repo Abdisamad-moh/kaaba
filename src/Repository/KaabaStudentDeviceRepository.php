@@ -121,4 +121,14 @@ public function findEnrolledWithFilters(array $filters = [])
 
     return $qb->getQuery()->getResult();
 }
+
+public function findByBiotimeEmployeeId(string $employeeId): ?KaabaStudentDevice
+{
+    return $this->createQueryBuilder('sd')
+        ->andWhere('sd.biotime_employee_id = :emp')
+        ->setParameter('emp', $employeeId)
+        ->getQuery()
+        ->getOneOrNullResult();
+}
+
 }

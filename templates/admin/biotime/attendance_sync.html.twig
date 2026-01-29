@@ -1,0 +1,271 @@
+{# templates/admin/biotime/attendance_sync.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}BioTime Attendance Sync{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1>BioTime Attendance Synchronization</h1>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Sync Status Card -->
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Sync Status</h5>
+                </div>
+                <div class="card-body">
+                    <div id="sync-status">
+                        <p class="text-muted">Loading status...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sync Controls Card -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Synchronize Attendance</h5>
+                </div>
+                <div class="card-body">
+                    <form id="sync-form">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="start-date">Start Date</label>
+                                    <input type="date" id="start-date" name="start_date" 
+                                           class="form-control" 
+                                           value="{{ 'now'|date_modify('-7 days')|date('Y-m-d') }}">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="end-date">End Date</label>
+                                    <input type="date" id="end-date" name="end_date" 
+                                           class="form-control" 
+                                           value="{{ 'now'|date('Y-m-d') }}">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="area-id">Area ID (Optional)</label>
+                                    <input type="text" id="area-id" name="area_id" 
+                                           class="form-control" 
+                                           placeholder="e.g., 2">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="device-id">Device ID (Optional)</label>
+                                    <input type="text" id="device-id" name="device_id" 
+                                           class="form-control" 
+                                           placeholder="e.g., CQQC231261649">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="form-check">
+                                <input type="checkbox" id="force-resync" name="force_resync" 
+                                       class="form-check-input">
+                                <label class="form-check-label" for="force-resync">
+                                    Force re-sync (overwrite existing records)
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary" id="sync-button">
+                            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            Start Sync
+                        </button>
+                        
+                        <button type="button" class="btn btn-secondary" id="progressive-sync">
+                            Progressive Sync
+                        </button>
+                    </form>
+                    
+                    <div id="sync-progress" class="mt-4 d-none">
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <div class="mt-2" id="progress-text"></div>
+                    </div>
+                    
+                    <div id="sync-result" class="mt-4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Errors Card -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Recent Sync Errors</h5>
+                </div>
+                <div class="card-body">
+                    <div id="recent-errors">
+                        <p class="text-muted">Loading errors...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block javascripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Load sync status
+    loadSyncStatus();
+    
+    // Form submission
+    document.getElementById('sync-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        startSync(false);
+    });
+    
+    // Progressive sync button
+    document.getElementById('progressive-sync').addEventListener('click', function() {
+        startSync(true);
+    });
+    
+    function loadSyncStatus() {
+        fetch('{{ path('admin_biotime_attendance_status') }}')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const statusDiv = document.getElementById('sync-status');
+                    const stats = data.data.statistics;
+                    
+                    statusDiv.innerHTML = `
+                        <div class="row">
+                            <div class="col-6">
+                                <h6>Records</h6>
+                                <p>Total: ${stats.total_attendance_records.toLocaleString()}<br>
+                                   Synced: ${stats.biometric_synced_records.toLocaleString()}</p>
+                            </div>
+                            <div class="col-6">
+                                <h6>Coverage</h6>
+                                <p>Enrolled: ${stats.enrolled_students.toLocaleString()}<br>
+                                   Coverage: ${stats.sync_coverage_percentage}%</p>
+                            </div>
+                        </div>
+                        <div class="mt-2">
+                            <small class="text-muted">
+                                Last sync: ${stats.last_sync_date ? new Date(stats.last_sync_date).toLocaleString() : 'Never'}
+                            </small>
+                        </div>
+                    `;
+                    
+                    // Load recent errors
+                    const errorsDiv = document.getElementById('recent-errors');
+                    if (data.data.recent_errors.length > 0) {
+                        let errorsHtml = '<ul class="list-group">';
+                        data.data.recent_errors.forEach(error => {
+                            errorsHtml += `
+                                <li class="list-group-item">
+                                    <small>
+                                        <strong>${error.transaction_id || 'N/A'}</strong><br>
+                                        ${error.notes}<br>
+                                        <span class="text-muted">${error.created_at}</span>
+                                    </small>
+                                </li>
+                            `;
+                        });
+                        errorsHtml += '</ul>';
+                        errorsDiv.innerHTML = errorsHtml;
+                    } else {
+                        errorsDiv.innerHTML = '<p class="text-success">No recent errors</p>';
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error loading sync status:', error);
+            });
+    }
+    
+    function startSync(progressive = false) {
+        const form = document.getElementById('sync-form');
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+        
+        // Convert checkbox value
+        data.force_resync = document.getElementById('force-resync').checked;
+        
+        const syncButton = document.getElementById('sync-button');
+        const spinner = syncButton.querySelector('.spinner-border');
+        
+        // Show loading state
+        syncButton.disabled = true;
+        spinner.classList.remove('d-none');
+        
+        const endpoint = progressive 
+            ? '{{ path('admin_biotime_attendance_sync_progress') }}'
+            : '{{ path('admin_biotime_attendance_sync') }}';
+        
+        fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+            // Hide loading state
+            syncButton.disabled = false;
+            spinner.classList.add('d-none');
+            
+            // Show result
+            const resultDiv = document.getElementById('sync-result');
+            
+            if (result.success) {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-success">
+                        <h6>${result.message}</h6>
+                        ${result.data ? `
+                            <pre class="mt-2" style="max-height: 300px; overflow-y: auto;">${JSON.stringify(result.data, null, 2)}</pre>
+                        ` : ''}
+                    </div>
+                `;
+                
+                // Reload status
+                setTimeout(loadSyncStatus, 2000);
+            } else {
+                resultDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <h6>Sync Failed</h6>
+                        <p>${result.message}</p>
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            // Hide loading state
+            syncButton.disabled = false;
+            spinner.classList.add('d-none');
+            
+            // Show error
+            const resultDiv = document.getElementById('sync-result');
+            resultDiv.innerHTML = `
+                <div class="alert alert-danger">
+                    <h6>Request Failed</h6>
+                    <p>${error.message}</p>
+                </div>
+            `;
+        });
+    }
+});
+</script>
+{% endblock %}
+{% endblock %}

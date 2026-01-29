@@ -62,6 +62,9 @@ class KaabaAttendance
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $verification_notes = null;
 
+    #[ORM\ManyToOne(inversedBy: 'attendances')]
+    private ?KaabaInstitute $institute = null;
+
     public function __construct()
     {
         $this->created_at = new \DateTime();
@@ -73,6 +76,25 @@ class KaabaAttendance
         return $this->id;
     }
 
+    // Add this method to KaabaAttendance entity
+public function calculateTotalHoursWithVirtualCheckout(): ?float
+{
+    if (!$this->check_in_time) {
+        return null;
+    }
+    
+    // If we have a check-out time, use it
+    if ($this->check_out_time) {
+        $interval = $this->check_in_time->diff($this->check_out_time);
+        return $interval->h + ($interval->i / 60) + ($interval->s / 3600);
+    }
+    
+    // If this is the last record of the day for this application,
+    // we need to use this check-in time as virtual check-out
+    // This should be handled at the controller level
+    
+    return 0;
+}
     public function getApplication(): ?KaabaApplication
     {
         return $this->application;
@@ -260,5 +282,17 @@ class KaabaAttendance
             $interval = $this->check_in_time->diff($this->check_out_time);
             $this->total_hours = $interval->h + ($interval->i / 60);
         }
+    }
+
+    public function getInstitute(): ?KaabaInstitute
+    {
+        return $this->institute;
+    }
+
+    public function setInstitute(?KaabaInstitute $institute): static
+    {
+        $this->institute = $institute;
+
+        return $this;
     }
 }
