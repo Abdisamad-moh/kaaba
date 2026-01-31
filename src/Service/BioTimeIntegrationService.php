@@ -491,7 +491,7 @@ private function prepareStudentForBioTime(KaabaApplication $application, KaabaBi
         'first_name' => $firstName,
         'last_name' => $lastName,
         'nickname' => $application->getFullName(),
-        'department' => 4, // Using department ID 4 (Admin and finance)
+        'department' => 2, // Using department ID 4 (Admin and finance)
         'area' => [(int)$areaId],
         'verify_mode' => 0,
         'mobile' => $application->getPhone() ?? '',

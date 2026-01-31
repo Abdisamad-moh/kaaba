@@ -11,6 +11,7 @@ use App\Entity\KaabaConfigSchoolDay;
 use App\Entity\KaabaConfigSchoolHour;
 use App\Entity\KaabaConfigSchoolHoliday;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\KaabaCourseRepository;
 use App\Repository\KaabaInstituteRepository;
 use App\Repository\KaabaAttendanceRepository;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,6 +19,7 @@ use App\Repository\KaabaApplicationRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Repository\KaabaConfigSchoolDayRepository;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use App\Repository\KaabaConfigSchoolHourRepository;
 use Symfony\Component\Validator\Constraints\DateTime;
 use App\Repository\KaabaConfigSchoolHolidayRepository;
@@ -41,7 +43,8 @@ class AttendanceController extends AbstractController
         KaabaInstituteRepository $instituteRepository,
         KaabaConfigSchoolDayRepository $schoolDayRepository,
         KaabaConfigSchoolHolidayRepository $holidayRepository,
-        KaabaConfigSchoolHourRepository $schoolHourRepository
+        KaabaConfigSchoolHourRepository $schoolHourRepository,
+        KaabaCourseRepository $courseRepository
     ) {
         $this->entityManager = $entityManager;
         $this->attendanceRepository = $attendanceRepository;
@@ -50,86 +53,281 @@ class AttendanceController extends AbstractController
         $this->schoolDayRepository = $schoolDayRepository;
         $this->holidayRepository = $holidayRepository;
         $this->schoolHourRepository = $schoolHourRepository;
+        $this->courseRepository = $courseRepository;
     }
 
 
-   #[Route('/', name: 'app_admin_attendance_index', methods: ['GET'])]
-    public function index(Request $request): Response
-    {
-        $user = $this->getUser();
+#[Route('/', name: 'app_admin_attendance_index', methods: ['GET'])]
+public function index(Request $request): Response
+{
+    $user = $this->getUser();
+    
+    // Get institutes managed by current user
+    if ($user && in_array('ROLE_USER', $user->getRoles()) && !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+        $managedInstitutes = $this->instituteRepository->findBy(['manager' => $user]);
         
-        // Get institutes managed by current user
+        // If user doesn't manage any institutes, show message
+        if (empty($managedInstitutes)) {
+            $this->addFlash('warning', 'You do not manage any institutes to view attendance.');
+            return $this->render('admin/attendance/index.html.twig', [
+                'no_institutes' => true,
+                'attendanceData' => [],
+                'stats' => [],
+                'selectedDate' => new \DateTime()
+            ]);
+        }
+    } else {
+        // Super admin or users with special roles can see all institutes
+        $managedInstitutes = $this->instituteRepository->findAll();
+    }
+
+    // Create search form with managed institutes
+    $searchForm = $this->createForm(AttendanceSearchType::class, null, [
+        'method' => 'GET',
+        'csrf_protection' => false,
+        'institutes' => $managedInstitutes,
+        'request' => $request
+    ]);
+
+    $searchForm->handleRequest($request);
+    
+    // Get filter values
+    $date = $searchForm->get('date')->getData() ?? new \DateTime();
+    $applicant = $searchForm->get('applicant')->getData();
+    $institute = $searchForm->get('institute')->getData();
+    $course = $searchForm->get('course')->getData();
+    $status = $searchForm->get('status')->getData();
+
+    // Get course ID from request if available
+    $courseId = $request->query->get('course');
+    if ($courseId && !$course) {
+        // If course is selected in URL but not in form data, try to find it
+        $course = $this->courseRepository->find($courseId); // FIXED: Removed extra $ sign
+    }
+    
+    // Convert date to string for template
+    $dateString = $date->format('Y-m-d');
+    
+    // Check if it's a holiday
+    $isHoliday = $this->isHoliday($date);
+    
+    // Check if it's a school day
+    $dayOfWeek = $date->format('l');
+    $isSchoolDay = $this->isSchoolDay($dayOfWeek);
+    
+    // Get attendance data - UPDATED to include all students
+    $attendanceData = $this->getDailyAttendanceWithAbsent($date, $applicant, $institute, $course, $status);
+    
+    // Calculate statistics (only for school days)
+    if ($isSchoolDay && !$isHoliday) {
+        $stats = $this->calculateAttendanceStatistics($attendanceData);
+    } else {
+        $stats = [
+            'total_students' => 0,
+            'present' => 0,
+            'absent' => 0,
+            'attendance_rate' => 0,
+            'total_hours' => 0,
+            'is_holiday' => $isHoliday,
+            'is_school_day' => $isSchoolDay
+        ];
+    }
+
+    return $this->render('admin/attendance/index.html.twig', [
+        'attendanceData' => $attendanceData,
+        'selectedDate' => $date,
+        'stats' => $stats,
+        'isHoliday' => $isHoliday,
+        'isSchoolDay' => $isSchoolDay,
+        'searchForm' => $searchForm->createView(),
+        'no_institutes' => false,
+        'selected_course_id' => $courseId,
+    ]);
+}
+
+
+#[Route('/courses-by-institute/{instituteId}', name: 'app_admin_attendance_courses_by_institute', methods: ['GET'])]
+public function getCoursesByInstitute(int $instituteId, Request $request, KaabaCourseRepository $courseRepository): JsonResponse
+{
+    // Validate institute ID
+    if ($instituteId <= 0) {
+        return $this->json([
+            'courses' => [],
+            'error' => 'Invalid institute ID'
+        ]);
+    }
+    
+    // Get courses for the institute
+    $courses = $courseRepository->findBy(['institute' => $instituteId]);
+    
+    $courseArray = [];
+    foreach ($courses as $course) {
+        $courseArray[] = [
+            'id' => $course->getId(),
+            'name' => $course->getName()
+        ];
+    }
+    
+    return $this->json([
+        'courses' => $courseArray,
+        'instituteId' => $instituteId,
+        'count' => count($courseArray)
+    ]);
+}
+
+private function getDailyAttendanceWithAbsent(
+    \DateTime $date, 
+    $applicant = null, 
+    $institute = null, 
+    $course = null, 
+    $status = null
+): array {
+    $startDate = clone $date;
+    $startDate->setTime(0, 0, 0);
+    
+    $endDate = clone $date;
+    $endDate->setTime(23, 59, 59);
+
+    // Get ALL students who are enrolled (have student device)
+    $qb = $this->entityManager->createQueryBuilder();
+    $qb->select('app', 'sd', 'inst', 'course')
+        ->from(KaabaApplication::class, 'app')
+        ->leftJoin('app.studentDevice', 'sd')
+        ->leftJoin('app.institute', 'inst')
+        ->leftJoin('app.course', 'course')
+        ->where('sd IS NOT NULL') // Only students with student device (enrolled)
+        ->orderBy('sd.created_at', 'DESC'); // Sort by created_at descending
+    
+    // Filter by applicant
+    if ($applicant) {
+        $qb->andWhere('app = :applicant')
+            ->setParameter('applicant', $applicant);
+    }
+    
+    // Filter by institute
+    if ($institute) {
+        $qb->andWhere('app.institute = :institute')
+            ->setParameter('institute', $institute);
+    } else {
+        // If no institute selected, filter by user's managed institutes
+        $user = $this->getUser();
         if ($user && in_array('ROLE_USER', $user->getRoles()) && !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
             $managedInstitutes = $this->instituteRepository->findBy(['manager' => $user]);
-            
-            // If user doesn't manage any institutes, show message
-            if (empty($managedInstitutes)) {
-                $this->addFlash('warning', 'You do not manage any institutes to view attendance.');
-                return $this->render('admin/attendance/index.html.twig', [
-                    'no_institutes' => true,
-                    'attendanceData' => [],
-                    'stats' => [],
-                    'selectedDate' => new \DateTime()
-                ]);
+            if (!empty($managedInstitutes)) {
+                $qb->andWhere('app.institute IN (:institutes)')
+                    ->setParameter('institutes', $managedInstitutes);
             }
-        } else {
-            // Super admin or users with special roles can see all institutes
-            $managedInstitutes = $this->instituteRepository->findAll();
         }
-
-        // Create search form with managed institutes
-        $searchForm = $this->createForm(AttendanceSearchType::class, null, [
-            'method' => 'GET',
-            'csrf_protection' => false,
-            'institutes' => $managedInstitutes
-        ]);
-
-        $searchForm->handleRequest($request);
-        
-        // Get filter values
-        $date = $searchForm->get('date')->getData() ?? new \DateTime();
-        $applicant = $searchForm->get('applicant')->getData();
-        $institute = $searchForm->get('institute')->getData();
-        $status = $searchForm->get('status')->getData();
-        
-        // Convert date to string for template
-        $dateString = $date->format('Y-m-d');
-        
-        // Check if it's a holiday
-        $isHoliday = $this->isHoliday($date);
-        
-        // Check if it's a school day
-        $dayOfWeek = $date->format('l');
-        $isSchoolDay = $this->isSchoolDay($dayOfWeek);
-        
-        // Get attendance data
-        $attendanceData = $this->getDailyAttendance($date, $applicant, $institute, $status);
-        
-        // Calculate statistics (only for school days)
-        if ($isSchoolDay && !$isHoliday) {
-            $stats = $this->calculateAttendanceStatistics($attendanceData);
-        } else {
-            $stats = [
-                'total_students' => 0,
-                'present' => 0,
-                'absent' => 0,
-                'attendance_rate' => 0,
-                'total_hours' => 0,
-                'is_holiday' => $isHoliday,
-                'is_school_day' => $isSchoolDay
-            ];
-        }
-
-        return $this->render('admin/attendance/index.html.twig', [
-            'attendanceData' => $attendanceData,
-            'selectedDate' => $date,
-            'stats' => $stats,
-            'isHoliday' => $isHoliday,
-            'isSchoolDay' => $isSchoolDay,
-            'searchForm' => $searchForm->createView(),
-            'no_institutes' => false
-        ]);
     }
+    
+    // Filter by course
+    if ($course) {
+        $qb->andWhere('app.course = :course')
+            ->setParameter('course', $course);
+    }
+    
+    $allStudents = $qb->getQuery()->getResult();
+    
+    // Get attendance records for the date
+    $attendanceQb = $this->entityManager->createQueryBuilder();
+    $attendanceQb->select('att')
+        ->from(KaabaAttendance::class, 'att')
+        ->join('att.application', 'app2')
+        ->where('att.attendance_date = :date')
+        ->setParameter('date', $startDate)
+        ->orderBy('att.check_in_time', 'ASC');
+    
+    // Apply institute filter to attendance query too
+    if ($institute) {
+        $attendanceQb->andWhere('att.institute = :institute')
+            ->setParameter('institute', $institute);
+    }
+    
+    $attendanceRecords = $attendanceQb->getQuery()->getResult();
+    
+    // Group attendance records by application
+    $attendanceByApplication = [];
+    foreach ($attendanceRecords as $record) {
+        $appId = $record->getApplication()->getId();
+        if (!isset($attendanceByApplication[$appId])) {
+            $attendanceByApplication[$appId] = [];
+        }
+        $attendanceByApplication[$appId][] = $record;
+    }
+    
+    // Process each student
+    $result = [];
+    foreach ($allStudents as $student) {
+        $appId = $student->getId();
+        $records = $attendanceByApplication[$appId] ?? [];
+        
+        if (empty($records)) {
+            // Student has no attendance records - mark as absent
+            $studentStatus = 'absent';
+            $checkInTime = null;
+            $checkOutTime = null;
+            $totalHours = 0;
+            $lastRecord = null;
+            $isVerified = false;
+            $hasVirtualCheckout = false;
+        } else {
+            // Student has attendance records - mark as present
+            // Sort by check-in time
+            usort($records, function($a, $b) {
+                return $a->getCheckInTime() <=> $b->getCheckInTime();
+            });
+
+            $firstRecord = $records[0];
+            $lastRecord = end($records);
+            
+            // Get check-in and check-out times
+            $checkInTime = $firstRecord->getCheckInTime();
+            $checkOutTime = $lastRecord->getCheckOutTime();
+            
+            // If check-out is null, use the last check-in time as check-out
+            if (!$checkOutTime) {
+                $checkOutTime = $lastRecord->getCheckInTime();
+                $hasVirtualCheckout = true;
+            } else {
+                $hasVirtualCheckout = false;
+            }
+            
+            // Calculate total hours
+            $totalHours = 0;
+            if ($checkInTime && $checkOutTime) {
+                $interval = $checkInTime->diff($checkOutTime);
+                $totalHours = $interval->h + ($interval->i / 60) + ($interval->s / 3600);
+            }
+
+            // Force status to 'present' since they have attendance records
+            $studentStatus = 'present';
+            $isVerified = $lastRecord->isIsVerified();
+        }
+        
+        // Apply status filter
+        if ($status && $studentStatus !== $status) {
+            continue;
+        }
+        
+        $result[] = [
+            'application' => $student,
+            'check_in' => $checkInTime,
+            'check_out' => $checkOutTime,
+            'total_hours' => $totalHours,
+            'status' => $studentStatus,
+            'records_count' => count($records),
+            'is_verified' => $isVerified,
+            'attendance_id' => $lastRecord ? $lastRecord->getId() : null,
+            'all_records' => $records,
+            'has_virtual_checkout' => $hasVirtualCheckout ?? false,
+            'institute' => $student->getInstitute(),
+            'course' => $student->getCourse(),
+            'created_at' => $student->getCreatedAt() // For sorting
+        ];
+    }
+    
+    return $result;
+}
 
 
 
@@ -539,15 +737,12 @@ class AttendanceController extends AbstractController
    // In src/Controller/Admin/AttendanceController.php
 
 
-
 private function calculateAttendanceStatistics(array $attendanceData): array
 {
     $stats = [
-        'total_employees' => count($attendanceData),
+        'total_students' => count($attendanceData),
         'present' => 0,
-        'late' => 0,
         'absent' => 0,
-        'half_day' => 0,
         'verified' => 0,
         'total_hours' => 0,
         'attendance_rate' => 0,
@@ -563,35 +758,23 @@ private function calculateAttendanceStatistics(array $attendanceData): array
         // Get the status from the data array
         $status = strtolower($data['status'] ?? 'absent');
         
-        switch ($status) {
-            case 'present':
-                $stats['present']++;
-                break;
-            case 'late':
-                $stats['late']++;
-                break;
-            case 'absent':
-                $stats['absent']++;
-                break;
-            case 'half-day':
-                $stats['half_day']++;
-                break;
-            default:
-                // For any other status, count as present if not absent
-                if ($status !== 'absent') {
-                    $stats['present']++;
-                }
-                break;
+        if ($status === 'present') {
+            $stats['present']++;
+        } else {
+            $stats['absent']++;
         }
     }
 
-    // Calculate attendance rate: (present + late + half_day) / total_employees
-    $attended = $stats['present'] + $stats['late'] + $stats['half_day'];
-    $stats['attendance_rate'] = $stats['total_employees'] > 0 ? 
-        round(($attended / $stats['total_employees']) * 100, 2) : 0;
+    // Calculate attendance rate: present / total_students
+    $stats['attendance_rate'] = $stats['total_students'] > 0 ? 
+        round(($stats['present'] / $stats['total_students']) * 100, 2) : 0;
 
     return $stats;
 }
+
+
+
+
 
 
     private function getAttendanceSummary(\DateTime $startDate, \DateTime $endDate, ?int $applicationId): array
@@ -712,10 +895,27 @@ public function monthlyReport(Request $request): Response
                 'monthlyData' => [],
                 'selectedYear' => date('Y'),
                 'selectedMonth' => date('n'),
-                'stats' => []
+                'stats' => [],
+                'total_items' => 0,
+                'current_page' => 1,
+                'total_pages' => 0,
+                'per_page' => 20,
+                'offset' => 0,
+                'next_page' => 1,
+                'prev_page' => 1,
+                'has_next_page' => false,
+                'has_prev_page' => false,
+                'months' => [],
+                'applicant_filter' => null,
+                'institute_filter' => null,
+                'course_filter' => null, // Add this
+                'managedInstitutes' => [],
+                'searchForm' => null,
+                'courses' => []
             ]);
         }
     } else {
+        // Super admin or users with special roles can see all institutes
         $managedInstitutes = $this->instituteRepository->findAll();
     }
 
@@ -727,6 +927,10 @@ public function monthlyReport(Request $request): Response
     $year = $request->query->getInt('year', $currentYear);
     $month = $request->query->getInt('month', $currentMonth);
     $monthYear = $request->query->get('monthYear');
+    
+    // Pagination parameters
+    $page = $request->query->getInt('page', 1);
+    $perPage = $request->query->getInt('per_page', 20); // Default 20 per page
     
     // If monthYear is provided, use it (for the month picker)
     if ($monthYear) {
@@ -745,16 +949,43 @@ public function monthlyReport(Request $request): Response
     
     $applicantId = $request->query->get('applicant');
     $instituteId = $request->query->get('institute');
+    $courseId = $request->query->get('course');
+    
+    // Get courses for the selected institute (if any)
+    $courses = [];
+    if ($instituteId) {
+        $courses = $this->courseRepository->findBy(['institute' => $instituteId]);
+    }
     
     $startDate = new \DateTime("{$year}-{$month}-01");
     $endDate = clone $startDate;
     $endDate->modify('last day of this month')->setTime(23, 59, 59);
     
-    // Get monthly data with required hours calculation
-    $monthlyData = $this->getMonthlyAttendanceDataWithRequiredHours($startDate, $endDate, $applicantId, $instituteId);
+    // Get ALL monthly data (for statistics) - Pass managed institutes AND course filter
+    $allMonthlyData = $this->getMonthlyAttendanceDataWithRequiredHours(
+        $startDate, 
+        $endDate, 
+        $applicantId, 
+        $instituteId,
+        $managedInstitutes,
+        $courseId // Pass course filter
+    );
     
     // Calculate statistics - UPDATED to include holiday count
-    $stats = $this->calculateMonthlyStatistics($monthlyData, $startDate, $endDate);
+    $stats = $this->calculateMonthlyStatistics($allMonthlyData, $startDate, $endDate);
+    
+    // Paginate the data
+    $totalItems = count($allMonthlyData);
+    $totalPages = ceil($totalItems / $perPage);
+    
+    // Ensure page is within bounds
+    if ($page > $totalPages) {
+        $page = max(1, $totalPages);
+    }
+    
+    // Get paginated slice of data
+    $offset = ($page - 1) * $perPage;
+    $monthlyData = array_slice($allMonthlyData, $offset, $perPage);
     
     $months = [
         1 => 'January', 2 => 'February', 3 => 'March', 4 => 'April',
@@ -766,7 +997,7 @@ public function monthlyReport(Request $request): Response
     $searchForm = $this->createForm(AttendanceSearchType::class, null, [
         'method' => 'GET',
         'csrf_protection' => false,
-        'institutes' => $managedInstitutes
+        'institutes' => $managedInstitutes // Pass only managed institutes to form
     ]);
     
     // Handle the form submission for applicant filter
@@ -789,11 +1020,22 @@ public function monthlyReport(Request $request): Response
         'no_institutes' => false,
         'applicant_filter' => $applicantId,
         'institute_filter' => $instituteId,
+        'course_filter' => $courseId,
         'managedInstitutes' => $managedInstitutes,
-        'searchForm' => $searchForm->createView()
+        'searchForm' => $searchForm->createView(),
+        'courses' => $courses,
+        // Pagination variables
+        'current_page' => $page,
+        'total_pages' => $totalPages,
+        'total_items' => $totalItems,
+        'per_page' => $perPage,
+        'offset' => $offset,
+        'next_page' => min($page + 1, $totalPages),
+        'prev_page' => max($page - 1, 1),
+        'has_next_page' => $page < $totalPages,
+        'has_prev_page' => $page > 1,
     ]);
 }
-
 
 private function getDaysPresentUpToToday(int $applicationId, \DateTime $startDate, \DateTime $today): int
 {
@@ -809,8 +1051,14 @@ private function getDaysPresentUpToToday(int $applicationId, \DateTime $startDat
     return (int)$qb->getQuery()->getSingleScalarResult();
 }
 
-private function getMonthlyAttendanceDataWithRequiredHours(\DateTime $startDate, \DateTime $endDate, $applicantId = null, $instituteId = null): array
-{
+private function getMonthlyAttendanceDataWithRequiredHours(
+    \DateTime $startDate, 
+    \DateTime $endDate, 
+    $applicantId = null, 
+    $instituteId = null,
+    array $managedInstitutes = [],
+    $courseId = null // Add course parameter
+): array {
     // Build query to get all attendance records for the month
     $qb = $this->entityManager->createQueryBuilder();
     $qb->select([
@@ -818,15 +1066,18 @@ private function getMonthlyAttendanceDataWithRequiredHours(\DateTime $startDate,
             'app.full_name as full_name',
             'app.phone as phone',
             'inst.id as institute_id',
-            'inst.name as institute_name'
+            'inst.name as institute_name',
+            'course.id as course_id', // ADD THIS
+            'course.name as course_name' // ADD THIS
         ])
         ->from(KaabaAttendance::class, 'att')
         ->join('att.application', 'app')
         ->leftJoin('att.institute', 'inst')
+        ->leftJoin('app.course', 'course') // ADD THIS - join with application's course
         ->where('att.attendance_date BETWEEN :startDate AND :endDate')
         ->setParameter('startDate', $startDate)
         ->setParameter('endDate', $endDate)
-        ->groupBy('app.id', 'app.full_name', 'app.phone', 'inst.id', 'inst.name')
+        ->groupBy('app.id', 'app.full_name', 'app.phone', 'inst.id', 'inst.name', 'course.id', 'course.name') // Update group by
         ->orderBy('app.full_name', 'ASC');
 
     if ($applicantId) {
@@ -837,6 +1088,24 @@ private function getMonthlyAttendanceDataWithRequiredHours(\DateTime $startDate,
     if ($instituteId) {
         $qb->andWhere('inst.id = :instituteId')
            ->setParameter('instituteId', $instituteId);
+    }
+    
+    // Add course filter if provided
+    if ($courseId) {
+        $qb->andWhere('course.id = :courseId')
+           ->setParameter('courseId', $courseId);
+    }
+    
+    // Filter by user's managed institutes if they're not a super admin
+    $user = $this->getUser();
+    if ($user && in_array('ROLE_USER', $user->getRoles()) && !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+        if (!empty($managedInstitutes)) {
+            $qb->andWhere('att.institute IN (:institutes)')
+               ->setParameter('institutes', $managedInstitutes);
+        } else {
+            // If no managed institutes, return empty array
+            return [];
+        }
     }
 
     $results = $qb->getQuery()->getResult();
@@ -882,6 +1151,8 @@ private function getMonthlyAttendanceDataWithRequiredHours(\DateTime $startDate,
             'phone' => $result['phone'],
             'institute_id' => $result['institute_id'],
             'institute_name' => $result['institute_name'],
+            'course_id' => $result['course_id'], // ADD THIS
+            'course_name' => $result['course_name'], // ADD THIS
             'days_present' => $daysPresentUpToToday,
             'total_hours' => $totalHours,
             'required_days' => $requiredDays,
@@ -893,6 +1164,7 @@ private function getMonthlyAttendanceDataWithRequiredHours(\DateTime $startDate,
     
     return $monthlyData;
 }
+
 
 private function getAttendanceDatesForApplicationUpToToday(int $applicationId, \DateTime $startDate, \DateTime $endDate): array
 {

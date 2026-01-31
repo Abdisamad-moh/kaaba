@@ -22,6 +22,6 @@ SMS_ENDPOINT="https://sms.mytelesom.com/index.php/Gway/sendsms/"
 
 
 
-BIOTIME_BASE_URL=http://attendance.amalbankso.so:8081
-BIOTIME_USERNAME=Warsame.abdi
+BIOTIME_BASE_URL=http://192.168.56.103:8081
+BIOTIME_USERNAME=admin
 BIOTIME_PASSWORD=Alhamdulilah123

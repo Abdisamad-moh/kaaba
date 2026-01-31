@@ -152,6 +152,35 @@
 										<span class="hide-menu">Application Reports</span>
 									</a>
 								</li>
+							<li class="sidebar-item">
+    <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+        <div class="round-16 d-flex align-items-center justify-content-center">
+            <i class="ti ti-clipboard-list"></i>
+        </div>
+        <span class="hide-menu">Attendance</span>
+    </a>
+
+    <ul aria-expanded="false" class="collapse second-level">
+        <li class="sidebar-item">
+            <a href="{{ path('app_admin_attendance_index') }}" class="sidebar-link">
+                <div class="round-16 d-flex align-items-center justify-content-center">
+                    <i class="ti ti-calendar"></i>
+                </div>
+                <span class="hide-menu">Daily Attendance</span>
+            </a>
+        </li>
+
+        <li class="sidebar-item">
+            <a href="{{ path('app_admin_attendance_monthly_report') }}" class="sidebar-link">
+                <div class="round-16 d-flex align-items-center justify-content-center">
+                    <i class="ti ti-calendar-stats"></i>
+                </div>
+                <span class="hide-menu">Monthly Attendance</span>
+            </a>
+        </li>
+    </ul>
+</li>
+
 								
 								  {# Hide Users Management for ROLE_USER #}
             {% if is_granted('ROLE_SUPER_ADMIN') %}
