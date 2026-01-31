@@ -44,22 +44,21 @@
         <div class="card mb-4">
             <div class="card-body">
                 <form method="get" action="{{ path('app_admin_attendance_monthly_report') }}" class="row g-3">
-
-     <div class="col-md-3">
-    <label for="monthYear" class="form-label">Month & Year</label>
-    <input type="month" 
-           class="form-control" 
-           id="monthYear" 
-           name="monthYear" 
-           value="{{ selectedYear }}-{{ selectedMonth|format('%02d') }}"
-           max="{{ 'now'|date('Y-m') }}">
-</div>
-                  <div class="col-md-3">
-    {{ form_label(searchForm.applicant, 'Applicant') }}
-    {{ form_widget(searchForm.applicant, {'attr': {
-        'class': 'form-control'
-    }}) }}
-</div>
+                    <div class="col-md-3">
+                        <label for="monthYear" class="form-label">Month & Year</label>
+                        <input type="month" 
+                               class="form-control" 
+                               id="monthYear" 
+                               name="monthYear" 
+                               value="{{ selectedYear }}-{{ selectedMonth|format('%02d') }}"
+                               max="{{ 'now'|date('Y-m') }}">
+                    </div>
+                    <div class="col-md-3">
+                        {{ form_label(searchForm.applicant, 'Applicant') }}
+                        {{ form_widget(searchForm.applicant, {'attr': {
+                            'class': 'form-control'
+                        }}) }}
+                    </div>
                     <div class="col-md-3">
                         <label for="institute" class="form-label">Institute</label>
                         <select class="form-control" id="institute" name="institute">
@@ -71,31 +70,29 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="col-md-12">
-                        <button type="submit" class="btn btn-primary me-2">
-                            <i class="ti ti-filter me-2"></i>Generate Report
-                        </button>
-                        <a href="{{ path('app_admin_attendance_monthly_report') }}" class="btn btn-outline-secondary">
-                            <i class="ti ti-refresh me-2"></i>Reset
-                        </a>
-                       
+                    <div class="col-md-3">
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="ti ti-filter me-2"></i>Generate Report
+                            </button>
+                            <a href="{{ path('app_admin_attendance_monthly_report') }}" class="btn btn-outline-secondary">
+                                <i class="ti ti-refresh me-2"></i>Reset
+                            </a>
+                        </div>
                     </div>
                 </form>
             </div>
         </div>
 
-       <!-- Statistics Cards -->
+<!-- Statistics Cards -->
 <div class="row mb-4">
-    <div class="col-md-3">
+    <div class="col-md-4">
         <div class="card border-start border-primary border-3">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <h6 class="text-muted fw-semibold mb-1">Total Students</h6>
                         <h4 class="fw-semibold mb-0">{{ stats.total_students }}</h4>
-                        {% if stats.students_with_hours_config > 0 %}
-                            <small class="text-muted">{{ stats.students_with_hours_config }} with hours config</small>
-                        {% endif %}
                     </div>
                     <div class="bg-primary text-white rounded-circle p-3">
                         <i class="ti ti-users fs-6"></i>
@@ -104,7 +101,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-4">
         <div class="card border-start border-success border-3">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
@@ -120,33 +117,17 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-4">
         <div class="card border-start border-info border-3">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h6 class="text-muted fw-semibold mb-1">Hours Compliance</h6>
-                        <h4 class="fw-semibold mb-0">{{ stats.hours_compliance_rate }}%</h4>
-                        <small class="text-muted">{{ stats.total_days_with_sufficient_hours }}/{{ stats.total_days_present }} days</small>
+                        <h6 class="text-muted fw-semibold mb-1">Holidays</h6>
+                        <h4 class="fw-semibold mb-0">{{ stats.holiday_count }}</h4>
+                        <small class="text-muted">Excluded from working days</small>
                     </div>
                     <div class="bg-info text-white rounded-circle p-3">
-                        <i class="ti ti-clock-check fs-6"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card border-start border-warning border-3">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="text-muted fw-semibold mb-1">Total Hours</h6>
-                        <h4 class="fw-semibold mb-0">{{ stats.total_hours|number_format(0) }}</h4>
-                        <small class="text-muted">{{ stats.average_hours|round(1) }} hrs avg</small>
-                    </div>
-                    <div class="bg-warning text-white rounded-circle p-3">
-                        <i class="ti ti-clock fs-6"></i>
+                        <i class="ti ti-beach fs-6"></i>
                     </div>
                 </div>
             </div>
@@ -158,133 +139,111 @@
         <!-- Monthly Report Table -->
         <div class="card">
             <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="card-title mb-0">
-                        Monthly Report - {{ months[selectedMonth] }} {{ selectedYear }}
-                    </h5>
-                    <div>
-                        <span class="badge bg-primary">Total Students: {{ stats.total_students }}</span>
-                        <span class="badge bg-success ms-2">Working Days: {{ stats.total_required_days }}</span>
-                    </div>
-                </div>
+              <!-- In the table header section -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h5 class="card-title mb-0">
+        Monthly Report - {{ months[selectedMonth] }} {{ selectedYear }}
+        {% if stats.future_dates_count > 0 %}
+            <small class="text-muted ms-2">({{ stats.future_dates_count }} future date(s) excluded)</small>
+        {% endif %}
+    </h5>
+    <div>
+        <span class="badge bg-primary">Students: {{ stats.total_students }}</span>
+        <span class="badge bg-success ms-2">Working Days: {{ stats.total_required_days }}</span>
+        <span class="badge bg-info ms-2">Holidays: {{ stats.holiday_count }}</span>
+        {% if stats.future_dates_count > 0 %}
+            <span class="badge bg-warning ms-2">Future Dates: {{ stats.future_dates_count }}</span>
+        {% endif %}
+    </div>
+</div>
 
                 {% if monthlyData|length > 0 %}
                     <div class="table-responsive">
-                      <table class="table table-hover" id="monthlyReportTable">
-    <thead>
+                        <table class="table table-hover" id="monthlyReportTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Application ID</th>
+                                    <th>Full Name</th>
+                                    <th>Institute</th>
+                                    <th>Days Present</th>
+                                    <th>Required Days</th>
+                                    <th>Hrs Worked</th>
+                                    <th>Required Hrs Total</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                          <!-- In the monthly table -->
+<tbody>
+    {% for data in monthlyData %}
         <tr>
-            <th>#</th>
-            <th>Application ID</th>
-            <th>Full Name</th>
-            <th>Institute</th>
-            <th>Days Present</th>
-            <th>Required Days</th>
-            <th>Attendance %</th>
-            <th>Hours Compliance</th>
-            <th>Total Hours</th>
-            <th>Avg Hours/Day</th>
-            <th>Status</th>
-            <th>Details</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for data in monthlyData %}
-            <tr>
-                <td>{{ loop.index }}</td>
-                <td>
-                    <a href="{{ path('app_admin_kaaba_application_view', {'uuid': data.application_id}) }}" class="text-primary text-decoration-none">
-                        #{{ data.application_id }}
-                    </a>
-                </td>
-                <td>
-                    <div class="d-flex align-items-center">
-                        <div>
-                            <h6 class="mb-0">{{ data.full_name }}</h6>
-                            <small class="text-muted">{{ data.phone }}</small>
-                        </div>
-                    </div>
-                </td>
-                <td>
-                    <span class="badge bg-info">{{ data.institute_name ?: 'No Institute' }}</span>
-                    {% if data.min_hours_per_day > 0 %}
-                        <br><small class="text-muted">Min: {{ data.min_hours_per_day }} hrs/day</small>
-                    {% endif %}
-                </td>
-                <td>
-                    <span class="badge bg-success">{{ data.days_present }}</span>
-                </td>
-                <td>
-                    <span class="badge bg-secondary">{{ data.required_days }}</span>
-                </td>
-                <td>
-                    {% set percentage = data.attendance_percentage %}
-                    {% if percentage >= 80 %}
-                        {% set badge_class = 'bg-success' %}
-                    {% elseif percentage >= 60 %}
-                        {% set badge_class = 'bg-warning' %}
-                    {% else %}
-                        {% set badge_class = 'bg-danger' %}
-                    {% endif %}
-                    <span class="badge {{ badge_class }}">
-                        {{ percentage }}%
-                    </span>
-                </td>
-                <td>
-                    {% if data.min_hours_per_day > 0 %}
-                        {% set hours_compliance = data.sufficient_hours_percentage %}
-                        {% if hours_compliance >= 80 %}
-                            {% set badge_class = 'bg-success' %}
-                        {% elseif hours_compliance >= 60 %}
-                            {% set badge_class = 'bg-warning' %}
-                        {% else %}
-                            {% set badge_class = 'bg-danger' %}
-                        {% endif %}
-                        <span class="badge {{ badge_class }}" title="{{ data.days_with_sufficient_hours }}/{{ data.days_present }} days with sufficient hours">
-                            {{ hours_compliance }}%
-                        </span>
-                    {% else %}
-                        <span class="badge bg-secondary" title="No minimum hours configured">
-                            N/A
-                        </span>
-                    {% endif %}
-                </td>
-                <td>
-                    <span class="badge bg-info">
-                        {{ data.total_hours|number_format(1) }} hrs
-                    </span>
-                </td>
-                <td>
-                    <span class="badge bg-light text-dark">
-                        {{ data.average_hours_per_day|number_format(1) }} hrs
-                    </span>
-                </td>
+            <td>{{ loop.index }}</td>
             <td>
-    {% set present_rate = data.required_days > 0 ? (data.days_present / data.required_days * 100) : 0 %}
-    {% set hours_ok = data.min_hours_per_day == 0 or data.sufficient_hours_percentage >= 80 %}
-    
-    {% if present_rate >= 80 and hours_ok %}
-        <span class="badge bg-success">Good</span>
-    {% elseif present_rate >= 60 and hours_ok %}
-        <span class="badge bg-warning">Average</span>
-    {% elseif present_rate > 0 %}
-        <span class="badge bg-danger">Poor</span>
-    {% else %}
-        <span class="badge bg-secondary">No Data</span>
-    {% endif %}
-</td>
-                <td>
-                    <button type="button" class="btn btn-sm btn-outline-primary" 
-                            data-bs-toggle="modal" 
-                            data-bs-target="#detailsModal{{ data.application_id }}"
-                            onclick="loadMonthlyDetails({{ data.application_id }}, {{ selectedYear }}, {{ selectedMonth }})">
-                        <i class="ti ti-eye me-1"></i>View
-                    </button>
-                </td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
+                <a href="{{ path('app_admin_kaaba_application_view', {'uuid': data.application_id}) }}" class="text-primary text-decoration-none">
+                    #{{ data.application_id }}
+                </a>
+            </td>
+            <td>
+                <div class="d-flex align-items-center">
+                    <div>
+                        <h6 class="mb-0">{{ data.full_name }}</h6>
+                        <small class="text-muted">{{ data.phone }}</small>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <span class="badge bg-info">{{ data.institute_name ?: 'No Institute' }}</span>
+                {% if data.min_hours_per_day > 0 %}
+                    <br><small class="text-muted">Min: {{ data.min_hours_per_day }} hrs/day</small>
+                {% endif %}
+            </td>
+            <td>
+                <span class="badge {{ data.days_present >= data.required_days ? 'bg-success' : 'bg-warning' }}">
+                    {{ data.days_present }}
+                </span>
+                {% set working_days_up_to_today = data.required_days - data.future_working_days|default(0) %}
+                {% if working_days_up_to_today < data.required_days %}
+                    <br><small class="text-muted">of {{ working_days_up_to_today }} days so far</small>
+                {% endif %}
+            </td>
+            <td>
+                <span class="badge bg-secondary">{{ data.required_days }}</span>
+                {% if data.future_working_days|default(0) > 0 %}
+                    <br><small class="text-muted">({{ data.future_working_days }} future)</small>
+                {% endif %}
+            </td>
+            <td>
+                <span class="badge bg-info">
+                    {{ data.total_hours|number_format(1) }} hrs
+                </span>
+            </td>
+            <td>
+                {% if data.required_hours_total > 0 %}
+                    <span class="badge {{ data.total_hours >= data.required_hours_total ? 'bg-success' : 'bg-warning' }}">
+                        {{ data.required_hours_total|number_format(1) }} hrs
+                    </span>
+                    {% if data.future_working_days|default(0) > 0 and data.min_hours_per_day > 0 %}
+                        {% set future_hours = data.future_working_days * data.min_hours_per_day %}
+                        <br><small class="text-muted">({{ future_hours|number_format(1) }} hrs future)</small>
+                    {% endif %}
+                {% else %}
+                    <span class="badge bg-secondary">
+                        N/A
+                    </span>
+                {% endif %}
+            </td>
+            <td>
+             <button type="button" class="btn btn-sm btn-outline-primary" 
+    data-bs-toggle="modal" 
+    data-bs-target="#detailsModal{{ data.application_id }}"
+    onclick="loadMonthlyDetails({{ data.application_id }}, {{ selectedYear }}, {{ selectedMonth }})">
+    <i class="ti ti-eye me-1"></i>View
+</button>
+            </td>
+        </tr>
+    {% endfor %}
+</tbody>
+                        </table>
                     </div>
                 {% else %}
                     <div class="text-center py-5">
@@ -323,16 +282,15 @@
                                 <p class="mt-2">Loading details...</p>
                             </div>
                         </div>
-                       {# In your modal footer in monthly_report.html.twig, add this: #}
-<div class="modal-footer">
-    <div class="me-auto">
-        <small class="text-muted">
-            <i class="ti ti-info-circle me-1"></i>
-            Weekends and holidays are excluded from working days calculation
-        </small>
-    </div>
-    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-</div>
+                        <div class="modal-footer">
+                            <div class="me-auto">
+                                <small class="text-muted">
+                                    <i class="ti ti-info-circle me-1"></i>
+                                    Weekends and holidays are excluded from working days calculation
+                                </small>
+                            </div>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -344,50 +302,11 @@
     {{ parent() }}
     
     <script>
-   document.getElementById('monthYear').addEventListener('change', function() {
-    this.form.submit();
-});
-        // Export to Excel functionality
-        document.getElementById('exportBtn').addEventListener('click', function() {
-            const table = document.getElementById('monthlyReportTable');
-            const rows = table.querySelectorAll('tr');
-            let csv = [];
-            
-            // Add headers
-            const headers = [];
-            table.querySelectorAll('th').forEach(th => {
-                headers.push(th.innerText);
-            });
-            csv.push(headers.join(','));
-            
-            // Add data rows
-            rows.forEach(row => {
-                const cols = row.querySelectorAll('td');
-                if (cols.length > 0) {
-                    let rowData = [];
-                    cols.forEach(col => {
-                        // Remove HTML tags and get text content
-                        let text = col.innerText.replace(/,/g, ';');
-                        rowData.push(text);
-                    });
-                    csv.push(rowData.join(','));
-                }
-            });
-            
-            // Create and download CSV file
-            const csvContent = csv.join('\n');
-            const blob = new Blob([csvContent], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.setAttribute('hidden', '');
-            a.setAttribute('href', url);
-            a.setAttribute('download', `attendance_report_${document.getElementById('year').value}_${document.getElementById('month').value}.csv`);
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+        document.getElementById('monthYear').addEventListener('change', function() {
+            this.form.submit();
         });
 
-     function loadMonthlyDetails(applicationId, year, month) {
+function loadMonthlyDetails(applicationId, year, month) {
     const modalContent = document.getElementById(`detailsContent${applicationId}`);
     
     // Show loading spinner
@@ -404,67 +323,38 @@
     fetch(`/admin/attendance/monthly-details/${applicationId}?year=${year}&month=${month}`)
         .then(response => response.json())
         .then(data => {
+            // Extract data from the response
+            const minHoursPerDay = data.min_hours_per_day || 0;
+            const instituteName = data.institute_name || 'No Institute';
+            const requiredHoursTotal = data.required_hours_total || 0;
+            const workingDays = data.working_days || 0;
+            const workingDaysUpToToday = data.working_days_up_to_today || 0;
+            const presentDays = data.present_days || 0;
+            const absentDays = data.absent_days || 0;
+            const totalHours = data.total_hours || 0;
+            const fullName = data.full_name || '';
+            const monthSummary = data.month_summary || { month_name: '', year: '' };
+            const dailyDetails = data.daily_details || [];
+            
             let html = `
                 <div class="row mb-4">
-                    <div class="col-md-4">
+                    <div class="col-md-12">
                         <div class="card">
                             <div class="card-body">
                                 <h6 class="card-title">Student Info</h6>
-                                <p class="mb-1"><strong>Name:</strong> ${data.full_name}</p>
-                                <p class="mb-1"><strong>Institute:</strong> ${data.institute_name}</p>
-                                <p class="mb-0"><strong>Min Hours/Day:</strong> ${data.min_hours_per_day > 0 ? data.min_hours_per_day + ' hrs' : 'Not set'}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card">
-                            <div class="card-body">
-                                <h6 class="card-title">Attendance Summary</h6>
                                 <div class="row">
-                                    <div class="col-6">
-                                        <small class="text-muted">Working Days</small>
-                                        <h5>${data.working_days}</h5>
+                                    <div class="col-md-6">
+                                        <p class="mb-1"><strong>Name:</strong> ${fullName}</p>
+                                        <p class="mb-1"><strong>Institute:</strong> ${instituteName}</p>
+                                        <p class="mb-0"><strong>Min Hours/Day:</strong> ${minHoursPerDay > 0 ? minHoursPerDay + ' hrs' : 'Not set'}</p>
                                     </div>
-                                    <div class="col-6">
-                                        <small class="text-muted">Present Days</small>
-                                        <h5>${data.present_days}</h5>
-                                    </div>
-                                    <div class="col-6">
-                                        <small class="text-muted">Absent Days</small>
-                                        <h5>${data.absent_days}</h5>
-                                    </div>
-                                    <div class="col-6">
-                                        <small class="text-muted">Attendance %</small>
-                                        <h5 class="${data.attendance_percentage >= 80 ? 'text-success' : data.attendance_percentage >= 60 ? 'text-warning' : 'text-danger'}">
-                                            ${data.attendance_percentage}%
-                                        </h5>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card">
-                            <div class="card-body">
-                                <h6 class="card-title">Hours Summary</h6>
-                                <div class="row">
-                                    <div class="col-6">
-                                        <small class="text-muted">Total Hours</small>
-                                        <h5>${data.total_hours}</h5>
-                                    </div>
-                                    <div class="col-6">
-                                        <small class="text-muted">Required Hours</small>
-                                        <h5>${data.total_required_hours}</h5>
-                                    </div>
-                                    <div class="col-6">
-                                        <small class="text-muted">Avg Hours/Day</small>
-                                        <h5>${data.average_hours_per_day}</h5>
-                                    </div>
-                                    <div class="col-6">
-                                        <small class="text-muted">Hours Compliance</small>
-                                        <h5 class="${data.hours_compliance_percentage >= 80 ? 'text-success' : data.hours_compliance_percentage >= 60 ? 'text-warning' : 'text-danger'}">
-                                            ${data.hours_compliance_percentage}%
-                                        </h5>
+                                    <div class="col-md-6">
+                                        <p class="mb-1"><strong>Month:</strong> ${monthSummary.month_name} ${monthSummary.year}</p>
+                                        <p class="mb-1"><strong>Total Working Days:</strong> ${workingDays}</p>
+                                        ${workingDays - workingDaysUpToToday > 0 ? 
+                                            `<p class="mb-0"><strong>Future Working Days:</strong> ${workingDays - workingDaysUpToToday}</p>` : 
+                                            ''
+                                        }
                                     </div>
                                 </div>
                             </div>
@@ -472,29 +362,103 @@
                     </div>
                 </div>
                 
-                <!-- Hours Requirement Summary -->
-                <div class="alert ${data.total_hours >= data.total_required_hours ? 'alert-success' : 'alert-warning'} mb-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="alert-heading mb-1">Monthly Hours Requirement</h6>
-                            <p class="mb-0">
-                                ${data.min_hours_per_day > 0 ? 
-                                    `Required: ${data.total_required_hours} hours (${data.working_days} days × ${data.min_hours_per_day} hrs)` :
-                                    'No minimum hours requirement configured'
-                                }
-                            </p>
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card border-start border-success border-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="text-muted fw-semibold mb-1">Days Present</h6>
+                                        <h4 class="fw-semibold mb-0">${presentDays}</h4>
+                                    </div>
+                                    <div class="bg-success text-white rounded-circle p-3">
+                                        <i class="ti ti-calendar fs-6"></i>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="text-end">
-                            <h4 class="mb-0">${data.total_hours}/${data.total_required_hours} hrs</h4>
-                            <small>${Math.round((data.total_hours / data.total_required_hours) * 100)}% of requirement</small>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-start border-secondary border-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="text-muted fw-semibold mb-1">Required Days</h6>
+                                        <h4 class="fw-semibold mb-0">${workingDays}</h4>
+                                        ${workingDays - workingDaysUpToToday > 0 ? 
+                                            `<small class="text-muted">(${workingDays - workingDaysUpToToday} future)</small>` : 
+                                            '<small class="text-muted">Full month</small>'
+                                        }
+                                    </div>
+                                    <div class="bg-secondary text-white rounded-circle p-3">
+                                        <i class="ti ti-calendar-event fs-6"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-start border-info border-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="text-muted fw-semibold mb-1">Hrs Worked</h6>
+                                        <h4 class="fw-semibold mb-0">${totalHours.toFixed(1)}</h4>
+                                        <small class="text-muted">hours</small>
+                                    </div>
+                                    <div class="bg-info text-white rounded-circle p-3">
+                                        <i class="ti ti-clock fs-6"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-start border-warning border-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="text-muted fw-semibold mb-1">Required Hrs Total</h6>
+                                        <h4 class="fw-semibold mb-0">${requiredHoursTotal.toFixed(1)}</h4>
+                                        <small class="text-muted">${minHoursPerDay > 0 ? `${workingDays} × ${minHoursPerDay} hrs` : 'Not set'}</small>
+                                    </div>
+                                    <div class="bg-warning text-white rounded-circle p-3">
+                                        <i class="ti ti-clock-hour-4 fs-6"></i>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                
-                <h6 class="mb-3">Daily Attendance - ${data.month_summary.month_name} ${data.month_summary.year}</h6>
             `;
             
-            if (data.daily_details && data.daily_details.length > 0) {
+            // Monthly Hours Requirement section
+            if (minHoursPerDay > 0 && requiredHoursTotal > 0) {
+                const percentage = totalHours > 0 ? Math.round((totalHours / requiredHoursTotal) * 100) : 0;
+                html += `
+                    <div class="alert ${totalHours >= requiredHoursTotal ? 'alert-success' : 'alert-warning'} mb-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="alert-heading mb-1">Monthly Hours Requirement Status</h6>
+                                <p class="mb-0">
+                                    ${totalHours.toFixed(1)} / ${requiredHoursTotal.toFixed(1)} hours
+                                    (${percentage}% of monthly requirement)
+                                </p>
+                            </div>
+                            <div class="text-end">
+                                ${totalHours >= requiredHoursTotal ? 
+                                    '<span class="badge bg-success fs-6">REQUIREMENT MET</span>' : 
+                                    '<span class="badge bg-warning fs-6">REQUIREMENT NOT MET</span>'
+                                }
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            html += `<h6 class="mb-3">Daily Attendance - ${monthSummary.month_name} ${monthSummary.year}</h6>`;
+            
+            if (dailyDetails.length > 0) {
                 html += `
                     <div class="table-responsive">
                         <table class="table table-sm table-hover">
@@ -507,49 +471,77 @@
                                     <th>Check In</th>
                                     <th>Check Out</th>
                                     <th>Hours</th>
-                                    <th>Hours Status</th>
                                 </tr>
                             </thead>
                             <tbody>
                 `;
                 
-                data.daily_details.forEach(detail => {
-                    // Determine row class based on status
-                    let rowClass = detail.row_class;
+                // Count statuses
+                const statusCounts = {
+                    present: 0,
+                    absent: 0,
+                    future: 0,
+                    holiday: 0,
+                    weekend: 0
+                };
+                
+                dailyDetails.forEach(detail => {
+                    // Determine status for counting
+                    const status = detail.status.toLowerCase();
                     if (detail.is_future_date) {
-                        rowClass = 'table-light text-muted';
+                        statusCounts.future++;
+                    } else if (detail.is_holiday) {
+                        statusCounts.holiday++;
+                    } else if (detail.is_weekend) {
+                        statusCounts.weekend++;
+                    } else if (status === 'present' || status === 'late' || status === 'half-day') {
+                        statusCounts.present++;
+                    } else if (status === 'absent') {
+                        statusCounts.absent++;
                     }
                     
-                    // Determine if this is a working day that needs hours check
-                    const needsHoursCheck = !detail.is_future_date && detail.is_working_day && !detail.is_holiday && detail.status !== 'Holiday' && detail.status !== 'Weekend';
+                    // Determine row class
+                    let rowClass = detail.row_class || '';
+                    let typeIcon = '';
+                    let typeText = '';
+                    
+                    if (detail.is_future_date) {
+                        rowClass = 'table-light text-muted';
+                        typeIcon = '⏳';
+                        typeText = 'Future';
+                    } else if (detail.is_holiday) {
+                        typeIcon = '🏖️';
+                        typeText = 'Holiday';
+                    } else if (detail.is_weekend) {
+                        typeIcon = '📅';
+                        typeText = 'Weekend';
+                    } else {
+                        typeIcon = '📚';
+                        typeText = 'Working Day';
+                    }
+                    
+                    // Determine if hours meet minimum requirement
+                    let hoursStatus = '';
+                    if (!detail.is_future_date && !detail.is_holiday && !detail.is_weekend && 
+                        detail.status !== 'Weekend' && detail.status !== 'Holiday' && 
+                        minHoursPerDay > 0 && detail.hours > 0) {
+                        const meetsRequirement = detail.hours >= minHoursPerDay;
+                        hoursStatus = meetsRequirement ? 
+                            `<span class="badge bg-success ms-1">✓</span>` : 
+                            `<span class="badge bg-danger ms-1">✗ ${minHoursPerDay}hrs</span>`;
+                    }
                     
                     html += `
                         <tr class="${rowClass}">
-                            <td>${detail.date} ${detail.is_future_date ? '⏳' : ''}</td>
+                            <td>${detail.date}</td>
                             <td>${detail.day}</td>
-                            <td>
-                                ${detail.is_future_date ? '⏳ Future' : 
-                                  detail.is_holiday ? '🏖️ Holiday' : 
-                                  detail.is_weekend ? '📅 Weekend' : 
-                                  '📚 Working Day'}
-                            </td>
+                            <td>${typeIcon} ${typeText}</td>
                             <td><span class="badge ${detail.status_class}">${detail.status}</span></td>
                             <td>${detail.check_in}</td>
                             <td>${detail.check_out}</td>
                             <td>
-                                ${detail.hours > 0 ? detail.hours + ' hrs' : '--'}
-                                ${needsHoursCheck && data.min_hours_per_day > 0 ? 
-                                    `<br><small class="text-muted">Min: ${data.min_hours_per_day} hrs</small>` : 
-                                    ''
-                                }
-                            </td>
-                            <td>
-                                ${detail.hours_status ? 
-                                    `<span class="badge ${detail.has_sufficient_hours ? 'bg-success' : detail.is_future_date ? 'bg-secondary' : 'bg-danger'}">
-                                        ${detail.hours_status}
-                                    </span>` : 
-                                    '<span class="badge bg-secondary">N/A</span>'
-                                }
+                                ${detail.hours > 0 ? detail.hours.toFixed(1) + ' hrs' : '--'}
+                                ${hoursStatus}
                             </td>
                         </tr>
                     `;
@@ -557,45 +549,20 @@
                 
                 html += `
                             </tbody>
-                            <tfoot>
-                                <tr class="table-light">
-                                    <td colspan="6" class="text-end"><strong>Monthly Totals:</strong></td>
-                                    <td><strong>${data.total_hours} hrs</strong></td>
-                                    <td><strong>${data.days_with_sufficient_hours}/${data.present_days} days compliant</strong></td>
-                                </tr>
-                                <tr class="table-light">
-                                    <td colspan="6" class="text-end"><strong>Required Monthly Total:</strong></td>
-                                    <td colspan="2"><strong>${data.total_required_hours} hrs (${data.working_days} days × ${data.min_hours_per_day} hrs)</strong></td>
-                                </tr>
-                                <tr class="${data.total_hours >= data.total_required_hours ? 'table-success' : 'table-warning'}">
-                                    <td colspan="6" class="text-end"><strong>Monthly Requirement Status:</strong></td>
-                                    <td colspan="2">
-                                        <strong>
-                                            ${data.total_hours >= data.total_required_hours ? '✅ MET' : '❌ NOT MET'} 
-                                            (${data.total_hours}/${data.total_required_hours} hrs)
-                                        </strong>
-                                        <br>
-                                        <small>${Math.round((data.total_hours / data.total_required_hours) * 100)}% of monthly requirement</small>
-                                    </td>
-                                </tr>
-                            </tfoot>
                         </table>
                     </div>
                     
-                    <div class="row mt-3">
+                    <div class="row mt-4">
                         <div class="col-md-6">
                             <div class="card">
                                 <div class="card-body">
-                                    <h6 class="card-title">Statuses</h6>
+                                    <h6 class="card-title">Status Summary</h6>
                                     <div class="d-flex flex-wrap gap-2">
-                                        <span class="badge bg-success">Present</span>
-                                        <span class="badge bg-danger">Absent</span>
-                                        <span class="badge bg-warning">Late</span>
-                                        <span class="badge bg-info">Half-day/Holiday</span>
-                                        <span class="badge bg-secondary">Weekend</span>
-                                        <span class="badge bg-light text-dark">⏳ Future Date</span>
-                                        <span class="badge bg-light text-dark">✅ Sufficient hours</span>
-                                        <span class="badge bg-light text-dark">❌ Insufficient hours</span>
+                                        ${statusCounts.present > 0 ? `<span class="badge bg-success">Present: ${statusCounts.present}</span>` : ''}
+                                        ${statusCounts.absent > 0 ? `<span class="badge bg-danger">Absent: ${statusCounts.absent}</span>` : ''}
+                                        ${statusCounts.future > 0 ? `<span class="badge bg-light text-dark">⏳ Future: ${statusCounts.future}</span>` : ''}
+                                        ${statusCounts.holiday > 0 ? `<span class="badge bg-info">🏖️ Holiday: ${statusCounts.holiday}</span>` : ''}
+                                        ${statusCounts.weekend > 0 ? `<span class="badge bg-secondary">📅 Weekend: ${statusCounts.weekend}</span>` : ''}
                                     </div>
                                 </div>
                             </div>
@@ -603,23 +570,37 @@
                         <div class="col-md-6">
                             <div class="card">
                                 <div class="card-body">
-                                    <h6 class="card-title">Key Statistics</h6>
+                                    <h6 class="card-title">Month Overview</h6>
                                     <div class="row small">
-                                        <div class="col-6">
-                                            <span class="text-muted">Working Days:</span> ${data.working_days}
+                                        <div class="col-6 mb-2">
+                                            <span class="text-muted">Total Days:</span> ${dailyDetails.length}
                                         </div>
-                                        <div class="col-6">
-                                            <span class="text-muted">Weekends:</span> ${data.daily_details.filter(d => d.is_weekend).length}
+                                        <div class="col-6 mb-2">
+                                            <span class="text-muted">Working Days:</span> ${workingDays}
                                         </div>
-                                        <div class="col-6">
-                                            <span class="text-muted">Holidays:</span> ${data.daily_details.filter(d => d.is_holiday).length}
+                                        <div class="col-6 mb-2">
+                                            <span class="text-muted">Present:</span> ${statusCounts.present}
                                         </div>
-                                        <div class="col-6">
-                                            <span class="text-muted">Future Dates:</span> ${data.daily_details.filter(d => d.is_future_date).length}
+                                        <div class="col-6 mb-2">
+                                            <span class="text-muted">Absent:</span> ${statusCounts.absent}
                                         </div>
-                                        <div class="col-6">
-                                            <span class="text-muted">Attendance Rate:</span> ${data.attendance_percentage}%
+                                        <div class="col-6 mb-2">
+                                            <span class="text-muted">Holidays:</span> ${statusCounts.holiday}
                                         </div>
+                                        <div class="col-6 mb-2">
+                                            <span class="text-muted">Weekends:</span> ${statusCounts.weekend}
+                                        </div>
+                                        <div class="col-6 mb-2">
+                                            <span class="text-muted">Future Dates:</span> ${statusCounts.future}
+                                        </div>
+                                        <div class="col-12 mt-2">
+                                            <span class="text-muted">Hours Worked:</span> <strong>${totalHours.toFixed(1)} hrs</strong>
+                                        </div>
+                                        ${minHoursPerDay > 0 ? `
+                                            <div class="col-12 mt-2">
+                                                <span class="text-muted">Required Hours:</span> <strong>${requiredHoursTotal.toFixed(1)} hrs</strong>
+                                            </div>
+                                        ` : ''}
                                     </div>
                                 </div>
                             </div>
@@ -647,6 +628,5 @@
             `;
         });
 }
-
     </script>
 {% endblock %}

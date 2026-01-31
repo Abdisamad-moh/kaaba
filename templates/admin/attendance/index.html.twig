@@ -84,80 +84,99 @@
 			</div>
 		</div>
 
-		<!-- Statistics Cards - Only show for school days -->
-		{% if isSchoolDay and not isHoliday %}
-			<div class="row mb-4">
-				<div class="col-md-3">
-					<div class="card border-start border-primary border-3">
-						<div class="card-body">
-							<div class="d-flex justify-content-between align-items-center">
-								<div>
-									<h6 class="text-muted fw-semibold mb-1">Total Students</h6>
-									<h4 class="fw-semibold mb-0">{{ stats.total_employees }}</h4>
-								</div>
-								<div class="bg-primary text-white rounded-circle p-3">
-									<i class="ti ti-users fs-6"></i>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="col-md-3">
-					<div class="card border-start border-success border-3">
-						<div class="card-body">
-							<div class="d-flex justify-content-between align-items-center">
-								<div>
-									<h6 class="text-muted fw-semibold mb-1">Present Today</h6>
-									<h4 class="fw-semibold mb-0">{{ stats.present }}</h4>
-									<small class="text-muted">{{ stats.present }}
-										Present</small>
-								</div>
-								<div class="bg-success text-white rounded-circle p-3">
-									<i class="ti ti-check fs-6"></i>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="col-md-3">
-					<div class="card border-start border-danger border-3">
-						<div class="card-body">
-							<div class="d-flex justify-content-between align-items-center">
-								<div>
-									<h6 class="text-muted fw-semibold mb-1">Absent Today</h6>
-									<h4 class="fw-semibold mb-0">{{ stats.absent }}</h4>
-								</div>
-								<div class="bg-danger text-white rounded-circle p-3">
-									<i class="ti ti-x fs-6"></i>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			
-			</div>
-		{% endif %}
-
+	<!-- Statistics Cards - Only show for school days -->
+{% if isSchoolDay and not isHoliday %}
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card border-start border-primary border-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted fw-semibold mb-1">Total Students</h6>
+                            <h4 class="fw-semibold mb-0">{{ stats.total_employees }}</h4>
+                        </div>
+                        <div class="bg-primary text-white rounded-circle p-3">
+                            <i class="ti ti-users fs-6"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-start border-success border-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted fw-semibold mb-1">Present Today</h6>
+                            <h4 class="fw-semibold mb-0">{{ stats.present + stats.late + stats.half_day }}</h4>
+                            <small class="text-muted">
+                                {{ stats.present }} Present
+                                {% if stats.late > 0 %}+ {{ stats.late }} Late{% endif %}
+                                {% if stats.half_day > 0 %}+ {{ stats.half_day }} Half-day{% endif %}
+                            </small>
+                        </div>
+                        <div class="bg-success text-white rounded-circle p-3">
+                            <i class="ti ti-check fs-6"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-start border-danger border-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted fw-semibold mb-1">Absent Today</h6>
+                            <h4 class="fw-semibold mb-0">{{ stats.absent }}</h4>
+                        </div>
+                        <div class="bg-danger text-white rounded-circle p-3">
+                            <i class="ti ti-x fs-6"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card border-start border-warning border-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted fw-semibold mb-1">Attendance Rate</h6>
+                            <h4 class="fw-semibold mb-0">{{ stats.attendance_rate|number_format(1) }}%</h4>
+                            <small class="text-muted">of students present</small>
+                        </div>
+                        <div class="bg-warning text-white rounded-circle p-3">
+                            <i class="ti ti-percentage fs-6"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
 		<!-- Attendance Table -->
 		<div class="card">
 			<div class="card-body">
 				<div class="d-flex justify-content-between align-items-center mb-4">
-					<h5 class="card-title mb-0">
-						{% if isHoliday %}
-							Holiday: {{ selectedDate|date('F j, Y') }}
-						{% elseif not isSchoolDay %}
-							Weekend: {{ selectedDate|date('F j, Y') }}
-						{% else %}
-							Attendance for {{ selectedDate|date('F j, Y') }}
-						{% endif %}
-					</h5>
-					{% if isSchoolDay and not isHoliday %}
-						<div>
-							<span class="badge bg-primary">Total Hours:
-								{{ stats.total_hours|number_format(2) }}</span>
-						</div>
-					{% endif %}
-				</div>
+    <h5 class="card-title mb-0">
+        {% if isHoliday %}
+            Holiday: {{ selectedDate|date('F j, Y') }}
+        {% elseif not isSchoolDay %}
+            Weekend: {{ selectedDate|date('F j, Y') }}
+        {% else %}
+            Attendance for {{ selectedDate|date('F j, Y') }}
+        {% endif %}
+    </h5>
+    {% if isSchoolDay and not isHoliday %}
+        <div>
+            <span class="badge bg-primary me-2">Total: {{ stats.total_employees }}</span>
+            <span class="badge bg-success me-2">Present: {{ stats.present + stats.late + stats.half_day }}</span>
+            <span class="badge bg-danger me-2">Absent: {{ stats.absent }}</span>
+            <span class="badge bg-info">Total Hours: {{ stats.total_hours|number_format(2) }}</span>
+        </div>
+    {% endif %}
+</div>
 
 				{% if attendanceData|length > 0 %}
 					<div class="table-responsive">

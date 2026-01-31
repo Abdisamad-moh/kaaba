@@ -540,46 +540,59 @@ class AttendanceController extends AbstractController
 
 
 
-    private function calculateAttendanceStatistics(array $attendanceData): array
-    {
-        $stats = [
-            'total_employees' => count($attendanceData),
-            'present' => 0,
-            'late' => 0,
-            'absent' => 0,
-            'half_day' => 0,
-            'verified' => 0,
-            'total_hours' => 0,
-        ];
+private function calculateAttendanceStatistics(array $attendanceData): array
+{
+    $stats = [
+        'total_employees' => count($attendanceData),
+        'present' => 0,
+        'late' => 0,
+        'absent' => 0,
+        'half_day' => 0,
+        'verified' => 0,
+        'total_hours' => 0,
+        'attendance_rate' => 0,
+    ];
 
-        foreach ($attendanceData as $data) {
-            $stats['total_hours'] += $data['total_hours'] ?? 0;
-            
-            if ($data['is_verified']) {
-                $stats['verified']++;
-            }
-
-            switch ($data['status']) {
-                case 'present':
-                    $stats['present']++;
-                    break;
-                case 'late':
-                    $stats['late']++;
-                    break;
-                case 'absent':
-                    $stats['absent']++;
-                    break;
-                case 'half-day':
-                    $stats['half_day']++;
-                    break;
-            }
+    foreach ($attendanceData as $data) {
+        $stats['total_hours'] += $data['total_hours'] ?? 0;
+        
+        if ($data['is_verified'] ?? false) {
+            $stats['verified']++;
         }
 
-        $stats['attendance_rate'] = $stats['total_employees'] > 0 ? 
-            (($stats['present'] + $stats['late'] + $stats['half_day']) / $stats['total_employees']) * 100 : 0;
-
-        return $stats;
+        // Get the status from the data array
+        $status = strtolower($data['status'] ?? 'absent');
+        
+        switch ($status) {
+            case 'present':
+                $stats['present']++;
+                break;
+            case 'late':
+                $stats['late']++;
+                break;
+            case 'absent':
+                $stats['absent']++;
+                break;
+            case 'half-day':
+                $stats['half_day']++;
+                break;
+            default:
+                // For any other status, count as present if not absent
+                if ($status !== 'absent') {
+                    $stats['present']++;
+                }
+                break;
+        }
     }
+
+    // Calculate attendance rate: (present + late + half_day) / total_employees
+    $attended = $stats['present'] + $stats['late'] + $stats['half_day'];
+    $stats['attendance_rate'] = $stats['total_employees'] > 0 ? 
+        round(($attended / $stats['total_employees']) * 100, 2) : 0;
+
+    return $stats;
+}
+
 
     private function getAttendanceSummary(\DateTime $startDate, \DateTime $endDate, ?int $applicationId): array
     {
@@ -724,16 +737,14 @@ public function monthlyReport(Request $request): Response
         }
     }
     
-    $applicantId = $request->query->get('applicant');
-    $instituteId = $request->query->get('institute');
-    
-    // Validate month and year
+    // Ensure month is always valid
     if ($month < 1 || $month > 12) {
         $month = $currentMonth;
-    }
-    if ($year < $currentYear - 5 || $year > $currentYear) {
         $year = $currentYear;
     }
+    
+    $applicantId = $request->query->get('applicant');
+    $instituteId = $request->query->get('institute');
     
     $startDate = new \DateTime("{$year}-{$month}-01");
     $endDate = clone $startDate;
@@ -742,7 +753,7 @@ public function monthlyReport(Request $request): Response
     // Get monthly data with required hours calculation
     $monthlyData = $this->getMonthlyAttendanceDataWithRequiredHours($startDate, $endDate, $applicantId, $instituteId);
     
-    // Calculate statistics
+    // Calculate statistics - UPDATED to include holiday count
     $stats = $this->calculateMonthlyStatistics($monthlyData, $startDate, $endDate);
     
     $months = [
@@ -779,27 +790,35 @@ public function monthlyReport(Request $request): Response
         'applicant_filter' => $applicantId,
         'institute_filter' => $instituteId,
         'managedInstitutes' => $managedInstitutes,
-        'searchForm' => $searchForm->createView()  // Add this line
+        'searchForm' => $searchForm->createView()
     ]);
 }
 
 
-
-
-
+private function getDaysPresentUpToToday(int $applicationId, \DateTime $startDate, \DateTime $today): int
+{
+    $qb = $this->entityManager->createQueryBuilder();
+    $qb->select('COUNT(DISTINCT att.attendance_date)')
+        ->from(KaabaAttendance::class, 'att')
+        ->where('att.application = :applicationId')
+        ->andWhere('att.attendance_date BETWEEN :startDate AND :today')
+        ->setParameter('applicationId', $applicationId)
+        ->setParameter('startDate', $startDate)
+        ->setParameter('today', $today);
+    
+    return (int)$qb->getQuery()->getSingleScalarResult();
+}
 
 private function getMonthlyAttendanceDataWithRequiredHours(\DateTime $startDate, \DateTime $endDate, $applicantId = null, $instituteId = null): array
 {
-    // Build query for monthly attendance
+    // Build query to get all attendance records for the month
     $qb = $this->entityManager->createQueryBuilder();
     $qb->select([
             'app.id as application_id',
             'app.full_name as full_name',
             'app.phone as phone',
             'inst.id as institute_id',
-            'inst.name as institute_name',
-            'COUNT(DISTINCT att.attendance_date) as days_present',
-            'SUM(att.total_hours) as total_hours'
+            'inst.name as institute_name'
         ])
         ->from(KaabaAttendance::class, 'att')
         ->join('att.application', 'app')
@@ -810,7 +829,6 @@ private function getMonthlyAttendanceDataWithRequiredHours(\DateTime $startDate,
         ->groupBy('app.id', 'app.full_name', 'app.phone', 'inst.id', 'inst.name')
         ->orderBy('app.full_name', 'ASC');
 
-    // Apply filters
     if ($applicantId) {
         $qb->andWhere('app.id = :applicantId')
            ->setParameter('applicantId', $applicantId);
@@ -823,35 +841,10 @@ private function getMonthlyAttendanceDataWithRequiredHours(\DateTime $startDate,
 
     $results = $qb->getQuery()->getResult();
     
-    // Get attendance dates for each application
-    $attendanceDates = [];
-    if (!empty($results)) {
-        $applicationIds = array_column($results, 'application_id');
-        
-        $datesQb = $this->entityManager->createQueryBuilder();
-        $datesQb->select('IDENTITY(att.application) as app_id', 'att.attendance_date')
-                ->from(KaabaAttendance::class, 'att')
-                ->where('att.attendance_date BETWEEN :startDate AND :endDate')
-                ->andWhere('att.application IN (:appIds)')
-                ->setParameter('startDate', $startDate)
-                ->setParameter('endDate', $endDate)
-                ->setParameter('appIds', $applicationIds)
-                ->orderBy('att.attendance_date', 'ASC');
-        
-        $datesResults = $datesQb->getQuery()->getResult();
-        foreach ($datesResults as $dateResult) {
-            $appId = $dateResult['app_id'];
-            if (!isset($attendanceDates[$appId])) {
-                $attendanceDates[$appId] = [];
-            }
-            $attendanceDates[$appId][] = $dateResult['attendance_date']->format('Y-m-d');
-        }
-    }
-    
-    // Calculate required working days
-    $totalRequiredDays = $this->calculateRequiredWorkingDays($startDate, $endDate);
-    
     $monthlyData = [];
+    $today = new \DateTime();
+    $today->setTime(0, 0, 0);
+    
     foreach ($results as $result) {
         $appId = $result['application_id'];
         
@@ -864,51 +857,23 @@ private function getMonthlyAttendanceDataWithRequiredHours(\DateTime $startDate,
             }
         }
         
-        // Calculate required hours (required days * min hours per day)
-        $requiredHours = $minHoursPerDay > 0 ? $totalRequiredDays * $minHoursPerDay : 0;
+        // Calculate required working days (INCLUDING future dates)
+        $requiredDays = $this->calculateRequiredWorkingDays($startDate, $endDate);
         
-        // Calculate days with sufficient hours
-        $daysWithSufficientHours = 0;
-        if (isset($attendanceDates[$appId]) && $minHoursPerDay > 0) {
-            foreach ($attendanceDates[$appId] as $dateStr) {
-                $date = \DateTime::createFromFormat('Y-m-d', $dateStr);
-                if ($date) {
-                    $dayAttendance = $this->getAttendanceForDateAndApplication($date, $appId);
-                    $dayHours = $dayAttendance['total_hours'] ?? 0;
-                    
-                    if ($dayHours >= $minHoursPerDay) {
-                        $daysWithSufficientHours++;
-                    }
-                }
-            }
-        }
+        // Calculate required hours total for the month
+        $requiredHoursTotal = $minHoursPerDay > 0 ? $requiredDays * $minHoursPerDay : 0;
         
-        // Calculate hours percentage
-        $hoursPercentage = 0;
-        if ($requiredHours > 0) {
-            $hoursPercentage = round(($result['total_hours'] / $requiredHours) * 100, 2);
-        }
+        // Get all distinct attendance dates for this application (up to today only)
+        $attendanceDates = $this->getAttendanceDatesForApplicationUpToToday($appId, $startDate, min($endDate, $today));
         
-        // Calculate sufficient hours percentage
-        $sufficientHoursPercentage = 0;
-        if ($result['days_present'] > 0 && $minHoursPerDay > 0) {
-            $sufficientHoursPercentage = round(($daysWithSufficientHours / $result['days_present']) * 100, 2);
-        }
+        // Calculate total hours worked and days present
+        $totalHours = 0;
+        $daysPresentUpToToday = count($attendanceDates); // If there's attendance for a date, count it as present
         
-        // Determine status based on attendance percentage
-        $attendancePercentage = $totalRequiredDays > 0 ? round(($result['days_present'] / $totalRequiredDays) * 100, 2) : 0;
-        $status = 'No Data';
-        $statusClass = 'bg-secondary';
-        
-        if ($attendancePercentage >= 80) {
-            $status = 'Good';
-            $statusClass = 'bg-success';
-        } elseif ($attendancePercentage >= 60) {
-            $status = 'Average';
-            $statusClass = 'bg-warning';
-        } elseif ($attendancePercentage > 0) {
-            $status = 'Poor';
-            $statusClass = 'bg-danger';
+        foreach ($attendanceDates as $date) {
+            // Get attendance for this specific date
+            $attendance = $this->getAttendanceForDateAndApplication($date, $appId);
+            $totalHours += $attendance['total_hours'];
         }
         
         $monthlyData[] = [
@@ -917,30 +882,78 @@ private function getMonthlyAttendanceDataWithRequiredHours(\DateTime $startDate,
             'phone' => $result['phone'],
             'institute_id' => $result['institute_id'],
             'institute_name' => $result['institute_name'],
-            'days_present' => (int)$result['days_present'],
-            'days_with_sufficient_hours' => $daysWithSufficientHours,
-            'total_hours' => (float)$result['total_hours'],
-            'required_days' => $totalRequiredDays,
-            'required_hours' => $requiredHours,
+            'days_present' => $daysPresentUpToToday,
+            'total_hours' => $totalHours,
+            'required_days' => $requiredDays,
+            'required_hours_total' => $requiredHoursTotal,
             'min_hours_per_day' => $minHoursPerDay,
-            'hours_percentage' => $hoursPercentage,
-            'sufficient_hours_percentage' => $sufficientHoursPercentage,
-            'attendance_percentage' => $attendancePercentage,
-            'average_hours_per_day' => $result['days_present'] > 0 ? round($result['total_hours'] / $result['days_present'], 2) : 0,
-            'status' => $status,
-            'status_class' => $statusClass,
-            'attendance_dates' => $attendanceDates[$appId] ?? []
+            'attendance_percentage' => $requiredDays > 0 ? round(($daysPresentUpToToday / $requiredDays) * 100, 2) : 0
         ];
     }
     
     return $monthlyData;
 }
 
+private function getAttendanceDatesForApplicationUpToToday(int $applicationId, \DateTime $startDate, \DateTime $endDate): array
+{
+    $qb = $this->entityManager->createQueryBuilder();
+    $qb->select('DISTINCT att.attendance_date')
+        ->from(KaabaAttendance::class, 'att')
+        ->where('att.application = :applicationId')
+        ->andWhere('att.attendance_date BETWEEN :startDate AND :endDate')
+        ->setParameter('applicationId', $applicationId)
+        ->setParameter('startDate', $startDate)
+        ->setParameter('endDate', $endDate)
+        ->orderBy('att.attendance_date', 'ASC');
+    
+    $results = $qb->getQuery()->getResult();
+    
+    $dates = [];
+    foreach ($results as $result) {
+        $dates[] = $result['attendance_date'];
+    }
+    
+    return $dates;
+}
 
+private function getAttendanceDatesForApplication(int $applicationId, \DateTime $startDate, \DateTime $endDate): array
+{
+    $qb = $this->entityManager->createQueryBuilder();
+    $qb->select('DISTINCT att.attendance_date')
+        ->from(KaabaAttendance::class, 'att')
+        ->where('att.application = :applicationId')
+        ->andWhere('att.attendance_date BETWEEN :startDate AND :endDate')
+        ->setParameter('applicationId', $applicationId)
+        ->setParameter('startDate', $startDate)
+        ->setParameter('endDate', $endDate)
+        ->orderBy('att.attendance_date', 'ASC');
+    
+    $results = $qb->getQuery()->getResult();
+    
+    $dates = [];
+    foreach ($results as $result) {
+        $dates[] = $result['attendance_date'];
+    }
+    
+    return $dates;
+}
 
-
-
-
+private function countFutureDates(\DateTime $startDate, \DateTime $endDate): int
+{
+    $futureCount = 0;
+    $currentDate = clone $startDate;
+    $today = new \DateTime();
+    $today->setTime(0, 0, 0);
+    
+    while ($currentDate <= $endDate) {
+        if ($currentDate > $today) {
+            $futureCount++;
+        }
+        $currentDate->modify('+1 day');
+    }
+    
+    return $futureCount;
+}
 
 private function getMonthlyAttendanceData(\DateTime $startDate, \DateTime $endDate, $applicantId = null, $instituteId = null): array
 {
@@ -1132,29 +1145,51 @@ private function getAttendanceForDateAndApplication(\DateTime $date, int $applic
     $endDate = clone $date;
     $endDate->setTime(23, 59, 59);
 
+    // Get all attendance records for this date and application
     $qb = $this->entityManager->createQueryBuilder();
-    $qb->select([
-            'MIN(att.check_in_time) as first_check_in',
-            'MAX(att.check_in_time) as last_check_in',
-            'MAX(att.check_out_time) as last_check_out',
-            'SUM(att.total_hours) as total_hours',
-            'att.status'
-        ])
+    $qb->select('att')
         ->from(KaabaAttendance::class, 'att')
         ->where('att.attendance_date = :date')
         ->andWhere('att.application = :applicationId')
+        ->orderBy('att.check_in_time', 'ASC')
         ->setParameter('date', $startDate)
-        ->setParameter('applicationId', $applicationId)
-        ->groupBy('att.application', 'att.attendance_date', 'att.status'); // Added att.status to GROUP BY
+        ->setParameter('applicationId', $applicationId);
 
-    $result = $qb->getQuery()->getOneOrNullResult();
+    $records = $qb->getQuery()->getResult();
     
-    return $result ?: [
-        'total_hours' => 0,
-        'status' => 'absent'
+    if (empty($records)) {
+        return [
+            'total_hours' => 0,
+            'status' => 'absent'
+        ];
+    }
+    
+    // Get first and last records
+    $firstRecord = $records[0];
+    $lastRecord = end($records);
+    
+    // Calculate hours worked
+    $totalHours = 0;
+    $firstCheckIn = $firstRecord->getCheckInTime();
+    $lastCheckOut = $lastRecord->getCheckOutTime();
+    
+    if ($firstCheckIn) {
+        // Use check-out time if available, otherwise use last check-in time
+        $endTime = $lastCheckOut ?: $lastRecord->getCheckInTime();
+        
+        if ($endTime) {
+            $interval = $firstCheckIn->diff($endTime);
+            $totalHours = $interval->h + ($interval->i / 60) + ($interval->s / 3600);
+        }
+    }
+    
+    return [
+        'total_hours' => $totalHours,
+        'status' => $lastRecord->getStatus(),
+        'first_check_in' => $firstCheckIn,
+        'last_check_out' => $lastCheckOut
     ];
 }
-
 
 
 private function calculateRequiredWorkingDays(\DateTime $startDate, \DateTime $endDate): int
@@ -1167,7 +1202,7 @@ private function calculateRequiredWorkingDays(\DateTime $startDate, \DateTime $e
         $isSchoolDay = $this->isSchoolDay($dayOfWeek);
         $isHoliday = $this->isHoliday($currentDate);
         
-        // Count only school days that are not holidays
+        // Count all school days that are not holidays (INCLUDING future dates)
         if ($isSchoolDay && !$isHoliday) {
             $requiredDays++;
         }
@@ -1178,69 +1213,57 @@ private function calculateRequiredWorkingDays(\DateTime $startDate, \DateTime $e
     return $requiredDays;
 }
 
-
-
+private function countHolidays(\DateTime $startDate, \DateTime $endDate): int
+{
+    $holidayCount = 0;
+    $currentDate = clone $startDate;
+    
+    while ($currentDate <= $endDate) {
+        if ($this->isHoliday($currentDate)) {
+            $holidayCount++;
+        }
+        $currentDate->modify('+1 day');
+    }
+    
+    return $holidayCount;
+}
 
 private function calculateMonthlyStatistics(array $monthlyData, \DateTime $startDate, \DateTime $endDate): array
 {
     $totalStudents = count($monthlyData);
     $totalRequiredDays = $this->calculateRequiredWorkingDays($startDate, $endDate);
     
+    // Calculate holidays count (excluding future dates)
+    $holidayCount = $this->countHolidays($startDate, $endDate);
+    
+    // Calculate future dates count
+    $futureDatesCount = $this->countFutureDates($startDate, $endDate);
+    
     $totalDaysPresent = 0;
     $totalHours = 0;
     $totalRequiredHours = 0;
-    $totalDaysWithSufficientHours = 0;
-    $studentsWithHoursConfig = 0;
     
     foreach ($monthlyData as $data) {
         $totalDaysPresent += $data['days_present'];
         $totalHours += $data['total_hours'];
-        $totalRequiredHours += $data['required_hours'];
-        
-        // Count students with hours configuration
-        if ($data['min_hours_per_day'] > 0) {
-            $studentsWithHoursConfig++;
-        }
-        
-        // Count days with sufficient hours
-        if (isset($data['days_with_sufficient_hours'])) {
-            $totalDaysWithSufficientHours += $data['days_with_sufficient_hours'];
-        }
+        $totalRequiredHours += $data['required_hours_total'];
     }
     
     $averageDaysPresent = $totalStudents > 0 ? round($totalDaysPresent / $totalStudents, 2) : 0;
     $averageHours = $totalStudents > 0 ? round($totalHours / $totalStudents, 2) : 0;
-    $averageRequiredHours = $totalStudents > 0 ? round($totalRequiredHours / $totalStudents, 2) : 0;
-    
-    // Calculate overall hours completion percentage
-    $overallHoursPercentage = 0;
-    if ($totalRequiredHours > 0) {
-        $overallHoursPercentage = round(($totalHours / $totalRequiredHours) * 100, 2);
-    }
-    
-    // Calculate hours compliance rate
-    $hoursComplianceRate = 0;
-    if ($totalDaysPresent > 0 && $studentsWithHoursConfig > 0) {
-        $hoursComplianceRate = round(($totalDaysWithSufficientHours / $totalDaysPresent) * 100, 2);
-    }
     
     return [
         'total_students' => $totalStudents,
         'total_required_days' => $totalRequiredDays,
+        'holiday_count' => $holidayCount,
+        'future_dates_count' => $futureDatesCount,
         'total_days_present' => $totalDaysPresent,
         'total_hours' => round($totalHours, 2),
         'total_required_hours' => round($totalRequiredHours, 2),
         'average_days_present' => $averageDaysPresent,
-        'average_hours' => $averageHours,
-        'average_required_hours' => $averageRequiredHours,
-        'overall_hours_percentage' => $overallHoursPercentage,
-        'students_with_hours_config' => $studentsWithHoursConfig,
-        'total_days_with_sufficient_hours' => $totalDaysWithSufficientHours,
-        'hours_compliance_rate' => $hoursComplianceRate
+        'average_hours' => $averageHours
     ];
 }
-
-
 
 
 #[Route('/monthly-details/{id}', name: 'app_admin_attendance_monthly_details', methods: ['GET'])]
@@ -1266,6 +1289,12 @@ public function monthlyDetails(int $id, Request $request): Response
     // Get institute
     $institute = $application->getInstitute();
     
+    // Get minimum hours per day from institute configuration
+    $minHoursPerDay = 0;
+    if ($institute && $institute->getSchoolHoursConfig()) {
+        $minHoursPerDay = $institute->getSchoolHoursConfig()->getMinHoursPerDay() ?? 0;
+    }
+    
     // Get ALL attendance records for the ENTIRE month for this application
     $attendanceRecords = $this->attendanceRepository->findByApplicationAndDateRange(
         $application,
@@ -1287,6 +1316,9 @@ public function monthlyDetails(int $id, Request $request): Response
     $allDays = [];
     $currentDate = clone $startDate;
     $workingDays = 0;
+    $presentDaysUpToToday = 0;
+    $absentDaysUpToToday = 0;
+    $totalHoursUpToToday = 0;
     
     while ($currentDate <= $endDate) {
         $dateKey = $currentDate->format('Y-m-d');
@@ -1299,7 +1331,7 @@ public function monthlyDetails(int $id, Request $request): Response
         $attendanceForDay = null;
         $dayRecords = $groupedRecords[$dateKey] ?? [];
         
-        // Find attendance for this day - use the latest check-in as check-out
+        // Find attendance for this day
         if (!empty($dayRecords)) {
             // Sort by check-in time
             usort($dayRecords, function($a, $b) {
@@ -1309,16 +1341,15 @@ public function monthlyDetails(int $id, Request $request): Response
             $firstRecord = $dayRecords[0];
             $lastRecord = end($dayRecords);
             
-            // Use the last check-in time as check-out time if no check-out exists
             $checkInTime = $firstRecord->getCheckInTime();
             $checkOutTime = $lastRecord->getCheckOutTime();
             
-            // If no check-out time, use the last check-in time as virtual check-out
+            // If no check-out time, use last check-in time
             if (!$checkOutTime) {
                 $checkOutTime = $lastRecord->getCheckInTime();
             }
             
-            // Calculate total hours using the virtual check-out
+            // Calculate total hours
             $totalHours = 0;
             if ($checkInTime && $checkOutTime) {
                 $interval = $checkInTime->diff($checkOutTime);
@@ -1355,13 +1386,28 @@ public function monthlyDetails(int $id, Request $request): Response
                 'absent' => 'bg-danger',
                 'late' => 'bg-warning',
                 'half-day' => 'bg-info',
-                default => 'bg-secondary'
+                default => 'bg-success' // Default to success if status is empty or null
             };
             $rowClass = $attendanceForDay['record']->getStatus() === 'absent' ? 'table-danger' : 'table-success';
+            
+            // Count present days and hours (only up to today)
+            if (!$isFutureDate) {
+                // If there are attendance records, count it as a present day
+                $presentDaysUpToToday++;
+                $totalHoursUpToToday += $totalHours;
+            }
         } else {
-            $status = 'Absent';
-            $statusClass = 'bg-danger';
-            $rowClass = 'table-danger';
+            // Only count as absent if it's NOT a future date
+            if (!$isFutureDate) {
+                $status = 'Absent';
+                $statusClass = 'bg-danger';
+                $rowClass = 'table-danger';
+                $absentDaysUpToToday++;
+            } else {
+                $status = 'Future';
+                $statusClass = 'bg-light text-dark';
+                $rowClass = 'table-light';
+            }
         }
         
         $allDays[] = [
@@ -1383,46 +1429,55 @@ public function monthlyDetails(int $id, Request $request): Response
             'checkin_count' => $attendanceForDay ? $attendanceForDay['checkin_count'] : 0
         ];
         
-        // Count working days (excluding future dates)
-        if ($isWorkingDay && !$isFutureDate) {
+        // Count working days (INCLUDING future dates for monthly requirement)
+        if ($isWorkingDay) {
             $workingDays++;
         }
         
         $currentDate->modify('+1 day');
     }
     
-    // Calculate statistics (excluding future dates)
-    $presentDays = count(array_filter($allDays, function($day) {
-        return !$day['is_future_date'] && $day['is_working_day'] && in_array($day['status'], ['Present', 'Late', 'Half-day']);
-    }));
+    // Calculate attendance percentage based on days up to today only
+    $workingDaysUpToToday = 0;
+    $currentDate = clone $startDate;
+    while ($currentDate <= $today && $currentDate <= $endDate) {
+        $dayOfWeek = $currentDate->format('l');
+        $isSchoolDay = $this->isSchoolDay($dayOfWeek);
+        $isHoliday = $this->isHoliday($currentDate);
+        
+        if ($isSchoolDay && !$isHoliday) {
+            $workingDaysUpToToday++;
+        }
+        $currentDate->modify('+1 day');
+    }
     
-    $absentDays = count(array_filter($allDays, function($day) {
-        return !$day['is_future_date'] && $day['is_working_day'] && $day['status'] === 'Absent';
-    }));
+    $attendancePercentage = $workingDaysUpToToday > 0 ? 
+        round(($presentDaysUpToToday / $workingDaysUpToToday) * 100, 2) : 0;
     
-    $totalHours = array_sum(array_column($allDays, 'hours'));
+    $averageHoursPerDay = $presentDaysUpToToday > 0 ? 
+        round($totalHoursUpToToday / $presentDaysUpToToday, 2) : 0;
     
-    $attendancePercentage = $workingDays > 0 ? round(($presentDays / $workingDays) * 100, 2) : 0;
-    $averageHoursPerDay = $presentDays > 0 ? round($totalHours / $presentDays, 2) : 0;
+    // Calculate required hours total for the month (INCLUDING future dates)
+    $requiredHoursTotal = $minHoursPerDay > 0 ? $workingDays * $minHoursPerDay : 0;
     
-    return $this->json([
-        'application_id' => $application->getId(),
-        'full_name' => $application->getFullName(),
-        'institute_name' => $institute ? $institute->getName() : 'No Institute',
-        'working_days' => $workingDays,
-        'present_days' => $presentDays,
-        'absent_days' => $absentDays,
-        'attendance_percentage' => $attendancePercentage,
-        'total_hours' => round($totalHours, 2),
-        'average_hours_per_day' => $averageHoursPerDay,
-        'month_summary' => [
-            'year' => $year,
-            'month' => $month,
-            'month_name' => date('F', mktime(0, 0, 0, $month, 1))
-        ],
-        'daily_details' => $allDays
-    ]);
-}
+   return $this->json([
+    'application_id' => $application->getId(),
+    'full_name' => $application->getFullName(),
+    'institute_name' => $institute ? $institute->getName() : 'No Institute',
+    'min_hours_per_day' => $minHoursPerDay,
+    'working_days' => $workingDays, // TOTAL working days in month (including future)
+    'working_days_up_to_today' => $workingDaysUpToToday, // Working days up to today
+    'present_days' => $presentDaysUpToToday, // Only up to today
+    'absent_days' => $absentDaysUpToToday, // Only up to today
+    'total_hours' => round($totalHoursUpToToday, 2),
+    'required_hours_total' => $requiredHoursTotal,
+    'month_summary' => [
+        'year' => $year,
+        'month' => $month,
+        'month_name' => date('F', mktime(0, 0, 0, $month, 1))
+    ],
+    'daily_details' => $allDays
+]);}
 
 
 private function getDailyAttendanceWithHoursCheck(\DateTime $date, int $applicationId, ?int $minHoursPerDay): array
