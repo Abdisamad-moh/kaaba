@@ -22,10 +22,12 @@
 					</nav>
 				</div>
 				<div class="col-3">
+					{% if is_super_admin %}
 					<a href="{{ path('app_admin_biotime_enrollment') }}" class="btn btn-primary float-end">
 						<i class="ti ti-user-plus me-2"></i>
 						Enroll New Students
 					</a>
+				{% endif %}
 				</div>
 			</div>
 		</div>
@@ -408,10 +410,7 @@
 						{% endif %}
 					</p>
 					<div class="d-flex justify-content-center gap-3">
-						<a href="{{ path('app_admin_biotime_enrollment') }}" class="btn btn-primary">
-							<i class="ti ti-user-plus me-2"></i>
-							Enroll Students
-						</a>
+					
 						<a href="{{ path('app_admin_biotime_enrolled_students') }}" class="btn btn-secondary">
 							<i class="ti ti-refresh me-2"></i>
 							Clear Filters

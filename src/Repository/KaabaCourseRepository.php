@@ -40,4 +40,16 @@ class KaabaCourseRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+public function findByInstitutes(array $institutes): array
+{
+    $instituteIds = array_map(fn($institute) => $institute->getId(), $institutes);
+    
+    return $this->createQueryBuilder('c')
+        ->where('c.institute IN (:institutes)')
+        ->setParameter('institutes', $instituteIds)
+        ->orderBy('c.name', 'ASC')
+        ->getQuery()
+        ->getResult();
+}
 }

@@ -238,17 +238,7 @@
                                             Select Area
                                         </a>
                                         
-                                        {% if selectedAreaId == areaIdString %}
-                                            <button type="button" 
-                                                    class="btn btn-success" 
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#bulkEnrollmentModal"
-                                                    data-area-id="{{ area.id }}"
-                                                    data-area-name="{{ area.areaName }}">
-                                                <i class="ti ti-users me-2"></i>
-                                                Bulk Enroll All
-                                            </button>
-                                        {% endif %}
+                                       
                                     {% else %}
                                         <button type="button" class="btn btn-outline-secondary" disabled>
                                             <i class="ti ti-ban me-2"></i>
@@ -301,18 +291,8 @@
                         <span class="badge bg-primary me-2">
                             Ready: {{ applications|filter(a => not a.isEnrolledInBioTime)|length }}
                         </span>
-                        <span class="badge bg-success me-2">
-                            Enrolled: {{ applications|filter(a => a.isEnrolledInBioTime)|length }}
-                        </span>
-                        <button type="button" 
-                                class="btn btn-success" 
-                                data-bs-toggle="modal" 
-                                data-bs-target="#bulkEnrollmentModal"
-                                data-area-id="{{ selectedArea.id }}"
-                                data-area-name="{{ selectedArea.areaName }}">
-                            <i class="ti ti-users me-2"></i>
-                            Bulk Enroll All
-                        </button>
+                       
+                 
                     </div>
                 </div>
             </div>
@@ -416,15 +396,10 @@
                                                 </a>
                                             {% endif %}
                                             
-                                            <button type="button" 
-                                                    class="btn btn-info"
-                                                    data-bs-toggle="modal" 
-                                                    data-bs-target="#studentDetailsModal"
-                                                    data-student-id="{{ application.id }}"
-                                                    data-student-name="{{ application.fullName }}">
-                                                <i class="ti ti-eye me-1"></i>
-                                                View
-                                            </button>
+                                      	<a href="{{ path('app_admin_kaaba_application_view', {'uuid': application.uuid}) }}" target="_blank" class="btn btn-secondary btn-sm">
+																	<i class="ti ti-eye fs-4"></i>
+																	View
+																</a>
                                         </div>
                                     </td>
                                 </tr>
@@ -526,18 +501,160 @@
             </div>
         </div>
     {% endif %}
+
+
+
+
+
+ {% if bulkErrors is defined and bulkErrors|length > 0 %}
+    <div class="modal fade show" id="bulkErrorsModal" tabindex="-1" style="display: block; background: rgba(0,0,0,0.5);">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-warning">
+                    <h5 class="modal-title">Bulk Enrollment Errors</h5>
+                    <button type="button" class="btn-close" onclick="closeErrorModal()"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <i class="ti ti-alert-circle me-2"></i>
+                        Some students could not be enrolled. Details below:
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Error</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for error in bulkErrors %}
+                                    <tr>
+                                        <td>{{ loop.index }}</td>
+                                        <td class="text-danger">{{ error }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeErrorModal()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function closeErrorModal() {
+            document.getElementById('bulkErrorsModal').style.display = 'none';
+        }
+    </script>
+    {% endif %}
 {% endblock %}
 
 {% block javascripts %}
 <script>
-// Select/Deselect all checkboxes (only for non-enrolled students)
-document.getElementById('selectAll').addEventListener('change', function() {
-    const checkboxes = document.querySelectorAll('.student-checkbox:not(:disabled)');
-    checkboxes.forEach(checkbox => {
-        checkbox.checked = this.checked;
-    });
+// Main initialization function
+function initializeEnrollmentPage() {
+    // Select/Deselect all checkboxes (only for non-enrolled students)
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const enrollSelectedBtn = document.getElementById('enrollSelectedBtn');
+    const clearSelectionBtn = document.getElementById('clearSelectionBtn');
+
+    // These variables are only used in the bulk enrollment modal
+    // We'll define them safely to avoid Twig errors
+    const enrolledCount = {{ applications|filter(a => a.isEnrolledInBioTime)|length }};
+    
+    // Initialize the page
+    updateSelectAllCheckbox();
     updateSelectedStudents();
-});
+    
+    // Add event listeners to all checkboxes
+    document.querySelectorAll('.student-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', updateSelectedStudents);
+    });
+    
+    // Select All checkbox event
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('.student-checkbox:not(:disabled)');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            updateSelectedStudents();
+        });
+    }
+    
+    // Clear selection
+    if (clearSelectionBtn) {
+        clearSelectionBtn.addEventListener('click', function() {
+            document.querySelectorAll('.student-checkbox').forEach(checkbox => {
+                if (!checkbox.disabled) {
+                    checkbox.checked = false;
+                }
+            });
+            if (selectAllCheckbox) {
+                selectAllCheckbox.checked = false;
+            }
+            updateSelectedStudents();
+        });
+    }
+    
+    // Enroll selected students
+    if (enrollSelectedBtn) {
+        enrollSelectedBtn.addEventListener('click', function() {
+            const selectedIds = Array.from(document.querySelectorAll('.student-checkbox:checked'))
+                .map(checkbox => checkbox.value);
+            const areaId = this.dataset.areaId;
+            const areaName = this.dataset.areaName;
+            
+            if (selectedIds.length === 0) {
+                alert('Please select at least one student.');
+                return;
+            }
+            
+            if (confirm(`Enroll ${selectedIds.length} student(s) in ${areaName}?`)) {
+                // For single student, redirect directly
+                if (selectedIds.length === 1) {
+                    window.location.href = `?enroll=${selectedIds[0]}&area=${areaId}`;
+                } else {
+                    // For multiple students, show confirmation
+                    if (confirm(`Bulk enrollment for ${selectedIds.length} students will be processed. This may take several minutes. Continue?`)) {
+                        // Create a form to submit multiple student IDs
+                        const form = document.createElement('form');
+                        form.method = 'GET';
+                        form.action = window.location.pathname;
+                        
+                        const bulkInput = document.createElement('input');
+                        bulkInput.type = 'hidden';
+                        bulkInput.name = 'bulk_enroll';
+                        bulkInput.value = '1';
+                        form.appendChild(bulkInput);
+                        
+                        const areaIdInput = document.createElement('input');
+                        areaIdInput.type = 'hidden';
+                        areaIdInput.name = 'area';
+                        areaIdInput.value = areaId;
+                        form.appendChild(areaIdInput);
+                        
+                        // Add student IDs
+                        selectedIds.forEach(id => {
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = 'student_ids[]';
+                            input.value = id;
+                            form.appendChild(input);
+                        });
+                        
+                        document.body.appendChild(form);
+                        form.submit();
+                    }
+                }
+            }
+        });
+    }
+}
 
 // Update selected students count
 function updateSelectedStudents() {
@@ -549,89 +666,44 @@ function updateSelectedStudents() {
     const noteElement = document.getElementById('enrollmentNote');
     
     if (count > 0) {
-        section.style.display = 'block';
-        countElement.textContent = count;
+        if (section) section.style.display = 'block';
+        if (countElement) countElement.textContent = count;
         
         // Show first 3 names
         const names = Array.from(checkboxes).slice(0, 3).map(cb => cb.dataset.studentName);
-        namesElement.textContent = names.join(', ') + (count > 3 ? ` and ${count - 3} more...` : '');
+        if (namesElement) {
+            namesElement.textContent = names.join(', ') + (count > 3 ? ` and ${count - 3} more...` : '');
+        }
         
         // Show enrollment note
-        noteElement.textContent = 'Already enrolled students are automatically excluded from selection.';
+        if (noteElement) {
+            noteElement.textContent = 'Already enrolled students are automatically excluded from selection.';
+        }
     } else {
-        section.style.display = 'none';
+        if (section) section.style.display = 'none';
+    }
+    
+    updateSelectAllCheckbox();
+}
+
+// Update Select All checkbox based on available checkboxes
+function updateSelectAllCheckbox() {
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const allCheckboxes = document.querySelectorAll('.student-checkbox:not(:disabled)');
+    const checkedCheckboxes = document.querySelectorAll('.student-checkbox:not(:disabled):checked');
+    
+    if (selectAllCheckbox) {
+        if (allCheckboxes.length === 0) {
+            selectAllCheckbox.disabled = true;
+            selectAllCheckbox.checked = false;
+        } else {
+            selectAllCheckbox.disabled = false;
+            selectAllCheckbox.checked = allCheckboxes.length === checkedCheckboxes.length;
+        }
     }
 }
 
-// Add event listeners to all checkboxes
-document.querySelectorAll('.student-checkbox').forEach(checkbox => {
-    checkbox.addEventListener('change', updateSelectedStudents);
-});
-
-// Clear selection
-document.getElementById('clearSelectionBtn').addEventListener('click', function() {
-    document.querySelectorAll('.student-checkbox').forEach(checkbox => {
-        if (!checkbox.disabled) {
-            checkbox.checked = false;
-        }
-    });
-    document.getElementById('selectAll').checked = false;
-    updateSelectedStudents();
-});
-
-// Enroll selected students
-document.getElementById('enrollSelectedBtn').addEventListener('click', function() {
-    const selectedIds = Array.from(document.querySelectorAll('.student-checkbox:checked'))
-        .map(checkbox => checkbox.value);
-    const areaId = this.dataset.areaId;
-    const areaName = this.dataset.areaName;
-    
-    if (selectedIds.length === 0) {
-        alert('Please select at least one student.');
-        return;
-    }
-    
-    if (confirm(`Enroll ${selectedIds.length} student(s) in ${areaName}?`)) {
-        // For single student, redirect directly
-        if (selectedIds.length === 1) {
-            window.location.href = `?enroll=${selectedIds[0]}&area=${areaId}`;
-        } else {
-            // For multiple students, show processing message and process one by one
-            if (confirm(`Bulk enrollment for ${selectedIds.length} students will be processed. This may take several minutes. Continue?`)) {
-                // Create a form to submit multiple student IDs
-                const form = document.createElement('form');
-                form.method = 'GET';
-                form.action = window.location.pathname;
-                
-                const areaInput = document.createElement('input');
-                areaInput.type = 'hidden';
-                areaInput.name = 'bulk_enroll';
-                areaInput.value = '1';
-                form.appendChild(areaInput);
-                
-                const areaIdInput = document.createElement('input');
-                areaIdInput.type = 'hidden';
-                areaIdInput.name = 'bulk_area';
-                areaIdInput.value = areaId;
-                form.appendChild(areaIdInput);
-                
-                // Add student IDs
-                selectedIds.forEach(id => {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = 'student_ids[]';
-                    input.value = id;
-                    form.appendChild(input);
-                });
-                
-                document.body.appendChild(form);
-                form.submit();
-            }
-        }
-    }
-});
-
-// Bulk enrollment modal
+// Bulk enrollment modal - FIXED VERSION
 const bulkEnrollmentModal = document.getElementById('bulkEnrollmentModal');
 if (bulkEnrollmentModal) {
     bulkEnrollmentModal.addEventListener('show.bs.modal', function(event) {
@@ -644,40 +716,79 @@ if (bulkEnrollmentModal) {
         const enrollButton = bulkEnrollmentModal.querySelector('#confirmBulkEnroll');
         
         // Count non-enrolled students
-        const nonEnrolledCount = {{ applications|filter(a => not a.isEnrolledInBioTime)|length }};
+        const nonEnrolledCheckboxes = document.querySelectorAll('.student-checkbox:not(:disabled)');
+        const nonEnrolledCount = nonEnrolledCheckboxes.length;
         const enrolledCount = {{ applications|filter(a => a.isEnrolledInBioTime)|length }};
         
         modalTitle.textContent = `Bulk Enrollment - ${areaName}`;
-        modalBody.innerHTML = `
+        
+        // Build modal content safely without relying on selectedArea variable
+        let modalContent = `
             <p>You are about to enroll <strong>${nonEnrolledCount} students</strong> in <strong>${areaName}</strong>.</p>
             ${enrolledCount > 0 ? `
             <div class="alert alert-info">
                 <i class="ti ti-info-circle me-2"></i>
-                <strong>Note:</strong> ${enrolledCount} students are already enrolled and will be updated.
+                <strong>Note:</strong> ${enrolledCount} students are already enrolled and will not be included in bulk enrollment.
             </div>
             ` : ''}
             <div class="alert alert-warning">
                 <i class="ti ti-alert-circle me-2"></i>
                 <strong>Note:</strong> This action will:
                 <ul class="mb-0 mt-2">
-                    <li>Create/update BioTime employee records</li>
+                    <li>Create BioTime employee records for selected students</li>
                     <li>Assign students to the selected area</li>
                     <li>Enable attendance tracking</li>
                     <li>This process may take several minutes</li>
                 </ul>
             </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="includeEnrolled">
-                <label class="form-check-label" for="includeEnrolled">
-                    Include already enrolled students (will update their records)
-                </label>
-            </div>
         `;
         
+        // Only add institute info if we're in the area selection context
+        {% if app.request.query.get('area') and selectedArea is defined and selectedArea.institute %}
+            modalContent += `
+                <div class="alert alert-primary">
+                    <i class="ti ti-info-circle me-2"></i>
+                    Only students from <strong>{{ selectedArea.institute.name }}</strong> will be enrolled.
+                </div>
+            `;
+        {% endif %}
+        
+        modalBody.innerHTML = modalContent;
+        
         enrollButton.onclick = function() {
-            const includeEnrolled = document.getElementById('includeEnrolled').checked;
-            const url = `?bulk_enroll=1&bulk_area=${areaId}${includeEnrolled ? '&include_enrolled=1' : ''}`;
-            window.location.href = url;
+            // Get all non-enrolled student IDs (for bulk enroll all)
+            const allNonEnrolledIds = Array.from(nonEnrolledCheckboxes)
+                .map(checkbox => checkbox.value);
+            
+            // Create form for bulk enrollment
+            const form = document.createElement('form');
+            form.method = 'GET';
+            form.action = window.location.pathname;
+            
+            // Add bulk parameters
+            const bulkInput = document.createElement('input');
+            bulkInput.type = 'hidden';
+            bulkInput.name = 'bulk_enroll';
+            bulkInput.value = '1';
+            form.appendChild(bulkInput);
+            
+            const areaInput = document.createElement('input');
+            areaInput.type = 'hidden';
+            areaInput.name = 'area';
+            areaInput.value = areaId;
+            form.appendChild(areaInput);
+            
+            // Add all non-enrolled student IDs
+            allNonEnrolledIds.forEach(id => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'student_ids[]';
+                input.value = id;
+                form.appendChild(input);
+            });
+            
+            document.body.appendChild(form);
+            form.submit();
         };
     });
 }
@@ -760,29 +871,20 @@ if (studentDetailsModal) {
     });
 }
 
-// Update Select All checkbox based on available checkboxes
-function updateSelectAllCheckbox() {
-    const allCheckboxes = document.querySelectorAll('.student-checkbox:not(:disabled)');
-    const checkedCheckboxes = document.querySelectorAll('.student-checkbox:not(:disabled):checked');
-    const selectAllCheckbox = document.getElementById('selectAll');
-    
-    if (allCheckboxes.length === 0) {
-        selectAllCheckbox.disabled = true;
-        selectAllCheckbox.checked = false;
-    } else {
-        selectAllCheckbox.disabled = false;
-        selectAllCheckbox.checked = allCheckboxes.length === checkedCheckboxes.length;
-    }
-}
-
-// Initialize
+// Initialize the page when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    updateSelectAllCheckbox();
-    updateSelectedStudents();
+    initializeEnrollmentPage();
+    
+    // Close error modal if exists
+    const errorModal = document.getElementById('bulkErrorsModal');
+    if (errorModal) {
+        window.closeErrorModal = function() {
+            errorModal.style.display = 'none';
+        };
+    }
 });
 </script>
 {% endblock %}
-
 {% block modals %}
 <!-- Bulk Enrollment Modal -->
 <div class="modal fade" id="bulkEnrollmentModal" tabindex="-1" aria-hidden="true">
