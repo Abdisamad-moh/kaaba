@@ -19,7 +19,7 @@ class KaabaAttendance
     private ?KaabaApplication $application = null;
 
     #[ORM\ManyToOne(inversedBy: 'attendances')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true)]
     private ?KaabaBiotimeDevice $device = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
