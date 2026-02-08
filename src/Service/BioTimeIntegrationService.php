@@ -487,8 +487,9 @@ private function prepareStudentForBioTime(KaabaApplication $application, KaabaBi
     
     // Prepare employee data
     $employeeData = [
-        'emp_code' => $empCode,
-        'first_name' => $firstName,
+        'id' => $application->getId(),
+        'emp_code' => $application->getId(),
+        'first_name' => $application->getFullName(),
         'last_name' => $lastName,
         'nickname' => $application->getFullName(),
         'department' => 2, // Using department ID 4 (Admin and finance)
