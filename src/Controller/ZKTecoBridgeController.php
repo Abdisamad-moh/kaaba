@@ -89,6 +89,7 @@ class ZKTecoBridgeController extends AbstractController
                 $attendance->setAttendanceDate($attendanceDate);
                 $attendance->setCheckInTime($punchTime);
                 $attendance->setAttendanceType('biometric');
+                $attendance->setInstitute($application->getInstitute());
                 $attendance->setStatus('present');
                 $attendance->setCreatedAt(new \DateTime());
 
