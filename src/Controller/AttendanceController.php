@@ -196,7 +196,7 @@ private function getDailyAttendanceWithAbsent(
         ->leftJoin('app.institute', 'inst')
         ->leftJoin('app.course', 'course')
         // ->where('sd IS NOT NULL') // Only students with student device (enrolled)
-        ->andWhere('app.status.id = :status')
+        ->andWhere('app.status = :status')
         ->setParameter('status', 4)
         ->orderBy('sd.created_at', 'DESC'); // Sort by created_at descending
     
