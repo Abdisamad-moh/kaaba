@@ -22,7 +22,7 @@ class ZKTecoBridgeController extends AbstractController
             return $this->json(['ok' => true, 'received' => 0]);
         }
 
-        $logger->info('ZKTeco bridge attendance received', [
+        $logger->error('ZKTeco bridge attendance received', [
             'record_count' => count($records),
             'facility'     => $records[0]['facility'] ?? 'unknown',
         ]);
@@ -100,7 +100,7 @@ class ZKTecoBridgeController extends AbstractController
 
         $em->flush();
 
-        $logger->info('ZKTeco attendance processed', [
+        $logger->error('ZKTeco attendance processed', [
             'saved'   => $saved,
             'skipped' => $skipped,
             'errors'  => $errors,
@@ -117,7 +117,7 @@ class ZKTecoBridgeController extends AbstractController
     #[Route('/api/bridge/commands/pending', name: 'commands_pending', methods: ['GET'])]
     public function commandsPending(Request $request, LoggerInterface $logger): JsonResponse
     {
-        $logger->info('ZKTeco bridge polling commands', [
+        $logger->error('ZKTeco bridge polling commands', [
             'facility' => $request->query->get('facility'),
         ]);
 
@@ -159,7 +159,7 @@ class ZKTecoBridgeController extends AbstractController
     public function commandAck(string $id, Request $request, LoggerInterface $logger): JsonResponse
     {
         $data = json_decode($request->getContent(), true) ?? [];
-        $logger->info('akn data', [$data]);
+        $logger->error('akn data', [$data]);
         // $logger->info('ZKTeco bridge command ack', [
         //     'command_id' => $id,
         //     'success'    => $data['success'] ?? null,
@@ -174,7 +174,7 @@ class ZKTecoBridgeController extends AbstractController
     {
         $data = json_decode($request->getContent(), true) ?? [];
 
-        $logger->info('ZKTeco bridge template received', [
+        $logger->error('ZKTeco bridge template received', [
             'facility'  => $data['facility'] ?? null,
             'pin'       => $data['pin']      ?? null,
             'fid'       => $data['fid']      ?? null,
