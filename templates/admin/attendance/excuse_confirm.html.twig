@@ -1,0 +1,161 @@
+{# templates/admin/attendance/excuse_confirm.html.twig #}
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Confirm Excuse - Admin{% endblock %}
+
+{% block body %}
+    <div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+        <div class="card-body px-4 py-3">
+            <div class="row align-items-center">
+                <div class="col-9">
+                    <h4 class="fw-semibold mb-8">Confirm Excuse</h4>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a class="text-muted text-decoration-none" href="#">Admin</a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a class="text-muted text-decoration-none" href="{{ path('app_admin_attendance_excuse_list') }}">Excuses</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">Confirm</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Excuse Details</h5>
+                    <table class="table table-bordered">
+                        <tr>
+                            <th width="40%">Student</th>
+                            <td>{{ excuse.application.fullName }}</td>
+                        </tr>
+                        <tr>
+                            <th>Institute</th>
+                            <td>{{ excuse.institute.name }}</td>
+                        </tr>
+                        <tr>
+                            <th>Date Range</th>
+                            <td>
+                                {{ excuse.startDate|date('F d, Y') }}
+                                {% if excuse.endDate and excuse.endDate != excuse.startDate %}
+                                    - {{ excuse.endDate|date('F d, Y') }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Excuse Type</th>
+                            <td>
+                                {% set typeLabels = {
+                                    'sick': 'Sick Leave',
+                                    'personal': 'Personal',
+                                    'family': 'Family Emergency',
+                                    'travel': 'Travel',
+                                    'exam': 'Exam/Test',
+                                    'religious': 'Religious',
+                                    'other': 'Other'
+                                } %}
+                                {{ typeLabels[excuse.excuseType]|default(excuse.excuseType) }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Excused Hours</th>
+                            <td>
+                                {% if excuse.excusedHoursPerDay %}
+                                    {{ excuse.excusedHoursPerDay }} hours per day
+                                {% else %}
+                                    Full day
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Reason</th>
+                            <td>{{ excuse.reason|nl2br }}</td>
+                        </tr>
+                        <tr>
+                            <th>Created By</th>
+                            <td>{{ excuse.createdBy.email }}</td>
+                        </tr>
+                        <tr>
+                            <th>Created At</th>
+                            <td>{{ excuse.createdAt|date('Y-m-d H:i:s') }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Attendance Records During Excuse Period</h5>
+                    {% if attendanceRecords|length > 0 %}
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Check In</th>
+                                        <th>Check Out</th>
+                                        <th>Hours</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for date, record in attendanceRecords %}
+                                        <tr>
+                                            <td>{{ date }}</td>
+                                            <td>{{ record.checkInTime ? record.checkInTime|date('H:i') : '--' }}</td>
+                                            <td>{{ record.checkOutTime ? record.checkOutTime|date('H:i') : '--' }}</td>
+                                            <td>{{ record.totalHours|number_format(1) }} hrs</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info mb-0">
+                            <i class="ti ti-info-circle me-2"></i>
+                            No attendance records found for this period.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">Confirmation</h5>
+                    {{ form_start(form) }}
+                        <div class="mb-3">
+                            {{ form_label(form.is_approved) }}
+                            <div class="mt-2">
+                                {{ form_widget(form.is_approved) }}
+                                {{ form_label(form.is_approved, null, {'label_attr': {'class': 'ms-2'}}) }}
+                            </div>
+                            {{ form_errors(form.is_approved) }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form_label(form.admin_notes) }}
+                            {{ form_widget(form.admin_notes) }}
+                            {{ form_errors(form.admin_notes) }}
+                        </div>
+                        
+                        <div class="d-flex justify-content-end gap-2">
+                            <a href="{{ path('app_admin_attendance_excuse_list') }}" class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="ti ti-device-floppy me-2"></i>Save Confirmation
+                            </button>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

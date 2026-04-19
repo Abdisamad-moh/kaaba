@@ -1,0 +1,243 @@
+{# templates/admin/attendance/excuse_list.html.twig #}
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Student Excuses - Admin{% endblock %}
+
+{% block body %}
+    <!-- Page Header -->
+    <div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+        <div class="card-body px-4 py-3">
+            <div class="row align-items-center">
+                <div class="col-9">
+                    <h4 class="fw-semibold mb-8">Student Excuses</h4>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a class="text-muted text-decoration-none" href="#">Admin</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">Excuses</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-3">
+                    <div class="text-end">
+                        <a href="{{ path('app_admin_attendance_excuse_new') }}" class="btn btn-primary">
+                            <i class="ti ti-plus me-2"></i>New Excuse
+                        </a>
+                        <a href="{{ path('app_admin_attendance_index') }}" class="btn btn-outline-info ms-2">
+                            <i class="ti ti-calendar me-2"></i>Daily View
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if no_institutes %}
+        <div class="alert alert-warning" role="alert">
+            <i class="ti ti-alert-circle me-2"></i>
+            You do not manage any institutes to view excuses. Please contact the administrator.
+        </div>
+    {% else %}
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="card border-start border-primary border-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted fw-semibold mb-1">Total Excuses</h6>
+                                <h4 class="fw-semibold mb-0">{{ stats.total }}</h4>
+                            </div>
+                            <div class="bg-primary text-white rounded-circle p-3">
+                                <i class="ti ti-clipboard-list fs-6"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-start border-success border-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted fw-semibold mb-1">Approved</h6>
+                                <h4 class="fw-semibold mb-0">{{ stats.approved }}</h4>
+                            </div>
+                            <div class="bg-success text-white rounded-circle p-3">
+                                <i class="ti ti-check fs-6"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-start border-warning border-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="text-muted fw-semibold mb-1">Pending</h6>
+                                <h4 class="fw-semibold mb-0">{{ stats.pending }}</h4>
+                            </div>
+                            <div class="bg-warning text-white rounded-circle p-3">
+                                <i class="ti ti-clock fs-6"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="get" action="{{ path('app_admin_attendance_excuse_list') }}" class="row g-3">
+                    <div class="col-md-3">
+                        <label class="form-label">Status</label>
+                        <select name="status" class="form-control">
+                            <option value="">All</option>
+                            <option value="approved" {{ current_status_filter == 'approved' ? 'selected' : '' }}>Approved</option>
+                            <option value="pending" {{ current_status_filter == 'pending' ? 'selected' : '' }}>Pending</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Institute</label>
+                        <select name="institute" class="form-control">
+                            <option value="">All Institutes</option>
+                            {% for institute in managedInstitutes %}
+                                <option value="{{ institute.id }}" {{ current_institute_filter == institute.id ? 'selected' : '' }}>
+                                    {{ institute.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-3 mt-4">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ti ti-filter me-2"></i>Filter
+                        </button>
+                        <a href="{{ path('app_admin_attendance_excuse_list') }}" class="btn btn-outline-secondary ms-2">
+                            <i class="ti ti-refresh me-2"></i>Reset
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Excuses Table -->
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Student</th>
+                                <th>Institute</th>
+                                <th>Date Range</th>
+                                <th>Type</th>
+                                <th>Reason</th>
+                                <th>Excused Hours</th>
+                                <th>Status</th>
+                                <th>Created By</th>
+                                <th>Created At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for excuse in excuses %}
+                                <tr>
+                                    <td>{{ excuse.id }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div>
+                                                <h6 class="mb-0">{{ excuse.application.fullName }}</h6>
+                                                <small class="text-muted">{{ excuse.application.phone }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ excuse.institute.name }}</span>
+                                    </td>
+                                    <td>
+                                        {{ excuse.startDate|date('M d, Y') }}
+                                        {% if excuse.endDate and excuse.endDate != excuse.startDate %}
+                                            - {{ excuse.endDate|date('M d, Y') }}
+                                            <br><small class="text-muted">({{ excuse.totalExcusedDays }} days)</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% set typeLabels = {
+                                            'sick': 'Sick Leave',
+                                            'personal': 'Personal',
+                                            'family': 'Family Emergency',
+                                            'travel': 'Travel',
+                                            'exam': 'Exam/Test',
+                                            'religious': 'Religious',
+                                            'other': 'Other'
+                                        } %}
+                                        <span class="badge bg-secondary">{{ typeLabels[excuse.excuseType]|default(excuse.excuseType) }}</span>
+                                    </td>
+                                    <td>
+                                        <div style="max-width: 200px;">
+                                            <small>{{ excuse.reason|slice(0, 50) }}{% if excuse.reason|length > 50 %}...{% endif %}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% if excuse.excusedHoursPerDay %}
+                                            {{ excuse.excusedHoursPerDay }} hrs/day
+                                            <br><small class="text-muted">Total: {{ excuse.totalExcusedHours|number_format(1) }} hrs</small>
+                                        {% else %}
+                                            Full day
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if excuse.isApproved %}
+                                            <span class="badge bg-success">Approved</span>
+                                            <br><small>by {{ excuse.approvedBy.email|split('@')[0] }}</small>
+                                        {% else %}
+                                            <span class="badge bg-warning">Pending</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small>{{ excuse.createdBy.email|split('@')[0] }}</small>
+                                    </td>
+                                    <td>
+                                        <small>{{ excuse.createdAt|date('Y-m-d H:i') }}</small>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            {% if not excuse.isApproved %}
+                                                <a href="{{ path('app_admin_attendance_excuse_confirm', {'id': excuse.id}) }}" 
+                                                   class="btn btn-sm btn-success" title="Confirm">
+                                                    <i class="ti ti-check"></i>
+                                                </a>
+                                            {% endif %}
+                                            <form method="post" action="{{ path('app_admin_attendance_excuse_delete', {'id': excuse.id}) }}" 
+                                                  onsubmit="return confirm('Are you sure you want to delete this excuse?');" style="display: inline-block;">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete_excuse_' ~ excuse.id) }}">
+                                                <button type="submit" class="btn btn-sm btn-danger" title="Delete">
+                                                    <i class="ti ti-trash"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="11" class="text-center py-5">
+                                        <i class="ti ti-clipboard-list fs-1 text-muted mb-3 d-block"></i>
+                                        <h5 class="text-muted">No excuses found</h5>
+                                        <p class="text-muted">Create a new excuse to get started.</p>
+                                        <a href="{{ path('app_admin_attendance_excuse_new') }}" class="btn btn-primary">
+                                            <i class="ti ti-plus me-2"></i>Create Excuse
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

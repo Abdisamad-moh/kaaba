@@ -58,6 +58,10 @@ private ?KaabaBiotimeArea $biotimeArea = null;
     #[ORM\OneToMany(targetEntity: KaabaAttendance::class, mappedBy: 'institute')]
     private Collection $attendances;
 
+    // Add this property
+#[ORM\OneToMany(mappedBy: 'institute', targetEntity: KaabaStudentExcuse::class)]
+private Collection $excuses;
+
 
     public function __construct()
     {
@@ -66,7 +70,33 @@ private ?KaabaBiotimeArea $biotimeArea = null;
         $this->kaabaCourses = new ArrayCollection();
         $this->kaabaApplicationDuplicates = new ArrayCollection();
         $this->attendances = new ArrayCollection();
+        $this->excuses = new ArrayCollection();
     }
+
+    // Add these methods
+public function getExcuses(): Collection
+{
+    return $this->excuses;
+}
+
+public function addExcuse(KaabaStudentExcuse $excuse): static
+{
+    if (!$this->excuses->contains($excuse)) {
+        $this->excuses->add($excuse);
+        $excuse->setInstitute($this);
+    }
+    return $this;
+}
+
+public function removeExcuse(KaabaStudentExcuse $excuse): static
+{
+    if ($this->excuses->removeElement($excuse)) {
+        if ($excuse->getInstitute() === $this) {
+            $excuse->setInstitute(null);
+        }
+    }
+    return $this;
+}
 
     // Add getter and setter methods
 public function getBiotimeArea(): ?KaabaBiotimeArea

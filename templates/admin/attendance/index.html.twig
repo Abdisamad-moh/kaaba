@@ -191,7 +191,10 @@
                                 <th>Check In</th>
                                 <th>Check Out</th>
                                 <th>Total Hours</th>
-                                <th>Status</th>
+                                <th>Expected Hrs</th>
+<th>Hours Present</th>
+<th>% of Expected</th>
+<th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -264,18 +267,63 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        {% if isHoliday %}
-                                            <span class="badge bg-info">Holiday</span>
-                                        {% elseif not isSchoolDay %}
-                                            <span class="badge bg-secondary">Weekend</span>
-                                        {% else %}
-                                            {% if data.status == 'present' %}
-                                                <span class="badge bg-success">Present</span>
-                                            {% else %}
-                                                <span class="badge bg-danger">Absent</span>
-                                            {% endif %}
-                                        {% endif %}
-                                    </td>
+    {% if data.expected_hours > 0 %}
+        <span class="badge bg-secondary">{{ data.expected_hours }} hrs</span>
+    {% else %}
+        <span class="badge bg-light text-dark">--</span>
+    {% endif %}
+</td>
+<td>
+    {% set totalMinutes = (data.total_hours * 60)|round(0, 'floor') %}
+    {% set hours = (totalMinutes / 60)|round(0, 'floor') %}
+    {% set minutes = totalMinutes - (hours * 60) %}
+    
+    {% if data.total_hours > 0 %}
+        <span class="badge bg-info">
+            {% if hours < 1 %}
+                {{ minutes }}min
+            {% else %}
+                {{ hours }}hr{% if minutes > 0 %} {{ minutes }}min{% endif %}
+            {% endif %}
+        </span>
+    {% else %}
+        <span class="badge bg-secondary">0min</span>
+    {% endif %}
+</td>
+<td>
+    {% if data.expected_hours > 0 %}
+        {% set percent = (data.total_hours / data.expected_hours * 100)|round %}
+        {% if percent >= 100 %}
+            <span class="badge bg-success">{{ percent }}%</span>
+        {% elseif percent >= 75 %}
+            <span class="badge bg-warning">{{ percent }}%</span>
+        {% else %}
+            <span class="badge bg-danger">{{ percent }}%</span>
+        {% endif %}
+    {% else %}
+        <span class="badge bg-light text-dark">--</span>
+    {% endif %}
+</td>
+<td>
+    {% if isHoliday %}
+        <span class="badge bg-info">Holiday</span>
+    {% elseif not isSchoolDay %}
+        <span class="badge bg-secondary">Weekend</span>
+    {% elseif data.is_excused %}
+        <span class="badge bg-warning" 
+              data-bs-toggle="tooltip" 
+              title="{{ data.excuse_reason }}">
+            Excused
+            {% if data.excuse_hours_per_day %}
+                ({{ data.excuse_hours_per_day }} hrs)
+            {% endif %}
+        </span>
+    {% elseif data.status == 'present' %}
+        <span class="badge bg-success">Present</span>
+    {% else %}
+        <span class="badge bg-danger">Absent</span>
+    {% endif %}
+</td>
                                 </tr>
                             {% endfor %}
                         </tbody>

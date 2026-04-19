@@ -3,27 +3,31 @@
 
 namespace App\Controller;
 
-use App\Entity\KaabaInstitute;
-use App\Entity\KaabaAttendance;
 use App\Entity\KaabaApplication;
-use App\Form\AttendanceSearchType;
+use App\Entity\KaabaAttendance;
 use App\Entity\KaabaConfigSchoolDay;
-use App\Entity\KaabaConfigSchoolHour;
 use App\Entity\KaabaConfigSchoolHoliday;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\KaabaConfigSchoolHour;
+use App\Entity\KaabaInstitute;
+use App\Entity\KaabaStudentExcuse;
+use App\Form\AttendanceSearchType;
+use App\Form\ExcuseConfirmationType;
+use App\Form\StudentExcuseType;
+use App\Repository\KaabaApplicationRepository;
+use App\Repository\KaabaAttendanceRepository;
+use App\Repository\KaabaConfigSchoolDayRepository;
+use App\Repository\KaabaConfigSchoolHolidayRepository;
+use App\Repository\KaabaConfigSchoolHourRepository;
 use App\Repository\KaabaCourseRepository;
 use App\Repository\KaabaInstituteRepository;
-use App\Repository\KaabaAttendanceRepository;
+use App\Repository\KaabaStudentExcuseRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use App\Repository\KaabaApplicationRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Repository\KaabaConfigSchoolDayRepository;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use App\Repository\KaabaConfigSchoolHourRepository;
 use Symfony\Component\Validator\Constraints\DateTime;
-use App\Repository\KaabaConfigSchoolHolidayRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 #[Route('/admin/attendance')]
 class AttendanceController extends AbstractController
@@ -36,6 +40,8 @@ class AttendanceController extends AbstractController
     private $holidayRepository;
     private $schoolHourRepository;
 
+    private $excuseRepository;
+
     public function __construct(
         EntityManagerInterface $entityManager,
         KaabaAttendanceRepository $attendanceRepository,
@@ -44,7 +50,8 @@ class AttendanceController extends AbstractController
         KaabaConfigSchoolDayRepository $schoolDayRepository,
         KaabaConfigSchoolHolidayRepository $holidayRepository,
         KaabaConfigSchoolHourRepository $schoolHourRepository,
-        KaabaCourseRepository $courseRepository
+        KaabaCourseRepository $courseRepository,
+        KaabaStudentExcuseRepository $excuseRepository
     ) {
         $this->entityManager = $entityManager;
         $this->attendanceRepository = $attendanceRepository;
@@ -54,6 +61,8 @@ class AttendanceController extends AbstractController
         $this->holidayRepository = $holidayRepository;
         $this->schoolHourRepository = $schoolHourRepository;
         $this->courseRepository = $courseRepository;
+        $this->excuseRepository = $excuseRepository;
+        
     }
 
 
@@ -184,7 +193,6 @@ private function getDailyAttendanceWithAbsent(
 ): array {
     $startDate = clone $date;
     $startDate->setTime(0, 0, 0);
-    
     $endDate = clone $date;
     $endDate->setTime(23, 59, 59);
 
@@ -195,10 +203,8 @@ private function getDailyAttendanceWithAbsent(
         ->leftJoin('app.studentDevice', 'sd')
         ->leftJoin('app.institute', 'inst')
         ->leftJoin('app.course', 'course')
-        // ->where('sd IS NOT NULL') // Only students with student device (enrolled)
-        ->andWhere('app.status = :status')
-        ->setParameter('status', 4)
-        ->orderBy('sd.created_at', 'DESC'); // Sort by created_at descending
+        ->where('sd IS NOT NULL') // Only students with student device (enrolled)
+        ->orderBy('sd.created_at', 'DESC');
     
     // Filter by applicant
     if ($applicant) {
@@ -211,7 +217,6 @@ private function getDailyAttendanceWithAbsent(
         $qb->andWhere('app.institute = :institute')
             ->setParameter('institute', $institute);
     } else {
-        // If no institute selected, filter by user's managed institutes
         $user = $this->getUser();
         if ($user && in_array('ROLE_USER', $user->getRoles()) && !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
             $managedInstitutes = $this->instituteRepository->findBy(['manager' => $user]);
@@ -239,7 +244,6 @@ private function getDailyAttendanceWithAbsent(
         ->setParameter('date', $startDate)
         ->orderBy('att.check_in_time', 'ASC');
     
-    // Apply institute filter to attendance query too
     if ($institute) {
         $attendanceQb->andWhere('att.institute = :institute')
             ->setParameter('institute', $institute);
@@ -257,15 +261,39 @@ private function getDailyAttendanceWithAbsent(
         $attendanceByApplication[$appId][] = $record;
     }
     
+    // Get min hours per day from institute config
+    $minHoursByInstitute = [];
+    foreach ($allStudents as $student) {
+        $instId = $student->getInstitute()?->getId();
+        if ($instId && !isset($minHoursByInstitute[$instId])) {
+            $institute = $this->instituteRepository->find($instId);
+            if ($institute && $institute->getSchoolHoursConfig()) {
+                $minHoursByInstitute[$instId] = $institute->getSchoolHoursConfig()->getMinHoursPerDay() ?? 0;
+            } else {
+                $minHoursByInstitute[$instId] = 0;
+            }
+        }
+    }
+    
     // Process each student
     $result = [];
     foreach ($allStudents as $student) {
         $appId = $student->getId();
         $records = $attendanceByApplication[$appId] ?? [];
         
+        // Check if student is excused
+        $excuse = $this->isStudentExcused($student, $date);
+        $isExcused = $excuse !== null;
+        $excuseReason = $isExcused ? $excuse->getReason() : null;
+        $excuseHoursPerDay = $isExcused ? $excuse->getExcusedHoursPerDay() : null;
+        
         if (empty($records)) {
-            // Student has no attendance records - mark as absent
-            $studentStatus = 'absent';
+            // Student has no attendance records
+            if ($isExcused) {
+                $studentStatus = 'excused';
+            } else {
+                $studentStatus = 'absent';
+            }
             $checkInTime = null;
             $checkOutTime = null;
             $totalHours = 0;
@@ -273,8 +301,7 @@ private function getDailyAttendanceWithAbsent(
             $isVerified = false;
             $hasVirtualCheckout = false;
         } else {
-            // Student has attendance records - mark as present
-            // Sort by check-in time
+            // Student has attendance records
             usort($records, function($a, $b) {
                 return $a->getCheckInTime() <=> $b->getCheckInTime();
             });
@@ -282,11 +309,9 @@ private function getDailyAttendanceWithAbsent(
             $firstRecord = $records[0];
             $lastRecord = end($records);
             
-            // Get check-in and check-out times
             $checkInTime = $firstRecord->getCheckInTime();
             $checkOutTime = $lastRecord->getCheckOutTime();
             
-            // If check-out is null, use the last check-in time as check-out
             if (!$checkOutTime) {
                 $checkOutTime = $lastRecord->getCheckInTime();
                 $hasVirtualCheckout = true;
@@ -301,7 +326,6 @@ private function getDailyAttendanceWithAbsent(
                 $totalHours = $interval->h + ($interval->i / 60) + ($interval->s / 3600);
             }
 
-            // Force status to 'present' since they have attendance records
             $studentStatus = 'present';
             $isVerified = $lastRecord->isIsVerified();
         }
@@ -311,11 +335,20 @@ private function getDailyAttendanceWithAbsent(
             continue;
         }
         
+        // Get expected hours for the day
+        $instId = $student->getInstitute()?->getId();
+        $expectedHours = $minHoursByInstitute[$instId] ?? 0;
+        
+        // Calculate hours percentage
+        $hoursPercentage = $expectedHours > 0 ? round(($totalHours / $expectedHours) * 100, 2) : 0;
+        
         $result[] = [
             'application' => $student,
             'check_in' => $checkInTime,
             'check_out' => $checkOutTime,
             'total_hours' => $totalHours,
+            'expected_hours' => $expectedHours,
+            'hours_percentage' => $hoursPercentage,
             'status' => $studentStatus,
             'records_count' => count($records),
             'is_verified' => $isVerified,
@@ -324,7 +357,12 @@ private function getDailyAttendanceWithAbsent(
             'has_virtual_checkout' => $hasVirtualCheckout ?? false,
             'institute' => $student->getInstitute(),
             'course' => $student->getCourse(),
-            'created_at' => $student->getCreatedAt() // For sorting
+            'created_at' => $student->getCreatedAt(),
+            // Excuse data
+            'is_excused' => $isExcused,
+            'excuse_reason' => $excuseReason,
+            'excuse_hours_per_day' => $excuseHoursPerDay,
+            'excuse' => $excuse,
         ];
     }
     
@@ -1059,7 +1097,7 @@ private function getMonthlyAttendanceDataWithRequiredHours(
     $applicantId = null, 
     $instituteId = null,
     array $managedInstitutes = [],
-    $courseId = null // Add course parameter
+    $courseId = null
 ): array {
     // Build query to get all attendance records for the month
     $qb = $this->entityManager->createQueryBuilder();
@@ -1069,17 +1107,17 @@ private function getMonthlyAttendanceDataWithRequiredHours(
             'app.phone as phone',
             'inst.id as institute_id',
             'inst.name as institute_name',
-            'course.id as course_id', // ADD THIS
-            'course.name as course_name' // ADD THIS
+            'course.id as course_id',
+            'course.name as course_name'
         ])
         ->from(KaabaAttendance::class, 'att')
         ->join('att.application', 'app')
         ->leftJoin('att.institute', 'inst')
-        ->leftJoin('app.course', 'course') // ADD THIS - join with application's course
+        ->leftJoin('app.course', 'course')
         ->where('att.attendance_date BETWEEN :startDate AND :endDate')
         ->setParameter('startDate', $startDate)
         ->setParameter('endDate', $endDate)
-        ->groupBy('app.id', 'app.full_name', 'app.phone', 'inst.id', 'inst.name', 'course.id', 'course.name') // Update group by
+        ->groupBy('app.id', 'app.full_name', 'app.phone', 'inst.id', 'inst.name', 'course.id', 'course.name')
         ->orderBy('app.full_name', 'ASC');
 
     if ($applicantId) {
@@ -1092,20 +1130,17 @@ private function getMonthlyAttendanceDataWithRequiredHours(
            ->setParameter('instituteId', $instituteId);
     }
     
-    // Add course filter if provided
     if ($courseId) {
         $qb->andWhere('course.id = :courseId')
            ->setParameter('courseId', $courseId);
     }
     
-    // Filter by user's managed institutes if they're not a super admin
     $user = $this->getUser();
     if ($user && in_array('ROLE_USER', $user->getRoles()) && !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
         if (!empty($managedInstitutes)) {
             $qb->andWhere('att.institute IN (:institutes)')
                ->setParameter('institutes', $managedInstitutes);
         } else {
-            // If no managed institutes, return empty array
             return [];
         }
     }
@@ -1115,9 +1150,18 @@ private function getMonthlyAttendanceDataWithRequiredHours(
     $monthlyData = [];
     $today = new \DateTime();
     $today->setTime(0, 0, 0);
+    $periodEnd = min($endDate, $today);
+    
+    // Pre-fetch all applications for excuses
+    $applicationIds = array_column($results, 'application_id');
     
     foreach ($results as $result) {
         $appId = $result['application_id'];
+        $application = $this->applicationRepository->find($appId);
+        
+        if (!$application) {
+            continue;
+        }
         
         // Get institute's minimum hours configuration
         $minHoursPerDay = 0;
@@ -1131,21 +1175,58 @@ private function getMonthlyAttendanceDataWithRequiredHours(
         // Calculate required working days (INCLUDING future dates)
         $requiredDays = $this->calculateRequiredWorkingDays($startDate, $endDate);
         
-        // Calculate required hours total for the month
-        $requiredHoursTotal = $minHoursPerDay > 0 ? $requiredDays * $minHoursPerDay : 0;
+        // Calculate required hours total for the month (expected hours)
+        $expectedHours = $minHoursPerDay > 0 ? $requiredDays * $minHoursPerDay : 0;
         
         // Get all distinct attendance dates for this application (up to today only)
-        $attendanceDates = $this->getAttendanceDatesForApplicationUpToToday($appId, $startDate, min($endDate, $today));
+        $attendanceDates = $this->getAttendanceDatesForApplicationUpToToday($appId, $startDate, $periodEnd);
         
         // Calculate total hours worked and days present
         $totalHours = 0;
-        $daysPresentUpToToday = count($attendanceDates); // If there's attendance for a date, count it as present
+        $daysPresentUpToToday = count($attendanceDates);
         
         foreach ($attendanceDates as $date) {
-            // Get attendance for this specific date
             $attendance = $this->getAttendanceForDateAndApplication($date, $appId);
-            $totalHours += $attendance['total_hours'];
+            $totalHours += $attendance['total_hours'] ?? 0;
         }
+        
+        // Get excused days for this student in the period
+        $excusedDays = $this->getExcusedDaysCount($application, $startDate, $periodEnd);
+        
+        // Get active excuses with details
+        $excuses = $this->excuseRepository->findExcusesForDateRange($application, null, $startDate, $periodEnd);
+        $totalExcusedHours = 0;
+        $excuseDetails = [];
+        
+        foreach ($excuses as $excuse) {
+            if ($excuse->isIsApproved()) {
+                $excuseHours = $excuse->getTotalExcusedHours();
+                $totalExcusedHours += $excuseHours;
+                $excuseDetails[] = [
+                    'id' => $excuse->getId(),
+                    'start_date' => $excuse->getStartDate(),
+                    'end_date' => $excuse->getEndDate(),
+                    'reason' => $excuse->getReason(),
+                    'excuse_type' => $excuse->getExcuseType(),
+                    'excused_hours_per_day' => $excuse->getExcusedHoursPerDay(),
+                    'total_excused_days' => $excuse->getTotalExcusedDays(),
+                    'total_excused_hours' => $excuseHours
+                ];
+            }
+        }
+        
+        // Calculate effective days (present days + excused days)
+        $effectiveDays = $daysPresentUpToToday + $excusedDays;
+        
+        // Calculate attendance percentage based on effective days (safe with zero check)
+        $attendancePercentage = $requiredDays > 0 ? round(($effectiveDays / $requiredDays) * 100, 2) : 0;
+        
+        // Calculate hours percentage (safe with zero check)
+        $hoursPercentage = $expectedHours > 0 ? round(($totalHours / $expectedHours) * 100, 2) : 0;
+        
+        // Calculate remaining required hours (excluding excused hours)
+        $remainingRequiredHours = max(0, $expectedHours - $totalExcusedHours);
+        $hoursStatus = $expectedHours > 0 ? ($totalHours >= $remainingRequiredHours ? 'met' : 'not_met') : 'not_applicable';
         
         $monthlyData[] = [
             'application_id' => $appId,
@@ -1153,16 +1234,28 @@ private function getMonthlyAttendanceDataWithRequiredHours(
             'phone' => $result['phone'],
             'institute_id' => $result['institute_id'],
             'institute_name' => $result['institute_name'],
-            'course_id' => $result['course_id'], // ADD THIS
-            'course_name' => $result['course_name'], // ADD THIS
+            'course_id' => $result['course_id'],
+            'course_name' => $result['course_name'],
             'days_present' => $daysPresentUpToToday,
-            'total_hours' => $totalHours,
+            'excused_days' => $excusedDays,
+            'effective_days' => $effectiveDays,
+            'total_hours' => round($totalHours, 2),
+            'expected_hours' => round($expectedHours, 2),
+            'hours_percentage' => $hoursPercentage,
+            'remaining_required_hours' => round($remainingRequiredHours, 2),
+            'hours_status' => $hoursStatus,
             'required_days' => $requiredDays,
-            'required_hours_total' => $requiredHoursTotal,
             'min_hours_per_day' => $minHoursPerDay,
-            'attendance_percentage' => $requiredDays > 0 ? round(($daysPresentUpToToday / $requiredDays) * 100, 2) : 0
+            'attendance_percentage' => $attendancePercentage,
+            'excuse_details' => $excuseDetails,
+            'total_excused_hours' => round($totalExcusedHours, 2),
         ];
     }
+    
+    // Sort by attendance percentage (lowest first to highlight issues)
+    usort($monthlyData, function($a, $b) {
+        return $a['attendance_percentage'] <=> $b['attendance_percentage'];
+    });
     
     return $monthlyData;
 }
@@ -1484,7 +1577,8 @@ private function calculateRequiredWorkingDays(\DateTime $startDate, \DateTime $e
         $currentDate->modify('+1 day');
     }
     
-    return $requiredDays;
+    // Ensure at least 1 to avoid division by zero
+    return max(1, $requiredDays);
 }
 
 private function countHolidays(\DateTime $startDate, \DateTime $endDate): int
@@ -1516,15 +1610,36 @@ private function calculateMonthlyStatistics(array $monthlyData, \DateTime $start
     $totalDaysPresent = 0;
     $totalHours = 0;
     $totalRequiredHours = 0;
+    $totalExcusedDays = 0;
+    $totalEffectiveDays = 0;
     
     foreach ($monthlyData as $data) {
-        $totalDaysPresent += $data['days_present'];
-        $totalHours += $data['total_hours'];
-        $totalRequiredHours += $data['required_hours_total'];
+        $totalDaysPresent += $data['days_present'] ?? 0;
+        $totalHours += $data['total_hours'] ?? 0;
+        $totalRequiredHours += $data['expected_hours'] ?? 0;
+        $totalExcusedDays += $data['excused_days'] ?? 0;
+        $totalEffectiveDays += $data['effective_days'] ?? 0;
     }
     
+    // Avoid division by zero
     $averageDaysPresent = $totalStudents > 0 ? round($totalDaysPresent / $totalStudents, 2) : 0;
     $averageHours = $totalStudents > 0 ? round($totalHours / $totalStudents, 2) : 0;
+    $averageEffectiveDays = $totalStudents > 0 ? round($totalEffectiveDays / $totalStudents, 2) : 0;
+    
+    // Calculate overall attendance percentage - SAFE with zero check
+    $overallAttendancePercentage = 0;
+    if ($totalStudents > 0 && $totalRequiredDays > 0) {
+        $maxPossibleDays = $totalStudents * $totalRequiredDays;
+        if ($maxPossibleDays > 0) {
+            $overallAttendancePercentage = round(($totalEffectiveDays / $maxPossibleDays) * 100, 2);
+        }
+    }
+    
+    // Calculate overall hours percentage - SAFE with zero check
+    $overallHoursPercentage = 0;
+    if ($totalRequiredHours > 0) {
+        $overallHoursPercentage = round(($totalHours / $totalRequiredHours) * 100, 2);
+    }
     
     return [
         'total_students' => $totalStudents,
@@ -1532,13 +1647,17 @@ private function calculateMonthlyStatistics(array $monthlyData, \DateTime $start
         'holiday_count' => $holidayCount,
         'future_dates_count' => $futureDatesCount,
         'total_days_present' => $totalDaysPresent,
+        'total_excused_days' => $totalExcusedDays,
+        'total_effective_days' => $totalEffectiveDays,
         'total_hours' => round($totalHours, 2),
         'total_required_hours' => round($totalRequiredHours, 2),
         'average_days_present' => $averageDaysPresent,
-        'average_hours' => $averageHours
+        'average_effective_days' => $averageEffectiveDays,
+        'average_hours' => $averageHours,
+        'overall_attendance_percentage' => $overallAttendancePercentage,
+        'overall_hours_percentage' => $overallHoursPercentage,
     ];
 }
-
 
 #[Route('/monthly-details/{id}', name: 'app_admin_attendance_monthly_details', methods: ['GET'])]
 public function monthlyDetails(int $id, Request $request): Response
@@ -1795,6 +1914,253 @@ private function getDailyAttendanceWithHoursCheck(\DateTime $date, int $applicat
         'required_hours' => $minHoursPerDay,
         'hours_deficit' => $hasSufficientHours ? 0 : max(0, $minHoursPerDay - $dayHours)
     ];
+}
+
+
+#[Route('/excuse/new', name: 'app_admin_attendance_excuse_new', methods: ['GET', 'POST'])]
+public function newExcuse(Request $request): Response
+{
+    $user = $this->getUser();
+    
+    // Get institutes managed by current user
+    if ($user && in_array('ROLE_USER', $user->getRoles()) && !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+        $managedInstitutes = $this->instituteRepository->findBy(['manager' => $user]);
+        if (empty($managedInstitutes)) {
+            $this->addFlash('warning', 'You do not manage any institutes to create excuses.');
+            return $this->redirectToRoute('app_admin_attendance_index');
+        }
+    } else {
+        $managedInstitutes = $this->instituteRepository->findAll();
+    }
+
+    $excuse = new KaabaStudentExcuse();
+    $excuse->setCreatedBy($user);
+    
+    $form = $this->createForm(StudentExcuseType::class, $excuse, [
+        'attr' => ['class' => 'excuse-form']
+    ]);
+    
+    $form->handleRequest($request);
+    
+    if ($form->isSubmitted() && $form->isValid()) {
+
+    $excuse->setInstitute($excuse->getApplication()->getInstitute());
+        // Ensure institute is set from the form
+        $excuse->setCreatedAt(new \DateTime());
+        
+        $this->entityManager->persist($excuse);
+        $this->entityManager->flush();
+        
+        $this->addFlash('success', sprintf(
+            'Excuse created for %s from %s to %s',
+            $excuse->getApplication()->getFullName(),
+            $excuse->getStartDate()->format('Y-m-d'),
+            $excuse->getEndDate() ? $excuse->getEndDate()->format('Y-m-d') : $excuse->getStartDate()->format('Y-m-d')
+        ));
+        
+        return $this->redirectToRoute('app_admin_attendance_excuse_list');
+    }
+    
+    return $this->render('admin/attendance/excuse_new.html.twig', [
+        'form' => $form->createView(),
+        'managedInstitutes' => $managedInstitutes,
+    ]);
+}
+
+#[Route('/excuse/list', name: 'app_admin_attendance_excuse_list', methods: ['GET'])]
+public function listExcuses(Request $request): Response
+{
+    $user = $this->getUser();
+    
+    // Get institutes managed by current user
+    if ($user && in_array('ROLE_USER', $user->getRoles()) && !in_array('ROLE_SUPER_ADMIN', $user->getRoles())) {
+        $managedInstitutes = $this->instituteRepository->findBy(['manager' => $user]);
+        $instituteIds = array_map(function($inst) { return $inst->getId(); }, $managedInstitutes);
+        
+        if (empty($managedInstitutes)) {
+            $this->addFlash('warning', 'You do not manage any institutes to view excuses.');
+            return $this->render('admin/attendance/excuse_list.html.twig', [
+                'excuses' => [],
+                'no_institutes' => true,
+                'stats' => ['total' => 0, 'approved' => 0, 'pending' => 0],
+                'managedInstitutes' => []
+            ]);
+        }
+        
+        // Get excuses for managed institutes
+        $qb = $this->excuseRepository->createQueryBuilder('e')
+            ->leftJoin('e.institute', 'inst')
+            ->where('inst.id IN (:instituteIds)')
+            ->setParameter('instituteIds', $instituteIds)
+            ->orderBy('e.created_at', 'DESC');
+    } else {
+        // Super admin can see all
+        $qb = $this->excuseRepository->createQueryBuilder('e')
+            ->orderBy('e.created_at', 'DESC');
+    }
+    
+    // Apply filters
+    $status = $request->query->get('status');
+    if ($status === 'approved') {
+        $qb->andWhere('e.is_approved = true');
+    } elseif ($status === 'pending') {
+        $qb->andWhere('e.is_approved = false');
+    }
+    
+    $instituteFilter = $request->query->get('institute');
+    if ($instituteFilter) {
+        $qb->andWhere('e.institute = :instituteFilter')
+           ->setParameter('instituteFilter', $instituteFilter);
+    }
+    
+    $excuses = $qb->getQuery()->getResult();
+    
+    // Calculate statistics
+    $stats = [
+        'total' => count($excuses),
+        'approved' => count(array_filter($excuses, fn($e) => $e->isIsApproved())),
+        'pending' => count(array_filter($excuses, fn($e) => !$e->isIsApproved())),
+    ];
+    
+    return $this->render('admin/attendance/excuse_list.html.twig', [
+        'excuses' => $excuses,
+        'stats' => $stats,
+        'no_institutes' => false,
+        'managedInstitutes' => $managedInstitutes ?? $this->instituteRepository->findAll(),
+        'current_status_filter' => $status,
+        'current_institute_filter' => $instituteFilter,
+    ]);
+}
+
+#[Route('/excuse/{id}/confirm', name: 'app_admin_attendance_excuse_confirm', methods: ['GET', 'POST'])]
+public function confirmExcuse(int $id, Request $request): Response
+{
+    $excuse = $this->excuseRepository->find($id);
+    
+    if (!$excuse) {
+        $this->addFlash('error', 'Excuse not found.');
+        return $this->redirectToRoute('app_admin_attendance_excuse_list');
+    }
+    
+    $user = $this->getUser();
+    
+    // Check permission
+    $institute = $excuse->getInstitute();
+    $userInstitutes = $this->instituteRepository->findBy(['manager' => $user]);
+    $isManager = false;
+    foreach ($userInstitutes as $userInstitute) {
+        if ($userInstitute->getId() === $institute->getId()) {
+            $isManager = true;
+            break;
+        }
+    }
+    
+    if (!in_array('ROLE_SUPER_ADMIN', $user->getRoles()) && !$isManager) {
+        $this->addFlash('error', 'You do not have permission to confirm this excuse.');
+        return $this->redirectToRoute('app_admin_attendance_excuse_list');
+    }
+    
+    $form = $this->createForm(ExcuseConfirmationType::class, $excuse);
+    $form->handleRequest($request);
+    
+    if ($form->isSubmitted() && $form->isValid()) {
+        if ($excuse->isIsApproved()) {
+            $excuse->setApprovedBy($user);
+            $excuse->setApprovedAt(new \DateTime());
+        }
+        $excuse->setUpdatedAt(new \DateTime());
+        
+        $this->entityManager->flush();
+        
+        $status = $excuse->isIsApproved() ? 'approved' : 'rejected';
+        $this->addFlash('success', sprintf('Excuse has been %s successfully.', $status));
+        
+        return $this->redirectToRoute('app_admin_attendance_excuse_list');
+    }
+    
+    // Get attendance records for the excuse period
+    $attendanceRecords = [];
+    $excuseDates = $excuse->getExcuseDates();
+    foreach ($excuseDates as $date) {
+        $attendance = $this->attendanceRepository->findAttendanceByApplicationAndDate(
+            $excuse->getApplication()->getId(),
+            $date
+        );
+        if ($attendance) {
+            $attendanceRecords[$date->format('Y-m-d')] = $attendance;
+        }
+    }
+    
+    return $this->render('admin/attendance/excuse_confirm.html.twig', [
+        'excuse' => $excuse,
+        'form' => $form->createView(),
+        'attendanceRecords' => $attendanceRecords,
+    ]);
+}
+
+#[Route('/excuse/{id}/delete', name: 'app_admin_attendance_excuse_delete', methods: ['POST'])]
+public function deleteExcuse(int $id, Request $request): Response
+{
+    $excuse = $this->excuseRepository->find($id);
+    
+    if (!$excuse) {
+        $this->addFlash('error', 'Excuse not found.');
+        return $this->redirectToRoute('app_admin_attendance_excuse_list');
+    }
+    
+    if ($this->isCsrfTokenValid('delete_excuse_' . $excuse->getId(), $request->request->get('_token'))) {
+        $this->entityManager->remove($excuse);
+        $this->entityManager->flush();
+        $this->addFlash('success', 'Excuse deleted successfully.');
+    } else {
+        $this->addFlash('error', 'Invalid CSRF token.');
+    }
+    
+    return $this->redirectToRoute('app_admin_attendance_excuse_list');
+}
+
+// Helper method to check if a student is excused on a specific date
+private function isStudentExcused(KaabaApplication $application, \DateTimeInterface $date): ?KaabaStudentExcuse
+{
+    $excuses = $this->excuseRepository->findActiveExcusesForDate($application, $date);
+    return !empty($excuses) ? $excuses[0] : null;
+}
+
+// Helper method to get total excused days for a student in a period
+private function getExcusedDaysCount(KaabaApplication $application, \DateTimeInterface $startDate, \DateTimeInterface $endDate): int
+{
+    return $this->excuseRepository->findExcusedDaysCountForPeriod($application, $startDate, $endDate);
+}
+
+// Also add this helper method if needed:
+private function getExcusedHoursForPeriod(KaabaApplication $application, \DateTimeInterface $startDate, \DateTimeInterface $endDate): float
+{
+    return $this->excuseRepository->findExcusedHoursForPeriod($application, $startDate, $endDate);
+}
+
+
+#[Route('/students-by-institute/{instituteId}', name: 'app_admin_attendance_students_by_institute', methods: ['GET'])]
+public function getStudentsByInstitute(int $instituteId): JsonResponse
+{
+    $students = $this->applicationRepository->createQueryBuilder('app')
+        ->leftJoin('app.studentDevice', 'sd')
+        ->where('app.institute = :instituteId')
+        ->andWhere('sd IS NOT NULL')
+        ->setParameter('instituteId', $instituteId)
+        ->orderBy('app.full_name', 'ASC')
+        ->getQuery()
+        ->getResult();
+    
+    $studentArray = [];
+    foreach ($students as $student) {
+        $studentArray[] = [
+            'id' => $student->getId(),
+            'full_name' => $student->getFullName(),
+            'phone' => $student->getPhone(),
+        ];
+    }
+    
+    return $this->json(['students' => $studentArray]);
 }
 
 }

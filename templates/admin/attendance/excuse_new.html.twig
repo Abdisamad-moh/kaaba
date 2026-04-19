@@ -1,0 +1,182 @@
+{# templates/admin/attendance/excuse_new.html.twig #}
+{% extends 'admin_base2.html.twig' %}
+
+{% block title %}Create Student Excuse - Admin{% endblock %}
+
+{% block body %}
+    <!-- Page Header -->
+    <div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+        <div class="card-body px-4 py-3">
+            <div class="row align-items-center">
+                <div class="col-9">
+                    <h4 class="fw-semibold mb-8">Create Student Excuse</h4>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a class="text-muted text-decoration-none" href="#">Admin</a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a class="text-muted text-decoration-none" href="{{ path('app_admin_attendance_excuse_list') }}">Excuses</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">Create</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-3">
+                    <div class="text-end">
+                        <a href="{{ path('app_admin_attendance_excuse_list') }}" class="btn btn-outline-secondary">
+                            <i class="ti ti-arrow-left me-2"></i>Back to List
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            {{ form_start(form, {'attr': {'class': 'row g-3'}}) }}
+                
+                <div class="col-md-6">
+                    {{ form_label(form.application) }}
+                    {{ form_widget(form.application) }}
+                    {{ form_errors(form.application) }}
+                </div>
+                
+                <div class="col-md-4">
+                    {{ form_label(form.start_date) }}
+                    {{ form_widget(form.start_date) }}
+                    {{ form_errors(form.start_date) }}
+                    <small class="text-muted">First day of absence</small>
+                </div>
+                
+                <div class="col-md-4">
+                    {{ form_label(form.end_date) }}
+                    {{ form_widget(form.end_date) }}
+                    {{ form_errors(form.end_date) }}
+                    <small class="text-muted">Leave empty for single day</small>
+                </div>
+                
+                <div class="col-md-4">
+                    {{ form_label(form.excuse_type) }}
+                    {{ form_widget(form.excuse_type) }}
+                    {{ form_errors(form.excuse_type) }}
+                </div>
+                
+                <div class="col-md-6">
+                    {{ form_label(form.excused_hours_per_day) }}
+                    {{ form_widget(form.excused_hours_per_day) }}
+                    {{ form_errors(form.excused_hours_per_day) }}
+                    <small class="text-muted">{{ form.excused_hours_per_day.vars.help|raw }}</small>
+                </div>
+                
+                <div class="col-12">
+                    {{ form_label(form.reason) }}
+                    {{ form_widget(form.reason) }}
+                    {{ form_errors(form.reason) }}
+                </div>
+                
+                <div class="col-12">
+                    {{ form_label(form.admin_notes) }}
+                    {{ form_widget(form.admin_notes) }}
+                    {{ form_errors(form.admin_notes) }}
+                </div>
+                
+                <div class="col-12">
+                    <hr>
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{{ path('app_admin_attendance_excuse_list') }}" class="btn btn-outline-secondary">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="ti ti-device-floppy me-2"></i>Create Excuse
+                        </button>
+                    </div>
+                </div>
+                
+            {{ form_end(form) }}
+        </div>
+    </div>
+    
+    <div class="card mt-4">
+        <div class="card-body">
+            <h5 class="card-title">Information</h5>
+            <div class="alert alert-info">
+                <i class="ti ti-info-circle me-2"></i>
+                <strong>About Excuses:</strong>
+                <ul class="mb-0 mt-2">
+                    <li>Excuses mark a student as excused for the specified date(s)</li>
+                    <li>Excused days count toward attendance (considered "effective" attendance)</li>
+                    <li>If no end date is provided, only the start date is considered</li>
+                    <li>You can specify excused hours per day (leave empty to excuse full day)</li>
+                    <li>Excuses need to be approved by a manager or admin to take effect</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Filter students by selected institute
+            const instituteSelect = document.querySelector('#student_excuse_institute');
+            const studentSelect = document.querySelector('#student_excuse_application');
+            
+            if (instituteSelect && studentSelect) {
+                const originalOptions = studentSelect.innerHTML;
+                
+                instituteSelect.addEventListener('change', function() {
+                    const instituteId = this.value;
+                    
+                    if (!instituteId) {
+                        studentSelect.innerHTML = originalOptions;
+                        studentSelect.disabled = false;
+                        return;
+                    }
+                    
+                    studentSelect.innerHTML = '<option value="">Loading students...</option>';
+                    studentSelect.disabled = true;
+                    
+                    fetch(`/admin/attendance/students-by-institute/${instituteId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            studentSelect.innerHTML = '<option value="">Select student</option>';
+                            
+                            if (data.students && data.students.length > 0) {
+                                data.students.forEach(student => {
+                                    const option = document.createElement('option');
+                                    option.value = student.id;
+                                    option.textContent = student.full_name + ' (' + student.phone + ')';
+                                    studentSelect.appendChild(option);
+                                });
+                                studentSelect.disabled = false;
+                            } else {
+                                studentSelect.innerHTML = '<option value="">No students found</option>';
+                                studentSelect.disabled = true;
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            studentSelect.innerHTML = '<option value="">Error loading students</option>';
+                            studentSelect.disabled = false;
+                        });
+                });
+            }
+            
+            // Date range validation
+            const startDate = document.querySelector('#student_excuse_start_date');
+            const endDate = document.querySelector('#student_excuse_end_date');
+            
+            if (startDate && endDate) {
+                endDate.addEventListener('change', function() {
+                    if (startDate.value && this.value && new Date(this.value) < new Date(startDate.value)) {
+                        alert('End date cannot be before start date');
+                        this.value = startDate.value;
+                    }
+                });
+            }
+        });
+    </script>
+{% endblock %}
