@@ -1,62 +1,65 @@
 {# templates/admin/attendance/index.html.twig #}
 
 {% extends 'admin_base2.html.twig' %}
-{% block title %}Daily Attendance - Admin
-{% endblock %}
+{% block title %}Daily Attendance - Admin{% endblock %}
 
 {% block body %}
-	<!-- Page Header -->
-	<div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
-		<div class="card-body px-4 py-3">
-			<div class="row align-items-center">
-				<div class="col-9">
-					<h4 class="fw-semibold mb-8">Daily Attendance</h4>
-					<nav aria-label="breadcrumb">
-						<ol class="breadcrumb">
-							<li class="breadcrumb-item">
-								<a class="text-muted text-decoration-none" href="#">Admin</a>
-							</li>
-							<li class="breadcrumb-item">
-								<a class="text-muted text-decoration-none" href="#">Dashboard</a>
-							</li>
-							<li class="breadcrumb-item active" aria-current="page">Daily Attendance</li>
-						</ol>
-					</nav>
-				</div>
-				<div class="col-3">
-					<div class="text-end">
-						<a href="{{ path('app_admin_attendance_monthly_report') }}" class="btn btn-outline-info me-2">
+    <!-- Page Header -->
+    <div class="card bg-info-subtle shadow-none position-relative overflow-hidden mb-4">
+        <div class="card-body px-4 py-3">
+            <div class="row align-items-center">
+                <div class="col-9">
+                    <h4 class="fw-semibold mb-8">Daily Attendance</h4>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a class="text-muted text-decoration-none" href="#">Admin</a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a class="text-muted text-decoration-none" href="#">Dashboard</a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">Daily Attendance</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="col-3">
+                    <div class="text-end">
+                        <a href="{{ path('app_admin_attendance_monthly_report') }}" class="btn btn-outline-info me-2">
                             <i class="ti ti-calendar-stats me-2"></i>
                             Monthly Report
                         </a>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+                        <a href="{{ path('app_admin_attendance_excuse_list') }}" class="btn btn-outline-warning">
+                            <i class="ti ti-alert-circle me-2"></i>
+                            Excuses
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-	{% if no_institutes %}
-		<div class="alert alert-warning" role="alert">
-			<i class="ti ti-alert-circle me-2"></i>
-			You do not manage any institutes to view attendance. Please contact the administrator.
-		</div>
-	{% else %}
-		<!-- Day Type Indicator -->
-		{% if isHoliday %}
-			<div class="alert alert-info mb-4" role="alert">
-				<i class="ti ti-calendar-event me-2"></i>
-				<strong>Today is a Holiday:</strong> {{ selectedDate|date('F j, Y') }} - No attendance required
-			</div>
-		{% elseif not isSchoolDay %}
-			<div class="alert alert-secondary mb-4" role="alert">
-				<i class="ti ti-calendar-off me-2"></i>
-				<strong>Weekend:</strong> {{ selectedDate|date('F j, Y') }} - No school today
-			</div>
-		{% endif %}
+    {% if no_institutes %}
+        <div class="alert alert-warning" role="alert">
+            <i class="ti ti-alert-circle me-2"></i>
+            You do not manage any institutes to view attendance. Please contact the administrator.
+        </div>
+    {% else %}
+        <!-- Day Type Indicator -->
+        {% if isHoliday %}
+            <div class="alert alert-info mb-4" role="alert">
+                <i class="ti ti-calendar-event me-2"></i>
+                <strong>Today is a Holiday:</strong> {{ selectedDate|date('F j, Y') }} - No attendance required
+            </div>
+        {% elseif not isSchoolDay %}
+            <div class="alert alert-secondary mb-4" role="alert">
+                <i class="ti ti-calendar-off me-2"></i>
+                <strong>Weekend:</strong> {{ selectedDate|date('F j, Y') }} - No school today
+            </div>
+        {% endif %}
 
-		<!-- Filters Card -->
-		<div class="card mb-4">
-			<div class="card-body">
+        <!-- Filters Card -->
+        <div class="card mb-4">
+            <div class="card-body">
                 {{ form_start(searchForm, {'attr': {'class': 'row g-3'}}) }}
                     <div class="col-md-2">
                         {{ form_label(searchForm.date) }}
@@ -75,14 +78,13 @@
                         {{ form_label(searchForm.institute) }}
                         {{ form_widget(searchForm.institute, {'attr': {'class': 'form-control institute-select'}}) }}
                     </div>
-                  <div class="col-md-2">
-    {{ form_label(searchForm.course) }}
-    {{ form_widget(searchForm.course, {'attr': {
-        'class': 'form-control course-select',
-        'data-selected-course': selected_course_id|default('')
-    }}) }}
-</div>
-
+                    <div class="col-md-2">
+                        {{ form_label(searchForm.course) }}
+                        {{ form_widget(searchForm.course, {'attr': {
+                            'class': 'form-control course-select',
+                            'data-selected-course': selected_course_id|default('')
+                        }}) }}
+                    </div>
                     <div class="col-md-2">
                         {{ form_label(searchForm.status) }}
                         {{ form_widget(searchForm.status, {'attr': {'class': 'form-control'}}) }}
@@ -96,288 +98,306 @@
                         </a>
                     </div>
                 {{ form_end(searchForm) }}
-			</div>
-		</div>
-
-    <!-- Statistics Cards - Only show for school days -->
-    {% if isSchoolDay and not isHoliday %}
-        <div class="row mb-4">
-            <div class="col-md-4">
-                <div class="card border-start border-primary border-3">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="text-muted fw-semibold mb-1">Total Students</h6>
-                                <h4 class="fw-semibold mb-0">{{ stats.total_students }}</h4>
-                                <small class="text-muted">All enrolled students</small>
-                            </div>
-                            <div class="bg-primary text-white rounded-circle p-3">
-                                <i class="ti ti-users fs-6"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card border-start border-success border-3">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="text-muted fw-semibold mb-1">Present Today</h6>
-                                <h4 class="fw-semibold mb-0">{{ stats.present }}</h4>
-                                <small class="text-muted">Students with check-in</small>
-                            </div>
-                            <div class="bg-success text-white rounded-circle p-3">
-                                <i class="ti ti-check fs-6"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card border-start border-danger border-3">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <h6 class="text-muted fw-semibold mb-1">Absent Today</h6>
-                                <h4 class="fw-semibold mb-0">{{ stats.absent }}</h4>
-                                <small class="text-muted">No check-in recorded</small>
-                            </div>
-                            <div class="bg-danger text-white rounded-circle p-3">
-                                <i class="ti ti-x fs-6"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
-        
-      
-    {% endif %}
 
-    <!-- Attendance Table -->
-    <div class="card">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h5 class="card-title mb-0">
-                    {% if isHoliday %}
-                        Holiday: {{ selectedDate|date('F j, Y') }}
-                    {% elseif not isSchoolDay %}
-                        Weekend: {{ selectedDate|date('F j, Y') }}
-                    {% else %}
-                        Attendance for {{ selectedDate|date('F j, Y') }}
+        <!-- Statistics Cards - Only show for school days -->
+        {% if isSchoolDay and not isHoliday %}
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card border-start border-primary border-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted fw-semibold mb-1">Total Students</h6>
+                                    <h4 class="fw-semibold mb-0">{{ stats.total_students }}</h4>
+                                    <small class="text-muted">All enrolled students</small>
+                                </div>
+                                <div class="bg-primary text-white rounded-circle p-3">
+                                    <i class="ti ti-users fs-6"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-start border-success border-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted fw-semibold mb-1">Present Today</h6>
+                                    <h4 class="fw-semibold mb-0">{{ stats.present }}</h4>
+                                    <small class="text-muted">Students with check-in</small>
+                                </div>
+                                <div class="bg-success text-white rounded-circle p-3">
+                                    <i class="ti ti-check fs-6"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card border-start border-danger border-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="text-muted fw-semibold mb-1">Absent Today</h6>
+                                    <h4 class="fw-semibold mb-0">{{ stats.absent }}</h4>
+                                    <small class="text-muted">No check-in recorded</small>
+                                </div>
+                                <div class="bg-danger text-white rounded-circle p-3">
+                                    <i class="ti ti-x fs-6"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Attendance Table -->
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="card-title mb-0">
+                        {% if isHoliday %}
+                            Holiday: {{ selectedDate|date('F j, Y') }}
+                        {% elseif not isSchoolDay %}
+                            Weekend: {{ selectedDate|date('F j, Y') }}
+                        {% else %}
+                            Attendance for {{ selectedDate|date('F j, Y') }}
+                        {% endif %}
+                    </h5>
+                    {% if isSchoolDay and not isHoliday %}
+                        <div>
+                            <span class="badge bg-primary me-2">Total: {{ stats.total_students }}</span>
+                            <span class="badge bg-success me-2">Present: {{ stats.present }}</span>
+                            <span class="badge bg-danger me-2">Absent: {{ stats.absent }}</span>
+                            <span class="badge bg-info">Total Hours: {{ stats.total_hours|number_format(2) }}</span>
+                        </div>
                     {% endif %}
-                </h5>
-                {% if isSchoolDay and not isHoliday %}
-                    <div>
-                        <span class="badge bg-primary me-2">Total: {{ stats.total_students }}</span>
-                        <span class="badge bg-success me-2">Present: {{ stats.present }}</span>
-                        <span class="badge bg-danger me-2">Absent: {{ stats.absent }}</span>
-                        <span class="badge bg-info">Total Hours: {{ stats.total_hours|number_format(2) }}</span>
+                </div>
+
+                {% if attendanceData|length > 0 %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Application ID</th>
+                                    <th>Full Name</th>
+                                    <th>Institute</th>
+                                    <th>Course</th>
+                                    <th>Check In</th>
+                                    <th>Check Out</th>
+                                    <th>Total Hours</th>
+                                    <th>Expected Hrs</th>
+                                    <th>Hours Present</th>
+                                    <th>% of Expected</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for data in attendanceData %}
+                                    {% set app = data.application %}
+                                    {% set isExcused = data.is_excused|default(false) %}
+                                    {% set rowClass = '' %}
+                                    
+                                    {% if isExcused %}
+                                        {% set rowClass = 'table-warning' %}
+                                    {% elseif data.status == 'absent' %}
+                                        {% set rowClass = 'table-danger' %}
+                                    {% elseif data.status == 'present' %}
+                                        {% set rowClass = 'table-success' %}
+                                    {% endif %}
+                                    
+                                    <tr class="{{ rowClass }}">
+                                        <td>{{ loop.index }}</td>
+                                        <td>
+                                            <a href="{{ path('app_admin_kaaba_application_view', {'uuid': app.uuid}) }}" class="text-primary text-decoration-none">
+                                                #{{ app.id }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div>
+                                                    <h6 class="mb-0">{{ app.fullName }}</h6>
+                                                    <small class="text-muted">{{ app.phone }}</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% if data.institute %}
+                                                <span class="badge bg-info">{{ data.institute.name }}</span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">No Institute</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if data.course %}
+                                                <span class="badge bg-secondary">{{ data.course.name }}</span>
+                                            {% else %}
+                                                <span class="badge bg-light text-dark">No Course</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if data.check_in %}
+                                                <span class="badge bg-light text-dark">
+                                                    {{ data.check_in|date('h:i A') }}
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-danger">--</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {# FIXED: Show proper checkout status #}
+                                            {% if data.status == 'absent' or not data.check_in %}
+                                                <span class="badge bg-secondary">--</span>
+                                            {% elseif data.check_out and data.check_out != data.check_in %}
+                                                <span class="badge bg-light text-dark">
+                                                    {{ data.check_out|date('h:i A') }}
+                                                </span>
+                                            {% elseif data.check_out and data.check_out == data.check_in %}
+                                                <span class="badge bg-warning" title="Student checked in but not checked out">
+                                                    <i class="ti ti-clock"></i> Not checked out
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-warning" title="No checkout recorded">
+                                                    <i class="ti ti-clock"></i> In progress
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% set totalHours = data.total_hours|default(0) %}
+                                            {% set hours = totalHours|round(0, 'floor') %}
+                                            {% set minutes = ((totalHours - hours) * 60)|round(0, 'floor') %}
+                                            
+                                            {% if totalHours > 0 %}
+                                                {% if hours > 0 %}
+                                                    {% if minutes > 0 %}
+                                                        <span class="badge bg-info">{{ hours }}hr {{ minutes }}min</span>
+                                                    {% else %}
+                                                        <span class="badge bg-info">{{ hours }}hr</span>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <span class="badge bg-info">{{ minutes }}min</span>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="badge bg-secondary">0min</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if data.expected_hours > 0 %}
+                                                <span class="badge bg-secondary">{{ data.expected_hours }} hrs</span>
+                                            {% else %}
+                                                <span class="badge bg-light text-dark">--</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% set totalMinutes = (data.total_hours * 60)|round(0, 'floor') %}
+                                            {% set hours = (totalMinutes / 60)|round(0, 'floor') %}
+                                            {% set minutes = totalMinutes - (hours * 60) %}
+                                            
+                                            {% if data.total_hours > 0 %}
+                                                <span class="badge bg-info">
+                                                    {% if hours < 1 %}
+                                                        {{ minutes }}min
+                                                    {% else %}
+                                                        {{ hours }}hr{% if minutes > 0 %} {{ minutes }}min{% endif %}
+                                                    {% endif %}
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-secondary">0min</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if data.expected_hours > 0 %}
+                                                {% set percent = (data.total_hours / data.expected_hours * 100)|round %}
+                                                {% if percent >= 100 %}
+                                                    <span class="badge bg-success">{{ percent }}%</span>
+                                                {% elseif percent >= 75 %}
+                                                    <span class="badge bg-warning">{{ percent }}%</span>
+                                                {% else %}
+                                                    <span class="badge bg-danger">{{ percent }}%</span>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="badge bg-light text-dark">--</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if isHoliday %}
+                                                <span class="badge bg-info">Holiday</span>
+                                            {% elseif not isSchoolDay %}
+                                                <span class="badge bg-secondary">Weekend</span>
+                                            {% elseif isExcused %}
+                                                <span class="badge bg-warning" 
+                                                      data-bs-toggle="tooltip" 
+                                                      title="{{ data.excuse_reason }}">
+                                                    Excused
+                                                    {% if data.excuse_hours_per_day %}
+                                                        ({{ data.excuse_hours_per_day }} hrs)
+                                                    {% endif %}
+                                                </span>
+                                            {% elseif data.status == 'present' %}
+                                                <span class="badge bg-success">Present</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Absent</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <div class="mb-3">
+                            {% if isHoliday %}
+                                <i class="ti ti-calendar-event fs-1 text-info"></i>
+                            {% elseif not isSchoolDay %}
+                                <i class="ti ti-calendar-off fs-1 text-secondary"></i>
+                            {% else %}
+                                <i class="ti ti-calendar-off fs-1 text-muted"></i>
+                            {% endif %}
+                        </div>
+                        <h5 class="text-muted">
+                            {% if isHoliday %}
+                                No attendance required - Holiday
+                            {% elseif not isSchoolDay %}
+                                No attendance required - Weekend
+                            {% else %}
+                                No students found for {{ selectedDate|date('F j, Y') }}
+                            {% endif %}
+                        </h5>
+                        <p class="text-muted mb-0">
+                            {% if searchForm.applicant.vars.value or searchForm.institute.vars.value or searchForm.course.vars.value or searchForm.status.vars.value %}
+                                Try adjusting your filters
+                            {% elseif isSchoolDay and not isHoliday %}
+                                No enrolled students found
+                            {% endif %}
+                        </p>
                     </div>
                 {% endif %}
             </div>
-
-            {% if attendanceData|length > 0 %}
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Application ID</th>
-                                <th>Full Name</th>
-                                <th>Institute</th>
-                                <th>Course</th>
-                                <th>Check In</th>
-                                <th>Check Out</th>
-                                <th>Total Hours</th>
-                                <th>Expected Hrs</th>
-<th>Hours Present</th>
-<th>% of Expected</th>
-<th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for data in attendanceData %}
-                                {% set app = data.application %}
-                                <tr class="{{ data.status == 'absent' ? 'table-danger' : 'table-success' }}">
-                                    <td>{{ loop.index }}</td>
-                                    <td>
-                                        <a href="{{ path('app_admin_kaaba_application_view', {'uuid': app.uuid}) }}" class="text-primary text-decoration-none">
-                                            #{{ app.id }}
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex align-items-center">
-                                            <div>
-                                                <h6 class="mb-0">{{ app.fullName }}</h6>
-                                                <small class="text-muted">{{ app.phone }}</small>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        {% if data.institute %}
-                                            <span class="badge bg-info">{{ data.institute.name }}</span>
-                                        {% else %}
-                                            <span class="badge bg-secondary">No Institute</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if data.course %}
-                                            <span class="badge bg-secondary">{{ data.course.name }}</span>
-                                        {% else %}
-                                            <span class="badge bg-light text-dark">No Course</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if data.check_in %}
-                                            <span class="badge bg-light text-dark">
-                                                {{ data.check_in|date('h:i A') }}
-                                            </span>
-                                        {% else %}
-                                            <span class="badge bg-danger">--</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if data.check_out %}
-                                            <span class="badge bg-light text-dark">
-                                                {{ data.check_out|date('h:i A') }}
-                                            </span>
-                                        {% else %}
-                                            <span class="badge bg-warning">--</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% set totalHours = data.total_hours|default(0) %}
-                                        {% set hours = totalHours|round(0, 'floor') %}
-                                        {% set minutes = ((totalHours - hours) * 60)|round(0, 'floor') %}
-                                        
-                                        {% if totalHours > 0 %}
-                                            {% if hours > 0 %}
-                                                {% if minutes > 0 %}
-                                                    <span class="badge bg-info">{{ hours }}hr {{ minutes }}min</span>
-                                                {% else %}
-                                                    <span class="badge bg-info">{{ hours }}hr</span>
-                                                {% endif %}
-                                            {% else %}
-                                                <span class="badge bg-info">{{ minutes }}min</span>
-                                            {% endif %}
-                                        {% else %}
-                                            <span class="badge bg-secondary">0min</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-    {% if data.expected_hours > 0 %}
-        <span class="badge bg-secondary">{{ data.expected_hours }} hrs</span>
-    {% else %}
-        <span class="badge bg-light text-dark">--</span>
-    {% endif %}
-</td>
-<td>
-    {% set totalMinutes = (data.total_hours * 60)|round(0, 'floor') %}
-    {% set hours = (totalMinutes / 60)|round(0, 'floor') %}
-    {% set minutes = totalMinutes - (hours * 60) %}
-    
-    {% if data.total_hours > 0 %}
-        <span class="badge bg-info">
-            {% if hours < 1 %}
-                {{ minutes }}min
-            {% else %}
-                {{ hours }}hr{% if minutes > 0 %} {{ minutes }}min{% endif %}
-            {% endif %}
-        </span>
-    {% else %}
-        <span class="badge bg-secondary">0min</span>
-    {% endif %}
-</td>
-<td>
-    {% if data.expected_hours > 0 %}
-        {% set percent = (data.total_hours / data.expected_hours * 100)|round %}
-        {% if percent >= 100 %}
-            <span class="badge bg-success">{{ percent }}%</span>
-        {% elseif percent >= 75 %}
-            <span class="badge bg-warning">{{ percent }}%</span>
-        {% else %}
-            <span class="badge bg-danger">{{ percent }}%</span>
-        {% endif %}
-    {% else %}
-        <span class="badge bg-light text-dark">--</span>
-    {% endif %}
-</td>
-<td>
-    {% if isHoliday %}
-        <span class="badge bg-info">Holiday</span>
-    {% elseif not isSchoolDay %}
-        <span class="badge bg-secondary">Weekend</span>
-    {% elseif data.is_excused %}
-        <span class="badge bg-warning" 
-              data-bs-toggle="tooltip" 
-              title="{{ data.excuse_reason }}">
-            Excused
-            {% if data.excuse_hours_per_day %}
-                ({{ data.excuse_hours_per_day }} hrs)
-            {% endif %}
-        </span>
-    {% elseif data.status == 'present' %}
-        <span class="badge bg-success">Present</span>
-    {% else %}
-        <span class="badge bg-danger">Absent</span>
-    {% endif %}
-</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% else %}
-                <div class="text-center py-5">
-                    <div class="mb-3">
-                        {% if isHoliday %}
-                            <i class="ti ti-calendar-event fs-1 text-info"></i>
-                        {% elseif not isSchoolDay %}
-                            <i class="ti ti-calendar-off fs-1 text-secondary"></i>
-                        {% else %}
-                            <i class="ti ti-calendar-off fs-1 text-muted"></i>
-                        {% endif %}
-                    </div>
-                    <h5 class="text-muted">
-                        {% if isHoliday %}
-                            No attendance required - Holiday
-                        {% elseif not isSchoolDay %}
-                            No attendance required - Weekend
-                        {% else %}
-                            No students found for {{ selectedDate|date('F j, Y') }}
-                        {% endif %}
-                    </h5>
-                    <p class="text-muted mb-0">
-                        {% if searchForm.applicant.vars.value or searchForm.institute.vars.value or searchForm.course.vars.value or searchForm.status.vars.value %}
-                            Try adjusting your filters
-                        {% elseif isSchoolDay and not isHoliday %}
-                            No enrolled students found
-                        {% endif %}
-                    </p>
-                </div>
-            {% endif %}
         </div>
-    </div>
 
-    <!-- Quick Date Navigation -->
-    <div class="card mt-4">
-        <div class="card-body">
-            <div class="d-flex justify-content-center gap-2">
-                <a href="{{ path('app_admin_attendance_index', {'date': selectedDate|date_modify('-1 day')|date('Y-m-d')}) }}" class="btn btn-outline-primary">
-                    <i class="ti ti-chevron-left me-2"></i>Previous Day
-                </a>
-                <a href="{{ path('app_admin_attendance_index') }}" class="btn btn-primary">
-                    <i class="ti ti-calendar me-2"></i>Today
-                </a>
-                <a href="{{ path('app_admin_attendance_index', {'date': selectedDate|date_modify('+1 day')|date('Y-m-d')}) }}" class="btn btn-outline-primary">
-                    Next Day<i class="ti ti-chevron-right ms-2"></i>
-                </a>
+        <!-- Quick Date Navigation -->
+        <div class="card mt-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-center gap-2">
+                    <a href="{{ path('app_admin_attendance_index', {'date': selectedDate|date_modify('-1 day')|date('Y-m-d')}) }}" class="btn btn-outline-primary">
+                        <i class="ti ti-chevron-left me-2"></i>Previous Day
+                    </a>
+                    <a href="{{ path('app_admin_attendance_index') }}" class="btn btn-primary">
+                        <i class="ti ti-calendar me-2"></i>Today
+                    </a>
+                    <a href="{{ path('app_admin_attendance_index', {'date': selectedDate|date_modify('+1 day')|date('Y-m-d')}) }}" class="btn btn-outline-primary">
+                        Next Day<i class="ti ti-chevron-right ms-2"></i>
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
-{% endif %}
+    {% endif %}
 {% endblock %}
 
 {% block javascripts %}
@@ -473,6 +493,12 @@
                     instituteSelect.dispatchEvent(new Event('change'));
                 }
             }
+            
+            // Initialize tooltips
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
         });
     </script>
 {% endblock %}
